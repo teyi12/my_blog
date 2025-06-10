@@ -1,13 +1,28 @@
 # Python
 __pycache__/
 *.py[cod]
-*.sqlite3
+*.egg-info/
+*.env
+*.venv
+.env
+.env.*
 
 # Django staticfiles
 staticfiles/
+media/
 
-# Environnement virtuel
-env/
+# SQLite
+db.sqlite3
 
-# Env file
-.env
+# VSCode/PyCharm
+.vscode/
+.idea/
+
+# Docker
+*.log
+.DS_Store
+
+# Build
+build/
+dist/
+*.egg
