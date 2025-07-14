@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+
+# Detect platform
+if [[ "$OSTYPE" == "msys" || "$OSTYPE" == "win32" || "$OSTYPE" == "cygwin" ]]; then
+  echo "🟦 Environnement Windows détecté : PowerShell requis"
+  pwsh -Command "& { ./setup_https_dev.ps1 }"
+else
+  echo "🟩 Environnement Linux/macOS ou Git Bash détecté"
+  bash ./setup_https_dev.sh
+fi
