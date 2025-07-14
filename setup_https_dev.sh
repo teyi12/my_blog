@@ -1,8 +1,8 @@
 #!/bin/bash
 
 echo "🔐 Création du dossier SSL et génération des certificats..."
-mkdir -p ssl
-openssl req -x509 -newkey rsa:4096 -keyout ssl/key.pem -out ssl/cert.pem -days 365 -nodes -subj "/C=FR/ST=Dev/L=Local/O=LocalDev/OU=Dev/CN=localhost"
+mkdir -p certs
+openssl req -x509 -newkey rsa:4096 -keyout certs/key.pem -out certs/cert.pem -days 365 -nodes -subj "/C=FR/ST=Dev/L=Local/O=LocalDev/OU=Dev/CN=localhost"
 
 echo "📦 Installation de django-sslserver..."
 pip install django-sslserver
@@ -31,4 +31,4 @@ EOF
 echo ""
 echo "🎉 Configuration terminée !"
 echo "➡️ Pour lancer le serveur HTTPS :"
-echo "python manage.py runsslserver --certificate ssl/cert.pem --key ssl/key.pem"
+echo "python manage.py runsslserver --certificate certs/cert.pem --key certs/key.pem"
