@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-certfile = 'certs/cert.pem'
-keyfile = 'certs/key.pem'
+# certfile = 'certs/cert.pem'
+# keyfile = 'certs/key.pem'
 
 # Detect platform
 if [[ "$OSTYPE" == "msys" || "$OSTYPE" == "win32" || "$OSTYPE" == "cygwin" ]]; then
