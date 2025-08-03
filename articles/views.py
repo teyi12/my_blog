@@ -1,15 +1,22 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import get_object_or_404
 from django.http import HttpResponse
 from django.urls import reverse
-
 from .forms import ArticleForm 
 from .models import Article
+from django.core.paginator import Paginator
+from django.contrib.auth.decorators import login_required
+
 
 def articles_view(request):
-    articles = Article.objects.all().order_by ('-date_publication')
-    return render(request, 'articles/list.html', context={'articles': articles})
+    article_list = Article.objects.all().order_by('-date_publication')
+    paginator = Paginator(article_list, 6)  # 6 articles par page
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    return render(request, 'articles/list.html', context={'page_obj': page_obj})
+
 
 def article_view(request, slug):
     article = get_object_or_404(Article, slug=slug)
