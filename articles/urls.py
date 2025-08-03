@@ -1,14 +1,12 @@
-from django.contrib import admin
-from django.urls import path, include 
-
+from django.urls import path
 from . import views
 
-app_name = "articles"
+app_name = 'articles'
 
 urlpatterns = [
-   
-    path('', views.articles_view, name='articles'),  # WICHTIG: Hier den "/" am Ende hinzufügen
-    path('creer/', views.creer_view, name='creer'),
-    path('<slug:slug>/', views.article_view, name='article'),  # Namensraum und Name müssen korrekt sein
+    path('', views.articles_view, name='articles'),
+    path('creer/', views.creer_view, name='article_creer'),
+    path('<slug:slug>/', views.article_view, name='article_detail'),
+    path('<slug:slug>/modifier/', views.modifier_view, name='article_modifier'),
+    path('<slug:slug>/supprimer/', views.supprimer_view, name='article_supprimer'),
 ]
-

@@ -1,0 +1,14 @@
+{% extends "template_base.html" %}
+{% block titre %}Supprimer l'article{% endblock %}
+
+{% block contenu %}
+  <div class="container mt-4">
+    <h3>Supprimer : {{ article.titre }}</h3>
+    <p>Es-tu sûr de vouloir supprimer cet article ?</p>
+    <form method="post">
+      {% csrf_token %}
+      <button class="btn btn-danger">Oui, supprimer</button>
+      <a href="{% url 'articles:articles' %}" class="btn btn-secondary">Annuler</a>
+    </form>
+  </div>
+{% endblock %}
