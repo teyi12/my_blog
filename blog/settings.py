@@ -29,6 +29,10 @@ EMAIL_USE_SSL = False
 EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
 EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
 
+AUTH_USER_MODEL = 'accounts.CustomUser'
+
+
+
 # Applications installées
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -39,8 +43,10 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'sslserver',
-    'articles',  # votre app
+    'articles',  
+    'accounts',
 ]
+
 
 # Middleware
 MIDDLEWARE = [
@@ -104,3 +110,9 @@ if DEBUG:
     SECURE_SSL_REDIRECT = False
     SESSION_COOKIE_SECURE = False
     CSRF_COOKIE_SECURE = False
+
+
+
+LOGIN_REDIRECT_URL = '/'
+LOGOUT_REDIRECT_URL = '/accounts/login/'
+LOGIN_URL = '/accounts/login/'

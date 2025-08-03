@@ -1,0 +1,20 @@
+{% extends 'template_base.html' %}
+{% load static %}
+{% block content %}
+<div class="container mt-5">
+  <h2 class="mb-4">Mon profil</h2>
+  <form method="POST" enctype="multipart/form-data" class="border p-4 bg-light rounded shadow-sm">
+    {% csrf_token %}
+    {% for field in form %}
+      <div class="mb-3">
+        <label class="form-label">{{ field.label_tag }}</label>
+        {{ field }}
+        {% if field.errors %}
+          <div class="text-danger">{{ field.errors }}</div>
+        {% endif %}
+      </div>
+    {% endfor %}
+    <button type="submit" class="btn btn-success">Enregistrer</button>
+  </form>
+</div>
+{% endblock %}

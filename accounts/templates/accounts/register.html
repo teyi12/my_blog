@@ -1,0 +1,15 @@
+{% extends "template_base.html" %}
+{% load static %}
+
+{% block titre %}Inscription{% endblock %}
+
+{% block contenu %}
+<div class="container mt-5">
+    <h2>Créer un compte</h2>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary">S'inscrire</button>
+    </form>
+</div>
+{% endblock %}
