@@ -1,0 +1,28 @@
+{% extends 'template_base.html' %}
+{% block titre %}{{ categorie.nom }}{% endblock %}
+
+{% block contenu %}
+<div class="container mt-4">
+    <h2>Produits de la catégorie : {{ categorie.nom }}</h2>
+    <div class="row">
+        {% for produit in produits %}
+            <div class="col-md-4 mb-3">
+                <div class="card">
+                    {% if produit.image %}
+                        <img src="{{ produit.image.url }}" class="card-img-top" alt="{{ produit.nom }}">
+                    {% endif %}
+                    <div class="card-body">
+                        <h5 class="card-title">{{ produit.nom }}</h5>
+                        <p class="card-text">{{ produit.prix }} €</p>
+                        <a href="{% url 'shop:detail' produit.slug %}" class="btn btn-primary">Voir</a>
+                    </div>
+                </div>
+            </div>
+        {% empty %}
+            <div class="col-12">
+                <p class="text-muted">Aucun produit dans cette catégorie.</p>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

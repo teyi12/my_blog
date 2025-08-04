@@ -7,6 +7,8 @@ from .forms import ArticleForm
 from .models import Article
 from django.core.paginator import Paginator
 from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+
 
 
 def articles_view(request):
@@ -21,8 +23,10 @@ def articles_view(request):
 def article_view(request, slug):
     article = get_object_or_404(Article, slug=slug)
     return render(request, 'articles/detail.html', context={'article': article})
+    if article.is_premium and not request.user.is_authenticated:
+        messages.warning(request, "Cet article est réservé aux abonnés.")
+        return redirect('login')
 
-from django.contrib.auth.decorators import login_required
 
 @login_required
 def creer_view(request):

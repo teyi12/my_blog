@@ -13,7 +13,7 @@ urlpatterns = [
     path('remerciement/', views.remerciement_view, name='remerciement'),
     path('articles/', include('articles.urls'), name='articles'),
     path('accounts/', include('accounts.urls')),
-
+    path('shop/', include('shop.urls')),
     
 ] 
 

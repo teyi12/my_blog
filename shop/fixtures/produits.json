@@ -1,0 +1,24 @@
+[
+  {
+    "model": "shop.produit",
+    "pk": 1,
+    "fields": {
+      "nom": "T-shirt Django",
+      "description": "Un t-shirt pour les développeurs Django.",
+      "prix": "19.99",
+      "slug": "tshirt-django",
+      "image": "default.jpg"
+    }
+  },
+  {
+    "model": "shop.produit",
+    "pk": 2,
+    "fields": {
+      "nom": "Mug Python",
+      "description": "Un mug pour caféiné les développeurs Python.",
+      "prix": "12.50",
+      "slug": "mug-python",
+      "image": "default.jpg"
+    }
+  }
+]

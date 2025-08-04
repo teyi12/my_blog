@@ -1,0 +1,54 @@
+{% extends 'template_base.html' %}
+{% block titre %}Votre panier{% endblock %}
+
+{% block contenu %}
+<div class="container">
+    <h2 class="mb-4">Votre panier</h2>
+
+    {% if panier %}
+        <table class="table table-bordered">
+            <thead class="thead-light">
+                <tr>
+                    <th>Nom de l'article</th>
+                    <th>Quantité</th>
+                    <th>Prix unitaire (€)</th>
+                    <th>Sous-total (€)</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for id, item in panier.items %}
+                <tr>
+                    <td>{{ item.nom }}</td>
+                    <td>
+                        <form method="post" class="form-inline">
+                            {% csrf_token %}
+                            <input type="hidden" name="article_id" value="{{ id }}">
+                            <input type="hidden" name="action" value="modifier">
+                            <input type="number" name="quantité" value="{{ item.quantité }}" min="1" class="form-control mr-2" style="width:80px;">
+                            <button type="submit" class="btn btn-sm btn-primary">Modifier</button>
+                        </form>
+                    </td>
+                    <td>{{ item.prix }}</td>
+                    <td>{{ item.prix|floatformat:2|add:"0"|floatformat:2|add:""|add:item.quantité|floatformat:2 }}</td>
+                    <td>
+                        <form method="post">
+                            {% csrf_token %}
+                            <input type="hidden" name="article_id" value="{{ id }}">
+                            <input type="hidden" name="action" value="supprimer">
+                            <button type="submit" class="btn btn-sm btn-danger">Supprimer</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <div class="text-right">
+            <h4>Total : {{ total|floatformat:2 }} €</h4>
+        </div>
+    {% else %}
+        <p>Votre panier est vide.</p>
+    {% endif %}
+</div>
+{% endblock %}

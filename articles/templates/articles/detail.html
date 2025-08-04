@@ -1,5 +1,5 @@
 {% extends 'template_base.html' %}
-
+{% load static %}
 
 {% block contenu %}
 <div class="container">
@@ -8,4 +8,16 @@
     <p>{{ article.contenu }}</p>
     <span>{{ article.date_publication }}</span>
 </div>
+{% if article.est_sponsorise %}
+<div class="alert alert-warning">
+  🏷 Article sponsorisé par <strong>{{ article.sponsor }}</strong>
+</div>
+<!-- Zone AdSense simulée -->
+<div class="my-3 text-center">
+    <img src="{% static 'adsense-placeholder.jpg' %}" alt="Publicité" style="width:100%; max-width: 728px;">
+    <p class="text-muted"><small>Emplacement pub (AdSense)</small></p>
+</div>
+
+{% endif %}
+
 {% endblock %}

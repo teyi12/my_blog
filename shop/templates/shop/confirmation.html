@@ -1,0 +1,11 @@
+{% extends 'template_base.html' %}
+{% block titre %}Commande validée{% endblock %}
+
+{% block contenu %}
+<div class="container mt-5">
+    <h2>Merci pour votre commande !</h2>
+    <p>Votre commande n° <strong>#{{ commande.id }}</strong> a été enregistrée avec succès.</p>
+    <p>Montant total : <strong>{{ commande.total }} €</strong></p>
+    <a href="{% url 'shop:liste' %}" class="btn btn-primary mt-3">Retour à la boutique</a>
+</div>
+{% endblock %}

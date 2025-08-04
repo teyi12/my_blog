@@ -1,0 +1,14 @@
+{% extends 'template_base.html' %}
+{% block titre %}Créer un produit{% endblock %}
+
+{% block contenu %}
+<div class="container mt-5">
+    <h2>Ajouter un nouveau produit</h2>
+    <form method="POST" enctype="multipart/form-data" class="mt-4">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-success">💾 Enregistrer</button>
+        <a href="{% url 'shop:liste' %}" class="btn btn-secondary">Annuler</a>
+    </form>
+</div>
+{% endblock %}
