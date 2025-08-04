@@ -30,7 +30,7 @@
                         </form>
                     </td>
                     <td>{{ item.prix }}</td>
-                    <td>{{ item.prix|floatformat:2|add:"0"|floatformat:2|add:""|add:item.quantité|floatformat:2 }}</td>
+                    <td>{{ item.prix|floatformat:2|add:"0"|floatformat:2|add:""|add:item.quantite|floatformat:2 }}</td>
                     <td>
                         <form method="post">
                             {% csrf_token %}

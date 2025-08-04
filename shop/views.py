@@ -3,10 +3,30 @@ from .models import Produit, Commande, LigneCommande
 from .forms import ProduitForm, AjouterAuPanierForm
 from decimal import Decimal
 from django.contrib.auth.decorators import login_required
+from django.core.paginator import Paginator
+from django.shortcuts import render
+from .models import Produit, Categorie
+
 
 def liste_produits(request):
+    categorie_id = request.GET.get('categorie')
     produits = Produit.objects.all()
-    return render(request, 'shop/liste.html', {'produits': produits})
+
+    if categorie_id:
+        produits = produits.filter(categorie__id=categorie_id)
+
+    paginator = Paginator(produits, 9)  # par ex. 9 produits par page
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    categories = Categorie.objects.all()
+
+    return render(request, 'shop/liste_produits.html', {
+        'page_obj': page_obj,
+        'categories': categories,
+        'categorie_id': int(categorie_id) if categorie_id else None,
+    })
+
 
 def detail_produit(request, slug):
     produit = get_object_or_404(Produit, slug=slug)
