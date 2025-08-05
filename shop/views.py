@@ -8,24 +8,19 @@ from django.shortcuts import render
 from .models import Produit, Categorie
 
 
-def liste_produits(request):
-    categorie_id = request.GET.get('categorie')
-    produits = Produit.objects.all()
 
-    if categorie_id:
-        produits = produits.filter(categorie__id=categorie_id)
 
-    paginator = Paginator(produits, 9)  # par ex. 9 produits par page
+
+def produits_liste(request):
+    produits = Produit.objects.all().order_by('nom')
+    paginator = Paginator(produits, 6)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
 
-    categories = Categorie.objects.all()
-
-    return render(request, 'shop/liste_produits.html', {
-        'page_obj': page_obj,
-        'categories': categories,
-        'categorie_id': int(categorie_id) if categorie_id else None,
+    return render(request, 'shop/liste.html', {
+        'page_obj': page_obj  # 👈 CORRECTION ICI
     })
+
 
 
 def detail_produit(request, slug):

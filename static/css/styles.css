@@ -21,3 +21,23 @@ input, textarea {
     margin-bottom: 16px;
 }
 
+.card-img-top {
+    object-fit: cover;
+    height: 200px;
+}
+
+body {
+    background-color: #f8f9fa;
+}
+.table thead {
+    background-color: #e9ecef;
+}
+.btn {
+    padding: 0.375rem 0.75rem;
+}
+.total {
+    font-size: 1.25rem;
+    font-weight: bold;
+    text-align: right;
+    margin-top: 20px;
+}

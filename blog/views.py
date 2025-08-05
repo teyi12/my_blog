@@ -2,11 +2,14 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
 from django.core.mail import send_mail                                                                        
-
+from shop.models import Produit
 from .forms import ContactForm
 
 def home_view(request):
-    return render(request, 'home.html')
+    produits_vedettes = Produit.objects.filter(en_vedette=True)[:6]
+    return render(request, 'home.html', {
+        'produits_vedettes': produits_vedettes
+    })
 
 def contact_view(request):
     form = ContactForm()

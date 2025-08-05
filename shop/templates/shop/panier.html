@@ -2,12 +2,12 @@
 {% block titre %}Votre panier{% endblock %}
 
 {% block contenu %}
-<div class="container">
+<div class="container my-5">
     <h2 class="mb-4">Votre panier</h2>
 
     {% if panier %}
-        <table class="table table-bordered">
-            <thead class="thead-light">
+        <table class="table table-bordered text-center align-middle">
+            <thead class="table-light">
                 <tr>
                     <th>Nom de l'article</th>
                     <th>Quantité</th>
@@ -21,16 +21,16 @@
                 <tr>
                     <td>{{ item.nom }}</td>
                     <td>
-                        <form method="post" class="form-inline">
+                        <form method="post" class="d-flex justify-content-center align-items-center gap-2">
                             {% csrf_token %}
                             <input type="hidden" name="article_id" value="{{ id }}">
                             <input type="hidden" name="action" value="modifier">
-                            <input type="number" name="quantité" value="{{ item.quantité }}" min="1" class="form-control mr-2" style="width:80px;">
+                            <input type="number" name="quantité" value="{{ item.quantité }}" min="1" class="form-control" style="width:80px;">
                             <button type="submit" class="btn btn-sm btn-primary">Modifier</button>
                         </form>
                     </td>
-                    <td>{{ item.prix }}</td>
-                    <td>{{ item.prix|floatformat:2|add:"0"|floatformat:2|add:""|add:item.quantite|floatformat:2 }}</td>
+                    <td>{{ item.prix|floatformat:2 }}</td>
+                    <td>{{ item.sous_total|floatformat:2 }}</td>
                     <td>
                         <form method="post">
                             {% csrf_token %}
@@ -44,7 +44,7 @@
             </tbody>
         </table>
 
-        <div class="text-right">
+        <div class="text-end mt-4">
             <h4>Total : {{ total|floatformat:2 }} €</h4>
         </div>
     {% else %}

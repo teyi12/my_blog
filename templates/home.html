@@ -1,73 +1,93 @@
 {% extends 'template_base.html' %}
 {% load static %}
 
-{% block titre %}Page d´acceuil{% endblock %}
+{% block titre %}Page d'accueil{% endblock %}
 
 {% block contenu %}
+
 <div class="jumbotron jumbotron-fluid">
     <div class="container text-center">
         <h1 class="display-4">Voyages</h1>
         <p class="lead text-muted">
-            Voyager c´est ma vie! Je vais vous faire decouvrir mes destinations
-            favorites á travers ce blog.
+            Voyager, c’est ma vie ! Je vais vous faire découvrir mes destinations
+            favorites à travers ce blog.
         </p>
-        <a href="{% url 'articles:articles' %}" type="button" class="btn btn-primary mb-4">
+        <a href="{% url 'articles:articles' %}" class="btn btn-primary mb-4">
             Articles
         </a>
-
     </div>
 </div>
 
 <div class="container">
-    <div class="row">
+    <div class="row align-items-center">
         <div class="col-lg mb-4">
-            <img class="w-100" src="{% get_media_prefix %}voyages.jpg" alt="Image de blog">
+            <img class="w-100 rounded shadow-sm" src="{% get_media_prefix %}voyages.jpg" alt="Image de blog">
         </div>
         <div class="col-lg text-justify">
             <h2>Mes Aventures</h2>
-
             <hr class="my-4">
             <p class="lead">
-                Bienvenue sur mon blog de voyage. Chaque année je découvre
-                une nouvelle ville á la recherche de délices culinaires et d´aventures.
-                Á travers ce blog, je partage ma passion pour l´exploration
+                Bienvenue sur mon blog de voyage. Chaque année, je découvre
+                une nouvelle ville à la recherche de délices culinaires et d’aventures.
+                À travers ce blog, je partage ma passion pour l’exploration
                 et vous fais découvrir des villes du monde dans toute leur splendeur.
             </p>
         </div>
     </div>
-    <hr class="my-4">
-    <div class="row">
 
-        <div class="col-lg-4 text-center">
-            <span class="fa-stack fa-5x">
+    <hr class="my-4">
+
+    <div class="row text-center">
+        <div class="col-lg-4 mb-4">
+            <span class="fa-stack fa-5x text-primary">
                 <i class="fa-solid fa-circle fa-stack-2x fa-inverse"></i>
-                <i class="fa-solid fa-hiking fa-stack-1x "></i>
+                <i class="fa-solid fa-hiking fa-stack-1x"></i>
             </span>
-            <h2 class="display-6">Randonnée</h2>
-            <p>À pieds, c´est encore mieux! Explorer des endroits où très peu de gens n´osent s´aventurer</p>
+            <h3 class="mt-3">Randonnée</h3>
+            <p>À pied, c’est encore mieux ! Explorer des endroits que peu de gens osent visiter.</p>
         </div>
 
-        <div class="col-lg-4 text-center">
-            <span class="fa-stack fa-5x">
+        <div class="col-lg-4 mb-4">
+            <span class="fa-stack fa-5x text-success">
                 <i class="fa-solid fa-circle fa-stack-2x fa-inverse"></i>
                 <i class="fa-solid fa-utensils fa-stack-1x"></i>
             </span>
-            <h2 class="display-6">Dégustations</h2>
-            <p>Aller á la découverte de nouvelles saveures.
-                des menus en couleur et épicés par des saveures á couper le souffle.
-            </p>
+            <h3 class="mt-3">Dégustations</h3>
+            <p>À la découverte de nouvelles saveurs : des menus colorés et épicés à couper le souffle.</p>
         </div>
 
-        <div class="col-lg-4 text-center">
-            <span class="fa-stack fa-5x">
+        <div class="col-lg-4 mb-4">
+            <span class="fa-stack fa-5x text-info">
                 <i class="fa-solid fa-circle fa-stack-2x fa-inverse"></i>
                 <i class="fa-solid fa-route fa-stack-1x"></i>
             </span>
-            <h2 class="display-6">Découvertes</h2>
-            <p>Des falaises, des caves, des plages á sable blanc s´étendant sur des kilomètres</p>
+            <h3 class="mt-3">Découvertes</h3>
+            <p>Des falaises, des grottes, des plages de sable blanc s’étendant sur des kilomètres.</p>
         </div>
     </div>
 
+    <hr class="my-4">
 
+    <h2 class="mt-5 mb-4 text-center">✨ Produits Vedettes</h2>
+    <div class="row">
+        {% for produit in produits_vedettes %}
+            <div class="col-md-4 mb-4 d-flex align-items-stretch">
+                <div class="card shadow-sm h-100">
+                    {% if produit.image %}
+                        <img src="{{ produit.image.url }}" class="card-img-top" alt="{{ produit.nom }}">
+                    {% endif %}
+                    <div class="card-body">
+                        <h5 class="card-title">{{ produit.nom }}</h5>
+                        <p class="card-text">{{ produit.description|truncatechars:100 }}</p>
+                        <p class="text-primary font-weight-bold">{{ produit.prix }} €</p>
+                        <a href="{% url 'shop:produit_detail' produit.slug %}" class="btn btn-outline-primary btn-sm">Voir le produit</a>
+                    </div>
+                </div>
+            </div>
+        {% empty %}
+            <p class="text-muted text-center w-100">Aucun produit vedette pour l’instant.</p>
+        {% endfor %}
+    </div>
 </div>
+
 {% endblock %}

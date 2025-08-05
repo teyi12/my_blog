@@ -24,6 +24,10 @@ class Produit(models.Model):
     image = models.ImageField(upload_to='produits/', blank=True, null=True)
     fichier = models.FileField(upload_to='produits/fichiers/', blank=True, null=True)
 
+    # Ajouts importants :
+    categorie = models.ForeignKey(Categorie, on_delete=models.SET_NULL, null=True, blank=True)
+    en_vedette = models.BooleanField(default=False)
+
     def __str__(self):
         return self.nom
 
