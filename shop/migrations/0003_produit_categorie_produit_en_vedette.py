@@ -7,18 +7,23 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('shop', '0002_categorie_alter_produit_image_alter_produit_nom_and_more'),
+        ("shop", "0002_categorie_alter_produit_image_alter_produit_nom_and_more"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='produit',
-            name='categorie',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='shop.categorie'),
+            model_name="produit",
+            name="categorie",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                to="shop.categorie",
+            ),
         ),
         migrations.AddField(
-            model_name='produit',
-            name='en_vedette',
+            model_name="produit",
+            name="en_vedette",
             field=models.BooleanField(default=False),
         ),
     ]

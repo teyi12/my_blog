@@ -7,20 +7,32 @@ class Migration(migrations.Migration):
 
     initial = True
 
-    dependencies = [
-    ]
+    dependencies = []
 
     operations = [
         migrations.CreateModel(
-            name='Produit',
+            name="Produit",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('nom', models.CharField(max_length=150)),
-                ('description', models.TextField()),
-                ('prix', models.DecimalField(decimal_places=2, max_digits=8)),
-                ('image', models.ImageField(upload_to='produits/')),
-                ('fichier', models.FileField(blank=True, null=True, upload_to='produits/fichiers/')),
-                ('slug', models.SlugField(blank=True, unique=True)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("nom", models.CharField(max_length=150)),
+                ("description", models.TextField()),
+                ("prix", models.DecimalField(decimal_places=2, max_digits=8)),
+                ("image", models.ImageField(upload_to="produits/")),
+                (
+                    "fichier",
+                    models.FileField(
+                        blank=True, null=True, upload_to="produits/fichiers/"
+                    ),
+                ),
+                ("slug", models.SlugField(blank=True, unique=True)),
             ],
         ),
     ]

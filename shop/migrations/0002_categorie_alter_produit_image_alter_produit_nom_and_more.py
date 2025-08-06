@@ -8,51 +8,97 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('shop', '0001_initial'),
+        ("shop", "0001_initial"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Categorie',
+            name="Categorie",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('nom', models.CharField(max_length=100)),
-                ('slug', models.SlugField(unique=True)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("nom", models.CharField(max_length=100)),
+                ("slug", models.SlugField(unique=True)),
             ],
         ),
         migrations.AlterField(
-            model_name='produit',
-            name='image',
-            field=models.ImageField(blank=True, null=True, upload_to='produits/'),
+            model_name="produit",
+            name="image",
+            field=models.ImageField(blank=True, null=True, upload_to="produits/"),
         ),
         migrations.AlterField(
-            model_name='produit',
-            name='nom',
+            model_name="produit",
+            name="nom",
             field=models.CharField(max_length=255),
         ),
         migrations.AlterField(
-            model_name='produit',
-            name='slug',
+            model_name="produit",
+            name="slug",
             field=models.SlugField(unique=True),
         ),
         migrations.CreateModel(
-            name='Commande',
+            name="Commande",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('date_commande', models.DateTimeField(auto_now_add=True)),
-                ('total', models.DecimalField(decimal_places=2, default=0, max_digits=8)),
-                ('client', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='commandes', to=settings.AUTH_USER_MODEL)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("date_commande", models.DateTimeField(auto_now_add=True)),
+                (
+                    "total",
+                    models.DecimalField(decimal_places=2, default=0, max_digits=8),
+                ),
+                (
+                    "client",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="commandes",
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='LigneCommande',
+            name="LigneCommande",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('quantite', models.PositiveIntegerField(default=1)),
-                ('prix_unitaire', models.DecimalField(decimal_places=2, max_digits=8)),
-                ('commande', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='lignes', to='shop.commande')),
-                ('produit', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='shop.produit')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("quantite", models.PositiveIntegerField(default=1)),
+                ("prix_unitaire", models.DecimalField(decimal_places=2, max_digits=8)),
+                (
+                    "commande",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="lignes",
+                        to="shop.commande",
+                    ),
+                ),
+                (
+                    "produit",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE, to="shop.produit"
+                    ),
+                ),
             ],
         ),
     ]
