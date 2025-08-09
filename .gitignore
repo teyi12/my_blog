@@ -1,28 +1,42 @@
-# Python
+# --- Fichiers Python ---
 __pycache__/
 *.py[cod]
-*.egg-info/
+*.pyo
+*.pyd
+*.pyc
+
+# --- Environnement virtuel ---
+venv/
+ENV/
+env/
+.venv/
+
+# --- Base de données locale ---
+db.sqlite3
+
+# --- Migrations compilées ---
+*/migrations/__pycache__/
+*/migrations/*.pyc
+
+# --- Fichiers de configuration locaux ---
 *.env
-*.venv
-.env
 .env.*
 
-# Django staticfiles
+# --- Cache et logs ---
+*.log
+*.pot
+*.pyc
+*.mo
+*.swp
+.DS_Store
+
+# --- Fichiers générés par Django ---
 staticfiles/
 media/
 
-# SQLite
-db.sqlite3
-
-# VSCode/PyCharm
+# --- VS Code ---
 .vscode/
-.idea/
 
-# Docker
-*.log
-.DS_Store
-
-# Build
-build/
-dist/
+# --- Python egg ---
+*.egg-info/
 *.egg
