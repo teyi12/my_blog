@@ -10,9 +10,6 @@ urlpatterns = [
     path("ajouter/<slug:slug>/", views.ajouter_au_panier, name="ajouter"),
     path("panier/", views.afficher_panier, name="panier"),
     path("commander/", views.passer_commande, name="commander"),
-    path(
-        "categorie/<slug:slug>/",
-        views.produits_par_categorie,
-        name="produits_par_categorie",
-    ),
+    path("categorie/<slug:slug>/", views.produits_par_categorie, name="produits_par_categorie"),
+    path("checkout/", views.checkout, name="checkout",)
 ]

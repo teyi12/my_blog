@@ -45,8 +45,14 @@ INSTALLED_APPS = [
     "articles",
     "accounts",
     "shop",
+    "payments",
+    "social",
 ]
 
+SITE_ID = 1
+
+DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+AUTH_USER_MODEL = "accounts.CustomUser"
 
 # Middleware
 MIDDLEWARE = [
@@ -105,6 +111,7 @@ STATIC_ROOT = BASE_DIR / "staticfiles"
 
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
+MEDIA_ROOT = os.path.join(BASE_DIR, "static/media")
 
 
 # Clé auto-incrémentée par défaut
@@ -126,3 +133,20 @@ STRIPE_PUBLIC_KEY = os.getenv("STRIPE_PUBLIC_KEY", "")
 STRIPE_SECRET_KEY = os.getenv("STRIPE_SECRET_KEY", "")
 STRIPE_WEBHOOK_SECRET = os.getenv("STRIPE_WEBHOOK_SECRET", "")
 
+STRIPE_PRICE_MONTHLY = os.getenv("STRIPE_PRICE_MONTHLY", "")
+
+
+
+
+# Mobile Money (exemple PayDunya / Flutterwave)
+MOBILE_MONEY_API_KEY = os.getenv("MOBILE_MONEY_API_KEY")
+MOBILE_MONEY_SECRET_KEY = os.getenv("MOBILE_MONEY_SECRET_KEY")
+MOBILE_MONEY_BASE_URL = "https://app.paydunya.com/api/v1/checkout-invoice/create"
+
+
+
+# CINETPAY
+CINETPAY_API_KEY = os.getenv("CINETPAY_API_KEY", "")
+CINETPAY_SITE_ID = os.getenv("CINETPAY_SITE_ID", "")
+CINETPAY_BASE_URL = os.getenv("CINETPAY_BASE_URL", "https://api-checkout.cinetpay.com/v2")
+DEFAULT_CURRENCY = os.getenv("DEFAULT_CURRENCY", "XOF")

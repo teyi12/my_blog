@@ -1,12 +1,12 @@
 from django.db import models
 from django.conf import settings
-
 from django.utils.text import slugify
+from decimal import Decimal
 
 
 class Categorie(models.Model):
     nom = models.CharField(max_length=100)
-    slug = models.SlugField(unique=True)
+    slug = models.SlugField(unique=True, blank=True)
 
     def save(self, *args, **kwargs):
         if not self.slug:
@@ -19,17 +19,21 @@ class Categorie(models.Model):
 
 class Produit(models.Model):
     nom = models.CharField(max_length=255)
-    slug = models.SlugField(unique=True)
-    description = models.TextField()
-    prix = models.DecimalField(max_digits=8, decimal_places=2)
+    slug = models.SlugField(unique=True, blank=True)
+    description = models.TextField(blank=True)
+    prix = models.DecimalField(max_digits=10, decimal_places=2)
     image = models.ImageField(upload_to="produits/", blank=True, null=True)
     fichier = models.FileField(upload_to="produits/fichiers/", blank=True, null=True)
 
-    # Ajouts importants :
     categorie = models.ForeignKey(
         Categorie, on_delete=models.SET_NULL, null=True, blank=True
     )
     en_vedette = models.BooleanField(default=False)
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.nom)
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return self.nom
@@ -39,16 +43,55 @@ class Commande(models.Model):
     client = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
-        related_name="commandes",  # <- important pour éviter les conflits
+        related_name="commandes",
+    )
+    adresse = models.ForeignKey(  # 👈 nouvelle relation
+        "payments.Adresse",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="commandes"
     )
     date_commande = models.DateTimeField(auto_now_add=True)
-    total = models.DecimalField(max_digits=8, decimal_places=2, default=0)
+    total = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    transaction_id = models.CharField(max_length=100, blank=True, null=True)
+    payment_status = models.CharField(
+        max_length=20,
+        choices=[
+            ("PENDING", "En attente"),
+            ("SUCCESS", "Payée"),
+            ("FAILED", "Échouée"),
+        ],
+        default="PENDING",
+    )
+    payment_channel = models.CharField(
+        max_length=20,
+        choices=[
+            ("CARD", "Carte bancaire"),
+            ("MOBILE_MONEY", "Mobile Money"),
+            ("STRIPE", "Stripe"),
+        ],
+        blank=True,
+        null=True,
+    )
+    currency = models.CharField(
+        max_length=10,
+        choices=[
+            ("EUR", "Euro"),
+            ("USD", "Dollar"),
+            ("XOF", "Franc CFA"),
+        ],
+        default="EUR"
+    )
 
     def __str__(self):
-        return f"Commande #{self.id} - {self.client.email}"
+        return f"Commande #{self.id} - {self.client}"
 
-    def __str__(self):
-        return f"Commande #{self.id} - {self.client.email}"
+    def recalculate_total(self):
+        total = sum(lc.quantite * lc.prix_unitaire for lc in self.lignes.all())
+        self.total = total
+        self.save(update_fields=["total"])
+        return self.total
 
 
 class LigneCommande(models.Model):
@@ -57,7 +100,20 @@ class LigneCommande(models.Model):
     )
     produit = models.ForeignKey(Produit, on_delete=models.CASCADE)
     quantite = models.PositiveIntegerField(default=1)
-    prix_unitaire = models.DecimalField(max_digits=8, decimal_places=2)
+    prix_unitaire = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+
+    def save(self, *args, **kwargs):
+        # Si prix_unitaire n’est pas défini, on prend celui du produit
+        if not self.prix_unitaire and self.produit:
+            self.prix_unitaire = self.produit.prix
+        super().save(*args, **kwargs)
 
     def sous_total(self):
-        return self.quantite * self.prix_unitaire
+        # Sécurisation : éviter None ou erreurs
+        if not self.prix_unitaire:
+            return Decimal(0)
+        return Decimal(self.quantite) * self.prix_unitaire
+
+    def __str__(self):
+        return f"{self.quantite} x {self.produit.nom}"
+

@@ -1,0 +1,13 @@
+{% extends 'template_base.html' %}
+{% block titre %}Mode de payement{% endblock %}
+
+<h2>Choisissez votre mode de payement</h2>
+<p>Total à payer : {{ commande.total }} €</p>
+
+<a href="{% url 'payments:stripe_checkout' commande.id %}" class="btn btn-primary">
+    💳 Payer par carte
+</a>
+
+<a href="{% url 'payments:mobile_checkout' commande.id %}" class="btn btn-success">
+    📱 Payer par Mobile Money
+</a>

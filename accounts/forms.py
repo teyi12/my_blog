@@ -28,3 +28,9 @@ class CustomUserUpdateForm(forms.ModelForm):
     class Meta:
         model = CustomUser
         fields = ["first_name", "last_name", "photo", "telephone", "bio"]
+
+
+class ProfileForm(forms.ModelForm):
+    class Meta:
+        model = CustomUser
+        fields = ("first_name","last_name","photo","bio")

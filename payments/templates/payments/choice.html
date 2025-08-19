@@ -1,0 +1,84 @@
+{% extends 'template_base.html' %}
+{% block titre %}Choisir un mode de paiement{% endblock %}
+
+{% block contenu %}
+<div class="container py-5">
+  <h2 class="text-center mb-4">Choisissez votre mode de paiement</h2>
+  <div class="row g-4 justify-content-center">
+
+    <!-- Don ponctuel -->
+    <div class="col-md-4">
+      <div class="card shadow-sm p-4 border-0 rounded-4 text-center">
+        <h4>Don ponctuel</h4>
+        <p class="text-muted">Soutenez le projet avec le montant de votre choix.</p>
+        <form action="{% url 'payments:create_donation_checkout' %}" method="post">
+          {% csrf_token %}
+          <div class="mb-3">
+            <input type="number" name="amount" class="form-control" placeholder="Montant" required min="1">
+          </div>
+          <div class="mb-3">
+            <select name="currency" class="form-select">
+              <option value="eur">EUR €</option>
+              <option value="usd">USD $</option>
+              <option value="xof">XOF CFA</option>
+              <option value="xaf">XAF CFA</option>
+            </select>
+          </div>
+          <button type="submit" class="btn btn-success w-100">💖 Faire un don</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Paiement Stripe -->
+    <div class="col-md-4">
+      <div class="card shadow-sm p-4 border-0 rounded-4 text-center">
+        <h4>Paiement par carte</h4>
+        <p class="text-muted">Réglez une commande avec Stripe.</p>
+        <form action="{% url 'shop:checkout' %}" method="get">
+          <div class="mb-3">
+            <input type="text" name="order_id" class="form-control" placeholder="ID de la commande" required>
+          </div>
+          <button type="submit" class="btn btn-primary w-100">💳 Payer ma commande</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Paiement Mobile Money (CinetPay) -->
+    <div class="col-md-4">
+      <div class="card shadow-sm p-4 border-0 rounded-4 text-center">
+        <h4>Mobile Money</h4>
+        <p class="text-muted">Orange Money, MTN, Moov, Wave…</p>
+        <form id="cinetpay-form" method="get">
+          <div class="mb-3">
+            <input type="text" name="order_id" id="order_id" class="form-control" placeholder="ID de la commande" required>
+          </div>
+          <div class="mb-3">
+            <select name="channel" class="form-select">
+              <option value="MOBILE_MONEY">Mobile Money</option>
+              <option value="CARD">Carte bancaire (CinetPay)</option>
+            </select>
+          </div>
+          <button type="submit" class="btn btn-warning w-100">📱 Payer avec Mobile Money</button>
+        </form>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Script pour injecter order_id dans l’URL -->
+<script>
+  document.getElementById("cinetpay-form").addEventListener("submit", function (event) {
+    event.preventDefault(); // bloque l’envoi normal
+    const orderId = document.getElementById("order_id").value.trim();
+    if (!orderId) {
+      alert("Veuillez entrer un ID de commande.");
+      return;
+    }
+    // Redirige vers l’URL Django avec l’order_id saisi
+    const url = "{% url 'payments:cinetpay_create' order_id=0 %}".replace("0", orderId);
+    this.action = url;
+    this.submit(); // envoi final
+  });
+</script>
+{% endblock %}

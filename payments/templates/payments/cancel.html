@@ -1,0 +1,9 @@
+{% extends 'template_base.html' %}
+{% block titre %}Paiement annulé{% endblock %}
+{% block contenu %}
+<div class="container text-center py-5">
+  <h1 class="text-warning">⚠️ Paiement annulé</h1>
+  <p class="text-muted">Vous pouvez réessayer quand vous voulez.</p>
+  <a href="{% url 'payments:choice' %}" class="btn btn-outline-secondary mt-3">⬅ Retour aux paiements</a>
+</div>
+{% endblock %}

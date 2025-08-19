@@ -1,0 +1,45 @@
+{% extends 'template_base.html' %}
+{% block titre %}Modes de paiement{% endblock %}
+
+{% block contenu %}
+<div class="container my-5">
+    <h2 class="mb-4 text-center">Choisissez votre mode de paiement</h2>
+
+    <div class="row g-4 justify-content-center">
+        
+        <!-- Paiement par Carte Bancaire -->
+        <div class="col-md-4">
+            <div class="card shadow-sm h-100 text-center p-3">
+                <div class="card-body">
+                    <h5 class="card-title">💳 Carte Bancaire</h5>
+                    <p class="card-text">Payez en toute sécurité avec votre carte Visa, Mastercard ou autre carte bancaire.</p>
+                    <a href="{% url 'paiement_carte' %}" class="btn btn-primary w-100">Payer par carte</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Paiement via PayPal -->
+        <div class="col-md-4">
+            <div class="card shadow-sm h-100 text-center p-3">
+                <div class="card-body">
+                    <h5 class="card-title">🅿️ PayPal</h5>
+                    <p class="card-text">Utilisez votre compte PayPal pour un paiement rapide et sécurisé.</p>
+                    <a href="{% url 'paiement_paypal' %}" class="btn btn-warning w-100">Payer avec PayPal</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Paiement Mobile Money -->
+        <div class="col-md-4">
+            <div class="card shadow-sm h-100 text-center p-3">
+                <div class="card-body">
+                    <h5 class="card-title">📱 Mobile Money</h5>
+                    <p class="card-text">Payez facilement avec votre compte Mobile Money (Orange Money, MTN, etc.).</p>
+                    <a href="{% url 'paiement_mobile' %}" class="btn btn-success w-100">Payer avec Mobile Money</a>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

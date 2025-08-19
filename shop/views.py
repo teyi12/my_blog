@@ -10,7 +10,7 @@ from .models import Produit, Categorie
 
 def produits_liste(request):
     produits = Produit.objects.all().order_by("nom")
-    paginator = Paginator(produits, 6)
+    paginator = Paginator(produits, 4)
     page_number = request.GET.get("page")
     page_obj = paginator.get_page(page_number)
 
@@ -18,6 +18,8 @@ def produits_liste(request):
         request, "shop/liste.html", {"page_obj": page_obj}  # 👈 CORRECTION ICI
     )
 
+def checkout(request):
+    return render(request, "shop/checkout.html")
 
 def detail_produit(request, slug):
     produit = get_object_or_404(Produit, slug=slug)
@@ -52,39 +54,26 @@ from django.shortcuts import render, get_object_or_404, redirect
 from .models import Produit
 
 
+from django.shortcuts import render, redirect
+from .cart import get_cart_details, update_quantity, remove_from_cart
+
 def afficher_panier(request):
-    panier = request.session.get("panier", {})
-    panier_detail = {}
-    total = Decimal("0")
-
-    for produit_id, quantite in panier.items():
-        produit = get_object_or_404(Produit, pk=produit_id)
-        sous_total = produit.prix * quantite
-        panier_detail[produit_id] = {
-            "nom": produit.nom,
-            "prix": produit.prix,
-            "quantite": quantite,
-            "sous_total": sous_total,
-        }
-        total += sous_total
-
-    # Gestion des actions POST (modifier/supprimer)
+    # Gestion des actions POST
     if request.method == "POST":
         action = request.POST.get("action")
         produit_id = request.POST.get("article_id")
 
-        if produit_id and produit_id in panier:
+        if produit_id:
             if action == "modifier":
                 nouvelle_quantite = int(request.POST.get("quantité", 1))
-                if nouvelle_quantite > 0:
-                    panier[produit_id] = nouvelle_quantite
-                else:
-                    panier.pop(produit_id)
+                update_quantity(request.session, produit_id, nouvelle_quantite)
             elif action == "supprimer":
-                panier.pop(produit_id)
+                remove_from_cart(request.session, produit_id)
 
-            request.session["panier"] = panier
-            return redirect("shop:panier")
+        return redirect("shop:panier")
+
+    # Récupération des détails du panier
+    panier_detail, total = get_cart_details(request.session)
 
     context = {
         "panier": panier_detail,
