@@ -36,15 +36,43 @@ def creer_produit(request):
     return render(request, "shop/creer.html", {"form": form})
 
 
+from django.shortcuts import get_object_or_404, redirect
+from .models import Produit
+
 def ajouter_au_panier(request, slug):
     produit = get_object_or_404(Produit, slug=slug)
     form = AjouterAuPanierForm(request.POST)
     if form.is_valid():
         panier = request.session.get("panier", {})
         quantite = int(form.cleaned_data["quantite"])
-        panier[str(produit.id)] = panier.get(str(produit.id), 0) + quantite
+
+        produit_id = str(produit.id)
+
+        # Vérifier si c'est encore l'ancien format (int)
+        if produit_id in panier and isinstance(panier[produit_id], int):
+            panier[produit_id] = {
+                "nom": produit.nom,
+                "slug": produit.slug,
+                "prix": str(produit.prix),
+                "quantite": panier[produit_id] + quantite,
+                "image": produit.image.url if produit.image else None,
+            }
+        elif produit_id in panier:
+            panier[produit_id]["quantite"] += quantite
+        else:
+            panier[produit_id] = {
+                "nom": produit.nom,
+                "slug": produit.slug,
+                "prix": str(produit.prix),
+                "quantite": quantite,
+                "image": produit.image.url if produit.image else None,
+            }
+
         request.session["panier"] = panier
+
     return redirect("shop:panier")
+
+
 
 
 from django.urls import reverse
@@ -54,33 +82,51 @@ from django.shortcuts import render, get_object_or_404, redirect
 from .models import Produit
 
 
-from django.shortcuts import render, redirect
-from .cart import get_cart_details, update_quantity, remove_from_cart
-
 def afficher_panier(request):
-    # Gestion des actions POST
+    panier = request.session.get("panier", {})
+    panier_detail = {}
+    total = Decimal("0")
+
+    for produit_id, item in panier.items():
+        produit = get_object_or_404(Produit, pk=produit_id)
+
+        quantite = int(item["quantite"])
+        prix = Decimal(item["prix"])
+        sous_total = prix * quantite
+
+        panier_detail[produit_id] = {
+            "nom": produit.nom,
+            "slug": produit.slug,
+            "prix": prix,
+            "quantite": quantite,
+            "sous_total": sous_total,
+            "image": item.get("image"),
+        }
+        total += sous_total
+
+    # Gestion des actions POST (modifier/supprimer)
     if request.method == "POST":
         action = request.POST.get("action")
         produit_id = request.POST.get("article_id")
 
-        if produit_id:
+        if produit_id and produit_id in panier:
             if action == "modifier":
                 nouvelle_quantite = int(request.POST.get("quantité", 1))
-                update_quantity(request.session, produit_id, nouvelle_quantite)
+                if nouvelle_quantite > 0:
+                    panier[produit_id]["quantite"] = nouvelle_quantite
+                else:
+                    panier.pop(produit_id)
             elif action == "supprimer":
-                remove_from_cart(request.session, produit_id)
+                panier.pop(produit_id)
 
-        return redirect("shop:panier")
-
-    # Récupération des détails du panier
-    panier_detail, total = get_cart_details(request.session)
+            request.session["panier"] = panier
+            return redirect("shop:panier")
 
     context = {
         "panier": panier_detail,
         "total": total,
     }
     return render(request, "shop/panier.html", context)
-
 
 @login_required
 def passer_commande(request):
@@ -91,24 +137,31 @@ def passer_commande(request):
     commande = Commande.objects.create(client=request.user)
     total = Decimal("0")
 
-    for produit_id, quantite in panier.items():
+    for produit_id, item in panier.items():
         produit = get_object_or_404(Produit, pk=produit_id)
+
+        quantite = int(item["quantite"])
+        prix = Decimal(item["prix"])
+
         ligne = LigneCommande.objects.create(
             commande=commande,
             produit=produit,
             quantite=quantite,
-            prix_unitaire=produit.prix,
+            prix_unitaire=prix,
         )
         total += ligne.sous_total()
 
     commande.total = total
     commande.save()
+
+    # Vider le panier après commande
     request.session["panier"] = {}
 
-    return render(request, "shop/confirmation.html", {"commande": commande})
-
-
-# shop/views.py
+    # 🔑 On passe aussi les lignes de commande au template
+    return render(request, "shop/confirmation.html", {
+        "commande": commande,
+        "lignes": commande.lignes.all(),
+    })
 
 # shop/views.py
 
@@ -127,3 +180,4 @@ def produits_par_categorie(request, slug):
             "produits": produits,
         },
     )
+

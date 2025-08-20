@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth import get_user_model
+from django.utils.text import slugify
 
 
 class Article(models.Model):
@@ -22,3 +23,8 @@ class Article(models.Model):
 
     def __str__(self):
         return self.titre
+    
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.titre)
+        super().save(*args, **kwargs)

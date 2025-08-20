@@ -1,11 +1,40 @@
-{% extends 'template_base.html' %}
-{% block titre %}Commande validée{% endblock %}
-
-{% block contenu %}
+{% extends "base.html" %}
+{% block content %}
 <div class="container mt-5">
-    <h2>Merci pour votre commande !</h2>
-    <p>Votre commande n° <strong>#{{ commande.id }}</strong> a été enregistrée avec succès.</p>
-    <p>Montant total : <strong>{{ commande.total }} €</strong></p>
+    <h2>Merci pour votre commande ! 🎉</h2>
+    <p>Commande #{{ commande.id }} passée le {{ commande.date_commande|date:"d/m/Y H:i" }}</p>
+
+    <table class="table table-bordered mt-4">
+        <thead>
+            <tr>
+                <th>Image</th>
+                <th>Produit</th>
+                <th>Quantité</th>
+                <th>Prix unitaire</th>
+                <th>Sous-total</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for ligne in lignes %}
+            <tr>
+                <td>
+                    {% if ligne.produit.image %}
+                        <img src="{{ ligne.produit.image.url }}" alt="{{ ligne.produit.nom }}" width="60">
+                    {% else %}
+                        <span class="text-muted">Pas d'image</span>
+                    {% endif %}
+                </td>
+                <td>{{ ligne.produit.nom }}</td>
+                <td>{{ ligne.quantite }}</td>
+                <td>{{ ligne.prix_unitaire }} €</td>
+                <td>{{ ligne.sous_total }} €</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <h4 class="text-end">💰 Total : {{ commande.total }} €</h4>
+
     <a href="{% url 'shop:liste' %}" class="btn btn-primary mt-3">Retour à la boutique</a>
 </div>
 {% endblock %}

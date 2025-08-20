@@ -46,8 +46,26 @@ from django.contrib.auth.models import User
 from django.conf import settings
 from django.db import models
 
+from django.db import models
+from django.conf import settings
+
+
 class Adresse(models.Model):
-    utilisateur = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    TYPE_ADRESSE_CHOICES = [
+        ("LIVRAISON", "Adresse de livraison"),
+        ("FACTURATION", "Adresse de facturation"),
+    ]
+
+    utilisateur = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="adresses"
+    )
+    type_adresse = models.CharField(
+        max_length=20,
+        choices=TYPE_ADRESSE_CHOICES,
+        default="LIVRAISON"
+    )
     rue = models.CharField(max_length=255)
     ville = models.CharField(max_length=100)
     code_postal = models.CharField(max_length=20)
@@ -56,5 +74,6 @@ class Adresse(models.Model):
     cree_le = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"{self.rue}, {self.ville}, {self.pays}"
+        return f"[{self.get_type_adresse_display()}] {self.rue}, {self.ville}, {self.pays}"
+
 

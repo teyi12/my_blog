@@ -58,10 +58,15 @@ class AdresseInline(admin.TabularInline):  # ou StackedInline si tu veux en form
     readonly_fields = ("cree_le",)
 
 
+from django.contrib import admin
+from .models import Adresse
+
+
 @admin.register(Adresse)
 class AdresseAdmin(admin.ModelAdmin):
     list_display = (
         "utilisateur",
+        "type_adresse",
         "rue",
         "ville",
         "code_postal",
@@ -69,7 +74,7 @@ class AdresseAdmin(admin.ModelAdmin):
         "telephone",
         "cree_le",
     )
-    list_filter = ("pays", "ville", "cree_le")
+    list_filter = ("type_adresse", "pays", "ville", "cree_le")
     search_fields = (
         "utilisateur__username",
         "utilisateur__email",
@@ -80,5 +85,4 @@ class AdresseAdmin(admin.ModelAdmin):
     )
     autocomplete_fields = ("utilisateur",)
     ordering = ("-cree_le",)
-
 
