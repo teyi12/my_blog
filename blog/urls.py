@@ -3,6 +3,9 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 from django.views.generic import TemplateView
+from django.contrib import admin
+from django.urls import path, include
+from monetization.admin import custom_admin_site
 
 
 from . import views
@@ -18,6 +21,7 @@ urlpatterns = [
     path("shop/", include("shop.urls")),
     path("social/", include("social.urls")),
     path("payments/", include("payments.urls", namespace="payments")),
+    path("monetization/", include("monetization.urls")),
 ]
 
 

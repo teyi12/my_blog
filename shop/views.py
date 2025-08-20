@@ -35,66 +35,22 @@ def creer_produit(request):
         return redirect("shop:liste")
     return render(request, "shop/creer.html", {"form": form})
 
-
-from django.shortcuts import get_object_or_404, redirect
-from .models import Produit
-
-def ajouter_au_panier(request, slug):
-    produit = get_object_or_404(Produit, slug=slug)
-    form = AjouterAuPanierForm(request.POST)
-    if form.is_valid():
-        panier = request.session.get("panier", {})
-        quantite = int(form.cleaned_data["quantite"])
-
-        produit_id = str(produit.id)
-
-        # Vérifier si c'est encore l'ancien format (int)
-        if produit_id in panier and isinstance(panier[produit_id], int):
-            panier[produit_id] = {
-                "nom": produit.nom,
-                "slug": produit.slug,
-                "prix": str(produit.prix),
-                "quantite": panier[produit_id] + quantite,
-                "image": produit.image.url if produit.image else None,
-            }
-        elif produit_id in panier:
-            panier[produit_id]["quantite"] += quantite
-        else:
-            panier[produit_id] = {
-                "nom": produit.nom,
-                "slug": produit.slug,
-                "prix": str(produit.prix),
-                "quantite": quantite,
-                "image": produit.image.url if produit.image else None,
-            }
-
-        request.session["panier"] = panier
-
-    return redirect("shop:panier")
-
-
-
-
-from django.urls import reverse
-
-from decimal import Decimal
-from django.shortcuts import render, get_object_or_404, redirect
-from .models import Produit
-
-
 def afficher_panier(request):
     panier = request.session.get("panier", {})
     panier_detail = {}
     total = Decimal("0")
 
-    for produit_id, item in panier.items():
-        produit = get_object_or_404(Produit, pk=produit_id)
+    for slug, item in panier.items():
+        try:
+            produit = Produit.objects.get(slug=slug)
+        except Produit.DoesNotExist:
+            continue  # produit supprimé de la BDD
 
-        quantite = int(item["quantite"])
+        quantite = int(item.get("quantite", 1))
         prix = Decimal(item["prix"])
         sous_total = prix * quantite
 
-        panier_detail[produit_id] = {
+        panier_detail[slug] = {
             "nom": produit.nom,
             "slug": produit.slug,
             "prix": prix,
@@ -104,20 +60,19 @@ def afficher_panier(request):
         }
         total += sous_total
 
-    # Gestion des actions POST (modifier/supprimer)
     if request.method == "POST":
         action = request.POST.get("action")
-        produit_id = request.POST.get("article_id")
+        slug_post = request.POST.get("article_id")
 
-        if produit_id and produit_id in panier:
+        if slug_post and slug_post in panier:
             if action == "modifier":
-                nouvelle_quantite = int(request.POST.get("quantité", 1))
+                nouvelle_quantite = int(request.POST.get("quantite", 1))
                 if nouvelle_quantite > 0:
-                    panier[produit_id]["quantite"] = nouvelle_quantite
+                    panier[slug_post]["quantite"] = nouvelle_quantite
                 else:
-                    panier.pop(produit_id)
+                    panier.pop(slug_post)
             elif action == "supprimer":
-                panier.pop(produit_id)
+                panier.pop(slug_post)
 
             request.session["panier"] = panier
             return redirect("shop:panier")
@@ -127,6 +82,49 @@ def afficher_panier(request):
         "total": total,
     }
     return render(request, "shop/panier.html", context)
+
+
+# shop/views.py
+# shop/views.py
+from django.shortcuts import get_object_or_404, redirect
+from .models import Produit
+from .forms import AjouterAuPanierForm
+
+# shop/views.py
+from django.shortcuts import get_object_or_404, redirect
+from .models import Produit
+from .forms import AjouterAuPanierForm
+
+def ajouter_au_panier(request, slug):
+    produit = get_object_or_404(Produit, slug=slug)
+    panier = request.session.get("panier", {})
+
+    # Si c'est un POST avec un formulaire, on prend la quantité soumise
+    if request.method == "POST":
+        form = AjouterAuPanierForm(request.POST)
+        if form.is_valid():
+            quantite = int(form.cleaned_data.get("quantite", 1))
+        else:
+            quantite = 1
+    else:
+        # Si c'est un GET (ex: bouton "Ajouter au panier" depuis la liste)
+        quantite = 1
+
+    # Si le produit est déjà dans le panier, on ajoute la quantité
+    if slug in panier:
+        panier[slug]["quantite"] += quantite
+    else:
+        panier[slug] = {
+            "nom": produit.nom,
+            "slug": produit.slug,
+            "prix": str(produit.prix),  # ⚠️ Decimal doit être casté en str pour la session
+            "quantite": quantite,
+            "image": produit.image.url if produit.image else None,
+        }
+
+    request.session["panier"] = panier  # sauvegarde en session
+
+    return redirect("shop:panier")
 
 @login_required
 def passer_commande(request):
@@ -140,7 +138,7 @@ def passer_commande(request):
     for produit_id, item in panier.items():
         produit = get_object_or_404(Produit, pk=produit_id)
 
-        quantite = int(item["quantite"])
+        quantite = int(request.POST.get("quantité", 1))
         prix = Decimal(item["prix"])
 
         ligne = LigneCommande.objects.create(

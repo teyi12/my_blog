@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     "shop",
     "payments",
     "social",
+     "monetization",
 ]
 
 SITE_ID = 1

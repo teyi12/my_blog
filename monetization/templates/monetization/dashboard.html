@@ -1,0 +1,108 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard - Revenus</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body class="bg-gray-100 text-gray-800">
+    <div class="container mx-auto p-6">
+
+        <!-- 🔹 3 Cartes KPI -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div class="bg-white shadow-lg rounded-2xl p-6 flex items-center space-x-4 transform hover:scale-105 transition duration-300">
+                <i class="fa-solid fa-bullhorn text-blue-500 text-4xl animate-bounce"></i>
+                <div>
+                    <p class="text-gray-500">Publicité</p>
+                    <h2 class="text-2xl font-bold">{{ revenus_mensuels.total_publicite }} €</h2>
+                </div>
+            </div>
+
+            <div class="bg-white shadow-lg rounded-2xl p-6 flex items-center space-x-4 transform hover:scale-105 transition duration-300">
+                <i class="fa-solid fa-handshake text-yellow-500 text-4xl animate-pulse"></i>
+                <div>
+                    <p class="text-gray-500">Affiliation</p>
+                    <h2 class="text-2xl font-bold">{{ revenus_mensuels.total_affiliation }} €</h2>
+                </div>
+            </div>
+
+            <div class="bg-white shadow-lg rounded-2xl p-6 flex items-center space-x-4 transform hover:scale-105 transition duration-300">
+                <i class="fa-solid fa-crown text-pink-500 text-4xl animate-spin"></i>
+                <div>
+                    <p class="text-gray-500">Premium</p>
+                    <h2 class="text-2xl font-bold">{{ revenus_mensuels.total_premium }} €</h2>
+                </div>
+            </div>
+        </div>
+
+        <!-- 🔹 Grille des Graphiques -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+            <!-- 📈 Courbe -->
+            <div class="bg-white shadow-lg rounded-2xl p-6">
+                <h4 class="text-center font-semibold mb-2">Évolution Mensuelle</h4>
+                <canvas id="lineChart" height="120"></canvas>
+            </div>
+
+            <!-- 🥧 Camembert -->
+            <div class="bg-white shadow-lg rounded-2xl p-6">
+                <h4 class="text-center font-semibold mb-2">Répartition des Revenus</h4>
+                <canvas id="pieChart" height="120"></canvas>
+            </div>
+
+            <!-- 📊 Barres Comparatives -->
+            <div class="bg-white shadow-lg rounded-2xl p-6">
+                <h4 class="text-center font-semibold mb-2">Revenus Mensuels par Source</h4>
+                <canvas id="barChart" height="120"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts Chart.js -->
+    <script>
+        // 📈 Courbe
+        new Chart(document.getElementById('lineChart'), {
+            type: 'line',
+            data: {
+                labels: {{ revenus_mensuels.labels|safe }},
+                datasets: [
+                    { label: "Publicité", data: {{ revenus_mensuels.publicite|safe }}, borderColor: "blue", fill: false },
+                    { label: "Affiliation", data: {{ revenus_mensuels.affiliation|safe }}, borderColor: "orange", fill: false },
+                    { label: "Premium", data: {{ revenus_mensuels.premium|safe }}, borderColor: "pink", fill: false }
+                ]
+            },
+            options: { responsive: true, plugins: { legend: { position: "bottom" } } }
+        });
+
+        // 🥧 Camembert
+        new Chart(document.getElementById('pieChart'), {
+            type: 'pie',
+            data: {
+                labels: ["Publicité", "Affiliation", "Premium"],
+                datasets: [{
+                    data: [{{ revenus_mensuels.total_publicite }}, {{ revenus_mensuels.total_affiliation }}, {{ revenus_mensuels.total_premium }}],
+                    backgroundColor: ["blue", "orange", "pink"]
+                }]
+            }
+        });
+
+        // 📊 Barres Comparatives
+        new Chart(document.getElementById('barChart'), {
+            type: 'bar',
+            data: {
+                labels: {{ revenus_mensuels.labels|safe }},
+                datasets: [
+                    { label: "Publicité", data: {{ revenus_mensuels.publicite|safe }}, backgroundColor: "blue" },
+                    { label: "Affiliation", data: {{ revenus_mensuels.affiliation|safe }}, backgroundColor: "orange" },
+                    { label: "Premium", data: {{ revenus_mensuels.premium|safe }}, backgroundColor: "pink" }
+                ]
+            },
+            options: { responsive: true, plugins: { legend: { position: "bottom" } } }
+        });
+    </script>
+</body>
+</html>
