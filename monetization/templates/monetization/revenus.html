@@ -1,0 +1,43 @@
+{% extends "template_base.html" %}
+{% block titre %}Revenus{% endblock %}
+
+{% block contenu %}
+<div class="container my-5">
+    <h2 class="mb-4 text-center">Revenus du Blog</h2>
+
+    <div class="row">
+        {% for type, label in revenus_types %}
+            <div class="col-md-3 mb-3">
+                <div class="card shadow-sm text-center p-3">
+                    <h5>{{ label }}</h5>
+                    <p class="display-6">{{ revenus_total[type] }} €</p>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+
+    <hr>
+
+    <h4 class="mt-5">Historique des revenus</h4>
+    <table class="table table-striped mt-3">
+        <thead>
+            <tr>
+                <th>Type</th>
+                <th>Montant</th>
+                <th>Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for revenu in revenus %}
+                <tr>
+                    <td>{{ revenu.get_type_display }}</td>
+                    <td>{{ revenu.montant }} €</td>
+                    <td>{{ revenu.date }}</td>
+                </tr>
+            {% empty %}
+                <tr><td colspan="3" class="text-center text-muted">Aucun revenu enregistré.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

@@ -1,0 +1,12 @@
+{% extends "monetization/base.html" %}
+{% block title %}Demande d’Affiliation{% endblock %}
+
+{% block content %}
+<h1 class="text-2xl font-bold mb-6">Demande d’Affiliation</h1>
+
+<form method="post" class="bg-white shadow-lg rounded-2xl p-6 space-y-4">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600">Envoyer</button>
+</form>
+{% endblock %}

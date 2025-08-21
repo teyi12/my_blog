@@ -1,0 +1,17 @@
+{% extends "monetization/base.html" %}
+{% block title %}Abonnements Premium{% endblock %}
+
+{% block content %}
+<h1 class="text-2xl font-bold mb-6">Abonnements Premium</h1>
+
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    {% for abo in abonnements %}
+    <div class="bg-white shadow-lg rounded-2xl p-6 flex flex-col justify-between">
+        <h2 class="text-xl font-semibold">{{ abo.nom }}</h2>
+        <p class="my-2">{{ abo.description }}</p>
+        <p class="font-bold">{{ abo.prix }} € pour {{ abo.duree_jours }} jours</p>
+        <a href="{% url 'monetization:souscrire_abonnement' abo.slug %}" class="mt-4 bg-pink-500 text-white px-4 py-2 rounded hover:bg-pink-600 text-center">Souscrire</a>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

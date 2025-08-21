@@ -4,14 +4,21 @@
 
 {% block contenu %}
 <div class="container my-5">
+
+    <div class="mb-3">
+        <a href="{% url 'shop:liste' %}" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i> Continuer les achats
+        </a>
+    </div>
+
     <h2 class="mb-4 text-center">Votre panier</h2>
 
     {% if panier %}
-        <div class="table-responsive">
-            <table class="table table-bordered text-center align-middle">
+        <div class="table-responsive shadow-sm rounded">
+            <table class="table table-striped table-hover align-middle">
                 <thead class="table-light">
                     <tr>
-                        <th>Produit</th>
+                        <th class="text-start">Produit</th>
                         <th>Quantité</th>
                         <th>Prix unitaire (€)</th>
                         <th>Sous-total (€)</th>
@@ -21,36 +28,45 @@
                 <tbody>
                     {% for slug, item in panier.items %}
                     <tr>
+                        <!-- Produit avec image + nom -->
                         <td class="d-flex align-items-center gap-3">
                             <a href="{% url 'shop:detail' slug=item.slug %}">
                                 {% if item.image %}
                                     <img src="{{ item.image }}" alt="{{ item.nom }}" 
-                                         style="width:60px; height:60px; object-fit:cover; border-radius:5px;">
+                                         style="width:60px; height:60px; object-fit:cover; border-radius:6px;">
                                 {% else %}
                                     <img src="{% static 'images/default.jpg' %}" alt="{{ item.nom }}" 
-                                         style="width:60px; height:60px; object-fit:cover; border-radius:5px;">
+                                         style="width:60px; height:60px; object-fit:cover; border-radius:6px;">
                                 {% endif %}
                             </a>
                             <span>{{ item.nom }}</span>
                         </td>
+
+                        <!-- Modifier quantité -->
                         <td>
                             <form method="post" class="d-flex justify-content-center align-items-center gap-2">
                                 {% csrf_token %}
                                 <input type="hidden" name="article_id" value="{{ slug }}">
                                 <input type="hidden" name="action" value="modifier">
                                 <input type="number" name="quantite" value="{{ item.quantite }}" min="1" 
-                                       class="form-control" style="width:80px;">
+                                       class="form-control form-control-sm" style="width:80px;">
                                 <button type="submit" class="btn btn-sm btn-primary">Modifier</button>
                             </form>
                         </td>
+
+                        <!-- Prix unitaire -->
                         <td>{{ item.prix|floatformat:2 }}</td>
-                        <td>{{ item.sous_total|floatformat:2 }}</td>
+
+                        <!-- Sous-total -->
+                        <td class="fw-bold text-success">{{ item.sous_total|floatformat:2 }}</td>
+
+                        <!-- Supprimer -->
                         <td>
                             <form method="post">
                                 {% csrf_token %}
                                 <input type="hidden" name="article_id" value="{{ slug }}">
                                 <input type="hidden" name="action" value="supprimer">
-                                <button type="submit" class="btn btn-sm btn-danger">Supprimer</button>
+                                <button type="submit" class="btn btn-sm btn-outline-danger">Supprimer</button>
                             </form>
                         </td>
                     </tr>
@@ -59,16 +75,12 @@
             </table>
         </div>
 
+        <!-- Total + Payer -->
         <div class="d-flex flex-column flex-md-row justify-content-between align-items-center mt-4 gap-3">
-            <h4 class="btn btn-warning mb-2 mb-md-0">Total : {{ total|floatformat:2 }} €</h4>
-            <div class="d-flex gap-2">
-                <a href="{% url 'shop:liste' %}" class="btn btn-outline-secondary">
-                    <i class="bi bi-arrow-left"></i> Continuer les achats
-                </a>
-                <a href="{% url 'payments:choice' %}" class="btn btn-success">
-                    💳 Payer maintenant
-                </a>
-            </div>
+            <h4 class="mb-2 mb-md-0">Total : <span class="text-primary">{{ total|floatformat:2 }} €</span></h4>
+            <a href="{% url 'payments:choice' %}" class="btn btn-success btn-lg">
+                💳 Payer maintenant
+            </a>
         </div>
 
     {% else %}

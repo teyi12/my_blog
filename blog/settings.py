@@ -47,8 +47,13 @@ INSTALLED_APPS = [
     "shop",
     "payments",
     "social",
-     "monetization",
+    "monetization",
+    
+
 ]
+
+AUTH_USER_MODEL = "accounts.CustomUser"
+
 
 SITE_ID = 1
 
@@ -64,6 +69,9 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.contrib.messages.middleware.MessageMiddleware',
+
 ]
 
 # Configuration des templates
@@ -81,6 +89,7 @@ TEMPLATES = [
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
                 "shop.context_processors.nav_context",
+                
             ],
         },
     },
@@ -105,14 +114,12 @@ USE_I18N = True
 USE_TZ = True
 
 # Fichiers statiques et médias
-STATIC_URL = "/static/"
-# STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATIC_URL = '/static/'
 STATICFILES_DIRS = [BASE_DIR / "static"]
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
-MEDIA_URL = "/media/"
+MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / "media"
-# MEDIA_ROOT = os.path.join(BASE_DIR, "static/media")
 
 
 # Clé auto-incrémentée par défaut

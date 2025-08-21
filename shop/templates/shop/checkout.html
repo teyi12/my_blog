@@ -1,0 +1,107 @@
+{% extends 'template_base.html' %}
+{% load static %}
+
+{% block titre %}Checkout{% endblock %}
+
+{% block contenu %}
+<div class="container my-5">
+
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'shop:liste' %}">Boutique</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'shop:panier' %}">Panier</a></li>
+            <li class="breadcrumb-item active" aria-current="page"><a href="shop:checkout"></a>Checkout</li>
+        </ol>
+    </nav>
+
+    <h2 class="text-center mb-4">🛒 Finaliser votre commande</h2>
+
+    {% if panier %}
+        <div class="row">
+            <!-- Formulaire d’adresse -->
+            <div class="col-md-7">
+                <div class="card shadow-sm border-0 mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title mb-3">Adresse de livraison</h5>
+                        <form method="post" action="{% url 'shop:checkout' %}">
+                            {% csrf_token %}
+                            <div class="mb-3">
+                                <label class="form-label">Nom complet</label>
+                                <input type="text" name="nom" class="form-control" placeholder="Jean Dupont" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Adresse</label>
+                                <input type="text" name="adresse" class="form-control" placeholder="12 rue de Paris" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Ville</label>
+                                <input type="text" name="ville" class="form-control" placeholder="Paris" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Code postal</label>
+                                <input type="text" name="code_postal" class="form-control" placeholder="75001" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Pays</label>
+                                <input type="text" name="pays" class="form-control" placeholder="France" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Téléphone</label>
+                                <input type="text" name="telephone" class="form-control" placeholder="+33 6 12 34 56 78" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary w-100">Enregistrer l’adresse</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Récapitulatif commande -->
+            <div class="col-md-5">
+                <div class="card shadow-sm border-0">
+                    <div class="card-body">
+                        <h5 class="card-title">Résumé de la commande</h5>
+                        <ul class="list-group list-group-flush mb-3">
+                            {% for slug, item in panier.items %}
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <div class="d-flex align-items-center">
+                                    {% if item.image %}
+                                        <img src="{{ item.image }}" alt="{{ item.nom }}"
+                                             style="width:50px; height:50px; object-fit:cover; border-radius:5px;" class="me-2">
+                                    {% endif %}
+                                    <div>
+                                        <h6 class="mb-0">{{ item.nom }}</h6>
+                                        <small class="text-muted">x{{ item.quantite }}</small>
+                                    </div>
+                                </div>
+                                <span class="fw-bold">{{ item.sous_total|floatformat:2 }} €</span>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                        <div class="d-flex justify-content-between">
+                            <span>Sous-total :</span>
+                            <span>{{ total|floatformat:2 }} €</span>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <span>Livraison :</span>
+                            <span>Gratuite 🚚</span>
+                        </div>
+                        <hr>
+                        <div class="d-flex justify-content-between fw-bold mb-3">
+                            <span>Total :</span>
+                            <span>{{ total|floatformat:2 }} €</span>
+                        </div>
+                        <a href="{% url 'payments:choice' %}" class="btn btn-success w-100">
+                            💳 Procéder au paiement
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% else %}
+        <p class="text-center text-muted">Votre panier est vide. 
+           <a href="{% url 'shop:liste' %}">Retour à la boutique</a>
+        </p>
+    {% endif %}
+</div>
+{% endblock %}

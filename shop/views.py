@@ -132,13 +132,14 @@ def passer_commande(request):
     if not panier:
         return redirect("shop:panier")
 
+    # Création de la commande liée à l'utilisateur
     commande = Commande.objects.create(client=request.user)
     total = Decimal("0")
 
-    for produit_id, item in panier.items():
-        produit = get_object_or_404(Produit, pk=produit_id)
+    for slug, item in panier.items():   # ✅ utiliser slug et non produit_id
+        produit = get_object_or_404(Produit, slug=slug)  # ✅ récupérer par slug
 
-        quantite = int(request.POST.get("quantité", 1))
+        quantite = int(item.get("quantite", 1))  # ✅ on prend la quantité stockée en session
         prix = Decimal(item["prix"])
 
         ligne = LigneCommande.objects.create(
@@ -149,19 +150,22 @@ def passer_commande(request):
         )
         total += ligne.sous_total()
 
+    # Mise à jour du total de la commande
     commande.total = total
     commande.save()
 
-    # Vider le panier après commande
+    # Vider le panier après validation
     request.session["panier"] = {}
 
-    # 🔑 On passe aussi les lignes de commande au template
-    return render(request, "shop/confirmation.html", {
-        "commande": commande,
-        "lignes": commande.lignes.all(),
-    })
+    return render(
+        request,
+        "shop/confirmation.html",
+        {
+            "commande": commande,
+            "lignes": commande.lignes.all(),
+        },
+    )
 
-# shop/views.py
 
 from django.shortcuts import get_object_or_404, render
 from .models import Categorie, Produit

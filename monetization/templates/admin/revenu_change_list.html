@@ -1,8 +1,44 @@
 {% extends "admin/change_list.html" %}
+{% load static %}
+
 {% block content %}
-    <h2>📊 Tableau de bord des revenus</h2>
-    <div style="text-align:center; margin:20px;">
-        <img src="data:image/png;base64,{{ chart }}" alt="Graphique des revenus" />
+<div class="container mt-4">
+
+    <!-- En-tête -->
+    <div class="row mb-3">
+        <div class="col">
+            <h2 class="text-primary">📊 Tableau de bord des revenus</h2>
+        </div>
     </div>
-    {{ block.super }}
+
+    <!-- Graphique -->
+    <div class="row mb-4 justify-content-center">
+        <div class="col-md-8 text-center">
+            {% if chart %}
+                <img src="data:image/png;base64,{{ chart }}" class="img-fluid shadow-sm" alt="Graphique des revenus">
+            {% else %}
+                <div class="alert alert-warning">Aucun graphique disponible pour le moment.</div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Statistiques rapides (optionnel, si tu les passes via extra_context) -->
+    {% if revenus_mois %}
+    <div class="row mb-4">
+        <div class="col">
+            <div class="alert alert-info">
+                <strong>Revenus du mois en cours:</strong> {{ revenus_mois }} €
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Liste classique des objets -->
+    <div class="row">
+        <div class="col">
+            {{ block.super }}
+        </div>
+    </div>
+
+</div>
 {% endblock %}

@@ -29,7 +29,7 @@
 
 </head>
 
-<body>
+<body class="bg-gray-100 text-gray-800"></body>
 
 <!-- Navbar principale -->
 <nav class="navbar navbar-expand-md navbar-dark bg-dark">
@@ -58,11 +58,11 @@
                 </li>
 
                 <li class="nav-item">
-                    <a class="nav-link" href="{% url 'register' %}">S'INSCRIRE</a>
+                    <a class="nav-link" href="{% url 'accounts:register' %}">S'INSCRIRE</a>
                 </li>
 
                 <li class="nav-item">
-                    <a class="nav-link" href="{% url 'login' %}">SE CONNECTER</a>
+                    <a class="nav-link" href="{% url 'accounts:login' %}">SE CONNECTER</a>
                 </li>
 
                 <!-- CATÉGORIES -->
@@ -89,7 +89,15 @@
                 <li class="nav-item">
                     <a class="nav-link" href="{% url 'shop:liste' %}">PRODUITS</a>
                 </li>
-
+                {% if user.is_authenticated %}
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'accounts:logout' %}">LOGOUT</a>
+                </li>
+                {% else %}
+                  <li class="nav-item">
+                    <a class="nav-link" href="{% url 'accounts:login' %}">LOGIN</a>
+                  </li>
+                {% endif %}
 
             </ul>
         </div>
@@ -97,7 +105,62 @@
 </nav>
 
 <!-- Navbar panier -->
+<!-- Navbar panier -->
 <nav class="navbar navbar-expand-lg navbar-light bg-light border-bottom">
+    <!-- Navbar Monétisation -->
+
+  <div class="container">
+    <a class="navbar-brand" href="#">Monétisation</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#monetizationNav"
+      aria-controls="monetizationNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="monetizationNav">
+      <ul class="navbar-nav ms-auto">
+
+        <!-- Paiements -->
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'payments:choice' %}">
+            <i class="bi bi-credit-card"></i> Paiement / Don
+          </a>
+        </li>
+
+        <!-- Partenariat -->
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'contact' %}">
+            <i class="bi bi-briefcase"></i> Devenir Partenaire
+          </a>
+        </li>
+
+        <!-- Affiliation -->
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'contact' %}">
+            <i class="bi bi-link-45deg"></i> Proposer une Affiliation
+          </a>
+        </li>
+
+        <!-- Abonnements -->
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'monetization:abonnements' %}">
+            <i class="bi bi-star-fill"></i> S’abonner Premium
+          </a>
+        </li>
+
+      </ul>
+    </div>
+  </div>
+
+
+    <div>
+        <!-- Lien Dashboard pour admin -->
+    {% if request.user.is_authenticated and request.user.is_staff %}
+      <div class="ms-3">
+        <a class="btn btn-outline-dark" href="{% url 'monetization:dashboard' %}">
+          <i class="bi bi-speedometer2"></i> Dashboard
+        </a>
+      </div>
+    {% endif %}
     <div class="container d-flex justify-content-end">
         <a class="nav-link position-relative" href="{% url 'shop:panier' %}">
             <img src="{% static 'cart_icon.svg' %}" alt="Panier" width="50" height="50" />
@@ -109,10 +172,11 @@
             {% endif %}
         </a>
     </div>
-    <div class="ms-auto">
-      <a class="btn btn-outline-primary" href="/payments/choice/"><i class="bi bi-credit-card"></i> Paiements</a>
+
     </div>
+    
 </nav>
+
 
 <!-- Contenu principal -->
 <main class="container mt-4">

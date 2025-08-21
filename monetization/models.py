@@ -94,3 +94,29 @@ class Revenu(models.Model):
 
     def __str__(self):
         return f"{self.type} - {self.montant}€"
+    
+
+class DemandePartenariat(models.Model):
+    nom = models.CharField(max_length=150)
+    email = models.EmailField()
+    entreprise = models.CharField(max_length=200, blank=True, null=True)
+    message = models.TextField()
+    date = models.DateTimeField(auto_now_add=True)
+    traite = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"Partenariat - {self.nom} ({'Traité' if self.traite else 'En attente'})"
+
+
+class DemandeAffiliation(models.Model):
+    nom = models.CharField(max_length=150)
+    email = models.EmailField()
+    plateforme = models.CharField(max_length=100)
+    produit = models.CharField(max_length=200)
+    message = models.TextField()
+    date = models.DateTimeField(auto_now_add=True)
+    traite = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"Affiliation - {self.nom} ({self.plateforme})"
+

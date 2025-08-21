@@ -1,0 +1,28 @@
+{% extends "template_base.html" %}
+{% block titre %}Publicités{% endblock %}
+
+{% block contenu %}
+<div class="container my-5">
+    <h2 class="mb-4 text-center">Publicités Actives</h2>
+    <div class="row">
+        {% for pub in publicites %}
+            {% if pub.actif %}
+                <div class="col-md-4 mb-4">
+                    <div class="card shadow-sm h-100">
+                        <a href="{{ pub.lien }}" target="_blank">
+                            <img src="{{ pub.image.url }}" class="card-img-top" alt="{{ pub.titre }}">
+                        </a>
+                        <div class="card-body">
+                            <h5 class="card-title">{{ pub.titre }}</h5>
+                            <p class="text-muted">Sponsor : {{ pub.partenaire.nom }}</p>
+                            <p class="text-sm">Valable du {{ pub.date_debut }} au {{ pub.date_fin }}</p>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        {% empty %}
+            <p class="text-center text-muted">Aucune publicité active pour le moment.</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

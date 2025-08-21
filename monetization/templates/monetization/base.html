@@ -1,0 +1,48 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Mon Site{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body class="bg-gray-100 text-gray-800">
+
+    <!-- Navbar -->
+    <nav class="bg-white shadow-lg">
+        <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <a href="{% url 'home' %}" class="text-xl font-bold text-gray-800">MonSite</a>
+            
+            <ul class="flex space-x-4 items-center">
+                <li><a href="{% url 'home' %}" class="hover:text-blue-500">Accueil</a></li>
+
+                {% if user.is_authenticated %}
+                    <!-- Monetization links -->
+                    <li><a href="{% url 'monetization:partenariat' %}" class="hover:text-blue-500">Partenariat</a></li>
+                    <li><a href="{% url 'monetization:affiliation' %}" class="hover:text-blue-500">Affiliation</a></li>
+                    <li><a href="{% url 'monetization:abonnements' %}" class="hover:text-blue-500">Abonnements</a></li>
+                    <li><a href="{% url 'monetization:don' %}" class="hover:text-blue-500">Don</a></li>
+                    
+                    <!-- Logout -->
+                    <li>
+                        <form method="POST" action="{% url 'accounts:logout' %}">
+                            {% csrf_token %}
+                            <button type="submit" class="hover:text-red-500">Logout</button>
+                        </form>
+                    </li>
+                {% else %}
+                    <li><a href="{% url 'accounts:login' %}" class="hover:text-blue-500">Login</a></li>
+                {% endif %}
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Main content -->
+    <main class="container mx-auto p-6">
+        {% block content %}
+        {% endblock %}
+    </main>
+
+</body>
+</html>
