@@ -6,84 +6,108 @@
 {% block contenu %}
 
 <style>
-    .overlay-container {
-        position: relative;
-        display: inline-block;
-        overflow: hidden;
-        border-radius: 0.5rem;
-        cursor: pointer;
-    }
+  .overlay-container {
+    position: relative;
+    display: inline-block;
+    overflow: hidden;
+    border-radius: 0.5rem;
+    cursor: pointer;
+  }
 
-    .overlay-container img {
-        transition: transform 0.4s ease;
-        width: 100%;
-        height: auto;
-        display: block;
-    }
+  .overlay-container img {
+    transition: transform 0.4s ease;
+    width: 100%;
+    height: auto;
+    display: block;
+  }
 
-    .overlay-container:hover img {
-        transform: scale(1.08);
-    }
+  .overlay-container:hover img {
+    transform: scale(1.08);
+  }
 
-    .overlay-text {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background: rgba(0, 0, 0, 0.55);
-        color: #fff;
-        font-size: 1.5rem;
-        font-weight: bold;
-        opacity: 0;
-        transition: opacity 0.4s ease;
-    }
+  .overlay-text {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.55);
+    color: #fff;
+    font-size: 1.5rem;
+    font-weight: bold;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+  }
 
-    .overlay-container:hover .overlay-text {
-        opacity: 1;
-    }
+  .overlay-container:hover .overlay-text {
+    opacity: 1;
+  }
 </style>
 
 <div class="container my-5">
-    <div class="row text-center">
-
-        <!-- Bloc Articles -->
-        <div class="col-md-6 mb-4">
-            <a href="{% url 'articles:articles' %}">
-                <div class="overlay-container shadow-sm">
-                    <img src="{% get_media_prefix %}voyages.jpg" alt="Aller aux articles">
-                    <div class="overlay-text">Voir les Articles</div>
-                </div>
-            </a>
-            <h3 class="mt-3">Lire les Articles</h3>
-            <p class="text-muted">Découvrez mes aventures et récits de voyage.</p>
+  <div class="row text-center">
+    <!-- Bloc Articles -->
+    <div class="col-md-6 mb-4">
+      <a href="{% url 'articles:articles' %}">
+        <div class="overlay-container shadow-sm">
+          <img src="{% get_media_prefix %}voyages.jpg" alt="Aller aux articles" />
+          <div class="overlay-text">Voir les Articles</div>
         </div>
-
-        <!-- Bloc Produits -->
-        <div class="col-md-6 mb-4">
-            <a href="{% url 'shop:liste' %}">
-                <div class="overlay-container shadow-sm">
-                    <img src="{% static 'images/jeans.jpg' %}" alt="Voir les produits">
-                    <div class="overlay-text">Voir les Produits</div>
-                </div>
-            </a>
-            <h3 class="mt-3">Voir les Produits</h3>
-            <p class="text-muted">Explorez nos produits vedettes et offres spéciales.</p>
-        </div>
-        <div class="row text-center"> <div class="col-lg-4 mb-4"> <span class="fa-stack fa-5x text-primary"> 
-            <i class="fa-solid fa-circle fa-stack-2x fa-inverse"></i> <i class="fa-solid fa-hiking fa-stack-1x"></i>
-         </span> <h3 class="mt-3">Randonnée</h3> <p>À pied, c’est encore mieux ! Explorer des endroits que peu de gens osent visiter.</p> 
-        </div> <div class="col-lg-4 mb-4"> <span class="fa-stack fa-5x text-success"> <i class="fa-solid fa-circle fa-stack-2x fa-inverse"></i>
-             <i class="fa-solid fa-utensils fa-stack-1x"></i> </span> <h3 class="mt-3">Dégustations</h3> 
-             <p>À la découverte de nouvelles saveurs : des menus colorés et épicés à couper le souffle.</p> 
-            </div> <div class="col-lg-4 mb-4"> <span class="fa-stack fa-5x text-info"> <i class="fa-solid fa-circle fa-stack-2x fa-inverse"></i> 
-                <i class="fa-solid fa-route fa-stack-1x"></i> </span> <h3 class="mt-3">Découvertes</h3>
-                 <p>Des falaises, des grottes, des plages de sable blanc s’étendant sur des kilomètres.</p>
-
+      </a>
+      <h3 class="mt-3">Lire les Articles</h3>
+      <p class="text-muted">Découvrez mes aventures et récits de voyage.</p>
     </div>
-</div>
 
-{% endblock %}
+    <!-- Bloc Produits -->
+    <div class="col-md-6 mb-4">
+      <a href="{% url 'shop:liste' %}">
+        <div class="overlay-container shadow-sm">
+          <img src="{% static 'images/jeans.jpg' %}" alt="Voir les produits" />
+          <div class="overlay-text">Voir les Produits</div>
+        </div>
+      </a>
+      <h3 class="mt-3">Voir les Produits</h3>
+      <p class="text-muted">Explorez nos produits vedettes et offres spéciales.</p>
+    </div>
+    <div class="row text-center">
+      <div class="col-lg-4 mb-4">
+        <span class="fa-stack fa-5x text-primary">
+          <i class="fa-solid fa-circle fa-stack-2x fa-inverse"></i>
+          <i class="fa-solid fa-hiking fa-stack-1x"></i>
+        </span>
+        <h3 class="mt-3">Randonnée</h3>
+        <p>
+          À pied, c’est encore mieux ! Explorer des endroits que peu de gens osent
+          visiter.
+        </p>
+      </div>
+      <div class="col-lg-4 mb-4">
+        <span class="fa-stack fa-5x text-success">
+          <i class="fa-solid fa-circle fa-stack-2x fa-inverse"></i>
+          <i class="fa-solid fa-utensils fa-stack-1x"></i>
+        </span>
+        <h3 class="mt-3">Dégustations</h3>
+        <p>
+          À la découverte de nouvelles saveurs : des menus colorés et épicés à couper le
+          souffle.
+        </p>
+      </div>
+      <div class="col-lg-4 mb-4">
+        <span class="fa-stack fa-5x text-info">
+          <i class="fa-solid fa-circle fa-stack-2x fa-inverse"></i>
+          <i class="fa-solid fa-route fa-stack-1x"></i>
+        </span>
+        <h3 class="mt-3">Découvertes</h3>
+        <p>
+          Des falaises, des grottes, des plages de sable blanc s’étendant sur des
+          kilomètres.
+        </p>
+      </div>
+    </div>
+
+    {% endblock %}
+  </div>
+</div>

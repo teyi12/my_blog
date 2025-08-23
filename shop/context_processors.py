@@ -1,12 +1,10 @@
 # shop/context_processors.py
-from .models import Produit, Categorie
+from .models import Cart
 
-def nav_context(request):
-    panier = request.session.get("panier", {})
-    panier_items_count = sum(int(item.get("quantite", 0)) for item in panier.values())
-
-    return {
-        "categories_nav": Categorie.objects.all(),
-        "produits_nav": Produit.objects.all(),
-        "panier_items_count": panier_items_count,
-    }
+def panier_counter(request):
+    count = 0
+    if request.user.is_authenticated:
+        cart = Cart.objects.filter(user=request.user).first()
+        if cart:
+            count = cart.items.count()
+    return {"panier_items_count": count}

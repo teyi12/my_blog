@@ -34,7 +34,7 @@
       <div class="card shadow-sm p-4 border-0 rounded-4 text-center">
         <h4>Paiement par carte</h4>
         <p class="text-muted">Réglez une commande avec Stripe.</p>
-        <form action="{% url 'shop:checkout' %}" method="get">
+        <form action="{% url 'payments:choice' %}" method="get">
           <div class="mb-3">
             <input type="text" name="order_id" class="form-control" placeholder="ID de la commande" required>
           </div>

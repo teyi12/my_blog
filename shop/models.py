@@ -45,7 +45,7 @@ class Commande(models.Model):
         on_delete=models.CASCADE,
         related_name="commandes",
     )
-    adresse = models.ForeignKey(  # 👈 nouvelle relation
+    adresse = models.ForeignKey(
         "payments.Adresse",
         on_delete=models.SET_NULL,
         null=True,
@@ -103,17 +103,54 @@ class LigneCommande(models.Model):
     prix_unitaire = models.DecimalField(max_digits=10, decimal_places=2, default=0)
 
     def save(self, *args, **kwargs):
-        # Si prix_unitaire n’est pas défini, on prend celui du produit
         if not self.prix_unitaire and self.produit:
             self.prix_unitaire = self.produit.prix
         super().save(*args, **kwargs)
 
     def sous_total(self):
-        # Sécurisation : éviter None ou erreurs
-        if not self.prix_unitaire:
-            return Decimal(0)
         return Decimal(self.quantite) * self.prix_unitaire
 
     def __str__(self):
         return f"{self.quantite} x {self.produit.nom}"
 
+
+class Cart(models.Model):
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name="carts"
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Panier #{self.id} ({self.user})"
+
+    def total(self):
+        return sum(item.sous_total() for item in self.items.all())
+
+    def recalculate(self):
+        for item in self.items.all():
+            if not item.prix_unitaire:
+                item.prix_unitaire = item.produit.prix
+                item.save()
+        return self.total()
+
+
+class CartItem(models.Model):
+    cart = models.ForeignKey(Cart, related_name="items", on_delete=models.CASCADE)
+    produit = models.ForeignKey(Produit, on_delete=models.CASCADE)
+    quantite = models.PositiveIntegerField(default=1)
+    prix_unitaire = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+
+    def save(self, *args, **kwargs):
+        if not self.prix_unitaire:
+            self.prix_unitaire = self.produit.prix
+        super().save(*args, **kwargs)
+
+    def sous_total(self):
+        return Decimal(self.quantite) * self.prix_unitaire
+
+    def __str__(self):
+        return f"{self.quantite} x {self.produit.nom} (Panier {self.cart.id})"

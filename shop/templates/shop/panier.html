@@ -13,8 +13,8 @@
 
     <h2 class="mb-4 text-center">Votre panier</h2>
 
-    {% if panier %}
-        <div class="table-responsive shadow-sm rounded">
+    {% if cart.items.exists %}
+        <div class="table-responsive shadow-sm rounded" id="cart-table">
             <table class="table table-striped table-hover align-middle">
                 <thead class="table-light">
                     <tr>
@@ -26,48 +26,37 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% for slug, item in panier.items %}
-                    <tr>
-                        <!-- Produit avec image + nom -->
+                    {% for item in cart.items.all %}
+                    <tr id="item-{{ item.id }}">
                         <td class="d-flex align-items-center gap-3">
-                            <a href="{% url 'shop:detail' slug=item.slug %}">
-                                {% if item.image %}
-                                    <img src="{{ item.image }}" alt="{{ item.nom }}" 
+                            <a href="{% url 'shop:detail' slug=item.produit.slug %}">
+                                {% if item.produit.image %}
+                                    <img src="{{ item.produit.image.url }}" alt="{{ item.produit.nom }}" 
                                          style="width:60px; height:60px; object-fit:cover; border-radius:6px;">
                                 {% else %}
-                                    <img src="{% static 'images/default.jpg' %}" alt="{{ item.nom }}" 
+                                    <img src="{% static 'images/default.jpg' %}" alt="{{ item.produit.nom }}" 
                                          style="width:60px; height:60px; object-fit:cover; border-radius:6px;">
                                 {% endif %}
                             </a>
-                            <span>{{ item.nom }}</span>
+                            <span>{{ item.produit.nom }}</span>
                         </td>
 
-                        <!-- Modifier quantité -->
+                        <!-- Quantité -->
                         <td>
-                            <form method="post" class="d-flex justify-content-center align-items-center gap-2">
-                                {% csrf_token %}
-                                <input type="hidden" name="article_id" value="{{ slug }}">
-                                <input type="hidden" name="action" value="modifier">
-                                <input type="number" name="quantite" value="{{ item.quantite }}" min="1" 
-                                       class="form-control form-control-sm" style="width:80px;">
-                                <button type="submit" class="btn btn-sm btn-primary">Modifier</button>
-                            </form>
+                            <input type="number" value="{{ item.quantite }}" min="1" 
+                                   class="form-control form-control-sm"
+                                   style="width:80px;"
+                                   onchange="updateCart({{ item.id }}, this.value)">
                         </td>
 
-                        <!-- Prix unitaire -->
-                        <td>{{ item.prix|floatformat:2 }}</td>
+                        <td>{{ item.prix_unitaire|floatformat:2 }}</td>
+                        <td class="fw-bold text-success" id="subtotal-{{ item.id }}">
+                            {{ item.sous_total|floatformat:2 }}
+                        </td>
 
-                        <!-- Sous-total -->
-                        <td class="fw-bold text-success">{{ item.sous_total|floatformat:2 }}</td>
-
-                        <!-- Supprimer -->
                         <td>
-                            <form method="post">
-                                {% csrf_token %}
-                                <input type="hidden" name="article_id" value="{{ slug }}">
-                                <input type="hidden" name="action" value="supprimer">
-                                <button type="submit" class="btn btn-sm btn-outline-danger">Supprimer</button>
-                            </form>
+                            <button class="btn btn-sm btn-outline-danger"
+                                    onclick="removeFromCart({{ item.id }})">Supprimer</button>
                         </td>
                     </tr>
                     {% endfor %}
@@ -75,9 +64,11 @@
             </table>
         </div>
 
-        <!-- Total + Payer -->
+        <!-- Total -->
         <div class="d-flex flex-column flex-md-row justify-content-between align-items-center mt-4 gap-3">
-            <h4 class="mb-2 mb-md-0">Total : <span class="text-primary">{{ total|floatformat:2 }} €</span></h4>
+            <h4 class="mb-2 mb-md-0">Total : 
+                <span class="text-primary" id="cart-total">{{ cart.total|floatformat:2 }} €</span>
+            </h4>
             <a href="{% url 'payments:choice' %}" class="btn btn-success btn-lg">
                 💳 Payer maintenant
             </a>
@@ -87,4 +78,45 @@
         <p class="text-center text-muted">Votre panier est vide.</p>
     {% endif %}
 </div>
+
+<script>
+function getCSRFToken() {
+    return document.querySelector('[name=csrfmiddlewaretoken]')?.value;
+}
+
+function updateCart(itemId, quantity) {
+    fetch("{% url 'shop:panier' %}", {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': getCSRFToken(),
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({action: 'modifier', item_id: itemId, quantite: quantity})
+    })
+    .then(r => r.json())
+    .then(data => {
+        document.getElementById('subtotal-' + itemId).textContent = data.sous_total.toFixed(2);
+        document.getElementById('cart-total').textContent = data.total.toFixed(2) + " €";
+    });
+}
+
+function removeFromCart(itemId) {
+    fetch("{% url 'shop:panier' %}", {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': getCSRFToken(),
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({action: 'supprimer', item_id: itemId})
+    })
+    .then(r => r.json())
+    .then(data => {
+        document.getElementById('item-' + itemId).remove();
+        document.getElementById('cart-total').textContent = data.total.toFixed(2) + " €";
+        if (data.total === 0) {
+            document.getElementById('cart-table').innerHTML = '<p class="text-center text-muted">Votre panier est vide.</p>';
+        }
+    });
+}
+</script>
 {% endblock %}

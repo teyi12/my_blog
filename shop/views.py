@@ -1,185 +1,74 @@
-from django.shortcuts import render, get_object_or_404, redirect
-from .models import Produit, Commande, LigneCommande
-from .forms import ProduitForm, AjouterAuPanierForm
-from decimal import Decimal
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
-from django.core.paginator import Paginator
-from django.shortcuts import render
-from .models import Produit, Categorie
-
-
-def produits_liste(request):
-    produits = Produit.objects.all().order_by("nom")
-    paginator = Paginator(produits, 4)
-    page_number = request.GET.get("page")
-    page_obj = paginator.get_page(page_number)
-
-    return render(
-        request, "shop/liste.html", {"page_obj": page_obj}  # 👈 CORRECTION ICI
-    )
-
-def checkout(request):
-    return render(request, "shop/checkout.html")
-
-def detail_produit(request, slug):
-    produit = get_object_or_404(Produit, slug=slug)
-    form = AjouterAuPanierForm()
-    return render(request, "shop/detail.html", {"produit": produit, "form": form})
+from django.http import JsonResponse
+from .models import Produit, Cart, CartItem
+import json
 
 
 @login_required
-def creer_produit(request):
-    form = ProduitForm(request.POST or None, request.FILES or None)
-    if form.is_valid():
-        form.save()
-        return redirect("shop:liste")
-    return render(request, "shop/creer.html", {"form": form})
+def panier_view(request):
+    cart, created = Cart.objects.get_or_create(user=request.user)
 
-def afficher_panier(request):
-    panier = request.session.get("panier", {})
-    panier_detail = {}
-    total = Decimal("0")
-
-    for slug, item in panier.items():
+    # Gestion des actions AJAX ou POST
+    if request.method == "POST":
         try:
-            produit = Produit.objects.get(slug=slug)
-        except Produit.DoesNotExist:
-            continue  # produit supprimé de la BDD
+            data = json.loads(request.body.decode("utf-8"))
+        except:
+            data = request.POST
 
-        quantite = int(item.get("quantite", 1))
-        prix = Decimal(item["prix"])
-        sous_total = prix * quantite
+        action = data.get("action")
+        item_id = data.get("item_id")
+        quantite = int(data.get("quantite", 1))
 
-        panier_detail[slug] = {
-            "nom": produit.nom,
-            "slug": produit.slug,
-            "prix": prix,
-            "quantite": quantite,
-            "sous_total": sous_total,
-            "image": item.get("image"),
-        }
-        total += sous_total
+        if action == "modifier" and item_id:
+            item = get_object_or_404(CartItem, id=item_id, cart=cart)
+            item.quantite = max(1, quantite)
+            item.save()
+            return JsonResponse({
+                "total": cart.total(),
+                "sous_total": item.sous_total(),
+            })
 
-    if request.method == "POST":
-        action = request.POST.get("action")
-        slug_post = request.POST.get("article_id")
+        elif action == "supprimer" and item_id:
+            item = get_object_or_404(CartItem, id=item_id, cart=cart)
+            item.delete()
+            return JsonResponse({
+                "total": cart.total(),
+                "sous_total": 0,
+            })
 
-        if slug_post and slug_post in panier:
-            if action == "modifier":
-                nouvelle_quantite = int(request.POST.get("quantite", 1))
-                if nouvelle_quantite > 0:
-                    panier[slug_post]["quantite"] = nouvelle_quantite
-                else:
-                    panier.pop(slug_post)
-            elif action == "supprimer":
-                panier.pop(slug_post)
-
-            request.session["panier"] = panier
-            return redirect("shop:panier")
-
-    context = {
-        "panier": panier_detail,
-        "total": total,
-    }
-    return render(request, "shop/panier.html", context)
+    return render(request, "shop/panier.html", {"cart": cart})
 
 
-# shop/views.py
-# shop/views.py
-from django.shortcuts import get_object_or_404, redirect
-from .models import Produit
-from .forms import AjouterAuPanierForm
-
-# shop/views.py
-from django.shortcuts import get_object_or_404, redirect
-from .models import Produit
-from .forms import AjouterAuPanierForm
-
-def ajouter_au_panier(request, slug):
+@login_required
+def ajouter_panier(request, slug):
     produit = get_object_or_404(Produit, slug=slug)
-    panier = request.session.get("panier", {})
+    cart, created = Cart.objects.get_or_create(user=request.user)
 
-    # Si c'est un POST avec un formulaire, on prend la quantité soumise
-    if request.method == "POST":
-        form = AjouterAuPanierForm(request.POST)
-        if form.is_valid():
-            quantite = int(form.cleaned_data.get("quantite", 1))
-        else:
-            quantite = 1
-    else:
-        # Si c'est un GET (ex: bouton "Ajouter au panier" depuis la liste)
-        quantite = 1
-
-    # Si le produit est déjà dans le panier, on ajoute la quantité
-    if slug in panier:
-        panier[slug]["quantite"] += quantite
-    else:
-        panier[slug] = {
-            "nom": produit.nom,
-            "slug": produit.slug,
-            "prix": str(produit.prix),  # ⚠️ Decimal doit être casté en str pour la session
-            "quantite": quantite,
-            "image": produit.image.url if produit.image else None,
-        }
-
-    request.session["panier"] = panier  # sauvegarde en session
+    item, created = CartItem.objects.get_or_create(cart=cart, produit=produit)
+    if not created:
+        item.quantite += 1
+        item.save()
 
     return redirect("shop:panier")
 
-@login_required
-def passer_commande(request):
-    panier = request.session.get("panier", {})
-    if not panier:
-        return redirect("shop:panier")
+from django.views.generic import ListView, DetailView
 
-    # Création de la commande liée à l'utilisateur
-    commande = Commande.objects.create(client=request.user)
-    total = Decimal("0")
-
-    for slug, item in panier.items():   # ✅ utiliser slug et non produit_id
-        produit = get_object_or_404(Produit, slug=slug)  # ✅ récupérer par slug
-
-        quantite = int(item.get("quantite", 1))  # ✅ on prend la quantité stockée en session
-        prix = Decimal(item["prix"])
-
-        ligne = LigneCommande.objects.create(
-            commande=commande,
-            produit=produit,
-            quantite=quantite,
-            prix_unitaire=prix,
-        )
-        total += ligne.sous_total()
-
-    # Mise à jour du total de la commande
-    commande.total = total
-    commande.save()
-
-    # Vider le panier après validation
-    request.session["panier"] = {}
-
-    return render(
-        request,
-        "shop/confirmation.html",
-        {
-            "commande": commande,
-            "lignes": commande.lignes.all(),
-        },
-    )
+class ProduitListView(ListView):
+    model = Produit
+    template_name = "shop/liste.html"
+    context_object_name = "produits"
+    paginate_by = 12  # pagination (12 produits par page)
 
 
-from django.shortcuts import get_object_or_404, render
-from .models import Categorie, Produit
-
+class ProduitDetailView(DetailView):
+    model = Produit
+    template_name = "shop/detail.html"
+    context_object_name = "produit"
+    slug_field = "slug"
+    slug_url_kwarg = "slug"
 
 def produits_par_categorie(request, slug):
     categorie = get_object_or_404(Categorie, slug=slug)
     produits = Produit.objects.filter(categorie=categorie)
-    return render(
-        request,
-        "shop/produits_par_categorie.html",
-        {
-            "categorie": categorie,
-            "produits": produits,
-        },
-    )
-
+    return render(request, "shop/liste.html", {"produits": produits, "categorie": categorie})
