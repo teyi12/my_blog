@@ -3,8 +3,50 @@
 {% block titre %}Boutique{% endblock %}
 
 {% block contenu %}
+<style>
+/* Effet hover sur les images */
+.card-img-top {
+    transition: transform 0.3s ease, filter 0.3s ease;
+}
+
+.card:hover .card-img-top {
+    transform: scale(1.05);
+    filter: brightness(0.9);
+}
+
+/* Bouton Ajouter au panier sur overlay */
+.card {
+    position: relative;
+    overflow: hidden;
+}
+
+.card .btn-overlay {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: none;
+    opacity: 0.9;
+}
+
+.card:hover .btn-overlay {
+    display: block;
+}
+</style>
+
 <div class="container my-5">
-    <h2 class="mb-4 text-center">Notre Boutique</h2>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Notre Boutique</h2>
+        <a href="{% url 'shop:panier' %}" class="btn btn-outline-primary">
+            🛒 Panier (
+            {% if request.user.is_authenticated %}
+                {{ request.user.carts.first.items.count }}
+            {% else %}
+                0
+            {% endif %}
+            )
+        </a>
+    </div>
 
     <div class="row g-4">
         {% for produit in produits %}
@@ -17,11 +59,11 @@
                         <img src="{% static 'images/default.jpg' %}" class="card-img-top" alt="{{ produit.nom }}">
                     {% endif %}
                 </a>
+                <a href="{% url 'shop:ajouter_panier' slug=produit.slug %}" 
+                   class="btn btn-primary btn-overlay">🛒 Ajouter au panier</a>
                 <div class="card-body d-flex flex-column">
                     <h5 class="card-title">{{ produit.nom }}</h5>
                     <p class="card-text text-muted">{{ produit.prix }} €</p>
-                    <a href="{% url 'shop:ajouter_panier' slug=produit.slug %}" 
-                       class="btn btn-primary mt-auto">🛒 Ajouter au panier</a>
                 </div>
             </div>
         </div>

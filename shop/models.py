@@ -130,12 +130,16 @@ class Cart(models.Model):
     def total(self):
         return sum(item.sous_total() for item in self.items.all())
 
+    def total_articles(self):
+        return sum(item.quantite for item in self.items.all())
+
     def recalculate(self):
         for item in self.items.all():
             if not item.prix_unitaire:
                 item.prix_unitaire = item.produit.prix
                 item.save()
         return self.total()
+
 
 
 class CartItem(models.Model):

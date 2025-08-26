@@ -43,10 +43,11 @@
 
                         <!-- Quantité -->
                         <td>
-                            <input type="number" value="{{ item.quantite }}" min="1" 
+                            <input type="number" id="qty-{{ item.id }}" value="{{ item.quantite }}" min="1" 
                                    class="form-control form-control-sm"
                                    style="width:80px;"
-                                   onchange="updateCart({{ item.id }}, this.value)">
+                                   data-prix="{{ item.prix_unitaire }}"
+                                   onchange="updateCart({{ item.id }})">
                         </td>
 
                         <td>{{ item.prix_unitaire|floatformat:2 }}</td>
@@ -64,8 +65,9 @@
             </table>
         </div>
 
-        <!-- Total -->
+        <!-- Total et nombre d'articles -->
         <div class="d-flex flex-column flex-md-row justify-content-between align-items-center mt-4 gap-3">
+            <h5 class="mb-2 mb-md-0">Articles : <span id="cart-count">{{ cart.total_articles }}</span></h5>
             <h4 class="mb-2 mb-md-0">Total : 
                 <span class="text-primary" id="cart-total">{{ cart.total|floatformat:2 }} €</span>
             </h4>
@@ -84,8 +86,25 @@ function getCSRFToken() {
     return document.querySelector('[name=csrfmiddlewaretoken]')?.value;
 }
 
-function updateCart(itemId, quantity) {
-    fetch("{% url 'shop:panier' %}", {
+function updateCart(itemId) {
+    const input = document.getElementById('qty-' + itemId);
+    const quantity = parseInt(input.value);
+    const prixUnitaire = parseFloat(input.dataset.prix);
+
+    // Mise à jour instantanée du sous-total
+    document.getElementById('subtotal-' + itemId).textContent = (quantity * prixUnitaire).toFixed(2);
+
+    // Recalcul total et nombre d'articles côté front
+    let total = 0;
+    let totalArticles = 0;
+    document.querySelectorAll("[id^='subtotal-']").forEach(td => total += parseFloat(td.textContent));
+    document.querySelectorAll("[id^='qty-']").forEach(input => totalArticles += parseInt(input.value));
+
+    document.getElementById('cart-total').textContent = total.toFixed(2) + " €";
+    document.getElementById('cart-count').textContent = totalArticles;
+
+    // Envoi au serveur
+    fetch("{% url 'shop:update_panier' %}", {
         method: 'POST',
         headers: {
             'X-CSRFToken': getCSRFToken(),
@@ -95,13 +114,16 @@ function updateCart(itemId, quantity) {
     })
     .then(r => r.json())
     .then(data => {
-        document.getElementById('subtotal-' + itemId).textContent = data.sous_total.toFixed(2);
-        document.getElementById('cart-total').textContent = data.total.toFixed(2) + " €";
+        if (data.success) {
+            document.getElementById('subtotal-' + itemId).textContent = data.sous_total.toFixed(2);
+            document.getElementById('cart-total').textContent = data.total.toFixed(2) + " €";
+            document.getElementById('cart-count').textContent = data.total_articles;
+        }
     });
 }
 
 function removeFromCart(itemId) {
-    fetch("{% url 'shop:panier' %}", {
+    fetch("{% url 'shop:update_panier' %}", {
         method: 'POST',
         headers: {
             'X-CSRFToken': getCSRFToken(),
@@ -111,10 +133,13 @@ function removeFromCart(itemId) {
     })
     .then(r => r.json())
     .then(data => {
-        document.getElementById('item-' + itemId).remove();
-        document.getElementById('cart-total').textContent = data.total.toFixed(2) + " €";
-        if (data.total === 0) {
-            document.getElementById('cart-table').innerHTML = '<p class="text-center text-muted">Votre panier est vide.</p>';
+        if (data.success) {
+            document.getElementById('item-' + itemId).remove();
+            document.getElementById('cart-total').textContent = data.total.toFixed(2) + " €";
+            document.getElementById('cart-count').textContent = data.total_articles;
+            if (data.total === 0) {
+                document.getElementById('cart-table').innerHTML = '<p class="text-center text-muted">Votre panier est vide.</p>';
+            }
         }
     });
 }
