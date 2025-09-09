@@ -1,167 +1,273 @@
 {% load static %}
 
-<!DOCTYPE html>
+<!doctype html>
 <html lang="fr">
-
-<head>
+  <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{% block titre %}Mon Site{% endblock %}</title>
 
     <!-- Bootstrap 4 -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
     <!-- Font Awesome -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+      rel="stylesheet"
+    />
     <!-- Styles personnalisés -->
     <link rel="stylesheet" href="{% static 'css/styles.css' %}" />
 
     <style>
-        .hover-shadow:hover {
-            box-shadow: 0 0 12px rgba(0,0,0,0.15);
-            transition: box-shadow 0.3s ease;
-        }
-        .cart-badge {
-            position: absolute;
-            top: 0;
-            right: 0;
-            transform: translate(50%, -50%);
-        }
+      .hover-shadow:hover {
+        box-shadow: 0 0 12px rgba(0, 0, 0, 0.15);
+        transition: box-shadow 0.3s ease;
+      }
+      .cart-badge {
+        position: absolute;
+        top: 0;
+        right: 0;
+        transform: translate(50%, -50%);
+      }
+      .social-icons a {
+        color: white;
+        margin: 0 8px;
+        font-size: 1.2rem;
+        transition: color 0.3s ease;
+      }
+      .social-icons a:hover {
+        color: #f8d210; /* Jaune doré au hover */
+      }
+      footer .social-icons a {
+        font-size: 1.5rem; /* un peu plus grand dans le footer */
+      }
     </style>
 
     {% block scripts %}
-        <script src="{% static 'js/stripe.js' %}"></script>
+    <script src="{% static 'js/stripe.js' %}"></script>
     {% endblock %}
-</head>
+  </head>
 
-<body class="bg-light text-dark">
-
-<!-- NAVBAR PRINCIPALE -->
-<nav class="navbar navbar-expand-md navbar-dark bg-dark">
-    <div class="container">
+  <body class="bg-light text-dark">
+    <!-- NAVBAR PRINCIPALE -->
+    <nav class="navbar navbar-expand-md navbar-dark bg-dark">
+      <div class="container">
         <a class="navbar-brand" href="{% url 'home' %}">
-            <img src="{% static 'logo.webp' %}" alt="Logo" height="50">
+          <img src="{% static 'logo.webp' %}" alt="Logo" height="50" />
         </a>
 
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#mainNavbar">
-            <span class="navbar-toggler-icon"></span>
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-toggle="collapse"
+          data-target="#mainNavbar"
+        >
+          <span class="navbar-toggler-icon"></span>
         </button>
 
         <div class="collapse navbar-collapse" id="mainNavbar">
-            <ul class="navbar-nav mr-auto">
-
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'home' %}">ACCUEIL</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'articles:articles' %}">ARTICLES</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'contact' %}">CONTACT</a>
-                </li>
-
-                <!-- Catégories -->
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" id="categoriesDropdown" role="button" data-toggle="dropdown">
-                        CATÉGORIES
-                    </a>
-                    <div class="dropdown-menu" aria-labelledby="categoriesDropdown">
-                        {% for categorie in categories_nav %}
-                            {% if categorie.slug %}
-                                <a class="dropdown-item" href="{% url 'shop:par_categorie' slug=categorie.slug %}">
-                                    {{ categorie.nom }}
-                                </a>
-                            {% else %}
-                                <span class="dropdown-item text-muted">Catégorie sans slug</span>
-                            {% endif %}
-                        {% empty %}
-                            <span class="dropdown-item text-muted">Aucune catégorie</span>
-                        {% endfor %}
-                    </div>
-                </li>
-
-                <!-- Produits -->
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'shop:liste' %}">PRODUITS</a>
-                </li>
-            </ul>
-
-            <!-- Auth -->
-            <ul class="navbar-nav">
-                {% if user.is_authenticated %}
-                    <li class="nav-item">
-                        <span class="nav-link">Bonjour, {{ user.username }}</span>
-                    </li>
-                    <li class="nav-item">
-                        <form method="post" action="{% url 'accounts:logout' %}" style="display:inline;">
-                            {% csrf_token %}
-                            <button type="submit" class="btn btn-link nav-link" style="padding:0;">LOGOUT</button>
-                        </form>
-                    </li>
+          <ul class="navbar-nav mr-auto">
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'home' %}">ACCUEIL</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'articles:articles' %}">ARTICLES</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'contact' %}">CONTACT</a>
+            </li>
+            <!-- ✅ Ajout du lien "À propos" -->
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'about' %}">À PROPOS</a>
+            </li>
+            <!-- Catégories -->
+            <li class="nav-item dropdown">
+              <a
+                class="nav-link dropdown-toggle"
+                href="#"
+                id="categoriesDropdown"
+                role="button"
+                data-toggle="dropdown"
+              >
+                CATÉGORIES
+              </a>
+              <div class="dropdown-menu" aria-labelledby="categoriesDropdown">
+                {% for categorie in categories_nav %} {% if categorie.slug %}
+                <a
+                  class="dropdown-item"
+                  href="{% url 'shop:par_categorie' slug=categorie.slug %}"
+                >
+                  {{ categorie.nom }}
+                </a>
                 {% else %}
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'accounts:login' %}">LOGIN</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'accounts:register' %}">S'INSCRIRE</a>
-                    </li>
-                {% endif %}
-            </ul>
+                <span class="dropdown-item text-muted">Catégorie sans slug</span>
+                {% endif %} {% empty %}
+                <span class="dropdown-item text-muted">Aucune catégorie</span>
+                {% endfor %}
+              </div>
+            </li>
+
+            <!-- Produits -->
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'shop:liste' %}">PRODUITS</a>
+            </li>
+          </ul>
+
+          <!-- Auth + Réseaux sociaux -->
+          <ul class="navbar-nav align-items-center">
+            {% if user.is_authenticated %}
+            <li class="nav-item">
+              <span class="nav-link">Bonjour, {{ user.username }}</span>
+            </li>
+            <li class="nav-item">
+              <form
+                method="post"
+                action="{% url 'accounts:logout' %}"
+                style="display: inline"
+              >
+                {% csrf_token %}
+                <button type="submit" class="btn btn-link nav-link" style="padding: 0">
+                  LOGOUT
+                </button>
+              </form>
+            </li>
+            {% else %}
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'accounts:login' %}">LOGIN</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'accounts:register' %}">S'INSCRIRE</a>
+            </li>
+            {% endif %}
+
+            <!-- Icônes réseaux sociaux -->
+            <li class="nav-item ml-3">
+              <div class="social-icons d-flex">
+                <a href="https://facebook.com" target="_blank" title="Facebook"
+                  ><i class="fab fa-facebook"></i
+                ></a>
+                <a href="https://twitter.com" target="_blank" title="Twitter"
+                  ><i class="fab fa-twitter"></i
+                ></a>
+                <a href="https://instagram.com" target="_blank" title="Instagram"
+                  ><i class="fab fa-instagram"></i
+                ></a>
+                <a href="https://linkedin.com" target="_blank" title="LinkedIn"
+                  ><i class="fab fa-linkedin"></i
+                ></a>
+              </div>
+            </li>
+          </ul>
         </div>
-    </div>
-</nav>
+      </div>
+    </nav>
 
-<!-- NAVBAR SECONDAIRE (Monétisation + Panier) -->
-<nav class="navbar navbar-expand-lg navbar-light bg-light border-bottom">
-  <div class="container">
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#monetizationNav">
-      <span class="navbar-toggler-icon"></span>
-    </button>
+    <!-- NAVBAR SECONDAIRE (Monétisation + Panier) -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light border-bottom">
+      <div class="container">
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-toggle="collapse"
+          data-target="#monetizationNav"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
 
-    <div class="collapse navbar-collapse" id="monetizationNav">
-      <ul class="navbar-nav mr-auto">
-        <li class="nav-item"><a class="nav-link" href="{% url 'payments:choice' %}"><i class="fa fa-credit-card"></i> Paiement / Don</a></li>
-        <li class="nav-item"><a class="nav-link" href="{% url 'contact' %}"><i class="fa fa-briefcase"></i> Partenariat</a></li>
-        <li class="nav-item"><a class="nav-link" href="{% url 'contact' %}"><i class="fa fa-link"></i> Affiliation</a></li>
-        <li class="nav-item"><a class="nav-link" href="{% url 'monetization:abonnements' %}"><i class="fa fa-star"></i> Premium</a></li>
-      </ul>
+        <div class="collapse navbar-collapse" id="monetizationNav">
+          <ul class="navbar-nav mr-auto">
+            <!-- Dons -->
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'monetization:don' %}">
+                <i class="fa fa-hand-holding-heart"></i><strong>Faire un Don</strong>
+              </a>
+            </li>
 
-      <!-- Dashboard Admin -->
-      {% if request.user.is_authenticated and request.user.is_staff %}
-        <a class="btn btn-outline-dark mr-3" href="{% url 'monetization:dashboard' %}">
-          <i class="fa fa-gauge"></i> Dashboard
+            <!-- Abonnements -->
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'monetization:abonnements' %}">
+                <i class="fa fa-star"></i><strong>Abonnements Premium</strong>
+              </a>
+            </li>
+
+            <!-- Affiliation -->
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'monetization:affiliation' %}">
+                <i class="fa fa-link"></i><strong>Programme d’Affiliation</strong>
+              </a>
+            </li>
+
+            <!-- Partenaires -->
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'monetization:partenariat' %}">
+                <i class="fa fa-briefcase"></i><strong>Partenariats</strong>
+              </a>
+            </li>
+
+            <!-- Publicités -->
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'monetization:publicites' %}">
+                <i class="fa fa-bullhorn"></i><strong> Publicité</strong>
+              </a>
+            </li>
+          </ul>
+
+          <!-- Dashboard Admin (Revenus) -->
+          {% if request.user.is_authenticated and request.user.is_staff %}
+          <a class="btn btn-outline-dark mr-3" href="{% url 'monetization:revenus' %}">
+            <i class="fa fa-chart-line"></i><strong>Revenus</strong>
+          </a>
+          {% endif %}
+
+        
+          <!-- Panier -->
+          <a class="nav-link position-relative" href="{% url 'shop:panier' %}">
+            <img src="{% static 'cart_icon.svg' %}" alt="Panier" width="50" height="50" />
+            {% if panier_items_count and panier_items_count > 0 %}
+                <span class="badge badge-pill badge-danger position-absolute"
+                      style="top: 0; right: 0; transform: translate(50%, -50%);">
+                    {{ panier_items_count }}
+                </span>
+            {% endif %}
         </a>
-      {% endif %}
+        </div>
+      </div>
+    </nav>
 
-      <!-- Panier -->
-      <a class="nav-link position-relative" href="{% url 'shop:panier' %}">
-        <img src="{% static 'cart_icon.svg' %}" alt="Panier" width="40" height="40">
-        {% if panier_items_count and panier_items_count > 0 %}
-    <span class="badge badge-pill badge-danger position-absolute"
-          style="top: 0; right: 0; transform: translate(50%, -50%);">
-        {{ panier_items_count }}
-    </span>
-{% endif %}
+    <!-- CONTENU -->
+    <main class="container mt-4">{% block contenu %}{% endblock %}</main>
 
-      </a>
-    </div>
-  </div>
-</nav>
+    <!-- FOOTER -->
+    <footer class="bg-secondary text-white mt-5 py-4">
+      <div class="container text-center">
+        <p>&copy; 2025 | Vblog.com</p>
+        <div class="social-icons mt-3">
+          <a href="https://facebook.com" target="_blank" title="Facebook"
+            ><i class="fab fa-facebook"></i
+          ></a>
+          <a href="https://twitter.com" target="_blank" title="Twitter"
+            ><i class="fab fa-twitter"></i
+          ></a>
+          <a href="https://instagram.com" target="_blank" title="Instagram"
+            ><i class="fab fa-instagram"></i
+          ></a>
+          <a href="https://linkedin.com" target="_blank" title="LinkedIn"
+            ><i class="fab fa-linkedin"></i
+          ></a>
+          <a href="https://youtube.com" target="_blank" title="YouTube"
+            ><i class="fab fa-youtube"></i
+          ></a>
+          <a href="https://tiktok.com" target="_blank" title="TikTok"
+            ><i class="fab fa-tiktok"></i
+          ></a>
+        </div>
+      </div>
+    </footer>
 
-<!-- CONTENU -->
-<main class="container mt-4">
-    {% block contenu %}{% endblock %}
-</main>
-
-<!-- FOOTER -->
-<footer class="bg-secondary text-white mt-5 py-4">
-    <div class="container text-center">
-        &copy; 2025 | Vblog.com
-    </div>
-</footer>
-
-<!-- JS -->
-<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.bundle.min.js"></script>
-
-</body>
+    <!-- JS -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.bundle.min.js"></script>
+  </body>
 </html>

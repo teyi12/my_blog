@@ -120,3 +120,11 @@ def don_view(request):
 
 def paiement_view(request):
     return render(request, "monetization/paiement.html")
+
+
+def publicite_view(request):
+    """
+    Page de présentation pour proposer d’acheter un espace publicitaire.
+    Plus tard tu pourras y mettre un formulaire ou un système de gestion.
+    """
+    return render(request, "monetization/publicites.html")

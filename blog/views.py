@@ -32,3 +32,6 @@ def contact_view(request):
 
 def remerciement_view(request):
     return HttpResponse("Merci de nous avoir contacter")
+
+def about(request):
+    return render (request, "about.html")
