@@ -21,14 +21,15 @@ db.sqlite3
 # --- Fichiers de configuration locaux ---
 *.env
 .env.*
+*.local
 
 # --- Cache et logs ---
 *.log
 *.pot
-*.pyc
 *.mo
 *.swp
 .DS_Store
+*.tmp
 
 # --- Fichiers générés par Django ---
 staticfiles/
@@ -40,3 +41,18 @@ media/
 # --- Python egg ---
 *.egg-info/
 *.egg
+
+# --- Node.js / Frontend ---
+node_modules/
+package-lock.json
+
+# --- Docker ---
+docker-compose.override.yml
+*.dockerignore
+*.log
+*.env
+
+# --- Autres fichiers temporaires ou IDE ---
+.idea/
+*.iml
+Thumbs.db

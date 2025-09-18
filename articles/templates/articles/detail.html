@@ -1,23 +1,203 @@
-{% extends 'template_base.html' %}
-{% load static %}
+{% extends 'template_base.html' %} {% load static %} {% block contenu %}
+<div class="container py-4">
+  <div class="row g-4">
+    <!-- Image de l'article -->
+    <div class="col-md-6">
+      {% if article.image %}
+      <img
+        src="{{ article.image.url }}"
+        alt="{{ article.titre }}"
+        class="img-fluid rounded shadow-sm"
+      />
+      {% else %}
+      <img
+        src="{% static 'images/default.jpg' %}"
+        alt="Image par défaut"
+        class="img-fluid rounded shadow-sm"
+      />
+      {% endif %}
+    </div>
 
-{% block contenu %}
-<div class="container">
-    <h1>{{ article.titre }}</h1>
-    <img src="{{ article.image.url }}" alt="{{ article.titre }}">
-    <p>{{ article.contenu }}</p>
-    <span>{{ article.date_publication }}</span>
-</div>
-{% if article.est_sponsorise %}
-<div class="alert alert-warning">
-  🏷 Article sponsorisé par <strong>{{ article.sponsor }}</strong>
-</div>
-<!-- Zone AdSense simulée -->
-<div class="my-3 text-center">
-    <img src="{% static 'adsense-placeholder.jpg' %}" alt="Publicité" style="width:100%; max-width: 728px;">
-    <p class="text-muted"><small>Emplacement pub (AdSense)</small></p>
+    <!-- Contenu de l'article -->
+    <div class="col-md-6 d-flex flex-column">
+      <h1 class="fw-bold mb-3">{{ article.titre }}</h1>
+
+      <!-- Bouton retour -->
+      <div class="mb-3">
+        <a
+          href="{% url 'articles:articles' %}"
+          class="btn btn-outline-secondary btn-sm"
+        >
+          ⬅ Retour à la liste
+        </a>
+      </div>
+
+      <!-- Texte avec word-wrap -->
+      <p class="text-muted mb-2">{{ article.date_publication|date:"d F Y" }}</p>
+      <p class="flex-grow-1" style="word-wrap: break-word; overflow-wrap: break-word">
+        {{ article.contenu }}
+      </p>
+
+      {% if user.is_staff %}
+      <div class="mt-3 d-flex gap-2">
+        <a
+          href="{% url 'articles:article_modifier' slug=article.slug %}"
+          class="btn btn-warning btn-sm"
+        >
+          ✏️ Modifier
+        </a>
+        <a
+          href="{% url 'articles:article_supprimer' slug=article.slug %}"
+          class="btn btn-danger btn-sm"
+        >
+          🗑 Supprimer
+        </a>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Sponsor et pubs (desktop + mobile) -->
+  {% if article.est_sponsorise %}
+  <div class="alert alert-warning mt-4">
+    🏷 Article sponsorisé par <strong>{{ article.sponsor }}</strong>
+  </div>
+
+  {% if article.pub_images.all or article.pub_videos.all or article.medias.all %}
+  <h5 class="mt-4 mb-3">🎥 Publicités sponsorisées</h5>
+
+  <!-- Desktop : carousel -->
+  <div
+    id="carouselSponsor"
+    class="carousel slide d-none d-md-block"
+    data-bs-ride="carousel"
+  >
+    <div class="carousel-inner">
+      {% for pub in article.pub_images.all %}
+      <div class="carousel-item {% if forloop.first %}active{% endif %}">
+        <img
+          src="{{ pub.image.url }}"
+          class="d-block w-100 rounded shadow-sm"
+          style="max-height: 350px; object-fit: cover"
+        />
+      </div>
+      {% endfor %} {% for pub in article.pub_videos.all %}
+      <div
+        class="carousel-item {% if not article.pub_images.all and forloop.first %}active{% endif %}"
+      >
+        <video
+          class="d-block w-100 rounded shadow-sm"
+          style="max-height: 350px"
+          controls
+          preload="metadata"
+        >
+          <source src="{{ pub.video.url }}" type="video/mp4" />
+        </video>
+      </div>
+      {% endfor %} {% for media in article.medias.all %}
+      <div
+        class="carousel-item {% if not article.pub_images.all and not article.pub_videos.all and forloop.first %}active{% endif %}"
+      >
+        {% if media.type == "image" %}
+        <img
+          src="{{ media.fichier.url }}"
+          class="d-block w-100 rounded shadow-sm"
+          style="max-height: 350px; object-fit: cover"
+        />
+        {% elif media.type == "video" %}
+        <video
+          class="d-block w-100 rounded shadow-sm"
+          style="max-height: 350px"
+          controls
+          preload="metadata"
+        >
+          <source src="{{ media.fichier.url }}" type="video/mp4" />
+        </video>
+        {% endif %}
+      </div>
+      {% endfor %}
+    </div>
+    <!-- Flèches -->
+    <button
+      class="carousel-control-prev"
+      type="button"
+      data-bs-target="#carouselSponsor"
+      data-bs-slide="prev"
+    >
+      <span class="carousel-control-prev-icon"></span>
+    </button>
+    <button
+      class="carousel-control-next"
+      type="button"
+      data-bs-target="#carouselSponsor"
+      data-bs-slide="next"
+    >
+      <span class="carousel-control-next-icon"></span>
+    </button>
+  </div>
+
+  <!-- Mobile : slider horizontal -->
+  <div class="sponsor-slider d-flex overflow-auto pb-2 d-block d-md-none">
+    {% for pub in article.pub_images.all %}
+    <div class="slider-item mr-3">
+      <img
+        src="{{ pub.image.url }}"
+        class="img-fluid rounded shadow-sm"
+        style="max-height: 220px"
+      />
+    </div>
+    {% endfor %} {% for pub in article.pub_videos.all %}
+    <div class="slider-item mr-3">
+      <video
+        class="rounded shadow-sm"
+        style="max-height: 220px"
+        controls
+        preload="metadata"
+      >
+        <source src="{{ pub.video.url }}" type="video/mp4" />
+      </video>
+    </div>
+    {% endfor %} {% for media in article.medias.all %}
+    <div class="slider-item mr-3">
+      {% if media.type == "image" %}
+      <img
+        src="{{ media.fichier.url }}"
+        class="img-fluid rounded shadow-sm"
+        style="max-height: 220px"
+      />
+      {% elif media.type == "video" %}
+      <video
+        class="rounded shadow-sm"
+        style="max-height: 220px"
+        controls
+        preload="metadata"
+      >
+        <source src="{{ media.fichier.url }}" type="video/mp4" />
+      </video>
+      {% endif %}
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %} {% endif %}
+
+  <!-- Bouton retour bas -->
+  <div class="mt-4">
+    <a href="{% url 'articles:articles' %}" class="btn btn-outline-secondary">
+      ⬅ Retour à la liste
+    </a>
+  </div>
 </div>
 
-{% endif %}
-
+<!-- Style pour slider mobile -->
+<style>
+  .sponsor-slider {
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+  }
+  .slider-item {
+    flex: 0 0 auto;
+    scroll-snap-align: start;
+    width: 250px;
+  }
+</style>
 {% endblock %}
