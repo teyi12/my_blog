@@ -9,6 +9,7 @@ from decimal import Decimal
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.db import IntegrityError, transaction
+from django.db.models import Q
 from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import redirect, render, get_object_or_404
 from django.http import HttpResponse
@@ -67,6 +68,10 @@ def _get_payable_order(request, order_id):
 
 
 class PaymentChannelConflict(Exception):
+    pass
+
+
+class PaymentInitializationInProgress(Exception):
     pass
 
 
@@ -181,8 +186,13 @@ def _store_provider_checkout(payment_id, provider_reference, checkout_url):
 
 def _minor_amount(amount, currency):
     zero_decimal = {"bif", "clp", "djf", "gnf", "jpy", "kmf", "krw", "mga", "pyg", "rwf", "ugx", "vnd", "vuv", "xaf", "xof", "xpf"}
+    decimal_amount = Decimal(str(amount))
+    exponent = Decimal("1") if currency.lower() in zero_decimal else Decimal("0.01")
+    normalized = decimal_amount.quantize(exponent)
+    if normalized != decimal_amount:
+        raise ValueError(f"Le montant {decimal_amount} n'est pas valide pour {currency.upper()}.")
     multiplier = 1 if currency.lower() in zero_decimal else 100
-    return int(Decimal(str(amount)) * multiplier)
+    return int(normalized * multiplier)
 
 
 def _confirm_payment_once(payment_id, raw_response):
@@ -415,6 +425,71 @@ def _cinetpay_payload(commande, payment, request, channel="MOBILE_MONEY"):
     }
 
 
+def _claim_cinetpay_initialization_once(payment_id):
+    """Atomically claim the single allowed CinetPay network initialization."""
+    claim_token = uuid.uuid4()
+    now = timezone.now()
+    stale_before = now - timedelta(seconds=120)
+    claimed = Payment.objects.filter(
+        pk=payment_id,
+        channel="CINETPAY",
+        status="PROCESSING",
+        checkout_url="",
+    ).filter(
+        Q(initialization_token__isnull=True)
+        | Q(initialization_started_at__lt=stale_before)
+    ).update(
+        initialization_token=claim_token,
+        initialization_started_at=now,
+    )
+    return claim_token if claimed else None
+
+
+def _claim_cinetpay_initialization(payment_id):
+    return execute_with_sqlite_lock_retry(
+        lambda: _claim_cinetpay_initialization_once(payment_id)
+    )
+
+
+def _release_cinetpay_initialization(payment_id, claim_token):
+    return execute_with_sqlite_lock_retry(
+        lambda: Payment.objects.filter(
+            pk=payment_id,
+            initialization_token=claim_token,
+            checkout_url="",
+        ).update(initialization_token=None, initialization_started_at=None)
+    )
+
+
+def _complete_cinetpay_initialization_once(payment_id, claim_token, checkout_url):
+    with transaction.atomic():
+        payment = Payment.objects.select_for_update().get(pk=payment_id)
+        if payment.checkout_url:
+            return payment
+        if payment.initialization_token != claim_token:
+            raise PaymentInitializationInProgress
+        payment.checkout_url = checkout_url
+        payment.initialization_token = None
+        payment.initialization_started_at = None
+        payment.save(update_fields=[
+            "checkout_url",
+            "initialization_token",
+            "initialization_started_at",
+            "updated_at",
+        ])
+        return payment
+
+
+def _complete_cinetpay_initialization(payment_id, claim_token, checkout_url):
+    return execute_with_sqlite_lock_retry(
+        lambda: _complete_cinetpay_initialization_once(
+            payment_id,
+            claim_token,
+            checkout_url,
+        )
+    )
+
+
 @login_required
 @require_POST
 def cinetpay_create_payment(request, order_id):
@@ -422,6 +497,8 @@ def cinetpay_create_payment(request, order_id):
     if channel not in ("MOBILE_MONEY", "CARD"):
         channel = "MOBILE_MONEY"
 
+    claim_token = None
+    payment = None
     try:
         commande, payment = _reserve_payment(request, order_id, "CINETPAY")
         if payment.checkout_url:
@@ -434,6 +511,12 @@ def cinetpay_create_payment(request, order_id):
                 cinetpay_reference,
                 "",
             )
+        claim_token = _claim_cinetpay_initialization(payment.id)
+        if claim_token is None:
+            payment.refresh_from_db(fields=["checkout_url"])
+            if payment.checkout_url:
+                return redirect(payment.checkout_url)
+            raise PaymentInitializationInProgress
         payload = _cinetpay_payload(commande, payment, request, channel=channel)
         r = requests.post(
             f"{settings.CINETPAY_BASE_URL}/payment",
@@ -444,21 +527,37 @@ def cinetpay_create_payment(request, order_id):
         data = r.json()
     except PaymentChannelConflict:
         return HttpResponse("Une autre tentative de paiement est déjà active.", status=409)
+    except PaymentInitializationInProgress:
+        return HttpResponse("Initialisation CinetPay déjà en cours.", status=409)
     except SQLiteLockRetryExhausted:
         return HttpResponse("RETRY", status=409)
     except Exception:
+        if payment is not None and claim_token is not None:
+            try:
+                _release_cinetpay_initialization(payment.id, claim_token)
+            except SQLiteLockRetryExhausted:
+                return HttpResponse("RETRY", status=409)
         logger.exception("Erreur CinetPay")
         return render(request, "payments/cancel.html", {"message": "Erreur de connexion à CinetPay."})
 
     payment_url = (data.get("data") or {}).get("payment_url")
     if str(data.get("code")) in ("201", "200") and payment_url:
-        payment = _store_provider_checkout(
-            payment.id,
-            payment.transaction_id,
-            payment_url,
-        )
+        try:
+            payment = _complete_cinetpay_initialization(
+                payment.id,
+                claim_token,
+                payment_url,
+            )
+        except PaymentInitializationInProgress:
+            return HttpResponse("Initialisation CinetPay remplacée.", status=409)
+        except SQLiteLockRetryExhausted:
+            return HttpResponse("RETRY", status=409)
         return redirect(payment.checkout_url)
 
+    try:
+        _release_cinetpay_initialization(payment.id, claim_token)
+    except SQLiteLockRetryExhausted:
+        return HttpResponse("RETRY", status=409)
     return render(request, "payments/cancel.html", {"message": data})
 
 

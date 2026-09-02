@@ -1,15 +1,19 @@
 import json
+import importlib
+import uuid
 from datetime import timedelta
 from decimal import Decimal
 from types import SimpleNamespace
 from unittest.mock import Mock, patch
 
 from django.contrib.auth import get_user_model
+from django.apps import apps
 from django.test import Client, TestCase
 from django.urls import reverse
 from django.utils import timezone
 
 from payments.models import Adresse, Payment
+from payments.views import _claim_cinetpay_initialization, _minor_amount
 from shop.models import Cart, CartItem, Commande, LigneCommande, Produit
 
 
@@ -130,6 +134,103 @@ class OrderPaymentSecurityTests(TestCase):
         self.assertEqual(first.url, second.url)
         self.assertEqual(post.call_count, 1)
         self.assertEqual(Payment.objects.filter(status="PROCESSING").count(), 1)
+
+    def test_cinetpay_network_initialization_has_one_atomic_owner(self):
+        payment = Payment.objects.create(
+            commande=self.order,
+            montant=self.order.total,
+            devise=self.order.currency,
+            transaction_id="cinetpay-claim",
+            channel="CINETPAY",
+            status="PROCESSING",
+        )
+        self.order.payment_status = "PROCESSING"
+        self.order.payment_channel = "CINETPAY"
+        self.order.transaction_id = payment.transaction_id
+        self.order.save(update_fields=[
+            "payment_status", "payment_channel", "transaction_id"
+        ])
+
+        first_claim = _claim_cinetpay_initialization(payment.id)
+        second_claim = _claim_cinetpay_initialization(payment.id)
+
+        self.assertIsNotNone(first_claim)
+        self.assertIsNone(second_claim)
+        with patch("payments.views.requests.post") as post:
+            response = self.client.post(
+                reverse("payments:cinetpay_create", args=[self.order.id])
+            )
+        self.assertEqual(response.status_code, 409)
+        post.assert_not_called()
+
+    def test_stale_cinetpay_initialization_claim_can_be_recovered(self):
+        payment = Payment.objects.create(
+            commande=self.order,
+            montant=self.order.total,
+            devise=self.order.currency,
+            transaction_id="cinetpay-stale-claim",
+            channel="CINETPAY",
+            status="PROCESSING",
+            initialization_token=uuid.uuid4(),
+            initialization_started_at=timezone.now() - timedelta(minutes=3),
+        )
+        self.order.payment_status = "PROCESSING"
+        self.order.payment_channel = "CINETPAY"
+        self.order.transaction_id = payment.transaction_id
+        self.order.save(update_fields=[
+            "payment_status", "payment_channel", "transaction_id"
+        ])
+        provider_response = Mock()
+        provider_response.json.return_value = {
+            "code": "201",
+            "data": {"payment_url": "https://cinetpay.test/recovered"},
+        }
+
+        with patch(
+            "payments.views.requests.post", return_value=provider_response
+        ) as post:
+            response = self.client.post(
+                reverse("payments:cinetpay_create", args=[self.order.id])
+            )
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, "https://cinetpay.test/recovered")
+        self.assertEqual(post.call_count, 1)
+        payment.refresh_from_db()
+        self.assertIsNone(payment.initialization_token)
+        self.assertIsNone(payment.initialization_started_at)
+
+    def test_minor_amount_is_exact_for_two_decimal_currencies(self):
+        self.assertEqual(_minor_amount(Decimal("20.50"), "EUR"), 2050)
+        self.assertEqual(_minor_amount(Decimal("20"), "EUR"), 2000)
+        with self.assertRaises(ValueError):
+            _minor_amount(Decimal("20.501"), "EUR")
+
+    def test_minor_amount_rejects_fraction_for_zero_decimal_currency(self):
+        self.assertEqual(_minor_amount(Decimal("1500"), "XOF"), 1500)
+        with self.assertRaises(ValueError):
+            _minor_amount(Decimal("1500.50"), "XOF")
+
+    def test_historical_pending_reconciliation_is_terminal_and_neutral(self):
+        payment = Payment.objects.create(
+            commande=self.order,
+            montant=self.order.total,
+            devise=self.order.currency,
+            transaction_id="historical-pending",
+            channel="STRIPE",
+            status="PENDING",
+        )
+        migration = importlib.import_module(
+            "payments.migrations.0005_payment_initialization_claim_and_reconcile_pending"
+        )
+
+        migration.reconcile_historical_pending_payments(apps, None)
+
+        payment.refresh_from_db()
+        self.order.refresh_from_db()
+        self.assertEqual(payment.status, "CANCELED")
+        self.assertEqual(self.order.payment_status, "PENDING")
+        self.assertIsNone(self.order.cart_finalized_at)
 
     def test_valid_stripe_webhook_is_idempotent(self):
         self.initiate_stripe()

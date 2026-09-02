@@ -34,6 +34,8 @@ class Payment(models.Model):
     transaction_id = models.CharField(max_length=100, unique=True)
     idempotency_key = models.UUIDField(default=uuid.uuid4, unique=True, editable=False)
     checkout_url = models.URLField(max_length=500, blank=True)
+    initialization_token = models.UUIDField(null=True, blank=True, editable=False)
+    initialization_started_at = models.DateTimeField(null=True, blank=True, editable=False)
     channel = models.CharField(max_length=20, choices=CHANNEL_CHOICES, default="STRIPE")
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="PENDING")
 
@@ -87,4 +89,3 @@ class Adresse(models.Model):
 
     def __str__(self):
         return f"[{self.get_type_adresse_display()}] {self.rue}, {self.ville}, {self.pays}"
-
