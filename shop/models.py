@@ -69,8 +69,10 @@ class Commande(models.Model):
         max_length=20,
         choices=[
             ("PENDING", "En attente"),
+            ("PROCESSING", "Paiement en cours"),
             ("SUCCESS", "Payée"),
             ("FAILED", "Échouée"),
+            ("CANCELED", "Annulée"),
         ],
         default="PENDING",
     )
@@ -80,6 +82,7 @@ class Commande(models.Model):
             ("CARD", "Carte bancaire"),
             ("MOBILE_MONEY", "Mobile Money"),
             ("STRIPE", "Stripe"),
+            ("CINETPAY", "CinetPay"),
         ],
         blank=True,
         null=True,

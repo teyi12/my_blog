@@ -34,9 +34,12 @@
       <div class="card shadow-sm p-4 border-0 rounded-4 text-center">
         <h4>Paiement par carte</h4>
         <p class="text-muted">Réglez une commande avec Stripe.</p>
-        <a href="{% url 'payments:stripe_checkout' commande.id %}" class="btn btn-primary w-100">
-          💳 Payer ma commande
-        </a>
+        <form action="{% url 'payments:stripe_checkout' commande.id %}" method="post">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-primary w-100">
+            💳 Payer ma commande
+          </button>
+        </form>
       </div>
     </div>
 
@@ -45,9 +48,13 @@
       <div class="card shadow-sm p-4 border-0 rounded-4 text-center">
         <h4>Mobile Money</h4>
         <p class="text-muted">Orange Money, MTN, Moov, Wave…</p>
-        <a href="{% url 'payments:cinetpay_create' commande.id %}" class="btn btn-warning w-100">
-          📱 Payer avec Mobile Money
-        </a>
+        <form action="{% url 'payments:cinetpay_create' commande.id %}" method="post">
+          {% csrf_token %}
+          <input type="hidden" name="channel" value="MOBILE_MONEY">
+          <button type="submit" class="btn btn-warning w-100">
+            📱 Payer avec Mobile Money
+          </button>
+        </form>
       </div>
     </div>
 

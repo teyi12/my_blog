@@ -7,7 +7,7 @@ from django.db import OperationalError
 from django.test import TestCase
 from django.urls import reverse
 
-from payments.models import Adresse
+from payments.models import Adresse, Payment
 from shop.models import Cart, CartItem, Commande, LigneCommande, Produit
 from shop.services import (
     SQLiteLockRetryExhausted,
@@ -247,13 +247,29 @@ class CheckoutFlowTests(TestCase):
 
     def test_stripe_webhook_returns_409_when_sqlite_lock_persists(self):
         order = self.create_order()
+        payment = Payment.objects.create(
+            commande=order,
+            montant=order.total,
+            devise=order.currency,
+            transaction_id="cs_test_session",
+            channel="STRIPE",
+            status="PROCESSING",
+        )
+        order.transaction_id = payment.transaction_id
+        order.payment_status = "PROCESSING"
+        order.save(update_fields=["transaction_id", "payment_status"])
         event = {
             "type": "checkout.session.completed",
             "data": {
                 "object": {
+                    "id": payment.transaction_id,
+                    "payment_status": "paid",
+                    "amount_total": 25,
+                    "currency": order.currency.lower(),
                     "metadata": {
                         "commande_id": str(order.id),
                         "user_id": str(self.user.id),
+                        "payment_id": str(payment.id),
                     }
                 }
             },
@@ -272,14 +288,29 @@ class CheckoutFlowTests(TestCase):
 
         self.assertEqual(response.status_code, 409)
         order.refresh_from_db()
-        self.assertEqual(order.payment_status, "PENDING")
+        self.assertEqual(order.payment_status, "PROCESSING")
 
     def test_cinetpay_ipn_returns_409_when_sqlite_lock_persists(self):
         order = self.create_order()
         order.transaction_id = "cinetpay-transaction"
-        order.save(update_fields=["transaction_id"])
+        order.payment_status = "PROCESSING"
+        order.save(update_fields=["transaction_id", "payment_status"])
+        Payment.objects.create(
+            commande=order,
+            montant=order.total,
+            devise=order.currency,
+            transaction_id=order.transaction_id,
+            channel="CINETPAY",
+            status="PROCESSING",
+        )
 
-        with patch("payments.views._cinetpay_check_status", return_value="ACCEPTED"), patch(
+        provider_data = {
+            "status": "ACCEPTED",
+            "transaction_id": order.transaction_id,
+            "amount": str(order.total),
+            "currency": order.currency,
+        }
+        with patch("payments.views._cinetpay_check_status", return_value=provider_data), patch(
             "payments.views.finalize_paid_order",
             side_effect=SQLiteLockRetryExhausted,
         ):
@@ -291,4 +322,4 @@ class CheckoutFlowTests(TestCase):
 
         self.assertEqual(response.status_code, 409)
         order.refresh_from_db()
-        self.assertEqual(order.payment_status, "PENDING")
+        self.assertEqual(order.payment_status, "PROCESSING")
