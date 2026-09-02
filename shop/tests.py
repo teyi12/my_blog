@@ -78,6 +78,21 @@ class CheckoutFlowTests(TestCase):
         self.assertEqual(line.quantite, 2)
         self.assertEqual(line.prix_unitaire, Decimal("12.50"))
 
+    def test_confirmation_page_renders_important_order_content(self):
+        order = self.create_order()
+
+        response = self.client.get(reverse("shop:confirmation", args=[order.id]))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Commande confirmée")
+        self.assertContains(
+            response,
+            f"<strong>Numéro de commande :</strong> {order.id}",
+            html=True,
+        )
+        self.assertContains(response, self.product.nom)
+        self.assertContains(response, "1 rue du Test")
+
     def test_double_checkout_post_reuses_the_same_order(self):
         token = self.get_checkout_token()
         data = self.checkout_data(token)

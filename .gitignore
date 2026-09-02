@@ -69,3 +69,6 @@ test_smtp.py
 # Local maintenance/setup scripts
 full_auto_django_auto_detect.sh
 setup_env_auto.sh
+
+# Local HTTPS development certificates and private keys
+certs/*.pem
