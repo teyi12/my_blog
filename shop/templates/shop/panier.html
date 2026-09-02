@@ -5,6 +5,7 @@
 {% block contenu %}
 <div class="container my-5">
 
+    <!-- Retour à la boutique -->
     <div class="mb-3">
         <a href="{% url 'shop:liste' %}" class="btn btn-outline-secondary">
             <i class="bi bi-arrow-left"></i> Continuer les achats
@@ -65,14 +66,14 @@
             </table>
         </div>
 
-        <!-- Total et nombre d'articles -->
-        <div class="d-flex flex-column flex-md-row justify-content-between align-items-center mt-4 gap-3">
+        <!-- Résumé panier -->
+        <div id="cart-summary" class="d-flex flex-column flex-md-row justify-content-between align-items-center mt-4 gap-3">
             <h5 class="mb-2 mb-md-0">Articles : <span id="cart-count">{{ cart.total_articles }}</span></h5>
             <h4 class="mb-2 mb-md-0">Total : 
                 <span class="text-primary" id="cart-total">{{ cart.total|floatformat:2 }} €</span>
             </h4>
-            <a href="{% url 'payments:choice' %}" class="btn btn-success btn-lg">
-                💳 Payer maintenant
+            <a href="{% url 'shop:checkout' %}" id="checkout-btn" class="btn btn-success btn-lg">
+                💳 Passer à la caisse
             </a>
         </div>
 
@@ -89,21 +90,7 @@ function getCSRFToken() {
 function updateCart(itemId) {
     const input = document.getElementById('qty-' + itemId);
     const quantity = parseInt(input.value);
-    const prixUnitaire = parseFloat(input.dataset.prix);
 
-    // Mise à jour instantanée du sous-total
-    document.getElementById('subtotal-' + itemId).textContent = (quantity * prixUnitaire).toFixed(2);
-
-    // Recalcul total et nombre d'articles côté front
-    let total = 0;
-    let totalArticles = 0;
-    document.querySelectorAll("[id^='subtotal-']").forEach(td => total += parseFloat(td.textContent));
-    document.querySelectorAll("[id^='qty-']").forEach(input => totalArticles += parseInt(input.value));
-
-    document.getElementById('cart-total').textContent = total.toFixed(2) + " €";
-    document.getElementById('cart-count').textContent = totalArticles;
-
-    // Envoi au serveur
     fetch("{% url 'shop:update_panier' %}", {
         method: 'POST',
         headers: {
@@ -113,13 +100,7 @@ function updateCart(itemId) {
         body: JSON.stringify({action: 'modifier', item_id: itemId, quantite: quantity})
     })
     .then(r => r.json())
-    .then(data => {
-        if (data.success) {
-            document.getElementById('subtotal-' + itemId).textContent = data.sous_total.toFixed(2);
-            document.getElementById('cart-total').textContent = data.total.toFixed(2) + " €";
-            document.getElementById('cart-count').textContent = data.total_articles;
-        }
-    });
+    .then(data => updateUI(data));
 }
 
 function removeFromCart(itemId) {
@@ -134,14 +115,31 @@ function removeFromCart(itemId) {
     .then(r => r.json())
     .then(data => {
         if (data.success) {
-            document.getElementById('item-' + itemId).remove();
-            document.getElementById('cart-total').textContent = data.total.toFixed(2) + " €";
-            document.getElementById('cart-count').textContent = data.total_articles;
-            if (data.total === 0) {
-                document.getElementById('cart-table').innerHTML = '<p class="text-center text-muted">Votre panier est vide.</p>';
-            }
+            document.getElementById('item-' + itemId)?.remove();
+            updateUI(data);
         }
     });
+}
+
+function updateUI(data) {
+    if (data.success) {
+        document.getElementById('cart-total').textContent = data.total.toFixed(2) + " €";
+        document.getElementById('cart-count').textContent = data.total_articles;
+
+        // Mise à jour des sous-totaux
+        if (data.sous_totaux) {
+            for (const [id, sousTotal] of Object.entries(data.sous_totaux)) {
+                const el = document.getElementById('subtotal-' + id);
+                if (el) el.textContent = sousTotal.toFixed(2);
+            }
+        }
+
+        // Si panier vide => affiche message
+        if (data.total_articles === 0) {
+            document.getElementById('cart-table').innerHTML = '<p class="text-center text-muted">Votre panier est vide.</p>';
+            document.getElementById('cart-summary').style.display = "none";
+        }
+    }
 }
 </script>
 {% endblock %}

@@ -4,6 +4,7 @@ from django.utils.text import slugify
 from decimal import Decimal
 
 
+
 class Categorie(models.Model):
     nom = models.CharField(max_length=100)
     slug = models.SlugField(unique=True, blank=True)
@@ -52,6 +53,15 @@ class Commande(models.Model):
         blank=True,
         related_name="commandes"
     )
+    source_cart = models.ForeignKey(
+        "Cart",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="commandes",
+    )
+    checkout_token = models.UUIDField(unique=True, null=True, blank=True, editable=False)
+    cart_finalized_at = models.DateTimeField(null=True, blank=True, editable=False)
     date_commande = models.DateTimeField(auto_now_add=True)
     total = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     transaction_id = models.CharField(max_length=100, blank=True, null=True)
@@ -59,8 +69,10 @@ class Commande(models.Model):
         max_length=20,
         choices=[
             ("PENDING", "En attente"),
+            ("PROCESSING", "Paiement en cours"),
             ("SUCCESS", "Payée"),
             ("FAILED", "Échouée"),
+            ("CANCELED", "Annulée"),
         ],
         default="PENDING",
     )
@@ -70,6 +82,7 @@ class Commande(models.Model):
             ("CARD", "Carte bancaire"),
             ("MOBILE_MONEY", "Mobile Money"),
             ("STRIPE", "Stripe"),
+            ("CINETPAY", "CinetPay"),
         ],
         blank=True,
         null=True,
@@ -99,6 +112,13 @@ class LigneCommande(models.Model):
         Commande, related_name="lignes", on_delete=models.CASCADE
     )
     produit = models.ForeignKey(Produit, on_delete=models.CASCADE)
+    source_cart_item = models.ForeignKey(
+        "CartItem",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="lignes_commande",
+    )
     quantite = models.PositiveIntegerField(default=1)
     prix_unitaire = models.DecimalField(max_digits=10, decimal_places=2, default=0)
 

@@ -50,3 +50,13 @@ body {
   text-overflow: ellipsis;
   max-height: 4.5em; /* Facultatif : hauteur max pour 3 lignes */
 }
+
+
+.sponsor-slider {
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+  }
+  .slider-item {
+    flex: 0 0 auto;
+    scroll-snap-align: start;
+    width: 250px;}

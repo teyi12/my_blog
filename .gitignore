@@ -56,3 +56,19 @@ docker-compose.override.yml
 .idea/
 *.iml
 Thumbs.db
+
+# Local development utilities
+copy_and_run_django.sh
+
+# Third-party downloaded binaries
+stripe_*.tar.gz
+
+# Local SMTP testing / secrets
+test_smtp.py
+
+# Local maintenance/setup scripts
+full_auto_django_auto_detect.sh
+setup_env_auto.sh
+
+# Local HTTPS development certificates and private keys
+certs/*.pem

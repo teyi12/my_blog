@@ -11,13 +11,13 @@
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="{% url 'shop:liste' %}">Boutique</a></li>
             <li class="breadcrumb-item"><a href="{% url 'shop:panier' %}">Panier</a></li>
-            <li class="breadcrumb-item active" aria-current="page"><a href="shop:checkout"></a>Checkout</li>
+            <li class="breadcrumb-item active" aria-current="page">Checkout</li>
         </ol>
     </nav>
 
     <h2 class="text-center mb-4">🛒 Finaliser votre commande</h2>
 
-    {% if panier %}
+    {% if cart and cart.items.exists %}
         <div class="row">
             <!-- Formulaire d’adresse -->
             <div class="col-md-7">
@@ -26,31 +26,31 @@
                         <h5 class="card-title mb-3">Adresse de livraison</h5>
                         <form method="post" action="{% url 'shop:checkout' %}">
                             {% csrf_token %}
+                            <input type="hidden" name="checkout_token" value="{{ checkout_token }}">
+                            {{ form.non_field_errors }}
+
                             <div class="mb-3">
-                                <label class="form-label">Nom complet</label>
-                                <input type="text" name="nom" class="form-control" placeholder="Jean Dupont" required>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Adresse</label>
-                                <input type="text" name="adresse" class="form-control" placeholder="12 rue de Paris" required>
+                                <label class="form-label">Rue</label>
+                                {{ form.rue }}
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">Ville</label>
-                                <input type="text" name="ville" class="form-control" placeholder="Paris" required>
+                                {{ form.ville }}
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">Code postal</label>
-                                <input type="text" name="code_postal" class="form-control" placeholder="75001" required>
+                                {{ form.code_postal }}
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">Pays</label>
-                                <input type="text" name="pays" class="form-control" placeholder="France" required>
+                                {{ form.pays }}
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">Téléphone</label>
-                                <input type="text" name="telephone" class="form-control" placeholder="+33 6 12 34 56 78" required>
+                                {{ form.telephone }}
                             </div>
-                            <button type="submit" class="btn btn-primary w-100">Enregistrer l’adresse</button>
+
+                            <button type="submit" class="btn btn-primary w-100">Enregistrer et continuer vers le paiement</button>
                         </form>
                     </div>
                 </div>
@@ -62,15 +62,15 @@
                     <div class="card-body">
                         <h5 class="card-title">Résumé de la commande</h5>
                         <ul class="list-group list-group-flush mb-3">
-                            {% for slug, item in panier.items %}
+                            {% for item in cart.items.all %}
                             <li class="list-group-item d-flex justify-content-between align-items-center">
                                 <div class="d-flex align-items-center">
-                                    {% if item.image %}
-                                        <img src="{{ item.image }}" alt="{{ item.nom }}"
+                                    {% if item.produit.image %}
+                                        <img src="{{ item.produit.image.url }}" alt="{{ item.produit.nom }}"
                                              style="width:50px; height:50px; object-fit:cover; border-radius:5px;" class="me-2">
                                     {% endif %}
                                     <div>
-                                        <h6 class="mb-0">{{ item.nom }}</h6>
+                                        <h6 class="mb-0">{{ item.produit.nom }}</h6>
                                         <small class="text-muted">x{{ item.quantite }}</small>
                                     </div>
                                 </div>
@@ -91,9 +91,6 @@
                             <span>Total :</span>
                             <span>{{ total|floatformat:2 }} €</span>
                         </div>
-                        <a href="{% url 'payments:choice' %}" class="btn btn-success w-100">
-                            💳 Procéder au paiement
-                        </a>
                     </div>
                 </div>
             </div>

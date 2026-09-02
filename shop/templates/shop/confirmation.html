@@ -1,40 +1,64 @@
-{% extends "base.html" %}
-{% block content %}
-<div class="container mt-5">
-    <h2>Merci pour votre commande ! 🎉</h2>
-    <p>Commande #{{ commande.id }} passée le {{ commande.date_commande|date:"d/m/Y H:i" }}</p>
+{% extends "template_base.html" %}
+{% load static %}
 
-    <table class="table table-bordered mt-4">
-        <thead>
-            <tr>
-                <th>Image</th>
-                <th>Produit</th>
-                <th>Quantité</th>
-                <th>Prix unitaire</th>
-                <th>Sous-total</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for ligne in lignes %}
-            <tr>
-                <td>
-                    {% if ligne.produit.image %}
-                        <img src="{{ ligne.produit.image.url }}" alt="{{ ligne.produit.nom }}" width="60">
-                    {% else %}
-                        <span class="text-muted">Pas d'image</span>
-                    {% endif %}
-                </td>
-                <td>{{ ligne.produit.nom }}</td>
-                <td>{{ ligne.quantite }}</td>
-                <td>{{ ligne.prix_unitaire }} €</td>
-                <td>{{ ligne.sous_total }} €</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+{% block contenu %}
+<div class="container my-5">
+    <div class="card shadow-lg border-0">
+        <div class="card-body p-4">
+            <h2 class="mb-4 text-success">✅ Commande confirmée</h2>
 
-    <h4 class="text-end">💰 Total : {{ commande.total }} €</h4>
+            <p class="mb-3">
+                Merci <strong>{{ commande.client.username }}</strong>, votre commande a bien été enregistrée.
+            </p>
 
-    <a href="{% url 'shop:liste' %}" class="btn btn-primary mt-3">Retour à la boutique</a>
+            <h5 class="mb-3">📦 Détails de la commande</h5>
+            <ul class="list-group mb-3">
+                <li class="list-group-item">
+                    <strong>Numéro de commande :</strong> {{ commande.id }}
+                </li>
+                <li class="list-group-item">
+                    <strong>Date :</strong> {{ commande.date_commande|date:"d/m/Y H:i" }}
+                </li>
+                <li class="list-group-item">
+                    <strong>Total :</strong> {{ commande.total|floatformat:2 }} €
+                </li>
+                <li class="list-group-item">
+                    <strong>Adresse :</strong><br>
+                    {{ commande.adresse.rue }} <br>
+                    {{ commande.adresse.code_postal }} {{ commande.adresse.ville }} <br>
+                    {{ commande.adresse.pays }} <br>
+                    📞 {{ commande.adresse.telephone }}
+                </li>
+            </ul>
+
+            <h5 class="mb-3">🛒 Articles</h5>
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Produit</th>
+                        <th>Quantité</th>
+                        <th>Prix unitaire</th>
+                        <th>Sous-total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for ligne in commande.lignes.all %}
+                    <tr>
+                        <td>{{ ligne.produit.nom }}</td>
+                        <td>{{ ligne.quantite }}</td>
+                        <td>{{ ligne.prix_unitaire }} €</td>
+                        <td>{{ ligne.sous_total }} €</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            <div class="mt-4">
+                <a href="{% url 'payments:choice' commande.id %}" class="btn btn-primary btn-lg w-100">
+                    💳 Procéder au paiement
+                </a>
+            </div>
+        </div>
+    </div>
 </div>
 {% endblock %}

@@ -34,11 +34,11 @@
       <div class="card shadow-sm p-4 border-0 rounded-4 text-center">
         <h4>Paiement par carte</h4>
         <p class="text-muted">Réglez une commande avec Stripe.</p>
-        <form action="{% url 'payments:choice' %}" method="get">
-          <div class="mb-3">
-            <input type="text" name="order_id" class="form-control" placeholder="ID de la commande" required>
-          </div>
-          <button type="submit" class="btn btn-primary w-100">💳 Payer ma commande</button>
+        <form action="{% url 'payments:stripe_checkout' commande.id %}" method="post">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-primary w-100">
+            💳 Payer ma commande
+          </button>
         </form>
       </div>
     </div>
@@ -48,37 +48,16 @@
       <div class="card shadow-sm p-4 border-0 rounded-4 text-center">
         <h4>Mobile Money</h4>
         <p class="text-muted">Orange Money, MTN, Moov, Wave…</p>
-        <form id="cinetpay-form" method="get">
-          <div class="mb-3">
-            <input type="text" name="order_id" id="order_id" class="form-control" placeholder="ID de la commande" required>
-          </div>
-          <div class="mb-3">
-            <select name="channel" class="form-select">
-              <option value="MOBILE_MONEY">Mobile Money</option>
-              <option value="CARD">Carte bancaire (CinetPay)</option>
-            </select>
-          </div>
-          <button type="submit" class="btn btn-warning w-100">📱 Payer avec Mobile Money</button>
+        <form action="{% url 'payments:cinetpay_create' commande.id %}" method="post">
+          {% csrf_token %}
+          <input type="hidden" name="channel" value="MOBILE_MONEY">
+          <button type="submit" class="btn btn-warning w-100">
+            📱 Payer avec Mobile Money
+          </button>
         </form>
       </div>
     </div>
 
   </div>
 </div>
-
-<!-- Script pour injecter order_id dans l’URL -->
-<script>
-  document.getElementById("cinetpay-form").addEventListener("submit", function (event) {
-    event.preventDefault(); // bloque l’envoi normal
-    const orderId = document.getElementById("order_id").value.trim();
-    if (!orderId) {
-      alert("Veuillez entrer un ID de commande.");
-      return;
-    }
-    // Redirige vers l’URL Django avec l’order_id saisi
-    const url = "{% url 'payments:cinetpay_create' order_id=0 %}".replace("0", orderId);
-    this.action = url;
-    this.submit(); // envoi final
-  });
-</script>
 {% endblock %}

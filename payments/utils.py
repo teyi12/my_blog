@@ -1,40 +1,49 @@
-from decimal import Decimal
+
+# payments/utils.py
+from shop.models import Cart
 
 def get_panier(request):
     """
-    Récupère le panier depuis la session utilisateur.
-    Si le panier est vide ou inexistant, retourne un dict vide.
+    Retourne le panier de l'utilisateur.
+    Crée un panier vide si nécessaire.
     """
-    return request.session.get("panier", {})
+    if not request.user.is_authenticated:
+        return None
+    cart, _ = Cart.objects.get_or_create(user=request.user)
+    return cart
 
 
-def get_total(panier):
+def get_total(request):
     """
-    Calcule le total du panier en utilisant quantité * prix.
-    Retourne un Decimal pour éviter les erreurs d'arrondi.
+    Retourne le total du panier en base.
     """
-    total = Decimal("0.00")
-    for item in panier.values():
-        prix = Decimal(str(item.get("prix", 0)))
-        qte = int(item.get("quantité", 0))
-        total += prix * qte
-    return total
+    cart = get_panier(request)
+    if not cart:
+        return 0
+    return cart.total()
 
 
-def get_nombre_articles(panier):
+def enrichir_panier(request):
     """
-    Retourne le nombre total d’articles dans le panier.
+    Retourne un dictionnaire enrichi du panier,
+    utile pour l'affichage ou l’API.
     """
-    return sum(int(item.get("quantité", 0)) for item in panier.values())
+    cart = get_panier(request)
+    if not cart:
+        return {"items": [], "total": 0, "total_articles": 0}
 
+    items = []
+    for item in cart.items.select_related("produit"):
+        items.append({
+            "id": item.id,
+            "produit": item.produit.nom,
+            "prix_unitaire": float(item.prix_unitaire),
+            "quantite": item.quantite,
+            "sous_total": float(item.sous_total()),
+        })
 
-def enrichir_panier(panier):
-    """
-    Ajoute un champ 'sous_total' à chaque item du panier.
-    Utile pour l'affichage dans les templates.
-    """
-    for item in panier.values():
-        prix = Decimal(str(item.get("prix", 0)))
-        qte = int(item.get("quantité", 0))
-        item["sous_total"] = prix * qte
-    return panier
+    return {
+        "items": items,
+        "total": float(cart.total()),
+        "total_articles": cart.total_articles(),
+    }

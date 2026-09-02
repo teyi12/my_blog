@@ -1,11 +1,14 @@
 from django.db import models
 from django.conf import settings
+from django.db.models import Q
 from shop.models import Commande
+import uuid
 
 
 class Payment(models.Model):
     STATUS_CHOICES = [
         ("PENDING", "En attente"),
+        ("PROCESSING", "En cours"),
         ("SUCCESS", "Réussi"),
         ("FAILED", "Échoué"),
         ("CANCELED", "Annulé"),
@@ -29,6 +32,10 @@ class Payment(models.Model):
 
     # Infos transaction
     transaction_id = models.CharField(max_length=100, unique=True)
+    idempotency_key = models.UUIDField(default=uuid.uuid4, unique=True, editable=False)
+    checkout_url = models.URLField(max_length=500, blank=True)
+    initialization_token = models.UUIDField(null=True, blank=True, editable=False)
+    initialization_started_at = models.DateTimeField(null=True, blank=True, editable=False)
     channel = models.CharField(max_length=20, choices=CHANNEL_CHOICES, default="STRIPE")
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="PENDING")
 
@@ -39,6 +46,15 @@ class Payment(models.Model):
 
     def __str__(self):
         return f"Paiement {self.channel} - {self.transaction_id} - {self.status}"
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["commande"],
+                condition=Q(status="PROCESSING"),
+                name="one_processing_payment_per_order",
+            )
+        ]
 
 from django.db import models
 from django.contrib.auth.models import User
@@ -73,5 +89,3 @@ class Adresse(models.Model):
 
     def __str__(self):
         return f"[{self.get_type_adresse_display()}] {self.rue}, {self.ville}, {self.pays}"
-
-
