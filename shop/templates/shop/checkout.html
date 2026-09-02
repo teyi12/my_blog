@@ -26,6 +26,7 @@
                         <h5 class="card-title mb-3">Adresse de livraison</h5>
                         <form method="post" action="{% url 'shop:checkout' %}">
                             {% csrf_token %}
+                            <input type="hidden" name="checkout_token" value="{{ checkout_token }}">
                             {{ form.non_field_errors }}
 
                             <div class="mb-3">
@@ -49,7 +50,7 @@
                                 {{ form.telephone }}
                             </div>
 
-                            <button type="submit" class="btn btn-primary w-100">Enregistrer l’adresse</button>
+                            <button type="submit" class="btn btn-primary w-100">Enregistrer et continuer vers le paiement</button>
                         </form>
                     </div>
                 </div>
@@ -90,9 +91,6 @@
                             <span>Total :</span>
                             <span>{{ total|floatformat:2 }} €</span>
                         </div>
-                        <a href="{% url 'payments:choice' %}">
-                            💳 Procéder au paiement
-                        </a>
                     </div>
                 </div>
             </div>

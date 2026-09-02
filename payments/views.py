@@ -12,8 +12,8 @@ from django.shortcuts import redirect, render, get_object_or_404
 from django.http import HttpResponse
 from django.urls import reverse
 
-from shop.models import Commande, Cart
-from .utils import get_total
+from shop.models import Commande
+from shop.services import SQLiteLockRetryExhausted, finalize_paid_order
 
 # --- LOGGING ---
 logger = logging.getLogger(__name__)
@@ -26,22 +26,28 @@ stripe.api_key = settings.STRIPE_SECRET_KEY
 # CHOIX / RÉCAPITULATIF AVANT PAIEMENT
 # ================================================================
 @login_required
-def choice(request):
+def choice(request, order_id=None):
     """Page de choix avant paiement"""
-    commande = Commande.objects.filter(client=request.user, payment_status="PENDING").first()
-    if not commande:
-        total = get_total(request) or Decimal("1000.00")
-        commande = Commande.objects.create(
-            client=request.user,
-            total=total,
-            currency=getattr(settings, "DEFAULT_CURRENCY", "EUR"),
-            payment_status="PENDING"
-        )
+    if order_id is None:
+        return redirect("shop:checkout")
+
+    commande = _get_payable_order(request, order_id)
 
     return render(request, "payments/choice.html", {
         "STRIPE_PUBLIC_KEY": getattr(settings, "STRIPE_PUBLIC_KEY", ""),
         "commande": commande
     })
+
+
+def _get_payable_order(request, order_id):
+    return get_object_or_404(
+        Commande.objects.filter(lignes__isnull=False).distinct(),
+        id=order_id,
+        client=request.user,
+        payment_status="PENDING",
+        adresse__isnull=False,
+        total__gt=0,
+    )
 
 
 # ================================================================
@@ -114,7 +120,7 @@ def create_subscription_checkout(request):
 @login_required
 def stripe_checkout(request, order_id):
     """Paiement d’une commande avec Stripe"""
-    commande = get_object_or_404(Commande, id=order_id, client=request.user)
+    commande = _get_payable_order(request, order_id)
     try:
         montant = Decimal(str(commande.total))
         currency = (commande.currency or getattr(settings, "DEFAULT_CURRENCY", "EUR")).lower()
@@ -150,7 +156,7 @@ def stripe_checkout(request, order_id):
 @login_required
 def mobile_money_checkout(request, order_id):
     """Paiement via API Mobile Money"""
-    commande = get_object_or_404(Commande, id=order_id, client=request.user)
+    commande = _get_payable_order(request, order_id)
 
     payload = {
         "invoice": {
@@ -219,7 +225,7 @@ def _cinetpay_payload(commande, request, channel="MOBILE_MONEY"):
 
 @login_required
 def cinetpay_create_payment(request, order_id):
-    commande = get_object_or_404(Commande, id=order_id, client=request.user)
+    commande = _get_payable_order(request, order_id)
     channel = request.GET.get("channel", "MOBILE_MONEY").upper()
     if channel not in ("MOBILE_MONEY", "CARD"):
         channel = "MOBILE_MONEY"
@@ -264,7 +270,11 @@ def cinetpay_ipn(request):
         return HttpResponse("NO_ORDER", status=404)
 
     if status == "ACCEPTED":
-        commande.payment_status = "SUCCESS"
+        try:
+            finalize_paid_order(commande.id)
+        except SQLiteLockRetryExhausted:
+            return HttpResponse("RETRY", status=409)
+        return HttpResponse("OK", status=200)
     elif status in ("REFUSED", "CANCELED"):
         commande.payment_status = "FAILED"
     else:
@@ -334,17 +344,12 @@ def stripe_webhook(request):
 
         try:
             commande = Commande.objects.get(id=commande_id, client_id=user_id)
-            commande.payment_status = "SUCCESS"
-            commande.save(update_fields=["payment_status"])
-
-            # 🧹 Vider le panier de l'utilisateur
-            from shop.models import Cart
-            cart = Cart.objects.filter(user_id=user_id).first()
-            if cart:
-                cart.items.all().delete()
+            finalize_paid_order(commande.id)
 
         except Commande.DoesNotExist:
             pass
+        except SQLiteLockRetryExhausted:
+            return HttpResponse("RETRY", status=409)
 
     # ❌ Paiement échoué ou annulé
     elif event["type"] == "checkout.session.async_payment_failed":

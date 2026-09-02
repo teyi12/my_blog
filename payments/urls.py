@@ -7,6 +7,7 @@ app_name = "payments"
 urlpatterns = [
     # Choix du paiement
     path("choice/", views.choice, name="choice"),
+    path("choice/<int:order_id>/", views.choice, name="choice"),
 
     # Stripe
     path("donate/", views.create_donation_checkout, name="create_donation_checkout"),

@@ -1,17 +1,22 @@
 import json
 import stripe
+import uuid
+from decimal import Decimal
 from django.conf import settings
+from django.db import IntegrityError, transaction
+from django.db.models import F
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import ListView, DetailView, View
-from django.urls import reverse_lazy
+from django.urls import reverse, reverse_lazy
 from django.contrib import messages
 
 from .models import Produit, Categorie, Cart, CartItem, Commande, LigneCommande
 from payments.models import Adresse
 from .forms import AdresseForm
+from .services import SQLiteLockRetryExhausted, execute_with_sqlite_lock_retry
 
 # --- STRIPE ---
 stripe.api_key = settings.STRIPE_SECRET_KEY
@@ -68,8 +73,7 @@ def ajouter_panier(request, slug):
 
     item, created = CartItem.objects.get_or_create(cart=cart, produit=produit)
     if not created:
-        item.quantite += 1
-        item.save()
+        CartItem.objects.filter(pk=item.pk).update(quantite=F("quantite") + 1)
 
     return redirect("shop:panier")
 
@@ -129,31 +133,128 @@ class CheckoutView(LoginRequiredMixin, View):
             "cart": cart,
             "total": cart.total(),
             "form": form,
+            "checkout_token": uuid.uuid4(),
         })
 
     def post(self, request, *args, **kwargs):
-        """Sauvegarde de l’adresse puis redirection vers la page de confirmation"""
+        """Crée l'adresse et la commande correspondant au panier validé."""
         form = AdresseForm(request.POST)
-        cart = Cart.objects.filter(user=request.user).first()
+        try:
+            checkout_token = uuid.UUID(request.POST.get("checkout_token", ""))
+        except (TypeError, ValueError):
+            messages.error(request, "Session de checkout invalide. Veuillez réessayer.")
+            return redirect("shop:checkout")
 
-        if not cart:
+        if form.is_valid():
+            address_data = {
+                field: form.cleaned_data[field]
+                for field in ("rue", "ville", "code_postal", "pays", "telephone")
+            }
+
+            def create_order():
+                with transaction.atomic():
+                    existing = Commande.objects.filter(
+                        client=request.user,
+                        checkout_token=checkout_token,
+                    ).first()
+                    if existing:
+                        return existing
+
+                    cart = (
+                        Cart.objects.select_for_update()
+                        .filter(user=request.user)
+                        .first()
+                    )
+                    if not cart:
+                        return None
+
+                    items = list(
+                        cart.items.select_for_update().select_related("produit")
+                    )
+                    if not items:
+                        return None
+
+                    adresse = Adresse.objects.create(
+                        utilisateur=request.user,
+                        **address_data,
+                    )
+                    total = sum(
+                        (item.produit.prix * item.quantite for item in items),
+                        Decimal("0.00"),
+                    )
+                    commande = Commande.objects.create(
+                        client=request.user,
+                        adresse=adresse,
+                        source_cart=cart,
+                        checkout_token=checkout_token,
+                        total=total,
+                        currency=getattr(settings, "DEFAULT_CURRENCY", "EUR"),
+                        payment_status="PENDING",
+                    )
+                    LigneCommande.objects.bulk_create(
+                        [
+                            LigneCommande(
+                                commande=commande,
+                                produit=item.produit,
+                                source_cart_item=item,
+                                quantite=item.quantite,
+                                prix_unitaire=item.produit.prix,
+                            )
+                            for item in items
+                        ]
+                    )
+                    return commande
+
+            try:
+                commande = execute_with_sqlite_lock_retry(create_order)
+            except IntegrityError:
+                commande = Commande.objects.filter(
+                    client=request.user,
+                    checkout_token=checkout_token,
+                ).first()
+                if not commande:
+                    raise
+            except SQLiteLockRetryExhausted:
+                try:
+                    commande = execute_with_sqlite_lock_retry(
+                        lambda: Commande.objects.filter(
+                            client=request.user,
+                            checkout_token=checkout_token,
+                        ).first()
+                    )
+                except SQLiteLockRetryExhausted:
+                    commande = None
+
+                if not commande:
+                    cart = Cart.objects.filter(user=request.user).first()
+                    messages.warning(
+                        request,
+                        "Le checkout est momentanément occupé. Veuillez réessayer.",
+                    )
+                    return render(request, "shop/checkout.html", {
+                        "cart": cart,
+                        "total": cart.total() if cart else Decimal("0.00"),
+                        "form": form,
+                        "checkout_token": checkout_token,
+                    }, status=409)
+
+            if not commande:
+                messages.warning(request, "Votre panier est vide.")
+                return redirect("shop:panier")
+
+            url = reverse("shop:adresse_enregistree")
+            return redirect(f"{url}?order_id={commande.id}")
+
+        cart = Cart.objects.filter(user=request.user).first()
+        if not cart or not cart.items.exists():
             messages.warning(request, "Votre panier est vide.")
             return redirect("shop:panier")
 
-        if form.is_valid():
-            adresse = form.save(commit=False)
-            adresse.utilisateur = request.user
-            adresse.cree_le = timezone.now()
-            adresse.save()
-
-            # ✅ Redirige vers la page d’adresse enregistrée
-            return redirect("shop:adresse_enregistree")
-
-        # ❌ Si formulaire invalide
         return render(request, "shop/checkout.html", {
             "cart": cart,
             "total": cart.total(),
             "form": form,
+            "checkout_token": checkout_token,
         })
 
 
@@ -161,7 +262,17 @@ class CheckoutView(LoginRequiredMixin, View):
 @login_required
 def adresse_enregistree(request):
     """Affiche un message de confirmation puis redirige vers le choix du paiement"""
-    return render(request, "shop/adresse_enregistree.html")
+    commande = get_object_or_404(
+        Commande,
+        id=request.GET.get("order_id"),
+        client=request.user,
+        payment_status="PENDING",
+    )
+    return render(
+        request,
+        "shop/adresse_enregistree.html",
+        {"commande": commande},
+    )
 
 
 # ================= CONFIRMATION COMMANDE =================

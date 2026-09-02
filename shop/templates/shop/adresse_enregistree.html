@@ -7,7 +7,7 @@
     <div class="alert alert-success shadow-sm p-4 rounded-3">
         <h3 class="mb-3">✅ Adresse enregistrée avec succès !</h3>
         <p>Vous allez être redirigé vers la page de paiement dans quelques secondes...</p>
-        <a href="{% url 'payments:choice' %}" class="btn btn-primary mt-3">
+        <a href="{% url 'payments:choice' commande.id %}" class="btn btn-primary mt-3">
             Continuer vers le paiement
         </a>
     </div>
@@ -15,7 +15,7 @@
 
 <script>
     setTimeout(function() {
-        window.location.href = "{% url 'payments:choice' %}";
+        window.location.href = "{% url 'payments:choice' commande.id %}";
     }, 3000); // 3 secondes avant la redirection
 </script>
 {% endblock %}
