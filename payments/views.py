@@ -12,9 +12,8 @@ from django.shortcuts import redirect, render, get_object_or_404
 from django.http import HttpResponse
 from django.urls import reverse
 
-from shop.models import Commande
-from .forms import AdresseForm
-from .utils import get_panier, get_total, enrichir_panier
+from shop.models import Commande, Cart
+from .utils import get_total
 
 # --- LOGGING ---
 logger = logging.getLogger(__name__)
@@ -23,16 +22,33 @@ logger = logging.getLogger(__name__)
 stripe.api_key = settings.STRIPE_SECRET_KEY
 
 
+# ================================================================
+# CHOIX / RÉCAPITULATIF AVANT PAIEMENT
+# ================================================================
 @login_required
 def choice(request):
+    """Page de choix avant paiement"""
+    commande = Commande.objects.filter(client=request.user, payment_status="PENDING").first()
+    if not commande:
+        total = get_total(request) or Decimal("1000.00")
+        commande = Commande.objects.create(
+            client=request.user,
+            total=total,
+            currency=getattr(settings, "DEFAULT_CURRENCY", "EUR"),
+            payment_status="PENDING"
+        )
+
     return render(request, "payments/choice.html", {
-        "STRIPE_PUBLIC_KEY": settings.STRIPE_PUBLIC_KEY
+        "STRIPE_PUBLIC_KEY": getattr(settings, "STRIPE_PUBLIC_KEY", ""),
+        "commande": commande
     })
 
 
+# ================================================================
+# STRIPE : DON
+# ================================================================
 @login_required
 def create_donation_checkout(request):
-    """Don ponctuel avec montant libre"""
     if request.method != "POST":
         return redirect("payments:choice")
 
@@ -48,7 +64,7 @@ def create_donation_checkout(request):
             line_items=[{
                 "price_data": {
                     "currency": currency,
-                    "product_data": {"name": f"Don à {request.user.first_name or request.user.email}"},
+                    "product_data": {"name": f"Don {request.user.email}"},
                     "unit_amount": int(amount * 100),
                 },
                 "quantity": 1,
@@ -56,17 +72,23 @@ def create_donation_checkout(request):
             success_url=request.build_absolute_uri(reverse("payments:success")),
             cancel_url=request.build_absolute_uri(reverse("payments:cancel")),
             customer_email=request.user.email or None,
+            metadata={
+                "donation": "1",
+                "user_id": str(request.user.id)
+            }
         )
         return redirect(session.url, code=303)
-    except Exception as e:
-        logger.error(f"Erreur Stripe donation: {e}")
+    except Exception:
+        logger.exception("Erreur Stripe donation")
         return redirect("payments:cancel")
 
 
+# ================================================================
+# STRIPE : ABONNEMENT
+# ================================================================
 @login_required
 def create_subscription_checkout(request):
-    """Abonnement mensuel"""
-    price_id = settings.STRIPE_PRICE_MONTHLY
+    price_id = getattr(settings, "STRIPE_PRICE_MONTHLY", None)
     if not price_id:
         return redirect("payments:choice")
 
@@ -78,25 +100,31 @@ def create_subscription_checkout(request):
             success_url=request.build_absolute_uri(reverse("payments:success")),
             cancel_url=request.build_absolute_uri(reverse("payments:cancel")),
             customer_email=request.user.email or None,
+            metadata={"user_id": str(request.user.id)}
         )
         return redirect(session.url, code=303)
-    except Exception as e:
-        logger.error(f"Erreur Stripe abonnement: {e}")
+    except Exception:
+        logger.exception("Erreur Stripe abonnement")
         return redirect("payments:cancel")
 
 
+# ================================================================
+# STRIPE : COMMANDE
+# ================================================================
 @login_required
 def stripe_checkout(request, order_id):
     """Paiement d’une commande avec Stripe"""
     commande = get_object_or_404(Commande, id=order_id, client=request.user)
     try:
         montant = Decimal(str(commande.total))
+        currency = (commande.currency or getattr(settings, "DEFAULT_CURRENCY", "EUR")).lower()
+
         session = stripe.checkout.Session.create(
             mode="payment",
             payment_method_types=["card"],
             line_items=[{
                 "price_data": {
-                    "currency": "eur",
+                    "currency": currency,
                     "product_data": {"name": f"Commande #{commande.id}"},
                     "unit_amount": int(montant * 100),
                 },
@@ -105,19 +133,25 @@ def stripe_checkout(request, order_id):
             success_url=request.build_absolute_uri(reverse("payments:success")),
             cancel_url=request.build_absolute_uri(reverse("payments:cancel")),
             customer_email=request.user.email or None,
+            metadata={
+                "commande_id": str(commande.id),
+                "user_id": str(request.user.id)
+            },
         )
         return redirect(session.url, code=303)
-    except Exception as e:
-        logger.error(f"Erreur Stripe commande: {e}")
+    except Exception:
+        logger.exception("Erreur Stripe commande")
         return redirect("payments:cancel")
 
 
-# --- MOBILE MONEY ---
+# ================================================================
+# MOBILE MONEY
+# ================================================================
 @login_required
 def mobile_money_checkout(request, order_id):
     """Paiement via API Mobile Money"""
     commande = get_object_or_404(Commande, id=order_id, client=request.user)
-    
+
     payload = {
         "invoice": {
             "total_amount": str(Decimal(str(commande.total))),
@@ -136,28 +170,30 @@ def mobile_money_checkout(request, order_id):
     headers = {
         "Content-Type": "application/json",
         "ApiKey": settings.MOBILE_MONEY_API_KEY,
-        "ApiSecret": settings.MOBILE_MONEY_SECRET_KEY
+        "ApiSecret": settings.MOBILE_MONEY_SECRET_KEY,
     }
 
     try:
         r = requests.post(settings.MOBILE_MONEY_BASE_URL, json=payload, headers=headers, timeout=30)
         data = r.json()
-    except Exception as e:
-        logger.error(f"Erreur Mobile Money: {e}")
+    except Exception:
+        logger.exception("Erreur Mobile Money")
         return render(request, "payments/error.html", {"error": "Impossible de contacter Mobile Money."})
 
     payment_url = data.get("invoice_url") or data.get("payment_url")
     if payment_url:
         return redirect(payment_url)
-    else:
-        return render(request, "payments/error.html", {"error": data})
+
+    return render(request, "payments/error.html", {"error": data})
 
 
-# --- CINETPAY ---
+# ================================================================
+# CINETPAY
+# ================================================================
 CINETPAY_HEADERS = {"Content-Type": "application/json"}
 
+
 def _abs_url(name, request):
-    """Construit une URL absolue basée sur la requête"""
     return request.build_absolute_uri(reverse(name))
 
 
@@ -169,7 +205,7 @@ def _cinetpay_payload(commande, request, channel="MOBILE_MONEY"):
 
     return {
         "amount": str(Decimal(str(commande.total))),
-        "currency": commande.currency or settings.DEFAULT_CURRENCY,
+        "currency": commande.currency or getattr(settings, "DEFAULT_CURRENCY", "EUR"),
         "apikey": settings.CINETPAY_API_KEY,
         "site_id": settings.CINETPAY_SITE_ID,
         "transaction_id": tx_id,
@@ -197,8 +233,8 @@ def cinetpay_create_payment(request, order_id):
             timeout=30
         )
         data = r.json()
-    except Exception as e:
-        logger.error(f"Erreur CinetPay: {e}")
+    except Exception:
+        logger.exception("Erreur CinetPay")
         return render(request, "payments/cancel.html", {"message": "Erreur de connexion à CinetPay."})
 
     payment_url = (data.get("data") or {}).get("payment_url")
@@ -213,8 +249,8 @@ def cinetpay_ipn(request):
     """Notification serveur à serveur"""
     try:
         data = json.loads(request.body.decode("utf-8"))
-    except Exception as e:
-        logger.error(f"IPN invalide: {e}")
+    except Exception:
+        logger.exception("IPN invalide")
         return HttpResponse("INVALID_JSON", status=400)
 
     tx_id = data.get("transaction_id")
@@ -252,8 +288,8 @@ def _cinetpay_check_status(transaction_id):
         )
         data = r.json()
         return (data.get("data") or {}).get("status") or data.get("status")
-    except Exception as e:
-        logger.error(f"Erreur check status CinetPay: {e}")
+    except Exception:
+        logger.exception("Erreur check status CinetPay")
         return "PENDING"
 
 
@@ -272,4 +308,66 @@ def cinetpay_cancel(request):
     return render(request, "payments/cancel.html")
 
 
+# ================================================================
+# STRIPE WEBHOOK
+# ================================================================
+@csrf_exempt
+def stripe_webhook(request):
+    payload = request.body
+    sig_header = request.META.get("HTTP_STRIPE_SIGNATURE")
+    endpoint_secret = settings.STRIPE_WEBHOOK_SECRET
 
+    try:
+        event = stripe.Webhook.construct_event(
+            payload, sig_header, endpoint_secret
+        )
+    except ValueError:
+        return HttpResponse(status=400)
+    except stripe.error.SignatureVerificationError:
+        return HttpResponse(status=400)
+
+    # ✅ Paiement réussi
+    if event["type"] == "checkout.session.completed":
+        session = event["data"]["object"]
+        commande_id = session["metadata"].get("commande_id")
+        user_id = session["metadata"].get("user_id")
+
+        try:
+            commande = Commande.objects.get(id=commande_id, client_id=user_id)
+            commande.payment_status = "SUCCESS"
+            commande.save(update_fields=["payment_status"])
+
+            # 🧹 Vider le panier de l'utilisateur
+            from shop.models import Cart
+            cart = Cart.objects.filter(user_id=user_id).first()
+            if cart:
+                cart.items.all().delete()
+
+        except Commande.DoesNotExist:
+            pass
+
+    # ❌ Paiement échoué ou annulé
+    elif event["type"] == "checkout.session.async_payment_failed":
+        session = event["data"]["object"]
+        commande_id = session["metadata"].get("commande_id")
+
+        try:
+            commande = Commande.objects.get(id=commande_id)
+            commande.payment_status = "FAILED"
+            commande.save(update_fields=["payment_status"])
+        except Commande.DoesNotExist:
+            pass
+
+    return HttpResponse(status=200)
+
+
+
+# ================================================================
+# SUCCESS / CANCEL
+# ================================================================
+def paiement_reussi(request):
+    return render(request, "payments/success.html")
+
+
+def paiement_annule(request):
+    return render(request, "payments/cancel.html")
