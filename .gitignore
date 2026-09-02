@@ -65,3 +65,7 @@ stripe_*.tar.gz
 
 # Local SMTP testing / secrets
 test_smtp.py
+
+# Local maintenance/setup scripts
+full_auto_django_auto_detect.sh
+setup_env_auto.sh
