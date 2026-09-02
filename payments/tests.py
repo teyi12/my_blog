@@ -8,12 +8,17 @@ from unittest.mock import Mock, patch
 
 from django.contrib.auth import get_user_model
 from django.apps import apps
+from django.db import transaction
 from django.test import Client, TestCase
 from django.urls import reverse
 from django.utils import timezone
 
 from payments.models import Adresse, Payment
-from payments.views import _claim_cinetpay_initialization, _minor_amount
+from payments.views import (
+    _claim_cinetpay_initialization,
+    _lock_order_then_payment,
+    _minor_amount,
+)
 from shop.models import Cart, CartItem, Commande, LigneCommande, Produit
 
 
@@ -102,6 +107,38 @@ class OrderPaymentSecurityTests(TestCase):
             first_create.call_args.kwargs["idempotency_key"],
             str(payment.idempotency_key),
         )
+        expires_at = first_create.call_args.kwargs["expires_at"]
+        remaining = expires_at - int(timezone.now().timestamp())
+        self.assertGreaterEqual(remaining, 3595)
+        self.assertLessEqual(remaining, 3600)
+
+    def test_payment_state_lock_order_is_order_then_payment(self):
+        payment = Payment.objects.create(
+            commande=self.order,
+            montant=self.order.total,
+            devise=self.order.currency,
+            transaction_id="lock-order",
+            channel="STRIPE",
+            status="PROCESSING",
+        )
+        events = []
+        real_order_lock = Commande.objects.select_for_update
+        real_payment_lock = Payment.objects.select_for_update
+
+        with patch.object(
+            Commande.objects,
+            "select_for_update",
+            side_effect=lambda: events.append("Commande") or real_order_lock(),
+        ), patch.object(
+            Payment.objects,
+            "select_for_update",
+            side_effect=lambda: events.append("Payment") or real_payment_lock(),
+        ), transaction.atomic():
+            commande, locked_payment = _lock_order_then_payment(payment.id)
+
+        self.assertEqual(events, ["Commande", "Payment"])
+        self.assertEqual(commande.id, self.order.id)
+        self.assertEqual(locked_payment.id, payment.id)
 
     def test_active_stripe_payment_blocks_cinetpay(self):
         self.initiate_stripe()
@@ -523,7 +560,21 @@ class OrderPaymentSecurityTests(TestCase):
             updated_at=timezone.now() - timedelta(hours=2)
         )
 
+        provider_session = {
+            "id": old_payment.transaction_id,
+            "status": "open",
+            "payment_status": "unpaid",
+            "amount_total": 2000,
+            "currency": "eur",
+        }
+        expired_session = {**provider_session, "status": "expired"}
         with patch(
+            "payments.views.stripe.checkout.Session.retrieve",
+            return_value=provider_session,
+        ), patch(
+            "payments.views.stripe.checkout.Session.expire",
+            return_value=expired_session,
+        ) as expire, patch(
             "payments.views.stripe.checkout.Session.create",
             return_value=self.stripe_session("cs_after_expiration"),
         ):
@@ -537,6 +588,7 @@ class OrderPaymentSecurityTests(TestCase):
         self.assertEqual(old_payment.status, "CANCELED")
         self.assertNotEqual(new_payment.pk, old_payment.pk)
         self.assertNotEqual(new_payment.idempotency_key, old_payment.idempotency_key)
+        expire.assert_called_once_with(old_payment.transaction_id)
 
     def test_old_callback_cannot_validate_replacement_attempt(self):
         self.initiate_stripe()
@@ -544,7 +596,17 @@ class OrderPaymentSecurityTests(TestCase):
         Payment.objects.filter(pk=old_payment.pk).update(
             updated_at=timezone.now() - timedelta(hours=2)
         )
+        provider_session = {
+            "id": old_payment.transaction_id,
+            "status": "expired",
+            "payment_status": "unpaid",
+            "amount_total": 2000,
+            "currency": "eur",
+        }
         with patch(
+            "payments.views.stripe.checkout.Session.retrieve",
+            return_value=provider_session,
+        ), patch(
             "payments.views.stripe.checkout.Session.create",
             return_value=self.stripe_session("cs_current_attempt"),
         ):
@@ -573,3 +635,152 @@ class OrderPaymentSecurityTests(TestCase):
         self.assertEqual(self.order.payment_status, "PROCESSING")
         self.assertEqual(self.order.transaction_id, current_payment.transaction_id)
         self.assertIsNone(self.order.cart_finalized_at)
+
+    def test_expired_stripe_attempt_paid_at_provider_is_finalized_not_replaced(self):
+        self.initiate_stripe()
+        payment = Payment.objects.get()
+        Payment.objects.filter(pk=payment.pk).update(
+            updated_at=timezone.now() - timedelta(hours=2)
+        )
+        provider_session = {
+            "id": payment.transaction_id,
+            "status": "complete",
+            "payment_status": "paid",
+            "amount_total": 2000,
+            "currency": "eur",
+        }
+
+        with patch(
+            "payments.views.stripe.checkout.Session.retrieve",
+            return_value=provider_session,
+        ), patch("payments.views.stripe.checkout.Session.create") as create:
+            response = self.client.post(
+                reverse("payments:stripe_checkout", args=[self.order.id])
+            )
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, reverse("payments:success"))
+        create.assert_not_called()
+        payment.refresh_from_db()
+        self.order.refresh_from_db()
+        self.assertEqual(payment.status, "SUCCESS")
+        self.assertEqual(self.order.payment_status, "SUCCESS")
+
+    def test_expired_stripe_attempt_is_not_replaced_when_provider_is_unknown(self):
+        self.initiate_stripe()
+        payment = Payment.objects.get()
+        Payment.objects.filter(pk=payment.pk).update(
+            updated_at=timezone.now() - timedelta(hours=2)
+        )
+
+        with patch(
+            "payments.views.stripe.checkout.Session.retrieve",
+            side_effect=RuntimeError("provider unavailable"),
+        ), patch("payments.views.stripe.checkout.Session.create") as create:
+            response = self.client.post(
+                reverse("payments:stripe_checkout", args=[self.order.id])
+            )
+
+        self.assertEqual(response.status_code, 409)
+        create.assert_not_called()
+        payment.refresh_from_db()
+        self.assertEqual(payment.status, "PROCESSING")
+
+    def test_expired_cinetpay_attempt_is_resolved_before_replacement(self):
+        provider_response = Mock()
+        provider_response.json.return_value = {
+            "code": "201",
+            "data": {"payment_url": "https://cinetpay.test/old"},
+        }
+        with patch("payments.views.requests.post", return_value=provider_response):
+            self.client.post(reverse("payments:cinetpay_create", args=[self.order.id]))
+        old_payment = Payment.objects.get()
+        Payment.objects.filter(pk=old_payment.pk).update(
+            updated_at=timezone.now() - timedelta(hours=2)
+        )
+        refused = {"status": "REFUSED", "amount": "20.00", "currency": "EUR"}
+        retry_response = Mock()
+        retry_response.json.return_value = {
+            "code": "201",
+            "data": {"payment_url": "https://cinetpay.test/new"},
+        }
+
+        with patch(
+            "payments.views._cinetpay_check_status", return_value=refused
+        ), patch("payments.views.requests.post", return_value=retry_response) as post:
+            response = self.client.post(
+                reverse("payments:cinetpay_create", args=[self.order.id])
+            )
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(post.call_count, 1)
+        old_payment.refresh_from_db()
+        self.assertEqual(old_payment.status, "FAILED")
+        self.assertEqual(Payment.objects.filter(status="PROCESSING").count(), 1)
+
+    def test_expired_cinetpay_accepted_is_finalized_and_not_replaced(self):
+        payment = Payment.objects.create(
+            commande=self.order,
+            montant=self.order.total,
+            devise=self.order.currency,
+            transaction_id="accepted-old-cinetpay",
+            channel="CINETPAY",
+            status="PROCESSING",
+        )
+        self.order.payment_status = "PROCESSING"
+        self.order.payment_channel = "CINETPAY"
+        self.order.transaction_id = payment.transaction_id
+        self.order.save(update_fields=[
+            "payment_status", "payment_channel", "transaction_id"
+        ])
+        Payment.objects.filter(pk=payment.pk).update(
+            updated_at=timezone.now() - timedelta(hours=2)
+        )
+        accepted = {"status": "ACCEPTED", "amount": "20.00", "currency": "EUR"}
+
+        with patch(
+            "payments.views._cinetpay_check_status", return_value=accepted
+        ), patch("payments.views.requests.post") as post:
+            response = self.client.post(
+                reverse("payments:cinetpay_create", args=[self.order.id])
+            )
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, reverse("payments:success"))
+        post.assert_not_called()
+        payment.refresh_from_db()
+        self.order.refresh_from_db()
+        self.assertEqual(payment.status, "SUCCESS")
+        self.assertEqual(self.order.payment_status, "SUCCESS")
+
+    def test_expired_cinetpay_active_or_unknown_is_not_replaced(self):
+        payment = Payment.objects.create(
+            commande=self.order,
+            montant=self.order.total,
+            devise=self.order.currency,
+            transaction_id="active-old-cinetpay",
+            channel="CINETPAY",
+            status="PROCESSING",
+        )
+        self.order.payment_status = "PROCESSING"
+        self.order.payment_channel = "CINETPAY"
+        self.order.transaction_id = payment.transaction_id
+        self.order.save(update_fields=[
+            "payment_status", "payment_channel", "transaction_id"
+        ])
+        Payment.objects.filter(pk=payment.pk).update(
+            updated_at=timezone.now() - timedelta(hours=2)
+        )
+
+        with patch(
+            "payments.views._cinetpay_check_status",
+            return_value={"status": "WAITING_FOR_CUSTOMER"},
+        ), patch("payments.views.requests.post") as post:
+            response = self.client.post(
+                reverse("payments:cinetpay_create", args=[self.order.id])
+            )
+
+        self.assertEqual(response.status_code, 409)
+        post.assert_not_called()
+        payment.refresh_from_db()
+        self.assertEqual(payment.status, "PROCESSING")

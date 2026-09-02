@@ -75,10 +75,34 @@ class PaymentInitializationInProgress(Exception):
     pass
 
 
+class PaymentResolutionRequired(Exception):
+    def __init__(self, payment_id):
+        self.payment_id = payment_id
+
+
+class OrderAlreadyPaid(Exception):
+    pass
+
+
+def _payment_timeout_seconds():
+    configured = int(getattr(settings, "PAYMENT_PROCESSING_TIMEOUT_SECONDS", 3600))
+    return min(max(configured, 1800), 86400)
+
+
 def _processing_expiration_cutoff():
     """Return the cutoff after which an unfinished provider attempt is abandoned."""
-    timeout = getattr(settings, "PAYMENT_PROCESSING_TIMEOUT_SECONDS", 3600)
-    return timezone.now() - timedelta(seconds=max(int(timeout), 1))
+    return timezone.now() - timedelta(seconds=_payment_timeout_seconds())
+
+
+def _lock_order_then_payment(payment_id):
+    """Lock payment state in the global Commande -> Payment order."""
+    commande_id = Payment.objects.only("commande_id").get(pk=payment_id).commande_id
+    commande = Commande.objects.select_for_update().get(pk=commande_id)
+    payment = Payment.objects.select_for_update().get(
+        pk=payment_id,
+        commande_id=commande.id,
+    )
+    return commande, payment
 
 
 def _reserve_payment(request, order_id, channel):
@@ -111,10 +135,7 @@ def _reserve_payment(request, order_id, channel):
                         raise PaymentChannelConflict
                     return commande, active
 
-                active.status = "CANCELED"
-                active.save(update_fields=["status", "updated_at"])
-                commande.payment_status = "CANCELED"
-                commande.save(update_fields=["payment_status"])
+                raise PaymentResolutionRequired(active.id)
             if commande.payment_status == "PROCESSING":
                 raise PaymentChannelConflict
 
@@ -137,24 +158,32 @@ def _reserve_payment(request, order_id, channel):
             ])
             return commande, payment
 
-    try:
-        return execute_with_sqlite_lock_retry(reserve_once)
-    except IntegrityError:
-        active = Payment.objects.select_related("commande").filter(
-            commande_id=order_id,
-            commande__client=request.user,
-            status="PROCESSING",
-        ).first()
-        if not active:
-            raise
-        if active.channel != channel:
-            raise PaymentChannelConflict
-        return active.commande, active
+    for _attempt in range(2):
+        try:
+            return execute_with_sqlite_lock_retry(reserve_once)
+        except PaymentResolutionRequired as exc:
+            outcome = _resolve_expired_payment(exc.payment_id)
+            if outcome == "SUCCESS":
+                raise OrderAlreadyPaid
+            if outcome != "TERMINAL":
+                raise PaymentChannelConflict
+        except IntegrityError:
+            active = Payment.objects.select_related("commande").filter(
+                commande_id=order_id,
+                commande__client=request.user,
+                status="PROCESSING",
+            ).first()
+            if not active:
+                raise
+            if active.channel != channel:
+                raise PaymentChannelConflict
+            return active.commande, active
+    raise PaymentChannelConflict
 
 
 def _store_provider_checkout_once(payment_id, provider_reference, checkout_url):
     with transaction.atomic():
-        payment = Payment.objects.select_for_update().get(pk=payment_id)
+        commande, payment = _lock_order_then_payment(payment_id)
         if payment.status != "PROCESSING":
             return payment
         if not payment.transaction_id.startswith("pending_"):
@@ -168,9 +197,8 @@ def _store_provider_checkout_once(payment_id, provider_reference, checkout_url):
         payment.transaction_id = provider_reference
         payment.checkout_url = checkout_url
         payment.save(update_fields=["transaction_id", "checkout_url", "updated_at"])
-        Commande.objects.filter(pk=payment.commande_id).update(
-            transaction_id=provider_reference
-        )
+        commande.transaction_id = provider_reference
+        commande.save(update_fields=["transaction_id"])
         return payment
 
 
@@ -197,15 +225,13 @@ def _minor_amount(amount, currency):
 
 def _confirm_payment_once(payment_id, raw_response):
     with transaction.atomic():
-        payment = Payment.objects.select_for_update().select_related("commande").get(
-            pk=payment_id
-        )
+        commande, payment = _lock_order_then_payment(payment_id)
         if payment.status == "SUCCESS":
             return payment
         if payment.status != "PROCESSING":
             raise PaymentChannelConflict
 
-        finalize_paid_order(payment.commande_id)
+        finalize_paid_order(commande.id)
         payment.status = "SUCCESS"
         payment.raw_response = raw_response
         payment.save(update_fields=["status", "raw_response", "updated_at"])
@@ -220,9 +246,7 @@ def _confirm_payment(payment_id, raw_response):
 
 def _fail_payment_once(payment_id, raw_response):
     with transaction.atomic():
-        payment = Payment.objects.select_for_update().select_related("commande").get(
-            pk=payment_id
-        )
+        commande, payment = _lock_order_then_payment(payment_id)
         if payment.status == "SUCCESS":
             return payment
         if payment.status in ("FAILED", "CANCELED"):
@@ -231,18 +255,47 @@ def _fail_payment_once(payment_id, raw_response):
         payment.raw_response = raw_response
         payment.save(update_fields=["status", "raw_response", "updated_at"])
         if (
-            payment.commande.payment_status == "PROCESSING"
-            and payment.commande.transaction_id == payment.transaction_id
-            and payment.commande.payment_channel == payment.channel
+            commande.payment_status == "PROCESSING"
+            and commande.transaction_id == payment.transaction_id
+            and commande.payment_channel == payment.channel
         ):
-            payment.commande.payment_status = "FAILED"
-            payment.commande.save(update_fields=["payment_status"])
+            commande.payment_status = "FAILED"
+            commande.save(update_fields=["payment_status"])
         return payment
 
 
 def _fail_payment(payment_id, raw_response):
     return execute_with_sqlite_lock_retry(
         lambda: _fail_payment_once(payment_id, raw_response)
+    )
+
+
+def _cancel_payment_once(payment_id, raw_response):
+    with transaction.atomic():
+        commande, payment = _lock_order_then_payment(payment_id)
+        if payment.status == "SUCCESS":
+            return "SUCCESS"
+        if payment.status in ("FAILED", "CANCELED"):
+            return "TERMINAL"
+        if payment.status != "PROCESSING":
+            return "ACTIVE"
+
+        payment.status = "CANCELED"
+        payment.raw_response = raw_response
+        payment.save(update_fields=["status", "raw_response", "updated_at"])
+        if (
+            commande.payment_status == "PROCESSING"
+            and commande.transaction_id == payment.transaction_id
+            and commande.payment_channel == payment.channel
+        ):
+            commande.payment_status = "CANCELED"
+            commande.save(update_fields=["payment_status"])
+        return "TERMINAL"
+
+
+def _cancel_payment(payment_id, raw_response):
+    return execute_with_sqlite_lock_retry(
+        lambda: _cancel_payment_once(payment_id, raw_response)
     )
 
 
@@ -344,12 +397,15 @@ def stripe_checkout(request, order_id):
                 "user_id": str(request.user.id),
                 "payment_id": str(payment.id),
             },
+            expires_at=int(timezone.now().timestamp()) + _payment_timeout_seconds(),
             idempotency_key=str(payment.idempotency_key),
         )
         payment = _store_provider_checkout(payment.id, session.id, session.url)
         return redirect(payment.checkout_url, code=303)
     except PaymentChannelConflict:
         return HttpResponse("Une autre tentative de paiement est déjà active.", status=409)
+    except OrderAlreadyPaid:
+        return redirect("payments:success")
     except SQLiteLockRetryExhausted:
         return HttpResponse("RETRY", status=409)
     except Exception:
@@ -527,6 +583,8 @@ def cinetpay_create_payment(request, order_id):
         data = r.json()
     except PaymentChannelConflict:
         return HttpResponse("Une autre tentative de paiement est déjà active.", status=409)
+    except OrderAlreadyPaid:
+        return redirect("payments:success")
     except PaymentInitializationInProgress:
         return HttpResponse("Initialisation CinetPay déjà en cours.", status=409)
     except SQLiteLockRetryExhausted:
@@ -641,6 +699,103 @@ def _cinetpay_check_status(transaction_id):
     except Exception:
         logger.exception("Erreur check status CinetPay")
         return {}
+
+
+def _stripe_value(session, key):
+    if isinstance(session, dict):
+        return session.get(key)
+    return getattr(session, key, None)
+
+
+def _stripe_payment_matches(payment, session):
+    commande = payment.commande
+    return (
+        _stripe_value(session, "id") == payment.transaction_id
+        and commande.transaction_id == payment.transaction_id
+        and _stripe_value(session, "amount_total")
+        == _minor_amount(payment.montant, payment.devise)
+        and str(_stripe_value(session, "currency") or "").upper()
+        == payment.devise.upper()
+        and payment.montant == commande.total
+        and payment.devise.upper() == commande.currency.upper()
+    )
+
+
+def _cinetpay_payment_matches(payment, provider_data):
+    try:
+        provider_amount = Decimal(str(provider_data.get("amount")))
+    except (TypeError, ValueError):
+        return False
+    provider_currency = str(provider_data.get("currency") or "").upper()
+    commande = payment.commande
+    return (
+        commande.transaction_id == payment.transaction_id
+        and provider_amount == payment.montant
+        and provider_amount == commande.total
+        and provider_currency == payment.devise.upper()
+        and provider_currency == commande.currency.upper()
+    )
+
+
+def _resolve_expired_stripe_payment(payment):
+    if payment.transaction_id.startswith("pending_"):
+        return _cancel_payment(payment.id, {"reason": "provider_not_initialized"})
+
+    try:
+        session = stripe.checkout.Session.retrieve(payment.transaction_id)
+    except Exception:
+        logger.exception("Impossible de vérifier la session Stripe expirée")
+        return "ACTIVE"
+
+    if _stripe_value(session, "payment_status") == "paid":
+        if not _stripe_payment_matches(payment, session):
+            return "ACTIVE"
+        _confirm_payment(payment.id, dict(session))
+        return "SUCCESS"
+
+    status = _stripe_value(session, "status")
+    if status == "expired":
+        return _cancel_payment(payment.id, dict(session))
+    if status != "open":
+        return "ACTIVE"
+
+    try:
+        expired_session = stripe.checkout.Session.expire(payment.transaction_id)
+    except Exception:
+        logger.exception("Impossible d'expirer la session Stripe")
+        return "ACTIVE"
+    if _stripe_value(expired_session, "status") != "expired":
+        return "ACTIVE"
+    return _cancel_payment(payment.id, dict(expired_session))
+
+
+def _resolve_expired_cinetpay_payment(payment):
+    provider_data = _cinetpay_check_status(payment.transaction_id)
+    status = provider_data.get("status")
+    if status == "ACCEPTED":
+        if not _cinetpay_payment_matches(payment, provider_data):
+            return "ACTIVE"
+        _confirm_payment(payment.id, provider_data)
+        return "SUCCESS"
+    if status in ("REFUSED", "CANCELED"):
+        _fail_payment(payment.id, provider_data)
+        return "TERMINAL"
+    return "ACTIVE"
+
+
+def _resolve_expired_payment(payment_id):
+    payment = Payment.objects.select_related("commande").get(pk=payment_id)
+    if payment.status == "SUCCESS":
+        return "SUCCESS"
+    if payment.status in ("FAILED", "CANCELED"):
+        return "TERMINAL"
+    if payment.status != "PROCESSING":
+        return "ACTIVE"
+    if payment.channel == "STRIPE":
+        return _resolve_expired_stripe_payment(payment)
+    if payment.channel == "CINETPAY":
+        return _resolve_expired_cinetpay_payment(payment)
+    return "ACTIVE"
 
 
 def cinetpay_return(request):
