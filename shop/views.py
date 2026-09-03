@@ -3,8 +3,9 @@ import stripe
 import uuid
 from decimal import Decimal
 from django.conf import settings
+from django.core.paginator import Paginator
 from django.db import IntegrityError, transaction
-from django.db.models import Count, F
+from django.db.models import Count, F, Q
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required, user_passes_test
@@ -161,22 +162,73 @@ def categorie_supprimer(request, slug):
     )
 
 
-import stripe
-from django.conf import settings
-from django.shortcuts import render, redirect, get_object_or_404
-from django.views import View
-from django.http import HttpResponse
-from django.contrib import messages
-from django.contrib.auth.decorators import login_required
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.utils import timezone
-from django.urls import reverse_lazy
+# ================= GESTION DES COMMANDES =================
+@user_passes_test(_staff_required)
+def commande_gestion_liste(request):
+    commandes = (
+        Commande.objects.select_related("client", "adresse")
+        .prefetch_related("lignes")
+        .order_by("-date_commande")
+    )
 
-from shop.models import Cart, Commande, LigneCommande
-from payments.models import Adresse
-from .forms import AdresseForm
+    statut = request.GET.get("statut", "").strip().upper()
+    recherche = request.GET.get("q", "").strip()
+    statuts_valides = {value for value, _label in Commande._meta.get_field("payment_status").choices}
 
-stripe.api_key = settings.STRIPE_SECRET_KEY
+    if statut in statuts_valides:
+        commandes = commandes.filter(payment_status=statut)
+    else:
+        statut = ""
+
+    if recherche:
+        filtre = (
+            Q(client__email__icontains=recherche)
+            | Q(client__first_name__icontains=recherche)
+            | Q(client__last_name__icontains=recherche)
+            | Q(transaction_id__icontains=recherche)
+        )
+        if recherche.isdigit():
+            filtre |= Q(pk=int(recherche))
+        commandes = commandes.filter(filtre).distinct()
+
+    compteurs = {
+        "ALL": Commande.objects.count(),
+        "PENDING": Commande.objects.filter(payment_status="PENDING").count(),
+        "PROCESSING": Commande.objects.filter(payment_status="PROCESSING").count(),
+        "SUCCESS": Commande.objects.filter(payment_status="SUCCESS").count(),
+        "FAILED": Commande.objects.filter(payment_status="FAILED").count(),
+        "CANCELED": Commande.objects.filter(payment_status="CANCELED").count(),
+    }
+
+    paginator = Paginator(commandes, 20)
+    page_obj = paginator.get_page(request.GET.get("page"))
+
+    return render(
+        request,
+        "shop/commandes/liste.html",
+        {
+            "page_obj": page_obj,
+            "commandes": page_obj.object_list,
+            "statut_actif": statut,
+            "recherche": recherche,
+            "compteurs": compteurs,
+        },
+    )
+
+
+@user_passes_test(_staff_required)
+def commande_gestion_detail(request, pk):
+    commande = get_object_or_404(
+        Commande.objects.select_related("client", "adresse")
+        .prefetch_related("lignes__produit", "payments"),
+        pk=pk,
+    )
+    paiements = commande.payments.order_by("-created_at")
+    return render(
+        request,
+        "shop/commandes/detail.html",
+        {"commande": commande, "paiements": paiements},
+    )
 
 
 # ================= CHECKOUT =================
@@ -336,9 +388,6 @@ def adresse_enregistree(request):
 
 
 # ================= CONFIRMATION COMMANDE =================
-from django.views.generic import DetailView
-
-
 class ConfirmationView(LoginRequiredMixin, DetailView):
     model = Commande
     template_name = "shop/confirmation.html"
