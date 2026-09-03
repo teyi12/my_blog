@@ -1,5 +1,5 @@
 from django.urls import path
-from . import views, customer_views
+from . import views, customer_views, order_views
 
 app_name = "shop"
 
@@ -26,6 +26,11 @@ urlpatterns = [
         "commandes/<int:pk>/traitement/",
         views.commande_traitement_modifier,
         name="commande_traitement_modifier",
+    ),
+    path(
+        "commandes/<int:pk>/expedition/",
+        order_views.commande_expedition_modifier,
+        name="commande_expedition_modifier",
     ),
 
     # Panier
