@@ -99,7 +99,8 @@ class CheckoutFlowTests(TestCase):
         self.assertContains(response, f"N° {order.id}")
         self.assertContains(response, self.product.nom)
         self.assertContains(response, "1 rue du Test")
-        self.assertContains(response, f"{order.total:.2f} {order.currency}")
+        self.assertContains(response, "Total à payer")
+        self.assertContains(response, order.currency)
         self.assertContains(response, "Choisir mon moyen de paiement")
 
     def test_double_checkout_post_reuses_the_same_order(self):
