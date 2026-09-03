@@ -50,6 +50,7 @@
                 </button>
                 <ul class="dropdown-menu dropdown-menu-end">
                   <li><a class="dropdown-item" href="{% url 'accounts:profile' %}"><i class="fa-regular fa-user" aria-hidden="true"></i> Mon profil</a></li>
+                  <li><a class="dropdown-item" href="{% url 'shop:mes_commandes' %}"><i class="fa-solid fa-box" aria-hidden="true"></i> Mes commandes</a></li>
                   {% if user.is_staff %}<li><a class="dropdown-item" href="{% url 'monetization:revenus' %}"><i class="fa-solid fa-chart-line" aria-hidden="true"></i> Revenus</a></li>{% endif %}
                   <li><hr class="dropdown-divider"></li>
                   <li><form method="post" action="{% url 'accounts:logout' %}">{% csrf_token %}<button class="dropdown-item" type="submit"><i class="fa-solid fa-arrow-right-from-bracket" aria-hidden="true"></i> Déconnexion</button></form></li>
