@@ -66,6 +66,19 @@
             {% csrf_token %}
             <label for="{{ traitement_form.statut.id_for_label }}">Étape suivante</label>
             {{ traitement_form.statut }}
+            {% if commande.fulfillment_status == 'PREPARING' %}
+              <div class="shipping-fields">
+                <div>
+                  <label for="{{ traitement_form.carrier.id_for_label }}">Transporteur</label>
+                  {{ traitement_form.carrier }}
+                </div>
+                <div>
+                  <label for="{{ traitement_form.tracking_number.id_for_label }}">Numéro de suivi</label>
+                  {{ traitement_form.tracking_number }}
+                </div>
+              </div>
+              <p class="fulfillment-note"><i class="fa-solid fa-truck" aria-hidden="true"></i> Le transporteur et le numéro de suivi sont requis pour passer la commande à « Expédiée ».</p>
+            {% endif %}
             <button type="submit">Mettre à jour le traitement</button>
           </form>
           <p class="fulfillment-note"><i class="fa-solid fa-circle-info" aria-hidden="true"></i> Les étapes avancent dans l’ordre. Annuler le traitement n’effectue aucun remboursement.</p>
@@ -74,12 +87,26 @@
         {% endif %}
       </section>
 
+      {% if commande.shipped_at %}
+      <section class="order-panel shipping-panel">
+        <div class="order-panel-heading"><h2>Expédition</h2><i class="fa-solid fa-truck-fast" aria-hidden="true"></i></div>
+        <dl class="order-meta">
+          <div><dt>Transporteur</dt><dd>{{ commande.carrier }}</dd></div>
+          <div><dt>Numéro de suivi</dt><dd><code>{{ commande.tracking_number }}</code></dd></div>
+          <div><dt>Expédiée le</dt><dd>{{ commande.shipped_at|date:'d/m/Y à H:i' }}</dd></div>
+          {% if commande.delivered_at %}<div><dt>Livrée le</dt><dd>{{ commande.delivered_at|date:'d/m/Y à H:i' }}</dd></div>{% endif %}
+        </dl>
+      </section>
+      {% endif %}
+
       <section class="order-panel">
         <h2>Résumé opérationnel</h2>
         <dl class="order-meta">
           <div><dt>Paiement</dt><dd>{{ commande.get_payment_status_display }}</dd></div>
           <div><dt>Traitement</dt><dd>{{ commande.get_fulfillment_status_display }}</dd></div>
           <div><dt>Panier finalisé</dt><dd>{% if commande.cart_finalized_at %}{{ commande.cart_finalized_at|date:'d/m/Y à H:i' }}{% else %}Non{% endif %}</dd></div>
+          {% if commande.shipped_at %}<div><dt>Expédition</dt><dd>{{ commande.shipped_at|date:'d/m/Y à H:i' }}</dd></div>{% endif %}
+          {% if commande.delivered_at %}<div><dt>Livraison</dt><dd>{{ commande.delivered_at|date:'d/m/Y à H:i' }}</dd></div>{% endif %}
         </dl>
       </section>
 
