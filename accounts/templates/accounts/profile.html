@@ -21,13 +21,13 @@
     <aside class="profile-summary">
       <div class="profile-avatar">
         {% if user.photo %}
-          <img src="{{ user.photo.url }}" alt="Photo de profil de {{ user.email }}">
+          <img src="{{ user.photo.url }}" alt="Photo de profil de {{ user.get_full_name|default:user.email }}">
         {% else %}
-          <span>{{ user.email|first|upper }}</span>
+          <span>{% if user.first_name %}{{ user.first_name|first|upper }}{% else %}{{ user.email|first|upper }}{% endif %}</span>
         {% endif %}
       </div>
       <div class="profile-identity">
-        {% if user.get_full_name %}<strong>{{ user.get_full_name }}</strong>{% else %}<strong>{{ user.email }}</strong>{% endif %}
+        {% if user.get_full_name %}<strong>{{ user.get_full_name }}</strong>{% else %}<strong>Mon compte</strong>{% endif %}
         <span>{{ user.email }}</span>
       </div>
       <div class="profile-summary-list">
@@ -40,7 +40,7 @@
       <div class="auth-card-heading">
         <span class="eyebrow">Informations</span>
         <h2>Modifier mon profil</h2>
-        <p>Vous pouvez mettre à jour votre nom, votre photo, votre téléphone et votre présentation selon les champs disponibles.</p>
+        <p>Vous pouvez mettre à jour votre nom, votre photo, votre téléphone et votre présentation.</p>
       </div>
 
       <form method="post" enctype="multipart/form-data" class="auth-form auth-form-grid">
@@ -48,8 +48,10 @@
         {% if form.non_field_errors %}<div class="alert alert-danger auth-grid-full" role="alert">{{ form.non_field_errors }}</div>{% endif %}
         {% for field in form %}
         <div class="auth-field {% if field.name == 'photo' or field.name == 'bio' %}auth-grid-full{% endif %}">
-          <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-          {{ field }}
+          <label for="{{ field.id_for_label }}">
+            {% if field.name == 'first_name' %}Prénom{% elif field.name == 'last_name' %}Nom{% elif field.name == 'photo' %}Photo de profil{% elif field.name == 'telephone' %}Téléphone{% elif field.name == 'bio' %}Présentation{% else %}{{ field.label }}{% endif %}
+          </label>
+          {% if field.name == 'photo' %}<div class="profile-file-field">{{ field }}</div>{% else %}{{ field }}{% endif %}
           {% if field.help_text %}<small>{{ field.help_text|safe }}</small>{% endif %}
           {% if field.errors %}<div class="auth-field-error">{{ field.errors }}</div>{% endif %}
         </div>
