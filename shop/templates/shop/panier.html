@@ -1,145 +1,196 @@
 {% extends 'template_base.html' %}
 {% load static %}
-{% block titre %}Votre panier{% endblock %}
+{% block titre %}Votre panier — Teyilawson{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{% static 'css/cart.css' %}">
+{% endblock %}
 
 {% block contenu %}
-<div class="container my-5">
+<section class="cart-page" aria-labelledby="cart-title">
+  <div class="cart-header">
+    <div>
+      <span class="eyebrow">Votre sélection</span>
+      <h1 id="cart-title">Votre panier</h1>
+      <p>Vérifiez vos articles avant de poursuivre vers la commande.</p>
+    </div>
+    <a href="{% url 'shop:liste' %}" class="btn btn-soft">
+      <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
+      Continuer mes achats
+    </a>
+  </div>
 
-    <!-- Retour à la boutique -->
-    <div class="mb-3">
-        <a href="{% url 'shop:liste' %}" class="btn btn-outline-secondary">
-            <i class="bi bi-arrow-left"></i> Continuer les achats
+  <form class="d-none" aria-hidden="true">{% csrf_token %}</form>
+
+  {% if cart.items.exists %}
+  <div class="cart-layout" id="cart-layout">
+    <div class="cart-items" id="cart-items">
+      {% for item in cart.items.all %}
+      <article class="cart-item" id="item-{{ item.id }}">
+        <a class="cart-item-image" href="{% url 'shop:detail' slug=item.produit.slug %}">
+          {% if item.produit.image %}
+            <img src="{{ item.produit.image.url }}" alt="{{ item.produit.nom }}">
+          {% else %}
+            <img src="{% static 'images/default.jpg' %}" alt="{{ item.produit.nom }}">
+          {% endif %}
         </a>
+
+        <div class="cart-item-info">
+          {% if item.produit.categorie %}<span class="cart-item-category">{{ item.produit.categorie.nom }}</span>{% endif %}
+          <h2><a href="{% url 'shop:detail' slug=item.produit.slug %}">{{ item.produit.nom }}</a></h2>
+          <span class="cart-unit-price">{{ item.prix_unitaire|floatformat:2 }} € / unité</span>
+        </div>
+
+        <div class="cart-item-quantity">
+          <label for="qty-{{ item.id }}">Quantité</label>
+          <input type="number"
+                 id="qty-{{ item.id }}"
+                 value="{{ item.quantite }}"
+                 min="1"
+                 inputmode="numeric"
+                 class="form-control cart-quantity-input"
+                 data-prix="{{ item.prix_unitaire }}"
+                 onchange="updateCart({{ item.id }})">
+        </div>
+
+        <div class="cart-item-total">
+          <span>Sous-total</span>
+          <strong id="subtotal-{{ item.id }}">{{ item.sous_total|floatformat:2 }} €</strong>
+        </div>
+
+        <button class="cart-remove-button"
+                type="button"
+                onclick="removeFromCart({{ item.id }})"
+                aria-label="Supprimer {{ item.produit.nom }} du panier">
+          <i class="fa-regular fa-trash-can" aria-hidden="true"></i>
+        </button>
+      </article>
+      {% endfor %}
     </div>
 
-    <h2 class="mb-4 text-center">Votre panier</h2>
+    <aside class="cart-summary" id="cart-summary" aria-labelledby="cart-summary-title">
+      <span class="cart-summary-kicker">Récapitulatif</span>
+      <h2 id="cart-summary-title">Votre commande</h2>
 
-    {% if cart.items.exists %}
-        <div class="table-responsive shadow-sm rounded" id="cart-table">
-            <table class="table table-striped table-hover align-middle">
-                <thead class="table-light">
-                    <tr>
-                        <th class="text-start">Produit</th>
-                        <th>Quantité</th>
-                        <th>Prix unitaire (€)</th>
-                        <th>Sous-total (€)</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for item in cart.items.all %}
-                    <tr id="item-{{ item.id }}">
-                        <td class="d-flex align-items-center gap-3">
-                            <a href="{% url 'shop:detail' slug=item.produit.slug %}">
-                                {% if item.produit.image %}
-                                    <img src="{{ item.produit.image.url }}" alt="{{ item.produit.nom }}" 
-                                         style="width:60px; height:60px; object-fit:cover; border-radius:6px;">
-                                {% else %}
-                                    <img src="{% static 'images/default.jpg' %}" alt="{{ item.produit.nom }}" 
-                                         style="width:60px; height:60px; object-fit:cover; border-radius:6px;">
-                                {% endif %}
-                            </a>
-                            <span>{{ item.produit.nom }}</span>
-                        </td>
+      <div class="cart-summary-line">
+        <span>Articles</span>
+        <strong id="cart-count">{{ cart.total_articles }}</strong>
+      </div>
+      <div class="cart-summary-line cart-summary-total">
+        <span>Total</span>
+        <strong id="cart-total">{{ cart.total|floatformat:2 }} €</strong>
+      </div>
 
-                        <!-- Quantité -->
-                        <td>
-                            <input type="number" id="qty-{{ item.id }}" value="{{ item.quantite }}" min="1" 
-                                   class="form-control form-control-sm"
-                                   style="width:80px;"
-                                   data-prix="{{ item.prix_unitaire }}"
-                                   onchange="updateCart({{ item.id }})">
-                        </td>
+      <a href="{% url 'shop:checkout' %}" id="checkout-btn" class="btn btn-brand btn-lg cart-checkout-button">
+        Passer à la caisse
+        <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+      </a>
 
-                        <td>{{ item.prix_unitaire|floatformat:2 }}</td>
-                        <td class="fw-bold text-success" id="subtotal-{{ item.id }}">
-                            {{ item.sous_total|floatformat:2 }}
-                        </td>
+      <div class="cart-trust">
+        <span><i class="fa-solid fa-lock" aria-hidden="true"></i> Paiement sécurisé</span>
+        <span><i class="fa-regular fa-circle-check" aria-hidden="true"></i> Récapitulatif avant paiement</span>
+      </div>
+    </aside>
+  </div>
+  {% else %}
+  <div class="cart-empty" id="cart-empty">
+    <span class="cart-empty-icon"><i class="fa-solid fa-bag-shopping" aria-hidden="true"></i></span>
+    <h2>Votre panier est vide</h2>
+    <p>Découvrez la boutique et ajoutez les produits qui vous intéressent.</p>
+    <a href="{% url 'shop:liste' %}" class="btn btn-brand">Découvrir la boutique</a>
+  </div>
+  {% endif %}
 
-                        <td>
-                            <button class="btn btn-sm btn-outline-danger"
-                                    onclick="removeFromCart({{ item.id }})">Supprimer</button>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
+  <p class="visually-hidden" id="cart-status" role="status" aria-live="polite"></p>
+</section>
+{% endblock %}
 
-        <!-- Résumé panier -->
-        <div id="cart-summary" class="d-flex flex-column flex-md-row justify-content-between align-items-center mt-4 gap-3">
-            <h5 class="mb-2 mb-md-0">Articles : <span id="cart-count">{{ cart.total_articles }}</span></h5>
-            <h4 class="mb-2 mb-md-0">Total : 
-                <span class="text-primary" id="cart-total">{{ cart.total|floatformat:2 }} €</span>
-            </h4>
-            <a href="{% url 'shop:checkout' %}" id="checkout-btn" class="btn btn-success btn-lg">
-                💳 Passer à la caisse
-            </a>
-        </div>
-
-    {% else %}
-        <p class="text-center text-muted">Votre panier est vide.</p>
-    {% endif %}
-</div>
-
+{% block extra_js %}
 <script>
 function getCSRFToken() {
-    return document.querySelector('[name=csrfmiddlewaretoken]')?.value;
+  return document.querySelector('[name=csrfmiddlewaretoken]')?.value || '';
+}
+
+function formatPrice(value) {
+  return Number(value).toFixed(2) + ' €';
+}
+
+function setCartStatus(message) {
+  const status = document.getElementById('cart-status');
+  if (status) status.textContent = message;
 }
 
 function updateCart(itemId) {
-    const input = document.getElementById('qty-' + itemId);
-    const quantity = parseInt(input.value);
+  const input = document.getElementById('qty-' + itemId);
+  if (!input) return;
 
-    fetch("{% url 'shop:update_panier' %}", {
-        method: 'POST',
-        headers: {
-            'X-CSRFToken': getCSRFToken(),
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({action: 'modifier', item_id: itemId, quantite: quantity})
-    })
-    .then(r => r.json())
-    .then(data => updateUI(data));
+  const quantity = parseInt(input.value, 10);
+  if (!Number.isInteger(quantity) || quantity < 1) {
+    input.value = 1;
+    return;
+  }
+
+  fetch("{% url 'shop:update_panier' %}", {
+    method: 'POST',
+    headers: {
+      'X-CSRFToken': getCSRFToken(),
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({action: 'modifier', item_id: itemId, quantite: quantity})
+  })
+  .then(response => response.json())
+  .then(data => {
+    updateUI(data);
+    if (data.success) setCartStatus('Quantité mise à jour.');
+  });
 }
 
 function removeFromCart(itemId) {
-    fetch("{% url 'shop:update_panier' %}", {
-        method: 'POST',
-        headers: {
-            'X-CSRFToken': getCSRFToken(),
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({action: 'supprimer', item_id: itemId})
-    })
-    .then(r => r.json())
-    .then(data => {
-        if (data.success) {
-            document.getElementById('item-' + itemId)?.remove();
-            updateUI(data);
-        }
-    });
+  fetch("{% url 'shop:update_panier' %}", {
+    method: 'POST',
+    headers: {
+      'X-CSRFToken': getCSRFToken(),
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({action: 'supprimer', item_id: itemId})
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.success) {
+      document.getElementById('item-' + itemId)?.remove();
+      updateUI(data);
+      setCartStatus('Article supprimé du panier.');
+    }
+  });
 }
 
 function updateUI(data) {
-    if (data.success) {
-        document.getElementById('cart-total').textContent = data.total.toFixed(2) + " €";
-        document.getElementById('cart-count').textContent = data.total_articles;
+  if (!data.success) return;
 
-        // Mise à jour des sous-totaux
-        if (data.sous_totaux) {
-            for (const [id, sousTotal] of Object.entries(data.sous_totaux)) {
-                const el = document.getElementById('subtotal-' + id);
-                if (el) el.textContent = sousTotal.toFixed(2);
-            }
-        }
+  const total = document.getElementById('cart-total');
+  const count = document.getElementById('cart-count');
+  if (total) total.textContent = formatPrice(data.total);
+  if (count) count.textContent = data.total_articles;
 
-        // Si panier vide => affiche message
-        if (data.total_articles === 0) {
-            document.getElementById('cart-table').innerHTML = '<p class="text-center text-muted">Votre panier est vide.</p>';
-            document.getElementById('cart-summary').style.display = "none";
-        }
+  if (data.sous_totaux) {
+    for (const [id, sousTotal] of Object.entries(data.sous_totaux)) {
+      const element = document.getElementById('subtotal-' + id);
+      if (element) element.textContent = formatPrice(sousTotal);
     }
+  }
+
+  if (data.total_articles === 0) {
+    const layout = document.getElementById('cart-layout');
+    if (layout) {
+      layout.outerHTML = `
+        <div class="cart-empty" id="cart-empty">
+          <span class="cart-empty-icon"><i class="fa-solid fa-bag-shopping" aria-hidden="true"></i></span>
+          <h2>Votre panier est vide</h2>
+          <p>Découvrez la boutique et ajoutez les produits qui vous intéressent.</p>
+          <a href="{% url 'shop:liste' %}" class="btn btn-brand">Découvrir la boutique</a>
+        </div>`;
+    }
+  }
 }
 </script>
 {% endblock %}
