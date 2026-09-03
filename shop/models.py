@@ -122,6 +122,10 @@ class Commande(models.Model):
         choices=FULFILLMENT_STATUS_CHOICES,
         default="WAITING_PAYMENT",
     )
+    carrier = models.CharField(max_length=100, blank=True)
+    tracking_number = models.CharField(max_length=150, blank=True)
+    shipped_at = models.DateTimeField(null=True, blank=True, editable=False)
+    delivered_at = models.DateTimeField(null=True, blank=True, editable=False)
 
     def __str__(self):
         return f"Commande #{self.id} - {self.client}"
