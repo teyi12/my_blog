@@ -1,9 +1,37 @@
 {% extends 'template_base.html' %}
-{% block titre %}Paiement réussi{% endblock %}
+{% load static %}
+
+{% block titre %}Paiement réussi — Teyilawson{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{% static 'css/payment-result.css' %}">
+{% endblock %}
+
 {% block contenu %}
-<div class="container text-center py-5">
-  <h1 class="text-success">✅ Paiement réussi</h1>
-  <p class="text-muted">Merci ! Votre opération a bien été enregistrée.</p>
-  <a href="/" class="btn btn-primary mt-3">Retour à l’accueil</a>
-</div>
+<section class="payment-result-page payment-result-success">
+  <div class="payment-result-card">
+    <div class="payment-result-icon" aria-hidden="true">
+      <i class="fa-solid fa-check"></i>
+    </div>
+
+    <span class="payment-result-eyebrow">Paiement terminé</span>
+    <h1>Merci, votre paiement a bien été enregistré.</h1>
+    <p class="payment-result-lead">Votre opération est terminée. La confirmation définitive de la commande est traitée de manière sécurisée par le système de paiement.</p>
+
+    <div class="payment-result-note">
+      <i class="fa-solid fa-shield-halved" aria-hidden="true"></i>
+      <div>
+        <strong>Confirmation sécurisée</strong>
+        <span>Vous pouvez maintenant poursuivre votre navigation sur le site.</span>
+      </div>
+    </div>
+
+    <div class="payment-result-actions">
+      <a href="{% url 'home' %}" class="btn btn-primary btn-lg">
+        Retour à l’accueil <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+      </a>
+      <a href="{% url 'shop:liste' %}" class="btn btn-soft btn-lg">Continuer mes achats</a>
+    </div>
+  </div>
+</section>
 {% endblock %}
