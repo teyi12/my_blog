@@ -49,6 +49,30 @@ class CategorieForm(forms.ModelForm):
 
 class CommandeTraitementForm(forms.Form):
     statut = forms.ChoiceField(label="Nouveau statut")
+    carrier = forms.CharField(
+        label="Transporteur",
+        max_length=100,
+        required=False,
+        widget=forms.TextInput(
+            attrs={
+                "class": "form-control",
+                "placeholder": "Ex. DHL, Deutsche Post, UPS",
+                "autocomplete": "off",
+            }
+        ),
+    )
+    tracking_number = forms.CharField(
+        label="Numéro de suivi",
+        max_length=150,
+        required=False,
+        widget=forms.TextInput(
+            attrs={
+                "class": "form-control",
+                "placeholder": "Ex. 00340434161094000000",
+                "autocomplete": "off",
+            }
+        ),
+    )
 
     def __init__(self, *args, commande, **kwargs):
         super().__init__(*args, **kwargs)
@@ -61,6 +85,16 @@ class CommandeTraitementForm(forms.Form):
             if value in allowed
         ]
         self.fields["statut"].widget.attrs.update({"class": "form-select"})
+
+    def clean(self):
+        cleaned_data = super().clean()
+        statut = cleaned_data.get("statut")
+        if statut == "SHIPPED":
+            if not cleaned_data.get("carrier", "").strip():
+                self.add_error("carrier", "Indiquez le transporteur avant de marquer la commande comme expédiée.")
+            if not cleaned_data.get("tracking_number", "").strip():
+                self.add_error("tracking_number", "Indiquez le numéro de suivi avant de marquer la commande comme expédiée.")
+        return cleaned_data
 
 
 class AjouterAuPanierForm(forms.Form):
