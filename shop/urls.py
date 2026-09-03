@@ -15,6 +15,10 @@ urlpatterns = [
     path("categories/<slug:slug>/modifier/", views.categorie_modifier, name="categorie_modifier"),
     path("categories/<slug:slug>/supprimer/", views.categorie_supprimer, name="categorie_supprimer"),
 
+    # Gestion des commandes (staff)
+    path("commandes/", views.commande_gestion_liste, name="commande_gestion_liste"),
+    path("commandes/<int:pk>/", views.commande_gestion_detail, name="commande_gestion_detail"),
+
     # Panier
     path("panier/", views.panier_view, name="panier"),
     path("panier/update/", views.update_panier, name="update_panier"),
