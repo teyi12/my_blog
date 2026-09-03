@@ -1,0 +1,84 @@
+{% extends 'template_base.html' %}
+{% load static %}
+
+{% block titre %}Commande #{{ commande.id }} — Teyilawson{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{% static 'css/customer-orders.css' %}">
+{% endblock %}
+
+{% block contenu %}
+<section class="customer-order-detail-page">
+  <a class="customer-orders-shop-link" href="{% url 'shop:mes_commandes' %}"><i class="fa-solid fa-arrow-left" aria-hidden="true"></i> Mes commandes</a>
+
+  <header class="customer-order-detail-hero">
+    <div>
+      <span class="customer-orders-eyebrow">Commande #{{ commande.id }}</span>
+      <h1>Suivi de votre commande</h1>
+      <p>Créée le {{ commande.date_commande|date:'d/m/Y à H:i' }} · {{ commande.total }} {{ commande.currency }}</p>
+    </div>
+    <div class="customer-order-detail-statuses">
+      <span class="customer-order-status payment-{{ commande.payment_status|lower }}">Paiement · {{ commande.get_payment_status_display }}</span>
+      <span class="customer-order-status fulfillment-{{ commande.fulfillment_status|lower }}">Traitement · {{ commande.get_fulfillment_status_display }}</span>
+    </div>
+  </header>
+
+  <div class="customer-order-detail-grid">
+    <div class="customer-order-detail-main">
+      <section class="customer-order-panel">
+        <div class="customer-order-panel-heading"><h2>Articles commandés</h2><span>{{ commande.lignes.count }} ligne{{ commande.lignes.count|pluralize }}</span></div>
+        {% for ligne in commande.lignes.all %}
+        <div class="customer-order-line">
+          <div class="customer-order-line-product">
+            {% if ligne.produit.image %}<img src="{{ ligne.produit.image.url }}" alt="">{% endif %}
+            <div><strong>{{ ligne.produit.nom }}</strong><small>{{ ligne.quantite }} × {{ ligne.prix_unitaire }} {{ commande.currency }}</small></div>
+          </div>
+          <strong>{{ ligne.sous_total }} {{ commande.currency }}</strong>
+        </div>
+        {% endfor %}
+        <div class="customer-order-total"><span>Total</span><strong>{{ commande.total }} {{ commande.currency }}</strong></div>
+      </section>
+
+      <section class="customer-order-panel">
+        <div class="customer-order-panel-heading"><h2>Progression</h2><span>{{ commande.get_fulfillment_status_display }}</span></div>
+        <div class="customer-order-timeline">
+          <div class="timeline-step {% if commande.payment_status == 'SUCCESS' %}is-done{% endif %}"><span><i class="fa-solid fa-credit-card" aria-hidden="true"></i></span><div><strong>Paiement confirmé</strong><small>{% if commande.payment_status == 'SUCCESS' %}Votre paiement a été validé.{% else %}En attente de confirmation du paiement.{% endif %}</small></div></div>
+          <div class="timeline-step {% if commande.fulfillment_status == 'TO_PREPARE' or commande.fulfillment_status == 'PREPARING' or commande.fulfillment_status == 'SHIPPED' or commande.fulfillment_status == 'DELIVERED' %}is-done{% endif %}"><span><i class="fa-solid fa-box" aria-hidden="true"></i></span><div><strong>Préparation</strong><small>Votre commande est prise en charge par la boutique.</small></div></div>
+          <div class="timeline-step {% if commande.fulfillment_status == 'SHIPPED' or commande.fulfillment_status == 'DELIVERED' %}is-done{% endif %}"><span><i class="fa-solid fa-truck" aria-hidden="true"></i></span><div><strong>Expédition</strong><small>{% if commande.shipped_at %}Expédiée le {{ commande.shipped_at|date:'d/m/Y à H:i' }}.{% else %}Le suivi apparaîtra ici dès l’expédition.{% endif %}</small></div></div>
+          <div class="timeline-step {% if commande.fulfillment_status == 'DELIVERED' %}is-done{% endif %}"><span><i class="fa-solid fa-house-circle-check" aria-hidden="true"></i></span><div><strong>Livraison</strong><small>{% if commande.delivered_at %}Livrée le {{ commande.delivered_at|date:'d/m/Y à H:i' }}.{% else %}En attente de livraison.{% endif %}</small></div></div>
+        </div>
+      </section>
+    </div>
+
+    <aside class="customer-order-detail-side">
+      {% if commande.shipped_at %}
+      <section class="customer-order-panel customer-shipping-panel">
+        <h2>Suivi de livraison</h2>
+        <dl>
+          <div><dt>Transporteur</dt><dd>{{ commande.carrier|default:'—' }}</dd></div>
+          <div><dt>Numéro de suivi</dt><dd><code>{{ commande.tracking_number|default:'—' }}</code></dd></div>
+          <div><dt>Expédiée le</dt><dd>{{ commande.shipped_at|date:'d/m/Y à H:i' }}</dd></div>
+          {% if commande.delivered_at %}<div><dt>Livrée le</dt><dd>{{ commande.delivered_at|date:'d/m/Y à H:i' }}</dd></div>{% endif %}
+        </dl>
+      </section>
+      {% endif %}
+
+      <section class="customer-order-panel">
+        <h2>Adresse de livraison</h2>
+        {% if commande.adresse %}
+        <address>
+          {{ commande.adresse.rue }}<br>
+          {{ commande.adresse.code_postal }} {{ commande.adresse.ville }}<br>
+          {{ commande.adresse.pays }}
+        </address>
+        {% else %}<p class="customer-order-muted">Aucune adresse associée.</p>{% endif %}
+      </section>
+
+      <section class="customer-order-panel customer-help-panel">
+        <i class="fa-regular fa-circle-question" aria-hidden="true"></i>
+        <div><strong>Besoin d’aide ?</strong><p>Pour une question sur cette commande, contactez-nous en indiquant le numéro #{{ commande.id }}.</p><a href="{% url 'contact' %}">Contacter Teyilawson</a></div>
+      </section>
+    </aside>
+  </div>
+</section>
+{% endblock %}
