@@ -9,9 +9,15 @@ urlpatterns = [
     path("produit/<slug:slug>/", views.ProduitDetailView.as_view(), name="detail"),
     path("categorie/<slug:slug>/", views.produits_par_categorie, name="par_categorie"),
 
+    # Gestion des catégories (staff)
+    path("categories/", views.categorie_gestion_liste, name="categorie_gestion_liste"),
+    path("categories/creer/", views.categorie_creer, name="categorie_creer"),
+    path("categories/<slug:slug>/modifier/", views.categorie_modifier, name="categorie_modifier"),
+    path("categories/<slug:slug>/supprimer/", views.categorie_supprimer, name="categorie_supprimer"),
+
     # Panier
     path("panier/", views.panier_view, name="panier"),
-    path("panier/update/", views.update_panier, name="update_panier"),   # ⚡ cohérence d’URL
+    path("panier/update/", views.update_panier, name="update_panier"),
     path("panier/ajouter/<slug:slug>/", views.ajouter_panier, name="ajouter_panier"),
 
     # Checkout et confirmation

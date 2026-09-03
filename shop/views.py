@@ -4,10 +4,10 @@ import uuid
 from decimal import Decimal
 from django.conf import settings
 from django.db import IntegrityError, transaction
-from django.db.models import F
+from django.db.models import Count, F
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import JsonResponse
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import ListView, DetailView, View
 from django.urls import reverse, reverse_lazy
@@ -15,7 +15,7 @@ from django.contrib import messages
 
 from .models import Produit, Categorie, Cart, CartItem, Commande, LigneCommande
 from payments.models import Adresse
-from .forms import AdresseForm
+from .forms import AdresseForm, CategorieForm
 from .services import SQLiteLockRetryExhausted, execute_with_sqlite_lock_retry
 
 # --- STRIPE ---
@@ -52,7 +52,6 @@ def update_panier(request):
         else:
             return JsonResponse({"success": False}, status=400)
 
-        # Sous-totaux de tous les items
         sous_totaux = {i.id: float(i.sous_total()) for i in cart.items.all()}
 
         return JsonResponse({
@@ -98,6 +97,68 @@ def produits_par_categorie(request, slug):
     categorie = get_object_or_404(Categorie, slug=slug)
     produits = Produit.objects.filter(categorie=categorie)
     return render(request, "shop/produits_par_categorie.html", {"produits": produits, "categorie": categorie})
+
+
+# ================= GESTION DES CATÉGORIES =================
+def _staff_required(user):
+    return user.is_authenticated and user.is_staff
+
+
+@user_passes_test(_staff_required)
+def categorie_gestion_liste(request):
+    categories = Categorie.objects.annotate(nombre_produits=Count("produit")).order_by("nom")
+    return render(request, "shop/categories/liste.html", {"categories": categories})
+
+
+@user_passes_test(_staff_required)
+def categorie_creer(request):
+    form = CategorieForm(request.POST or None)
+    if request.method == "POST" and form.is_valid():
+        categorie = form.save()
+        messages.success(request, f"La catégorie « {categorie.nom} » a été créée.")
+        return redirect("shop:categorie_gestion_liste")
+    return render(
+        request,
+        "shop/categories/form.html",
+        {"form": form, "mode": "creation"},
+    )
+
+
+@user_passes_test(_staff_required)
+def categorie_modifier(request, slug):
+    categorie = get_object_or_404(Categorie, slug=slug)
+    form = CategorieForm(request.POST or None, instance=categorie)
+    if request.method == "POST" and form.is_valid():
+        categorie = form.save()
+        messages.success(request, f"La catégorie « {categorie.nom} » a été mise à jour.")
+        return redirect("shop:categorie_gestion_liste")
+    return render(
+        request,
+        "shop/categories/form.html",
+        {"form": form, "categorie": categorie, "mode": "modification"},
+    )
+
+
+@user_passes_test(_staff_required)
+def categorie_supprimer(request, slug):
+    categorie = get_object_or_404(Categorie, slug=slug)
+    nombre_produits = categorie.produit_set.count()
+    if request.method == "POST":
+        nom = categorie.nom
+        categorie.delete()
+        if nombre_produits:
+            messages.warning(
+                request,
+                f"La catégorie « {nom} » a été supprimée. {nombre_produits} produit(s) sont maintenant sans catégorie.",
+            )
+        else:
+            messages.success(request, f"La catégorie « {nom} » a été supprimée.")
+        return redirect("shop:categorie_gestion_liste")
+    return render(
+        request,
+        "shop/categories/supprimer.html",
+        {"categorie": categorie, "nombre_produits": nombre_produits},
+    )
 
 
 import stripe
@@ -276,6 +337,7 @@ def adresse_enregistree(request):
 
 # ================= CONFIRMATION COMMANDE =================
 from django.views.generic import DetailView
+
 
 class ConfirmationView(LoginRequiredMixin, DetailView):
     model = Commande

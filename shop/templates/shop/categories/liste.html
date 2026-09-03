@@ -1,0 +1,65 @@
+{% extends "template_base.html" %}
+{% load static %}
+
+{% block titre %}Gestion des catégories — Teyilawson{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{% static 'css/categories.css' %}">
+{% endblock %}
+
+{% block contenu %}
+<section class="category-admin-page">
+  <div class="container-xl category-admin-shell">
+    <header class="category-admin-header">
+      <div>
+        <span class="category-eyebrow">Administration boutique</span>
+        <h1>Catégories produits</h1>
+        <p>Organisez le catalogue et gardez une navigation claire pour les visiteurs.</p>
+      </div>
+      <a class="btn btn-primary" href="{% url 'shop:categorie_creer' %}">
+        <i class="fa-solid fa-plus" aria-hidden="true"></i> Nouvelle catégorie
+      </a>
+    </header>
+
+    <div class="category-admin-card">
+      {% if categories %}
+      <div class="category-table-wrap">
+        <table class="category-table">
+          <thead>
+            <tr>
+              <th>Catégorie</th>
+              <th>Slug</th>
+              <th>Produits</th>
+              <th class="category-actions-heading">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for categorie in categories %}
+            <tr>
+              <td><strong>{{ categorie.nom }}</strong></td>
+              <td><code>{{ categorie.slug }}</code></td>
+              <td><span class="category-count">{{ categorie.nombre_produits }}</span></td>
+              <td>
+                <div class="category-actions">
+                  <a href="{% url 'shop:par_categorie' categorie.slug %}" class="btn btn-outline-secondary btn-sm">Voir</a>
+                  <a href="{% url 'shop:categorie_modifier' categorie.slug %}" class="btn btn-outline-secondary btn-sm">Modifier</a>
+                  <a href="{% url 'shop:categorie_supprimer' categorie.slug %}" class="btn btn-outline-danger btn-sm">Supprimer</a>
+                </div>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+      <div class="category-empty-state">
+        <i class="fa-solid fa-tags" aria-hidden="true"></i>
+        <h2>Aucune catégorie</h2>
+        <p>Créez votre première catégorie pour mieux structurer la boutique.</p>
+        <a class="btn btn-primary" href="{% url 'shop:categorie_creer' %}">Créer une catégorie</a>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</section>
+{% endblock %}

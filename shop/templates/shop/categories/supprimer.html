@@ -1,0 +1,33 @@
+{% extends "template_base.html" %}
+{% load static %}
+
+{% block titre %}Supprimer {{ categorie.nom }} — Teyilawson{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{% static 'css/categories.css' %}">
+{% endblock %}
+
+{% block contenu %}
+<section class="category-admin-page">
+  <div class="container-xl category-delete-shell">
+    <div class="category-delete-card">
+      <span class="category-delete-icon" aria-hidden="true"><i class="fa-solid fa-triangle-exclamation"></i></span>
+      <span class="category-eyebrow">Suppression</span>
+      <h1>Supprimer « {{ categorie.nom }} » ?</h1>
+      {% if nombre_produits %}
+      <p>Cette catégorie contient <strong>{{ nombre_produits }} produit{{ nombre_produits|pluralize }}</strong>. Les produits ne seront pas supprimés, mais ils deviendront sans catégorie.</p>
+      {% else %}
+      <p>Cette catégorie ne contient actuellement aucun produit.</p>
+      {% endif %}
+
+      <form method="post" class="category-delete-actions">
+        {% csrf_token %}
+        <a class="btn btn-outline-secondary" href="{% url 'shop:categorie_gestion_liste' %}">Annuler</a>
+        <button class="btn btn-danger" type="submit">
+          <i class="fa-solid fa-trash" aria-hidden="true"></i> Supprimer définitivement
+        </button>
+      </form>
+    </div>
+  </div>
+</section>
+{% endblock %}
