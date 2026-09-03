@@ -3,7 +3,7 @@ from django.utils.text import slugify
 
 from payments.models import Adresse
 
-from .models import Categorie, Produit
+from .models import Categorie, Commande, FULFILLMENT_STATUS_CHOICES, Produit
 
 
 class ProduitForm(forms.ModelForm):
@@ -45,6 +45,22 @@ class CategorieForm(forms.ModelForm):
         if commit:
             instance.save()
         return instance
+
+
+class CommandeTraitementForm(forms.Form):
+    statut = forms.ChoiceField(label="Nouveau statut")
+
+    def __init__(self, *args, commande, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.commande = commande
+        labels = dict(FULFILLMENT_STATUS_CHOICES)
+        allowed = commande.allowed_fulfillment_transitions()
+        self.fields["statut"].choices = [
+            (value, labels[value])
+            for value, _label in FULFILLMENT_STATUS_CHOICES
+            if value in allowed
+        ]
+        self.fields["statut"].widget.attrs.update({"class": "form-select"})
 
 
 class AjouterAuPanierForm(forms.Form):
