@@ -14,6 +14,7 @@ from django.views.decorators.http import require_POST
 from django.views.generic import ListView, DetailView, View
 from django.urls import reverse, reverse_lazy
 from django.contrib import messages
+from django.utils import timezone
 
 from .models import Produit, Categorie, Cart, CartItem, Commande, LigneCommande
 from payments.models import Adresse
@@ -187,6 +188,8 @@ def commande_gestion_liste(request):
             | Q(client__first_name__icontains=recherche)
             | Q(client__last_name__icontains=recherche)
             | Q(transaction_id__icontains=recherche)
+            | Q(tracking_number__icontains=recherche)
+            | Q(carrier__icontains=recherche)
         )
         if recherche.isdigit():
             filtre |= Q(pk=int(recherche))
@@ -254,7 +257,7 @@ def commande_traitement_modifier(request, pk):
             return redirect("shop:commande_gestion_detail", pk=commande.pk)
 
         if not form.is_valid():
-            messages.error(request, "Transition de traitement invalide.")
+            messages.error(request, "Transition de traitement invalide. Vérifiez les informations d’expédition.")
             return redirect("shop:commande_gestion_detail", pk=commande.pk)
 
         nouveau_statut = form.cleaned_data["statut"]
@@ -262,8 +265,19 @@ def commande_traitement_modifier(request, pk):
             messages.error(request, "Cette transition de traitement n’est pas autorisée.")
             return redirect("shop:commande_gestion_detail", pk=commande.pk)
 
+        update_fields = ["fulfillment_status"]
         commande.fulfillment_status = nouveau_statut
-        commande.save(update_fields=["fulfillment_status"])
+
+        if nouveau_statut == "SHIPPED":
+            commande.carrier = form.cleaned_data["carrier"].strip()
+            commande.tracking_number = form.cleaned_data["tracking_number"].strip()
+            commande.shipped_at = timezone.now()
+            update_fields.extend(["carrier", "tracking_number", "shipped_at"])
+        elif nouveau_statut == "DELIVERED":
+            commande.delivered_at = timezone.now()
+            update_fields.append("delivered_at")
+
+        commande.save(update_fields=update_fields)
 
     messages.success(
         request,
