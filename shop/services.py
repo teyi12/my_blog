@@ -41,6 +41,9 @@ def _finalize_paid_order_once(order_id):
         )
 
         if commande.cart_finalized_at is not None:
+            if commande.payment_status == "SUCCESS" and commande.fulfillment_status == "WAITING_PAYMENT":
+                commande.fulfillment_status = "TO_PREPARE"
+                commande.save(update_fields=["fulfillment_status"])
             return commande
 
         if commande.source_cart_id:
@@ -71,8 +74,12 @@ def _finalize_paid_order_once(order_id):
                     ).delete()
 
         commande.payment_status = "SUCCESS"
+        if commande.fulfillment_status == "WAITING_PAYMENT":
+            commande.fulfillment_status = "TO_PREPARE"
         commande.cart_finalized_at = timezone.now()
-        commande.save(update_fields=["payment_status", "cart_finalized_at"])
+        commande.save(
+            update_fields=["payment_status", "fulfillment_status", "cart_finalized_at"]
+        )
         return commande
 
 
