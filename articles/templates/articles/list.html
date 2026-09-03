@@ -1,118 +1,145 @@
-{% extends 'template_base.html' %} 
-{% load static %} {% block titre %}Articles{%endblock %} 
+{% extends 'template_base.html' %}
+{% load static %}
+
+{% block titre %}Articles — Teyilawson{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{% static 'css/articles.css' %}">
+{% endblock %}
+
 {% block contenu %}
-<div class="container py-5">
-  <!-- Titre et bouton créer -->
-  <div class="row align-items-center mb-4">
-    <div class="col-lg-10">
-      <h1 class="fw-bold text-center text-lg-start">📰 Liste des articles</h1>
+<div class="articles-page">
+  <header class="articles-hero">
+    <div class="articles-hero-copy">
+      <span class="articles-eyebrow">Journal · idées · découvertes</span>
+      <h1>Des lectures pour voir plus loin.</h1>
+      <p>
+        Récits, expériences et réflexions réunis dans un espace éditorial clair,
+        pensé pour prendre le temps de découvrir et de comprendre.
+      </p>
     </div>
-    <div class="col-lg-2 text-lg-end text-center mt-3 mt-lg-0">
-      {% if user.is_authenticated and user.is_staff %}
-      <a class="btn btn-success" href="{% url 'articles:article_creer' %}">
-        <i class="fas fa-plus-circle me-1"></i> Créer
+
+    {% if user.is_authenticated and user.is_staff %}
+      <a class="btn btn-brand articles-create" href="{% url 'articles:article_creer' %}">
+        <i class="fa-solid fa-plus" aria-hidden="true"></i>
+        Nouvel article
       </a>
-      {% endif %}
-    </div>
-  </div>
+    {% endif %}
+  </header>
 
-  <hr class="mb-5" />
+  {% if page_obj %}
+    <section class="articles-grid" aria-label="Liste des articles">
+      {% for article in page_obj %}
+        <article class="article-card {% if forloop.first %}article-card-featured{% endif %}">
+          <a class="article-card-media" href="{% url 'articles:article_detail' slug=article.slug %}" aria-label="Lire {{ article.titre }}">
+            {% if article.image %}
+              <img src="{{ article.image.url }}" alt="{{ article.titre }}">
+            {% else %}
+              <img src="{% static 'images/default.jpg' %}" alt="">
+            {% endif %}
 
-  <!-- Liste des articles -->
-  <div class="row g-4">
-    {% for article in page_obj %}
-    <div class="col-md-6 col-lg-4">
-      <div class="card h-100 shadow-sm border-0 rounded-3 overflow-hidden hover-shadow">
-        <a href="{% url 'articles:article_detail' slug=article.slug %}">
-          {% if article.image %}
-          <img
-            class="card-img-top"
-            src="{{ article.image.url }}"
-            alt="{{ article.titre }}"
-            style="height: 200px; object-fit: cover"
-          />
-          {% else %}
-          <img
-            class="card-img-top"
-            src="{% static 'images/default.jpg' %}"
-            alt="Image par défaut"
-            style="height: 200px; object-fit: cover"
-          />
-          {% endif %}
-        </a>
-
-        <div class="card-body d-flex flex-column">
-          <h5 class="card-title fw-bold">
-            <a
-              href="{% url 'articles:article_detail' slug=article.slug %}"
-              class="text-decoration-none text-dark"
-            >
-              {{ article.titre }}
-            </a>
-          </h5>
-
-          <p class="card-text text-muted small mb-2">
-            {{ article.date_publication|date:"d F Y" }}
-          </p>
-          <p class="card-text flex-grow-1">{{ article.contenu|truncatewords:25 }}</p>
-          <a
-            href="{% url 'articles:article_detail' slug=article.slug %}" class="btn btn-link p-0 mt-2 read-more" style="display: none"
-          >
-            Lire plus →
+            <div class="article-badges" aria-label="Informations de l’article">
+              {% if article.is_premium %}
+                <span class="article-badge article-badge-premium">
+                  <i class="fa-solid fa-star" aria-hidden="true"></i> Premium
+                </span>
+              {% endif %}
+              {% if article.est_sponsorise %}
+                <span class="article-badge">Sponsorisé</span>
+              {% endif %}
+            </div>
           </a>
-          {% if user.is_authenticated and user.is_staff or article.auteur == user %}
-          <div class="d-flex gap-2 mt-3">
-            <a
-              href="{% url 'articles:article_modifier' slug=article.slug %}"
-              class="btn btn-warning btn-sm flex-fill"
-              >✏️ Modifier</a
-            >
-            <a
-              href="{% url 'articles:article_supprimer' slug=article.slug %}"
-              class="btn btn-danger btn-sm flex-fill"
-              >🗑 Supprimer</a
-            >
-          </div>
-          {% endif %}
-        </div>
-      </div>
-    </div>
-    {% empty %}
-    <div class="col-12 text-center">
-      <p class="text-muted">Aucun article disponible pour le moment.</p>
-    </div>
-    {% endfor %}
-  </div>
 
-  <!-- Pagination -->
+          <div class="article-card-body">
+            <div class="article-meta">
+              <time datetime="{{ article.date_publication|date:'Y-m-d' }}">
+                {{ article.date_publication|date:"d F Y" }}
+              </time>
+              {% if article.auteur %}
+                <span aria-hidden="true">·</span>
+                <span>{{ article.auteur.username|default:article.auteur.email }}</span>
+              {% endif %}
+            </div>
+
+            <h2>
+              <a href="{% url 'articles:article_detail' slug=article.slug %}">
+                {{ article.titre }}
+              </a>
+            </h2>
+
+            <p class="article-excerpt">{{ article.contenu|striptags|truncatewords:30 }}</p>
+
+            <div class="article-card-footer">
+              <a class="article-read-link" href="{% url 'articles:article_detail' slug=article.slug %}">
+                Lire l’article
+                <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+              </a>
+
+              {% if user.is_authenticated and user.is_staff or article.auteur == user %}
+                <div class="article-admin-actions" aria-label="Actions de gestion">
+                  <a href="{% url 'articles:article_modifier' slug=article.slug %}" aria-label="Modifier {{ article.titre }}" title="Modifier">
+                    <i class="fa-regular fa-pen-to-square" aria-hidden="true"></i>
+                  </a>
+                  <a class="article-delete-link" href="{% url 'articles:article_supprimer' slug=article.slug %}" aria-label="Supprimer {{ article.titre }}" title="Supprimer">
+                    <i class="fa-regular fa-trash-can" aria-hidden="true"></i>
+                  </a>
+                </div>
+              {% endif %}
+            </div>
+          </div>
+        </article>
+      {% empty %}
+        <div class="articles-empty">
+          <span class="articles-empty-icon"><i class="fa-regular fa-newspaper" aria-hidden="true"></i></span>
+          <h2>Aucun article pour le moment</h2>
+          <p>Les prochains récits et découvertes apparaîtront ici.</p>
+        </div>
+      {% endfor %}
+    </section>
+  {% else %}
+    <div class="articles-empty">
+      <span class="articles-empty-icon"><i class="fa-regular fa-newspaper" aria-hidden="true"></i></span>
+      <h2>Aucun article pour le moment</h2>
+      <p>Les prochains récits et découvertes apparaîtront ici.</p>
+    </div>
+  {% endif %}
+
   {% if page_obj.has_other_pages %}
-  <nav aria-label="Pagination" class="mt-5">
-    <ul class="pagination justify-content-center">
+    <nav class="articles-pagination" aria-label="Pagination des articles">
       {% if page_obj.has_previous %}
-      <li class="page-item">
-        <a class="page-link" href="?page={{ page_obj.previous_page_number }}"
-          >&laquo; Précédent</a
-        >
-      </li>
+        <a class="articles-page-nav" href="?page={{ page_obj.previous_page_number }}">
+          <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
+          Précédent
+        </a>
       {% else %}
-      <li class="page-item disabled">
-        <span class="page-link">&laquo; Précédent</span>
-      </li>
-      {% endif %} {% for num in page_obj.paginator.page_range %}
-      <li class="page-item {% if page_obj.number == num %}active{% endif %}">
-        <a class="page-link" href="?page={{ num }}">{{ num }}</a>
-      </li>
-      {% endfor %} {% if page_obj.has_next %}
-      <li class="page-item">
-        <a class="page-link" href="?page={{ page_obj.next_page_number }}"
-          >Suivant &raquo;</a
-        >
-      </li>
-      {% else %}
-      <li class="page-item disabled"><span class="page-link">Suivant &raquo;</span></li>
+        <span class="articles-page-nav is-disabled">
+          <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
+          Précédent
+        </span>
       {% endif %}
-    </ul>
-  </nav>
+
+      <div class="articles-page-numbers" aria-label="Pages">
+        {% for num in page_obj.paginator.page_range %}
+          {% if page_obj.number == num %}
+            <span class="articles-page-number is-current" aria-current="page">{{ num }}</span>
+          {% else %}
+            <a class="articles-page-number" href="?page={{ num }}" aria-label="Page {{ num }}">{{ num }}</a>
+          {% endif %}
+        {% endfor %}
+      </div>
+
+      {% if page_obj.has_next %}
+        <a class="articles-page-nav" href="?page={{ page_obj.next_page_number }}">
+          Suivant
+          <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+        </a>
+      {% else %}
+        <span class="articles-page-nav is-disabled">
+          Suivant
+          <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+        </span>
+      {% endif %}
+    </nav>
   {% endif %}
 </div>
 {% endblock %}
