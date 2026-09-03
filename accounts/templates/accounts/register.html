@@ -31,9 +31,11 @@
       {% csrf_token %}
       {% if form.non_field_errors %}<div class="alert alert-danger auth-grid-full" role="alert">{{ form.non_field_errors }}</div>{% endif %}
       {% for field in form %}
-      <div class="auth-field {% if field.name == 'email' or field.name == 'password1' or field.name == 'password2' or field.name == 'bio' %}auth-grid-full{% endif %}">
-        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-        {{ field }}
+      <div class="auth-field {% if field.name == 'email' or field.name == 'password1' or field.name == 'password2' or field.name == 'photo' or field.name == 'bio' %}auth-grid-full{% endif %}">
+        <label for="{{ field.id_for_label }}">
+          {% if field.name == 'email' %}Adresse e-mail{% elif field.name == 'password1' %}Mot de passe{% elif field.name == 'password2' %}Confirmer le mot de passe{% elif field.name == 'first_name' %}Prénom{% elif field.name == 'last_name' %}Nom{% elif field.name == 'photo' %}Photo de profil{% elif field.name == 'telephone' %}Téléphone{% elif field.name == 'bio' %}Présentation{% else %}{{ field.label }}{% endif %}
+        </label>
+        {% if field.name == 'photo' %}<div class="profile-file-field">{{ field }}</div>{% else %}{{ field }}{% endif %}
         {% if field.help_text %}<small>{{ field.help_text|safe }}</small>{% endif %}
         {% if field.errors %}<div class="auth-field-error">{{ field.errors }}</div>{% endif %}
       </div>
