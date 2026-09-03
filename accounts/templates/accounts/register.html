@@ -1,15 +1,52 @@
 {% extends "template_base.html" %}
 {% load static %}
 
-{% block titre %}Inscription{% endblock %}
+{% block titre %}Inscription — Teyilawson{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{% static 'css/accounts.css' %}">
+{% endblock %}
 
 {% block contenu %}
-<div class="container mt-5">
-    <h2>Créer un compte</h2>
-    <form method="post" enctype="multipart/form-data">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit" class="btn btn-primary">S'inscrire</button>
+<section class="auth-page auth-page-register">
+  <div class="auth-panel auth-panel-intro">
+    <span class="eyebrow">Créer un compte</span>
+    <h1>Rejoignez l’univers Teyilawson.</h1>
+    <p>Créez votre espace personnel pour profiter d’une expérience plus fluide sur le site.</p>
+    <div class="auth-benefits">
+      <span><i class="fa-regular fa-circle-check" aria-hidden="true"></i> Profil personnalisable</span>
+      <span><i class="fa-regular fa-circle-check" aria-hidden="true"></i> Commandes liées à votre compte</span>
+      <span><i class="fa-regular fa-circle-check" aria-hidden="true"></i> Accès sécurisé</span>
+    </div>
+  </div>
+
+  <div class="auth-card auth-card-wide">
+    <div class="auth-card-heading">
+      <span class="eyebrow">Inscription</span>
+      <h2>Créer mon compte</h2>
+      <p>Quelques informations suffisent pour commencer.</p>
+    </div>
+
+    <form method="post" enctype="multipart/form-data" class="auth-form auth-form-grid">
+      {% csrf_token %}
+      {% if form.non_field_errors %}<div class="alert alert-danger auth-grid-full" role="alert">{{ form.non_field_errors }}</div>{% endif %}
+      {% for field in form %}
+      <div class="auth-field {% if field.name == 'email' or field.name == 'password1' or field.name == 'password2' or field.name == 'bio' %}auth-grid-full{% endif %}">
+        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+        {{ field }}
+        {% if field.help_text %}<small>{{ field.help_text|safe }}</small>{% endif %}
+        {% if field.errors %}<div class="auth-field-error">{{ field.errors }}</div>{% endif %}
+      </div>
+      {% endfor %}
+      <div class="auth-grid-full">
+        <button type="submit" class="btn btn-brand btn-lg auth-submit">Créer mon compte <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></button>
+      </div>
     </form>
-</div>
+
+    <div class="auth-switch">
+      <span>Déjà inscrit ?</span>
+      <a href="{% url 'accounts:login' %}">Se connecter</a>
+    </div>
+  </div>
+</section>
 {% endblock %}
