@@ -1,20 +1,65 @@
 {% extends 'template_base.html' %}
 {% load static %}
-{% block content %}
-<div class="container mt-5">
-  <h2 class="mb-4">Mon profil</h2>
-  <form method="POST" enctype="multipart/form-data" class="border p-4 bg-light rounded shadow-sm">
-    {% csrf_token %}
-    {% for field in form %}
-      <div class="mb-3">
-        <label class="form-label">{{ field.label_tag }}</label>
-        {{ field }}
-        {% if field.errors %}
-          <div class="text-danger">{{ field.errors }}</div>
+
+{% block titre %}Mon profil — Teyilawson{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{% static 'css/accounts.css' %}">
+{% endblock %}
+
+{% block contenu %}
+<section class="profile-page">
+  <header class="profile-header">
+    <div>
+      <span class="eyebrow">Espace personnel</span>
+      <h1>Mon profil</h1>
+      <p>Mettez à jour les informations visibles dans votre espace personnel.</p>
+    </div>
+  </header>
+
+  <div class="profile-layout">
+    <aside class="profile-summary">
+      <div class="profile-avatar">
+        {% if user.photo %}
+          <img src="{{ user.photo.url }}" alt="Photo de profil de {{ user.email }}">
+        {% else %}
+          <span>{{ user.email|first|upper }}</span>
         {% endif %}
       </div>
-    {% endfor %}
-    <button type="submit" class="btn btn-success">Enregistrer</button>
-  </form>
-</div>
+      <div class="profile-identity">
+        {% if user.get_full_name %}<strong>{{ user.get_full_name }}</strong>{% else %}<strong>{{ user.email }}</strong>{% endif %}
+        <span>{{ user.email }}</span>
+      </div>
+      <div class="profile-summary-list">
+        <span><i class="fa-regular fa-user" aria-hidden="true"></i> Compte personnel</span>
+        <span><i class="fa-solid fa-shield-halved" aria-hidden="true"></i> Accès sécurisé</span>
+      </div>
+    </aside>
+
+    <div class="profile-card">
+      <div class="auth-card-heading">
+        <span class="eyebrow">Informations</span>
+        <h2>Modifier mon profil</h2>
+        <p>Vous pouvez mettre à jour votre nom, votre photo, votre téléphone et votre présentation selon les champs disponibles.</p>
+      </div>
+
+      <form method="post" enctype="multipart/form-data" class="auth-form auth-form-grid">
+        {% csrf_token %}
+        {% if form.non_field_errors %}<div class="alert alert-danger auth-grid-full" role="alert">{{ form.non_field_errors }}</div>{% endif %}
+        {% for field in form %}
+        <div class="auth-field {% if field.name == 'photo' or field.name == 'bio' %}auth-grid-full{% endif %}">
+          <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+          {{ field }}
+          {% if field.help_text %}<small>{{ field.help_text|safe }}</small>{% endif %}
+          {% if field.errors %}<div class="auth-field-error">{{ field.errors }}</div>{% endif %}
+        </div>
+        {% endfor %}
+        <div class="auth-grid-full profile-actions">
+          <button type="submit" class="btn btn-brand">Enregistrer les modifications</button>
+          <a href="{% url 'home' %}" class="btn btn-soft">Retour au site</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</section>
 {% endblock %}
