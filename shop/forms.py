@@ -97,6 +97,44 @@ class CommandeTraitementForm(forms.Form):
         return cleaned_data
 
 
+class CommandeExpeditionForm(forms.ModelForm):
+    class Meta:
+        model = Commande
+        fields = ["carrier", "tracking_number"]
+        labels = {
+            "carrier": "Transporteur",
+            "tracking_number": "Numéro de suivi",
+        }
+        widgets = {
+            "carrier": forms.TextInput(
+                attrs={
+                    "class": "form-control",
+                    "placeholder": "Ex. DHL, Deutsche Post, UPS",
+                    "autocomplete": "off",
+                }
+            ),
+            "tracking_number": forms.TextInput(
+                attrs={
+                    "class": "form-control",
+                    "placeholder": "Ex. TEST-71-2026",
+                    "autocomplete": "off",
+                }
+            ),
+        }
+
+    def clean_carrier(self):
+        carrier = self.cleaned_data["carrier"].strip()
+        if not carrier:
+            raise forms.ValidationError("Indiquez le transporteur.")
+        return carrier
+
+    def clean_tracking_number(self):
+        tracking_number = self.cleaned_data["tracking_number"].strip()
+        if not tracking_number:
+            raise forms.ValidationError("Indiquez le numéro de suivi.")
+        return tracking_number
+
+
 class AjouterAuPanierForm(forms.Form):
     quantite = forms.IntegerField(min_value=1, initial=1, label="Quantité")
 
