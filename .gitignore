@@ -13,6 +13,7 @@ env/
 
 # --- Base de données locale ---
 db.sqlite3
+db.sqlite3.backup-*
 
 # --- Migrations compilées ---
 */migrations/__pycache__/
