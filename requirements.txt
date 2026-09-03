@@ -3,6 +3,7 @@ certifi==2025.8.3
 cloudinary==1.44.1
 Django==5.2.5
 django-allauth>=65,<66
+django-cloudinary-storage>=0.3,<1
 django-sslserver==0.22
 djangorestframework==3.16.0
 gunicorn>=23,<24
