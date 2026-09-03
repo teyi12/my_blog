@@ -35,15 +35,6 @@
             <li class="nav-item"><a class="nav-link" href="{% url 'home' %}">Accueil</a></li>
             <li class="nav-item"><a class="nav-link" href="{% url 'articles:articles' %}">Articles</a></li>
             <li class="nav-item"><a class="nav-link" href="{% url 'shop:liste' %}">Boutique</a></li>
-            <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle" href="#" id="categoriesDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">Catégories</a>
-              <ul class="dropdown-menu" aria-labelledby="categoriesDropdown">
-                {% for categorie in categories_nav %}
-                  {% if categorie.slug %}<li><a class="dropdown-item" href="{% url 'shop:par_categorie' slug=categorie.slug %}">{{ categorie.nom }}</a></li>
-                  {% else %}<li><span class="dropdown-item-text text-muted">Catégorie sans slug</span></li>{% endif %}
-                {% empty %}<li><span class="dropdown-item-text text-muted">Aucune catégorie</span></li>{% endfor %}
-              </ul>
-            </li>
             <li class="nav-item"><a class="nav-link" href="{% url 'about' %}">À propos</a></li>
             <li class="nav-item"><a class="nav-link" href="{% url 'contact' %}">Contact</a></li>
           </ul>
