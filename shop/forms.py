@@ -1,5 +1,8 @@
 from django import forms
-from .models import Produit
+
+from payments.models import Adresse
+
+from .models import Categorie, Produit
 
 
 class ProduitForm(forms.ModelForm):
@@ -8,12 +11,25 @@ class ProduitForm(forms.ModelForm):
         fields = ["nom", "description", "prix", "image", "fichier"]
 
 
+class CategorieForm(forms.ModelForm):
+    class Meta:
+        model = Categorie
+        fields = ["nom"]
+        labels = {"nom": "Nom de la catégorie"}
+        widgets = {
+            "nom": forms.TextInput(
+                attrs={
+                    "class": "form-control",
+                    "placeholder": "Ex. Mode, Livres, Accessoires",
+                    "autocomplete": "off",
+                }
+            )
+        }
+
+
 class AjouterAuPanierForm(forms.Form):
     quantite = forms.IntegerField(min_value=1, initial=1, label="Quantité")
 
-
-from django import forms
-from payments.models import Adresse
 
 class AdresseForm(forms.ModelForm):
     class Meta:
