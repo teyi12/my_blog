@@ -1,12 +1,35 @@
 {% extends "monetization/base.html" %}
-{% block title %}Demande de Partenariat{% endblock %}
+{% block title %}Partenariat — Teyilawson{% endblock %}
 
 {% block content %}
-<h1 class="text-2xl font-bold mb-6">Demande de Partenariat</h1>
+<div class="monetization-grid">
+  <div class="monetization-copy-card">
+    <span class="monetization-eyebrow">Partenariat</span>
+    <h2>Construisons une collaboration cohérente avec votre marque.</h2>
+    <p>Présentez votre projet, votre entreprise et le type de collaboration envisagé. Chaque demande est examinée avant toute mise en avant.</p>
+    <div class="monetization-points">
+      <span><i class="fa-regular fa-circle-check" aria-hidden="true"></i> Proposition étudiée individuellement</span>
+      <span><i class="fa-regular fa-circle-check" aria-hidden="true"></i> Présentation transparente au public</span>
+      <span><i class="fa-regular fa-circle-check" aria-hidden="true"></i> Intégration adaptée au contenu</span>
+    </div>
+  </div>
 
-<form method="post" class="bg-white shadow-lg rounded-2xl p-6 space-y-4">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Envoyer</button>
-</form>
+  <div class="monetization-form-card">
+    <div class="monetization-card-heading">
+      <span class="monetization-eyebrow">Votre demande</span>
+      <h2>Parlez-nous de votre projet</h2>
+    </div>
+    <form method="post" class="monetization-form">
+      {% csrf_token %}
+      {% if form.non_field_errors %}<div class="monetization-error">{{ form.non_field_errors }}</div>{% endif %}
+
+      <div class="monetization-field"><label for="{{ form.nom.id_for_label }}">Nom</label>{{ form.nom }}{{ form.nom.errors }}</div>
+      <div class="monetization-field"><label for="{{ form.email.id_for_label }}">Adresse e-mail</label>{{ form.email }}{{ form.email.errors }}</div>
+      <div class="monetization-field"><label for="{{ form.entreprise.id_for_label }}">Entreprise <span>(facultatif)</span></label>{{ form.entreprise }}{{ form.entreprise.errors }}</div>
+      <div class="monetization-field"><label for="{{ form.message.id_for_label }}">Votre proposition</label>{{ form.message }}{{ form.message.errors }}</div>
+
+      <button type="submit" class="btn btn-primary btn-lg monetization-submit">Envoyer ma demande <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></button>
+    </form>
+  </div>
+</div>
 {% endblock %}
