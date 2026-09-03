@@ -13,7 +13,7 @@
     <div>
       <span class="orders-admin-eyebrow">Espace staff · Boutique</span>
       <h1>Gestion des commandes</h1>
-      <p>Suivez les paiements, retrouvez rapidement une commande et consultez son contenu sans modifier manuellement l’état fourni par les prestataires de paiement.</p>
+      <p>Suivez séparément l’état du paiement et le traitement logistique de chaque commande.</p>
     </div>
     <a class="orders-admin-back" href="{% url 'shop:liste' %}"><i class="fa-solid fa-arrow-left" aria-hidden="true"></i> Retour à la boutique</a>
   </header>
@@ -45,7 +45,7 @@
       <div class="table-responsive">
         <table class="orders-table">
           <thead>
-            <tr><th>Commande</th><th>Client</th><th>Date</th><th>Paiement</th><th>Montant</th><th></th></tr>
+            <tr><th>Commande</th><th>Client</th><th>Date</th><th>Paiement</th><th>Traitement</th><th>Montant</th><th></th></tr>
           </thead>
           <tbody>
             {% for commande in commandes %}
@@ -54,6 +54,7 @@
               <td><strong>{{ commande.client.first_name|default:commande.client.email }} {{ commande.client.last_name }}</strong><small>{{ commande.client.email }}</small></td>
               <td>{{ commande.date_commande|date:'d/m/Y' }}<small>{{ commande.date_commande|date:'H:i' }}</small></td>
               <td><span class="order-status order-status-{{ commande.payment_status|lower }}">{{ commande.get_payment_status_display }}</span></td>
+              <td><span class="fulfillment-status fulfillment-status-{{ commande.fulfillment_status|lower }}">{{ commande.get_fulfillment_status_display }}</span></td>
               <td><strong>{{ commande.total }} {{ commande.currency }}</strong></td>
               <td class="orders-table-action"><a href="{% url 'shop:commande_gestion_detail' commande.pk %}" aria-label="Voir la commande {{ commande.id }}">Voir <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a></td>
             </tr>
