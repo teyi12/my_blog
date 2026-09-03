@@ -11,6 +11,24 @@ ORDER_CURRENCY_CHOICES = [
 ]
 DEFAULT_ORDER_CURRENCY = "EUR"
 
+FULFILLMENT_STATUS_CHOICES = [
+    ("WAITING_PAYMENT", "En attente de paiement"),
+    ("TO_PREPARE", "À préparer"),
+    ("PREPARING", "En préparation"),
+    ("SHIPPED", "Expédiée"),
+    ("DELIVERED", "Livrée"),
+    ("CANCELED", "Traitement annulé"),
+]
+
+FULFILLMENT_TRANSITIONS = {
+    "WAITING_PAYMENT": {"TO_PREPARE"},
+    "TO_PREPARE": {"PREPARING", "CANCELED"},
+    "PREPARING": {"SHIPPED", "CANCELED"},
+    "SHIPPED": {"DELIVERED"},
+    "DELIVERED": set(),
+    "CANCELED": set(),
+}
+
 
 class Categorie(models.Model):
     nom = models.CharField(max_length=100)
@@ -99,6 +117,11 @@ class Commande(models.Model):
         choices=ORDER_CURRENCY_CHOICES,
         default=DEFAULT_ORDER_CURRENCY,
     )
+    fulfillment_status = models.CharField(
+        max_length=20,
+        choices=FULFILLMENT_STATUS_CHOICES,
+        default="WAITING_PAYMENT",
+    )
 
     def __str__(self):
         return f"Commande #{self.id} - {self.client}"
@@ -108,6 +131,9 @@ class Commande(models.Model):
         self.total = total
         self.save(update_fields=["total"])
         return self.total
+
+    def allowed_fulfillment_transitions(self):
+        return FULFILLMENT_TRANSITIONS.get(self.fulfillment_status, set())
 
 
 class LigneCommande(models.Model):
@@ -162,7 +188,6 @@ class Cart(models.Model):
                 item.prix_unitaire = item.produit.prix
                 item.save()
         return self.total()
-
 
 
 class CartItem(models.Model):
