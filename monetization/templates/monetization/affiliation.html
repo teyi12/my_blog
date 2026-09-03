@@ -1,12 +1,36 @@
 {% extends "monetization/base.html" %}
-{% block title %}Demande d’Affiliation{% endblock %}
+{% block title %}Affiliation — Teyilawson{% endblock %}
 
 {% block content %}
-<h1 class="text-2xl font-bold mb-6">Demande d’Affiliation</h1>
+<div class="monetization-grid">
+  <div class="monetization-copy-card">
+    <span class="monetization-eyebrow">Affiliation</span>
+    <h2>Proposer un produit ou service réellement pertinent.</h2>
+    <p>L’affiliation doit rester utile au lecteur. Présentez la plateforme, le produit concerné et le contexte dans lequel vous imaginez la collaboration.</p>
+    <div class="monetization-points">
+      <span><i class="fa-regular fa-circle-check" aria-hidden="true"></i> Pertinence éditoriale avant tout</span>
+      <span><i class="fa-regular fa-circle-check" aria-hidden="true"></i> Liens commerciaux identifiables</span>
+      <span><i class="fa-regular fa-circle-check" aria-hidden="true"></i> Sélection indépendante</span>
+    </div>
+  </div>
 
-<form method="post" class="bg-white shadow-lg rounded-2xl p-6 space-y-4">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit" class="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600">Envoyer</button>
-</form>
+  <div class="monetization-form-card">
+    <div class="monetization-card-heading">
+      <span class="monetization-eyebrow">Votre proposition</span>
+      <h2>Soumettre une demande d’affiliation</h2>
+    </div>
+    <form method="post" class="monetization-form">
+      {% csrf_token %}
+      {% if form.non_field_errors %}<div class="monetization-error">{{ form.non_field_errors }}</div>{% endif %}
+
+      <div class="monetization-field"><label for="{{ form.nom.id_for_label }}">Nom</label>{{ form.nom }}{{ form.nom.errors }}</div>
+      <div class="monetization-field"><label for="{{ form.email.id_for_label }}">Adresse e-mail</label>{{ form.email }}{{ form.email.errors }}</div>
+      <div class="monetization-field"><label for="{{ form.plateforme.id_for_label }}">Plateforme</label>{{ form.plateforme }}{{ form.plateforme.errors }}</div>
+      <div class="monetization-field"><label for="{{ form.produit.id_for_label }}">Produit ou service</label>{{ form.produit }}{{ form.produit.errors }}</div>
+      <div class="monetization-field"><label for="{{ form.message.id_for_label }}">Votre proposition</label>{{ form.message }}{{ form.message.errors }}</div>
+
+      <button type="submit" class="btn btn-primary btn-lg monetization-submit">Envoyer ma proposition <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></button>
+    </form>
+  </div>
+</div>
 {% endblock %}
