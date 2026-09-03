@@ -1,0 +1,50 @@
+{% extends "template_base.html" %}
+{% load static %}
+
+{% block titre %}{% if mode == 'modification' %}Modifier{% else %}Créer{% endif %} une catégorie — Teyilawson{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{% static 'css/categories.css' %}">
+{% endblock %}
+
+{% block contenu %}
+<section class="category-admin-page">
+  <div class="container-xl category-form-shell">
+    <a href="{% url 'shop:categorie_gestion_liste' %}" class="category-back-link">
+      <i class="fa-solid fa-arrow-left" aria-hidden="true"></i> Retour aux catégories
+    </a>
+
+    <div class="category-form-card">
+      <div class="category-form-copy">
+        <span class="category-eyebrow">Administration boutique</span>
+        <h1>{% if mode == 'modification' %}Modifier la catégorie{% else %}Nouvelle catégorie{% endif %}</h1>
+        <p>Le slug public est généré automatiquement à partir du nom.</p>
+      </div>
+
+      <form method="post" novalidate>
+        {% csrf_token %}
+
+        {% if form.non_field_errors %}
+        <div class="alert alert-danger" role="alert">{{ form.non_field_errors }}</div>
+        {% endif %}
+
+        <div class="category-field">
+          <label for="{{ form.nom.id_for_label }}">{{ form.nom.label }}</label>
+          {{ form.nom }}
+          {% if form.nom.errors %}
+          <div class="category-field-errors">{{ form.nom.errors }}</div>
+          {% endif %}
+        </div>
+
+        <div class="category-form-actions">
+          <a class="btn btn-outline-secondary" href="{% url 'shop:categorie_gestion_liste' %}">Annuler</a>
+          <button class="btn btn-primary" type="submit">
+            <i class="fa-solid fa-floppy-disk" aria-hidden="true"></i>
+            {% if mode == 'modification' %}Enregistrer les modifications{% else %}Créer la catégorie{% endif %}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</section>
+{% endblock %}
