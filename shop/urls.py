@@ -18,6 +18,11 @@ urlpatterns = [
     # Gestion des commandes (staff)
     path("commandes/", views.commande_gestion_liste, name="commande_gestion_liste"),
     path("commandes/<int:pk>/", views.commande_gestion_detail, name="commande_gestion_detail"),
+    path(
+        "commandes/<int:pk>/traitement/",
+        views.commande_traitement_modifier,
+        name="commande_traitement_modifier",
+    ),
 
     # Panier
     path("panier/", views.panier_view, name="panier"),
