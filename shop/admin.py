@@ -30,11 +30,11 @@ class CommandeAdmin(admin.ModelAdmin):
     list_display = (
         "id",
         "client",
-        "adresse",
         "date_commande",
         "total",
         "payment_status",
         "fulfillment_status",
+        "carrier",
         "payment_channel",
         "currency",
     )
@@ -50,8 +50,10 @@ class CommandeAdmin(admin.ModelAdmin):
         "client__first_name",
         "client__last_name",
         "transaction_id",
+        "carrier",
+        "tracking_number",
     )
-    readonly_fields = ("total", "date_commande")
+    readonly_fields = ("total", "date_commande", "shipped_at", "delivered_at")
     inlines = [LigneCommandeInline]
 
 
