@@ -1,0 +1,86 @@
+{% extends 'template_base.html' %}
+{% load static %}
+
+{% block titre %}Commande #{{ commande.id }} — Teyilawson{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{% static 'css/order-management.css' %}">
+{% endblock %}
+
+{% block contenu %}
+<section class="order-detail-page">
+  <header class="order-detail-hero">
+    <div>
+      <a class="orders-admin-back" href="{% url 'shop:commande_gestion_liste' %}"><i class="fa-solid fa-arrow-left" aria-hidden="true"></i> Toutes les commandes</a>
+      <span class="orders-admin-eyebrow">Commande #{{ commande.id }}</span>
+      <h1>{{ commande.client.first_name|default:commande.client.email }} {{ commande.client.last_name }}</h1>
+      <p>Créée le {{ commande.date_commande|date:'d/m/Y à H:i' }} · {{ commande.total }} {{ commande.currency }}</p>
+    </div>
+    <span class="order-status order-status-{{ commande.payment_status|lower }} order-status-large">{{ commande.get_payment_status_display }}</span>
+  </header>
+
+  <div class="order-detail-grid">
+    <div class="order-detail-main">
+      <section class="order-panel">
+        <div class="order-panel-heading"><h2>Articles commandés</h2><span>{{ commande.lignes.count }} ligne{{ commande.lignes.count|pluralize }}</span></div>
+        <div class="order-lines">
+          {% for ligne in commande.lignes.all %}
+          <div class="order-line">
+            <div class="order-line-product">
+              {% if ligne.produit.image %}<img src="{{ ligne.produit.image.url }}" alt="">{% endif %}
+              <div><strong>{{ ligne.produit.nom }}</strong><small>{{ ligne.quantite }} × {{ ligne.prix_unitaire }} {{ commande.currency }}</small></div>
+            </div>
+            <strong>{{ ligne.sous_total }} {{ commande.currency }}</strong>
+          </div>
+          {% empty %}<p class="order-muted">Aucune ligne de commande.</p>{% endfor %}
+        </div>
+        <div class="order-total"><span>Total</span><strong>{{ commande.total }} {{ commande.currency }}</strong></div>
+      </section>
+
+      <section class="order-panel">
+        <div class="order-panel-heading"><h2>Historique de paiement</h2><span>{{ paiements.count }} tentative{{ paiements.count|pluralize }}</span></div>
+        {% if paiements %}
+          <div class="payment-history">
+            {% for paiement in paiements %}
+            <div class="payment-history-item">
+              <div><strong>{{ paiement.get_channel_display }}</strong><small>{{ paiement.created_at|date:'d/m/Y à H:i' }}</small></div>
+              <div><span class="order-status order-status-{{ paiement.status|lower }}">{{ paiement.get_status_display }}</span><small>{{ paiement.montant }} {{ paiement.devise }}</small></div>
+              <div class="payment-transaction"><span>Transaction</span><code>{{ paiement.transaction_id }}</code></div>
+            </div>
+            {% endfor %}
+          </div>
+        {% else %}<p class="order-muted">Aucune tentative de paiement enregistrée.</p>{% endif %}
+      </section>
+    </div>
+
+    <aside class="order-detail-side">
+      <section class="order-panel">
+        <h2>Client</h2>
+        <dl class="order-meta">
+          <div><dt>Nom</dt><dd>{{ commande.client.first_name }} {{ commande.client.last_name }}</dd></div>
+          <div><dt>Email</dt><dd>{{ commande.client.email }}</dd></div>
+          <div><dt>Canal</dt><dd>{{ commande.get_payment_channel_display|default:'Non choisi' }}</dd></div>
+          <div><dt>Transaction</dt><dd>{{ commande.transaction_id|default:'—' }}</dd></div>
+        </dl>
+      </section>
+
+      <section class="order-panel">
+        <h2>Adresse de livraison</h2>
+        {% if commande.adresse %}
+          <address class="order-address">
+            {{ commande.adresse.rue }}<br>
+            {{ commande.adresse.code_postal }} {{ commande.adresse.ville }}<br>
+            {{ commande.adresse.pays }}
+          </address>
+          {% if commande.adresse.telephone %}<p class="order-phone"><i class="fa-solid fa-phone" aria-hidden="true"></i> {{ commande.adresse.telephone }}</p>{% endif %}
+        {% else %}<p class="order-muted">Aucune adresse associée.</p>{% endif %}
+      </section>
+
+      <section class="order-panel order-trust-panel">
+        <i class="fa-solid fa-shield-halved" aria-hidden="true"></i>
+        <div><strong>Statut de paiement protégé</strong><p>Le statut affiché provient du flux de paiement. Il n’est pas modifiable manuellement depuis cette interface.</p></div>
+      </section>
+    </aside>
+  </div>
+</section>
+{% endblock %}
