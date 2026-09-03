@@ -87,15 +87,16 @@
         {% endif %}
       </section>
 
-      {% if commande.shipped_at %}
+      {% if commande.fulfillment_status == 'SHIPPED' or commande.fulfillment_status == 'DELIVERED' %}
       <section class="order-panel shipping-panel">
         <div class="order-panel-heading"><h2>Expédition</h2><i class="fa-solid fa-truck-fast" aria-hidden="true"></i></div>
         <dl class="order-meta">
-          <div><dt>Transporteur</dt><dd>{{ commande.carrier }}</dd></div>
-          <div><dt>Numéro de suivi</dt><dd><code>{{ commande.tracking_number }}</code></dd></div>
-          <div><dt>Expédiée le</dt><dd>{{ commande.shipped_at|date:'d/m/Y à H:i' }}</dd></div>
+          <div><dt>Transporteur</dt><dd>{{ commande.carrier|default:'Non renseigné' }}</dd></div>
+          <div><dt>Numéro de suivi</dt><dd>{% if commande.tracking_number %}<code>{{ commande.tracking_number }}</code>{% else %}Non renseigné{% endif %}</dd></div>
+          <div><dt>Expédiée le</dt><dd>{% if commande.shipped_at %}{{ commande.shipped_at|date:'d/m/Y à H:i' }}{% else %}Date non enregistrée{% endif %}</dd></div>
           {% if commande.delivered_at %}<div><dt>Livrée le</dt><dd>{{ commande.delivered_at|date:'d/m/Y à H:i' }}</dd></div>{% endif %}
         </dl>
+        <a class="orders-admin-back" href="{% url 'shop:commande_expedition_modifier' commande.pk %}"><i class="fa-solid fa-pen" aria-hidden="true"></i> Modifier les informations d’expédition</a>
       </section>
       {% endif %}
 
