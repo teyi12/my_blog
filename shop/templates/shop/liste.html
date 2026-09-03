@@ -28,7 +28,15 @@
       <span class="shop-toolbar-label">Catalogue</span>
       <strong>{% if page_obj %}{{ page_obj.paginator.count }}{% else %}{{ produits|length }}{% endif %} produit{{ produits|length|pluralize }}</strong>
     </div>
-    <span class="shop-toolbar-note"><i class="fa-regular fa-circle-check" aria-hidden="true"></i> Paiement sécurisé</span>
+    <div class="shop-toolbar-actions">
+      {% if user.is_staff %}
+        <a href="{% url 'shop:categorie_list' %}" class="shop-manage-link">
+          <i class="fa-solid fa-tags" aria-hidden="true"></i>
+          Gérer les catégories
+        </a>
+      {% endif %}
+      <span class="shop-toolbar-note"><i class="fa-regular fa-circle-check" aria-hidden="true"></i> Paiement sécurisé</span>
+    </div>
   </div>
 
   {% if produits %}
