@@ -1,0 +1,151 @@
+.home-page {
+  gap: clamp(3.25rem, 6vw, 5.5rem);
+}
+
+.home-hero {
+  grid-template-columns: minmax(0, 1fr) minmax(390px, .9fr);
+  gap: clamp(2.25rem, 4.5vw, 4rem);
+  padding-top: .35rem;
+}
+
+.home-hero-copy {
+  align-self: center;
+  padding-block: .75rem;
+}
+
+.home-hero-copy .eyebrow {
+  margin-bottom: .8rem;
+}
+
+.home-hero-copy h1 {
+  max-width: 12ch;
+  margin-bottom: 1.1rem;
+  font-size: clamp(2.9rem, 5.65vw, 4.85rem);
+  line-height: .99;
+  letter-spacing: -.05em;
+}
+
+.home-hero-lead {
+  max-width: 56ch;
+  margin-bottom: 1.4rem;
+  font-size: clamp(1rem, 1.25vw, 1.12rem);
+  line-height: 1.6;
+}
+
+.home-hero-actions {
+  gap: .65rem;
+}
+
+.home-hero-actions .btn-lg {
+  min-height: 48px;
+  padding: .66rem 1rem;
+  font-size: .98rem;
+}
+
+.home-trust-row {
+  gap: .75rem 1rem;
+  margin-top: 1.15rem;
+  font-size: .79rem;
+}
+
+.home-hero-visual {
+  min-height: 480px;
+}
+
+.hero-visual-card {
+  inset: 0 1.25rem;
+  border-radius: 1.65rem;
+}
+
+.hero-visual-overlay {
+  right: 1.65rem;
+  bottom: 1.6rem;
+  left: 1.65rem;
+}
+
+.hero-visual-overlay strong {
+  font-size: clamp(1.7rem, 2.6vw, 2.35rem);
+}
+
+.hero-floating-card {
+  min-width: 160px;
+  padding: .72rem .9rem;
+}
+
+.hero-floating-top {
+  top: 2rem;
+  left: -1rem;
+}
+
+.hero-floating-bottom {
+  right: -1rem;
+  bottom: 2.6rem;
+}
+
+.hero-floating-icon {
+  width: 38px;
+  height: 38px;
+}
+
+.home-section {
+  gap: 1.65rem;
+}
+
+@media (min-width: 1200px) {
+  .home-hero-copy h1 {
+    max-width: 11.7ch;
+  }
+}
+
+@media (max-width: 991.98px) {
+  .home-hero {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+
+  .home-hero-copy {
+    max-width: 760px;
+  }
+
+  .home-hero-copy h1 {
+    max-width: 13ch;
+  }
+
+  .home-hero-visual {
+    min-height: 460px;
+  }
+}
+
+@media (max-width: 767.98px) {
+  .home-page {
+    gap: 3.5rem;
+  }
+
+  .home-hero-copy {
+    padding-block: 0;
+  }
+
+  .home-hero-copy h1 {
+    max-width: 12ch;
+    font-size: clamp(2.4rem, 11vw, 3.6rem);
+  }
+
+  .home-hero-visual {
+    min-height: 390px;
+  }
+}
+
+@media (max-width: 479.98px) {
+  .home-hero-copy h1 {
+    font-size: clamp(2.25rem, 12vw, 3.15rem);
+  }
+
+  .home-hero-visual {
+    min-height: 340px;
+  }
+
+  .hero-floating-card {
+    min-width: 138px;
+    padding: .65rem .75rem;
+  }
+}
