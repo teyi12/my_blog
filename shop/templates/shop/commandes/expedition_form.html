@@ -1,0 +1,67 @@
+{% extends 'template_base.html' %}
+{% load static %}
+
+{% block titre %}Expédition commande #{{ commande.id }} — Teyilawson{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{% static 'css/order-management.css' %}">
+{% endblock %}
+
+{% block contenu %}
+<section class="order-detail-page">
+  <header class="order-detail-hero">
+    <div>
+      <a class="orders-admin-back" href="{% url 'shop:commande_gestion_detail' commande.pk %}"><i class="fa-solid fa-arrow-left" aria-hidden="true"></i> Retour à la commande</a>
+      <span class="orders-admin-eyebrow">Commande #{{ commande.id }}</span>
+      <h1>Informations d’expédition</h1>
+      <p>Ces informations sont affichées dynamiquement dans l’espace client « Mes commandes ».</p>
+    </div>
+  </header>
+
+  <div class="order-detail-grid">
+    <div class="order-detail-main">
+      <section class="order-panel">
+        <div class="order-panel-heading">
+          <h2>Suivi du colis</h2>
+          <span>{{ commande.get_fulfillment_status_display }}</span>
+        </div>
+
+        <form class="fulfillment-form" method="post">
+          {% csrf_token %}
+
+          <div>
+            <label for="{{ form.carrier.id_for_label }}">Transporteur</label>
+            {{ form.carrier }}
+            {% for error in form.carrier.errors %}<p class="fulfillment-note">{{ error }}</p>{% endfor %}
+          </div>
+
+          <div>
+            <label for="{{ form.tracking_number.id_for_label }}">Numéro de suivi</label>
+            {{ form.tracking_number }}
+            {% for error in form.tracking_number.errors %}<p class="fulfillment-note">{{ error }}</p>{% endfor %}
+          </div>
+
+          <button type="submit">Enregistrer les informations d’expédition</button>
+        </form>
+      </section>
+    </div>
+
+    <aside class="order-detail-side">
+      <section class="order-panel">
+        <h2>État actuel</h2>
+        <dl class="order-meta">
+          <div><dt>Traitement</dt><dd>{{ commande.get_fulfillment_status_display }}</dd></div>
+          <div><dt>Transporteur</dt><dd>{{ commande.carrier|default:'Non renseigné' }}</dd></div>
+          <div><dt>Numéro de suivi</dt><dd>{{ commande.tracking_number|default:'Non renseigné' }}</dd></div>
+          <div><dt>Date d’expédition</dt><dd>{% if commande.shipped_at %}{{ commande.shipped_at|date:'d/m/Y à H:i' }}{% else %}Date non enregistrée{% endif %}</dd></div>
+        </dl>
+      </section>
+
+      <section class="order-panel order-trust-panel">
+        <i class="fa-solid fa-arrows-rotate" aria-hidden="true"></i>
+        <div><strong>Données dynamiques</strong><p>Dès l’enregistrement, le transporteur et le numéro de suivi sont lus depuis la commande et apparaissent automatiquement dans l’espace client.</p></div>
+      </section>
+    </aside>
+  </div>
+</section>
+{% endblock %}
