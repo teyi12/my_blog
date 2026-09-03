@@ -105,6 +105,9 @@ INSTALLED_APPS = [
     "monetization",
 ]
 
+if IS_PRODUCTION:
+    INSTALLED_APPS += ["cloudinary", "cloudinary_storage"]
+
 SITE_ID = 1
 AUTH_USER_MODEL = "accounts.CustomUser"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
@@ -176,8 +179,9 @@ USE_TZ = True
 
 # -----------------------------------------------------------------------------
 # Fichiers statiques et médias
-# Les médias utilisateurs restent séparés des statiques. WhiteNoise ne doit
-# pas être utilisé comme stockage persistant des médias uploadés.
+# WhiteNoise sert uniquement les statiques. En production, les fichiers
+# uploadés sont stockés sur Cloudinary afin de ne pas dépendre du disque
+# éphémère du service Render. Le développement local conserve MEDIA_ROOT.
 # -----------------------------------------------------------------------------
 STATIC_URL = "/static/"
 STATICFILES_DIRS = [BASE_DIR / "static"]
@@ -186,9 +190,39 @@ STATIC_ROOT = BASE_DIR / "staticfiles"
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
 
+if IS_PRODUCTION:
+    CLOUDINARY_CLOUD_NAME = os.getenv("CLOUDINARY_CLOUD_NAME", "").strip()
+    CLOUDINARY_API_KEY = os.getenv("CLOUDINARY_API_KEY", "").strip()
+    CLOUDINARY_API_SECRET = os.getenv("CLOUDINARY_API_SECRET", "").strip()
+
+    missing_cloudinary = [
+        name
+        for name, value in {
+            "CLOUDINARY_CLOUD_NAME": CLOUDINARY_CLOUD_NAME,
+            "CLOUDINARY_API_KEY": CLOUDINARY_API_KEY,
+            "CLOUDINARY_API_SECRET": CLOUDINARY_API_SECRET,
+        }.items()
+        if not value
+    ]
+    if missing_cloudinary:
+        raise ImproperlyConfigured(
+            "Variables Cloudinary manquantes en production : "
+            + ", ".join(missing_cloudinary)
+        )
+
+    CLOUDINARY_STORAGE = {
+        "CLOUD_NAME": CLOUDINARY_CLOUD_NAME,
+        "API_KEY": CLOUDINARY_API_KEY,
+        "API_SECRET": CLOUDINARY_API_SECRET,
+    }
+
 STORAGES = {
     "default": {
-        "BACKEND": "django.core.files.storage.FileSystemStorage",
+        "BACKEND": (
+            "cloudinary_storage.storage.MediaCloudinaryStorage"
+            if IS_PRODUCTION
+            else "django.core.files.storage.FileSystemStorage"
+        ),
     },
     "staticfiles": {
         "BACKEND": (
