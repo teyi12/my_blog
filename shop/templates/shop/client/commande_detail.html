@@ -46,18 +46,7 @@
           <div class="timeline-step {% if commande.fulfillment_status == 'TO_PREPARE' or commande.fulfillment_status == 'PREPARING' or commande.fulfillment_status == 'SHIPPED' or commande.fulfillment_status == 'DELIVERED' %}is-done{% endif %}"><span><i class="fa-solid fa-box" aria-hidden="true"></i></span><div><strong>Préparation</strong><small>Votre commande est prise en charge par la boutique.</small></div></div>
           <div class="timeline-step {% if commande.fulfillment_status == 'SHIPPED' or commande.fulfillment_status == 'DELIVERED' %}is-done{% endif %}">
             <span><i class="fa-solid fa-truck" aria-hidden="true"></i></span>
-            <div>
-              <strong>Expédition</strong>
-              <small>
-                {% if commande.shipped_at %}
-                  Expédiée le {{ commande.shipped_at|date:'d/m/Y à H:i' }}{% if commande.carrier %} · {{ commande.carrier }}{% endif %}{% if commande.tracking_number %} · Suivi {{ commande.tracking_number }}{% endif %}.
-                {% elif commande.fulfillment_status == 'SHIPPED' or commande.fulfillment_status == 'DELIVERED' %}
-                  Commande expédiée{% if commande.carrier %} · {{ commande.carrier }}{% endif %}{% if commande.tracking_number %} · Suivi {{ commande.tracking_number }}{% endif %}.
-                {% else %}
-                  Le suivi apparaîtra ici dès l’expédition.
-                {% endif %}
-              </small>
-            </div>
+            <div><strong>Expédition</strong><small>{% if commande.shipped_at %}Expédiée le {{ commande.shipped_at|date:'d/m/Y à H:i' }}{% if commande.carrier %} · {{ commande.carrier }}{% endif %}{% if commande.tracking_number %} · Suivi {{ commande.tracking_number }}{% endif %}.{% elif commande.fulfillment_status == 'SHIPPED' or commande.fulfillment_status == 'DELIVERED' %}Commande expédiée{% if commande.carrier %} · {{ commande.carrier }}{% endif %}{% if commande.tracking_number %} · Suivi {{ commande.tracking_number }}{% endif %}.{% else %}Le suivi apparaîtra ici dès l’expédition.{% endif %}</small></div>
           </div>
           <div class="timeline-step {% if commande.fulfillment_status == 'DELIVERED' %}is-done{% endif %}"><span><i class="fa-solid fa-house-circle-check" aria-hidden="true"></i></span><div><strong>Livraison</strong><small>{% if commande.delivered_at %}Livrée le {{ commande.delivered_at|date:'d/m/Y à H:i' }}.{% else %}En attente de livraison.{% endif %}</small></div></div>
         </div>
@@ -74,18 +63,19 @@
           <div><dt>Expédiée le</dt><dd>{% if commande.shipped_at %}{{ commande.shipped_at|date:'d/m/Y à H:i' }}{% else %}Date non enregistrée{% endif %}</dd></div>
           {% if commande.delivered_at %}<div><dt>Livrée le</dt><dd>{{ commande.delivered_at|date:'d/m/Y à H:i' }}</dd></div>{% endif %}
         </dl>
+        {% if tracking_url %}
+          <a class="customer-tracking-button" href="{{ tracking_url }}" target="_blank" rel="noopener noreferrer">
+            <i class="fa-solid fa-location-arrow" aria-hidden="true"></i> Suivre mon colis
+          </a>
+        {% elif commande.tracking_number %}
+          <p class="customer-order-muted">Utilisez le numéro de suivi ci-dessus sur le site officiel du transporteur.</p>
+        {% endif %}
       </section>
       {% endif %}
 
       <section class="customer-order-panel">
         <h2>Adresse de livraison</h2>
-        {% if commande.adresse %}
-        <address>
-          {{ commande.adresse.rue }}<br>
-          {{ commande.adresse.code_postal }} {{ commande.adresse.ville }}<br>
-          {{ commande.adresse.pays }}
-        </address>
-        {% else %}<p class="customer-order-muted">Aucune adresse associée.</p>{% endif %}
+        {% if commande.adresse %}<address>{{ commande.adresse.rue }}<br>{{ commande.adresse.code_postal }} {{ commande.adresse.ville }}<br>{{ commande.adresse.pays }}</address>{% else %}<p class="customer-order-muted">Aucune adresse associée.</p>{% endif %}
       </section>
 
       <section class="customer-order-panel customer-help-panel">
