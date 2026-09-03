@@ -31,7 +31,6 @@ if not SECRET_KEY:
 ALLOWED_HOSTS = env_list("ALLOWED_HOSTS", "127.0.0.1,localhost")
 CSRF_TRUSTED_ORIGINS = env_list("CSRF_TRUSTED_ORIGINS")
 
-
 # -----------------------------------------------------------------------------
 # Base de données
 # SQLite en développement, PostgreSQL via DATABASE_URL en production.
@@ -54,7 +53,10 @@ if DATABASE_URL:
             "PORT": str(parsed_db.port or 5432),
             "CONN_MAX_AGE": 60,
             "OPTIONS": {
-                "sslmode": os.getenv("DATABASE_SSLMODE", "require" if IS_PRODUCTION else "prefer"),
+                "sslmode": os.getenv(
+                    "DATABASE_SSLMODE",
+                    "require" if IS_PRODUCTION else "prefer",
+                ),
             },
         }
     }
@@ -65,7 +67,6 @@ else:
             "NAME": BASE_DIR / "db.sqlite3",
         }
     }
-
 
 # -----------------------------------------------------------------------------
 # E-mail
@@ -79,7 +80,6 @@ EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER", "").strip()
 EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD", "")
 DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL", EMAIL_HOST_USER).strip()
 SITE_BASE_URL = os.getenv("SITE_BASE_URL", "http://127.0.0.1:8800").rstrip("/")
-
 
 # -----------------------------------------------------------------------------
 # Applications
@@ -109,12 +109,14 @@ SITE_ID = 1
 AUTH_USER_MODEL = "accounts.CustomUser"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-
 # -----------------------------------------------------------------------------
 # Middleware
+# WhiteNoise est placé juste après SecurityMiddleware afin de servir les
+# fichiers statiques collectés sur Render, sans dépendre d'un serveur séparé.
 # -----------------------------------------------------------------------------
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -123,7 +125,6 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "allauth.account.middleware.AccountMiddleware",
 ]
-
 
 # -----------------------------------------------------------------------------
 # Templates / WSGI
@@ -149,7 +150,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "blog.wsgi.application"
 
-
 # -----------------------------------------------------------------------------
 # Authentification / mots de passe
 # -----------------------------------------------------------------------------
@@ -166,7 +166,6 @@ LOGIN_REDIRECT_URL = "/"
 LOGOUT_REDIRECT_URL = "/accounts/login/"
 LOGIN_URL = "/accounts/login/"
 
-
 # -----------------------------------------------------------------------------
 # Internationalisation
 # -----------------------------------------------------------------------------
@@ -175,9 +174,10 @@ TIME_ZONE = os.getenv("TIME_ZONE", "Europe/Berlin")
 USE_I18N = True
 USE_TZ = True
 
-
 # -----------------------------------------------------------------------------
 # Fichiers statiques et médias
+# Les médias utilisateurs restent séparés des statiques. WhiteNoise ne doit
+# pas être utilisé comme stockage persistant des médias uploadés.
 # -----------------------------------------------------------------------------
 STATIC_URL = "/static/"
 STATICFILES_DIRS = [BASE_DIR / "static"]
@@ -186,6 +186,18 @@ STATIC_ROOT = BASE_DIR / "staticfiles"
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
 
+STORAGES = {
+    "default": {
+        "BACKEND": "django.core.files.storage.FileSystemStorage",
+    },
+    "staticfiles": {
+        "BACKEND": (
+            "whitenoise.storage.CompressedManifestStaticFilesStorage"
+            if IS_PRODUCTION
+            else "django.contrib.staticfiles.storage.StaticFilesStorage"
+        ),
+    },
+}
 
 # -----------------------------------------------------------------------------
 # Sécurité HTTP
@@ -206,7 +218,6 @@ else:
     SESSION_COOKIE_SECURE = False
     CSRF_COOKIE_SECURE = False
 
-
 # -----------------------------------------------------------------------------
 # Stripe
 # -----------------------------------------------------------------------------
@@ -218,7 +229,6 @@ PAYMENT_PROCESSING_TIMEOUT_SECONDS = int(
     os.getenv("PAYMENT_PROCESSING_TIMEOUT_SECONDS", "3600")
 )
 
-
 # -----------------------------------------------------------------------------
 # Mobile Money
 # -----------------------------------------------------------------------------
@@ -228,7 +238,6 @@ MOBILE_MONEY_BASE_URL = os.getenv(
     "MOBILE_MONEY_BASE_URL",
     "https://app.paydunya.com/api/v1/checkout-invoice/create",
 )
-
 
 # -----------------------------------------------------------------------------
 # CinetPay
