@@ -25,18 +25,21 @@ def carrier_tracking_url(carrier, tracking_number):
     return ""
 
 
+def _customer_order_url(commande, request=None):
+    path = reverse("shop:ma_commande_detail", kwargs={"pk": commande.pk})
+    if request is not None:
+        return request.build_absolute_uri(path)
+    base_url = getattr(settings, "SITE_BASE_URL", "").strip().rstrip("/")
+    return f"{base_url}{path}" if base_url else ""
+
+
 def send_fulfillment_notification(commande, new_status, request=None):
     """Send a best-effort customer email after a shipping status change."""
     recipient = (commande.client.email or "").strip()
     if not recipient or new_status not in {"SHIPPED", "DELIVERED"}:
         return False
 
-    if request is not None:
-        detail_url = request.build_absolute_uri(
-            reverse("shop:ma_commande_detail", kwargs={"pk": commande.pk})
-        )
-    else:
-        detail_url = ""
+    detail_url = _customer_order_url(commande, request=request)
 
     if new_status == "SHIPPED":
         subject = f"Votre commande #{commande.pk} a été expédiée"
