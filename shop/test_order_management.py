@@ -6,6 +6,7 @@ from django.urls import reverse
 
 from payments.models import Adresse
 from shop.models import Commande, LigneCommande, Produit
+from shop.services import finalize_paid_order
 
 
 class OrderManagementTests(TestCase):
@@ -42,6 +43,7 @@ class OrderManagementTests(TestCase):
             payment_status="SUCCESS",
             payment_channel="STRIPE",
             transaction_id="tx_test_123",
+            fulfillment_status="TO_PREPARE",
         )
         LigneCommande.objects.create(
             commande=self.order,
@@ -62,6 +64,7 @@ class OrderManagementTests(TestCase):
         self.assertContains(response, f"#{self.order.pk}")
         self.assertContains(response, "client@example.com")
         self.assertContains(response, "Payée")
+        self.assertContains(response, "À préparer")
 
     def test_staff_can_filter_orders_by_status(self):
         Commande.objects.create(
@@ -96,3 +99,74 @@ class OrderManagementTests(TestCase):
         self.assertContains(response, "Produit test")
         self.assertContains(response, "10 rue du Test")
         self.assertContains(response, "tx_test_123")
+        self.assertContains(response, "Traitement de la commande")
+
+    def test_non_staff_cannot_change_fulfillment(self):
+        self.client.force_login(self.customer)
+        response = self.client.post(
+            reverse("shop:commande_traitement_modifier", args=[self.order.pk]),
+            {"statut": "PREPARING"},
+        )
+        self.assertEqual(response.status_code, 302)
+        self.order.refresh_from_db()
+        self.assertEqual(self.order.fulfillment_status, "TO_PREPARE")
+
+    def test_staff_can_advance_paid_order_fulfillment(self):
+        self.client.force_login(self.staff)
+        response = self.client.post(
+            reverse("shop:commande_traitement_modifier", args=[self.order.pk]),
+            {"statut": "PREPARING"},
+        )
+        self.assertRedirects(
+            response,
+            reverse("shop:commande_gestion_detail", args=[self.order.pk]),
+        )
+        self.order.refresh_from_db()
+        self.assertEqual(self.order.fulfillment_status, "PREPARING")
+        self.assertEqual(self.order.payment_status, "SUCCESS")
+
+    def test_staff_cannot_skip_fulfillment_steps(self):
+        self.client.force_login(self.staff)
+        self.client.post(
+            reverse("shop:commande_traitement_modifier", args=[self.order.pk]),
+            {"statut": "SHIPPED"},
+        )
+        self.order.refresh_from_db()
+        self.assertEqual(self.order.fulfillment_status, "TO_PREPARE")
+
+    def test_unpaid_order_cannot_advance_fulfillment(self):
+        unpaid = Commande.objects.create(
+            client=self.customer,
+            total=Decimal("15.00"),
+            currency="EUR",
+            payment_status="PENDING",
+        )
+        self.client.force_login(self.staff)
+        self.client.post(
+            reverse("shop:commande_traitement_modifier", args=[unpaid.pk]),
+            {"statut": "TO_PREPARE"},
+        )
+        unpaid.refresh_from_db()
+        self.assertEqual(unpaid.fulfillment_status, "WAITING_PAYMENT")
+
+    def test_canceling_fulfillment_does_not_change_payment_status(self):
+        self.client.force_login(self.staff)
+        self.client.post(
+            reverse("shop:commande_traitement_modifier", args=[self.order.pk]),
+            {"statut": "CANCELED"},
+        )
+        self.order.refresh_from_db()
+        self.assertEqual(self.order.fulfillment_status, "CANCELED")
+        self.assertEqual(self.order.payment_status, "SUCCESS")
+
+    def test_payment_finalization_queues_order_for_preparation(self):
+        order = Commande.objects.create(
+            client=self.customer,
+            total=Decimal("20.00"),
+            currency="EUR",
+            payment_status="PROCESSING",
+        )
+        finalize_paid_order(order.pk)
+        order.refresh_from_db()
+        self.assertEqual(order.payment_status, "SUCCESS")
+        self.assertEqual(order.fulfillment_status, "TO_PREPARE")
