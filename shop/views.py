@@ -10,13 +10,14 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.views.decorators.http import require_POST
 from django.views.generic import ListView, DetailView, View
 from django.urls import reverse, reverse_lazy
 from django.contrib import messages
 
 from .models import Produit, Categorie, Cart, CartItem, Commande, LigneCommande
 from payments.models import Adresse
-from .forms import AdresseForm, CategorieForm
+from .forms import AdresseForm, CategorieForm, CommandeTraitementForm
 from .services import SQLiteLockRetryExhausted, execute_with_sqlite_lock_retry
 
 # --- STRIPE ---
@@ -224,11 +225,51 @@ def commande_gestion_detail(request, pk):
         pk=pk,
     )
     paiements = commande.payments.order_by("-created_at")
+    traitement_form = CommandeTraitementForm(commande=commande)
+    transitions_disponibles = bool(traitement_form.fields["statut"].choices)
     return render(
         request,
         "shop/commandes/detail.html",
-        {"commande": commande, "paiements": paiements},
+        {
+            "commande": commande,
+            "paiements": paiements,
+            "traitement_form": traitement_form,
+            "transitions_disponibles": transitions_disponibles,
+        },
     )
+
+
+@user_passes_test(_staff_required)
+@require_POST
+def commande_traitement_modifier(request, pk):
+    with transaction.atomic():
+        commande = get_object_or_404(Commande.objects.select_for_update(), pk=pk)
+        form = CommandeTraitementForm(request.POST, commande=commande)
+
+        if commande.payment_status != "SUCCESS":
+            messages.warning(
+                request,
+                "Le traitement logistique ne peut avancer qu’après confirmation du paiement.",
+            )
+            return redirect("shop:commande_gestion_detail", pk=commande.pk)
+
+        if not form.is_valid():
+            messages.error(request, "Transition de traitement invalide.")
+            return redirect("shop:commande_gestion_detail", pk=commande.pk)
+
+        nouveau_statut = form.cleaned_data["statut"]
+        if nouveau_statut not in commande.allowed_fulfillment_transitions():
+            messages.error(request, "Cette transition de traitement n’est pas autorisée.")
+            return redirect("shop:commande_gestion_detail", pk=commande.pk)
+
+        commande.fulfillment_status = nouveau_statut
+        commande.save(update_fields=["fulfillment_status"])
+
+    messages.success(
+        request,
+        f"Le traitement de la commande #{commande.pk} est maintenant « {commande.get_fulfillment_status_display()} ».",
+    )
+    return redirect("shop:commande_gestion_detail", pk=commande.pk)
 
 
 # ================= CHECKOUT =================
