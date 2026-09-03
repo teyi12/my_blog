@@ -5,6 +5,7 @@
 
 {% block styles %}
 <link rel="stylesheet" href="{% static 'css/payment-choice.css' %}">
+<link rel="stylesheet" href="{% static 'css/payment-donation.css' %}">
 {% endblock %}
 
 {% block contenu %}
@@ -108,5 +109,35 @@
       </a>
     </aside>
   </div>
+
+  <section class="payment-donation" aria-labelledby="donation-title">
+    <div class="payment-donation-copy">
+      <span class="payment-donation-icon"><i class="fa-regular fa-heart" aria-hidden="true"></i></span>
+      <div>
+        <span class="eyebrow">Soutenir le projet</span>
+        <h2 id="donation-title">Faire un don</h2>
+        <p>Le don est indépendant de votre commande et reste entièrement facultatif.</p>
+      </div>
+    </div>
+    <form action="{% url 'payments:create_donation_checkout' %}" method="post" class="payment-donation-form">
+      {% csrf_token %}
+      <label>
+        <span>Montant</span>
+        <input type="number" name="amount" min="1" step="1" required placeholder="10">
+      </label>
+      <label>
+        <span>Devise</span>
+        <select name="currency">
+          <option value="eur">EUR €</option>
+          <option value="usd">USD $</option>
+          <option value="xof">XOF CFA</option>
+          <option value="xaf">XAF CFA</option>
+        </select>
+      </label>
+      <button type="submit" class="btn btn-soft">
+        <i class="fa-regular fa-heart" aria-hidden="true"></i> Faire un don
+      </button>
+    </form>
+  </section>
 </section>
 {% endblock %}
