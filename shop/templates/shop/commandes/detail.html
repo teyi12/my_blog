@@ -16,7 +16,10 @@
       <h1>{{ commande.client.first_name|default:commande.client.email }} {{ commande.client.last_name }}</h1>
       <p>Créée le {{ commande.date_commande|date:'d/m/Y à H:i' }} · {{ commande.total }} {{ commande.currency }}</p>
     </div>
-    <span class="order-status order-status-{{ commande.payment_status|lower }} order-status-large">{{ commande.get_payment_status_display }}</span>
+    <div class="order-hero-statuses">
+      <span class="order-status order-status-{{ commande.payment_status|lower }} order-status-large">Paiement · {{ commande.get_payment_status_display }}</span>
+      <span class="fulfillment-status fulfillment-status-{{ commande.fulfillment_status|lower }} fulfillment-status-large">Traitement · {{ commande.get_fulfillment_status_display }}</span>
+    </div>
   </header>
 
   <div class="order-detail-grid">
@@ -54,6 +57,32 @@
     </div>
 
     <aside class="order-detail-side">
+      <section class="order-panel fulfillment-panel">
+        <div class="order-panel-heading"><h2>Traitement de la commande</h2><span class="fulfillment-status fulfillment-status-{{ commande.fulfillment_status|lower }}">{{ commande.get_fulfillment_status_display }}</span></div>
+        {% if commande.payment_status != 'SUCCESS' %}
+          <p class="fulfillment-note">Le traitement logistique sera disponible lorsque le paiement aura été confirmé.</p>
+        {% elif transitions_disponibles %}
+          <form class="fulfillment-form" method="post" action="{% url 'shop:commande_traitement_modifier' commande.pk %}">
+            {% csrf_token %}
+            <label for="{{ traitement_form.statut.id_for_label }}">Étape suivante</label>
+            {{ traitement_form.statut }}
+            <button type="submit">Mettre à jour le traitement</button>
+          </form>
+          <p class="fulfillment-note"><i class="fa-solid fa-circle-info" aria-hidden="true"></i> Les étapes avancent dans l’ordre. Annuler le traitement n’effectue aucun remboursement.</p>
+        {% else %}
+          <p class="fulfillment-note">Aucune transition supplémentaire n’est disponible pour cette commande.</p>
+        {% endif %}
+      </section>
+
+      <section class="order-panel">
+        <h2>Résumé opérationnel</h2>
+        <dl class="order-meta">
+          <div><dt>Paiement</dt><dd>{{ commande.get_payment_status_display }}</dd></div>
+          <div><dt>Traitement</dt><dd>{{ commande.get_fulfillment_status_display }}</dd></div>
+          <div><dt>Panier finalisé</dt><dd>{% if commande.cart_finalized_at %}{{ commande.cart_finalized_at|date:'d/m/Y à H:i' }}{% else %}Non{% endif %}</dd></div>
+        </dl>
+      </section>
+
       <section class="order-panel">
         <h2>Client</h2>
         <dl class="order-meta">
@@ -78,7 +107,7 @@
 
       <section class="order-panel order-trust-panel">
         <i class="fa-solid fa-shield-halved" aria-hidden="true"></i>
-        <div><strong>Statut de paiement protégé</strong><p>Le statut affiché provient du flux de paiement. Il n’est pas modifiable manuellement depuis cette interface.</p></div>
+        <div><strong>Statut de paiement protégé</strong><p>Le paiement reste piloté par Stripe/CinetPay. Cette interface ne modifie que le traitement logistique.</p></div>
       </section>
     </aside>
   </div>
