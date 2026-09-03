@@ -34,11 +34,23 @@ class CommandeAdmin(admin.ModelAdmin):
         "date_commande",
         "total",
         "payment_status",
+        "fulfillment_status",
         "payment_channel",
         "currency",
     )
-    list_filter = ("payment_status", "payment_channel", "currency", "date_commande")
-    search_fields = ("client__username", "transaction_id")
+    list_filter = (
+        "payment_status",
+        "fulfillment_status",
+        "payment_channel",
+        "currency",
+        "date_commande",
+    )
+    search_fields = (
+        "client__email",
+        "client__first_name",
+        "client__last_name",
+        "transaction_id",
+    )
     readonly_fields = ("total", "date_commande")
     inlines = [LigneCommandeInline]
 
