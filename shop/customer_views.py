@@ -3,6 +3,7 @@ from django.core.paginator import Paginator
 from django.shortcuts import get_object_or_404, render
 
 from .models import Commande
+from .shipping import carrier_tracking_url
 
 
 @login_required
@@ -35,5 +36,6 @@ def ma_commande_detail(request, pk):
         {
             "commande": commande,
             "paiements": commande.payments.order_by("-created_at"),
+            "tracking_url": carrier_tracking_url(commande.carrier, commande.tracking_number),
         },
     )
