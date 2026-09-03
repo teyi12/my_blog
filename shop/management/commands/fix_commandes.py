@@ -46,7 +46,7 @@ class Command(BaseCommand):
                 continue
 
             if not commande.currency:
-                commande.currency = "EUR"
+                commande.currency = Commande._meta.get_field("currency").get_default()
                 update_fields.append("currency")
 
             if not commande.payment_status:

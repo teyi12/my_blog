@@ -3,6 +3,11 @@
 
 {% block contenu %}
 <div class="container py-5">
+  {% if messages %}
+    {% for message in messages %}
+      <div class="alert alert-{{ message.tags|default:'info' }}" role="alert">{{ message }}</div>
+    {% endfor %}
+  {% endif %}
   <h2 class="text-center mb-4">Choisissez votre mode de paiement</h2>
   <div class="row g-4 justify-content-center">
 

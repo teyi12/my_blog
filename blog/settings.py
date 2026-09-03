@@ -161,4 +161,8 @@ MOBILE_MONEY_BASE_URL = "https://app.paydunya.com/api/v1/checkout-invoice/create
 CINETPAY_API_KEY = os.getenv("CINETPAY_API_KEY", "")
 CINETPAY_SITE_ID = os.getenv("CINETPAY_SITE_ID", "")
 CINETPAY_BASE_URL = os.getenv("CINETPAY_BASE_URL", "https://api-checkout.cinetpay.com/v2")
-DEFAULT_CURRENCY = os.getenv("DEFAULT_CURRENCY", "XOF")
+PAYMENT_MINIMUM_AMOUNTS = {
+    "EUR": os.getenv("PAYMENT_MINIMUM_AMOUNT_EUR", "0.50"),
+    "USD": os.getenv("PAYMENT_MINIMUM_AMOUNT_USD", "0.50"),
+    "XOF": os.getenv("PAYMENT_MINIMUM_AMOUNT_XOF", "500"),
+}

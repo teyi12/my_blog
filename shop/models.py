@@ -4,6 +4,13 @@ from django.utils.text import slugify
 from decimal import Decimal
 
 
+ORDER_CURRENCY_CHOICES = [
+    ("EUR", "Euro"),
+    ("USD", "Dollar"),
+    ("XOF", "Franc CFA"),
+]
+DEFAULT_ORDER_CURRENCY = "EUR"
+
 
 class Categorie(models.Model):
     nom = models.CharField(max_length=100)
@@ -89,12 +96,8 @@ class Commande(models.Model):
     )
     currency = models.CharField(
         max_length=10,
-        choices=[
-            ("EUR", "Euro"),
-            ("USD", "Dollar"),
-            ("XOF", "Franc CFA"),
-        ],
-        default="EUR"
+        choices=ORDER_CURRENCY_CHOICES,
+        default=DEFAULT_ORDER_CURRENCY,
     )
 
     def __str__(self):

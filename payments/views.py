@@ -7,6 +7,7 @@ from datetime import timedelta
 from decimal import Decimal
 
 from django.conf import settings
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.db import IntegrityError, transaction
 from django.db.models import Q
@@ -84,6 +85,44 @@ class OrderAlreadyPaid(Exception):
     pass
 
 
+class PaymentAmountTooLow(Exception):
+    def __init__(self, amount, currency, minimum):
+        self.amount = amount
+        self.currency = currency
+        self.minimum = minimum
+
+
+def _minimum_payment_amount(currency):
+    configured = getattr(settings, "PAYMENT_MINIMUM_AMOUNTS", {})
+    defaults = {"EUR": "0.50", "USD": "0.50", "XOF": "500"}
+    value = configured.get(currency.upper(), defaults.get(currency.upper()))
+    if value is None:
+        raise ValueError(f"Aucun montant minimum configuré pour {currency.upper()}.")
+    minimum = Decimal(str(value))
+    if minimum <= 0:
+        raise ValueError(f"Le minimum configuré pour {currency.upper()} doit être positif.")
+    return minimum
+
+
+def _validate_order_payment_amount(commande):
+    currency = commande.currency.upper()
+    amount = Decimal(str(commande.total))
+    # Valide aussi la précision monétaire, notamment l'absence de fraction XOF.
+    _minor_amount(amount, currency)
+    minimum = _minimum_payment_amount(currency)
+    if amount < minimum:
+        raise PaymentAmountTooLow(amount, currency, minimum)
+
+
+def _payment_amount_error_response(request, order_id, exc):
+    messages.error(
+        request,
+        f"Le montant minimum de paiement est de {exc.minimum} {exc.currency}. "
+        f"Le total actuel est de {exc.amount} {exc.currency}.",
+    )
+    return redirect("payments:choice", order_id=order_id)
+
+
 def _payment_timeout_seconds():
     configured = int(getattr(settings, "PAYMENT_PROCESSING_TIMEOUT_SECONDS", 3600))
     return min(max(configured, 1800), 86400)
@@ -125,6 +164,7 @@ def _reserve_payment(request, order_id, channel):
                 adresse__isnull=False,
                 total__gt=0,
             )
+            _validate_order_payment_amount(commande)
             active = Payment.objects.select_for_update().filter(
                 commande=commande,
                 status="PROCESSING",
@@ -376,7 +416,7 @@ def stripe_checkout(request, order_id):
             return redirect(payment.checkout_url, code=303)
 
         montant = Decimal(str(commande.total))
-        currency = (commande.currency or getattr(settings, "DEFAULT_CURRENCY", "EUR")).lower()
+        currency = commande.currency.lower()
 
         session = stripe.checkout.Session.create(
             mode="payment",
@@ -406,6 +446,8 @@ def stripe_checkout(request, order_id):
         return HttpResponse("Une autre tentative de paiement est déjà active.", status=409)
     except OrderAlreadyPaid:
         return redirect("payments:success")
+    except PaymentAmountTooLow as exc:
+        return _payment_amount_error_response(request, order_id, exc)
     except SQLiteLockRetryExhausted:
         return HttpResponse("RETRY", status=409)
     except Exception:
@@ -469,7 +511,7 @@ def _abs_url(name, request):
 def _cinetpay_payload(commande, payment, request, channel="MOBILE_MONEY"):
     return {
         "amount": str(Decimal(str(commande.total))),
-        "currency": commande.currency or getattr(settings, "DEFAULT_CURRENCY", "EUR"),
+        "currency": commande.currency,
         "apikey": settings.CINETPAY_API_KEY,
         "site_id": settings.CINETPAY_SITE_ID,
         "transaction_id": payment.transaction_id,
@@ -585,6 +627,8 @@ def cinetpay_create_payment(request, order_id):
         return HttpResponse("Une autre tentative de paiement est déjà active.", status=409)
     except OrderAlreadyPaid:
         return redirect("payments:success")
+    except PaymentAmountTooLow as exc:
+        return _payment_amount_error_response(request, order_id, exc)
     except PaymentInitializationInProgress:
         return HttpResponse("Initialisation CinetPay déjà en cours.", status=409)
     except SQLiteLockRetryExhausted:

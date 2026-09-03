@@ -5,6 +5,7 @@ from unittest.mock import Mock, patch
 from django.contrib.auth import get_user_model
 from django.db import OperationalError
 from django.test import TestCase
+from django.test import override_settings
 from django.urls import reverse
 
 from payments.models import Adresse, Payment
@@ -77,6 +78,16 @@ class CheckoutFlowTests(TestCase):
         self.assertEqual(line.source_cart_item, self.cart_item)
         self.assertEqual(line.quantite, 2)
         self.assertEqual(line.prix_unitaire, Decimal("12.50"))
+
+    @override_settings(DEFAULT_CURRENCY="XOF")
+    def test_checkout_uses_order_model_currency_as_single_source_of_truth(self):
+        order = self.create_order()
+
+        self.assertEqual(order.currency, "EUR")
+        self.assertEqual(
+            order.currency,
+            Commande._meta.get_field("currency").get_default(),
+        )
 
     def test_confirmation_page_renders_important_order_content(self):
         order = self.create_order()
@@ -279,7 +290,7 @@ class CheckoutFlowTests(TestCase):
                 "object": {
                     "id": payment.transaction_id,
                     "payment_status": "paid",
-                    "amount_total": 25,
+                    "amount_total": 2500,
                     "currency": order.currency.lower(),
                     "metadata": {
                         "commande_id": str(order.id),

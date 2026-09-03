@@ -107,6 +107,14 @@ class OrderPaymentSecurityTests(TestCase):
             first_create.call_args.kwargs["idempotency_key"],
             str(payment.idempotency_key),
         )
+        self.assertEqual(
+            first_create.call_args.kwargs["line_items"][0]["price_data"]["currency"],
+            "eur",
+        )
+        self.assertEqual(
+            first_create.call_args.kwargs["line_items"][0]["price_data"]["unit_amount"],
+            2000,
+        )
         expires_at = first_create.call_args.kwargs["expires_at"]
         remaining = expires_at - int(timezone.now().timestamp())
         self.assertGreaterEqual(remaining, 3595)
@@ -171,6 +179,63 @@ class OrderPaymentSecurityTests(TestCase):
         self.assertEqual(first.url, second.url)
         self.assertEqual(post.call_count, 1)
         self.assertEqual(Payment.objects.filter(status="PROCESSING").count(), 1)
+        self.assertEqual(post.call_args.kwargs["json"]["currency"], "EUR")
+        self.assertEqual(post.call_args.kwargs["json"]["amount"], "20.00")
+
+    def test_stripe_rejects_too_low_amount_before_provider_call(self):
+        self.order.total = Decimal("0.49")
+        self.order.save(update_fields=["total"])
+
+        with patch("payments.views.stripe.checkout.Session.create") as create:
+            response = self.client.post(
+                reverse("payments:stripe_checkout", args=[self.order.id]),
+                follow=True,
+            )
+
+        create.assert_not_called()
+        self.assertFalse(Payment.objects.exists())
+        self.assertContains(response, "montant minimum de paiement est de 0.50 EUR")
+        self.assertContains(response, "total actuel est de 0.49 EUR")
+
+    def test_cinetpay_rejects_too_low_xof_amount_before_provider_call(self):
+        self.order.total = Decimal("499")
+        self.order.currency = "XOF"
+        self.order.save(update_fields=["total", "currency"])
+
+        with patch("payments.views.requests.post") as post:
+            response = self.client.post(
+                reverse("payments:cinetpay_create", args=[self.order.id]),
+                follow=True,
+            )
+
+        post.assert_not_called()
+        self.assertFalse(Payment.objects.exists())
+        self.assertContains(response, "montant minimum de paiement est de 500 XOF")
+        self.assertContains(response, "total actuel est de 499.00 XOF")
+
+    def test_valid_xof_order_keeps_exact_currency_and_amount_for_cinetpay(self):
+        self.order.total = Decimal("500")
+        self.order.currency = "XOF"
+        self.order.save(update_fields=["total", "currency"])
+        provider_response = Mock()
+        provider_response.json.return_value = {
+            "code": "201",
+            "data": {"payment_url": "https://cinetpay.test/xof"},
+        }
+
+        with patch(
+            "payments.views.requests.post", return_value=provider_response
+        ) as post:
+            response = self.client.post(
+                reverse("payments:cinetpay_create", args=[self.order.id])
+            )
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(post.call_args.kwargs["json"]["currency"], "XOF")
+        self.assertEqual(post.call_args.kwargs["json"]["amount"], "500.00")
+        payment = Payment.objects.get()
+        self.assertEqual(payment.devise, "XOF")
+        self.assertEqual(payment.montant, Decimal("500"))
 
     def test_cinetpay_network_initialization_has_one_atomic_owner(self):
         payment = Payment.objects.create(

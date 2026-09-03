@@ -188,7 +188,6 @@ class CheckoutView(LoginRequiredMixin, View):
                         source_cart=cart,
                         checkout_token=checkout_token,
                         total=total,
-                        currency=getattr(settings, "DEFAULT_CURRENCY", "EUR"),
                         payment_status="PENDING",
                     )
                     LigneCommande.objects.bulk_create(
