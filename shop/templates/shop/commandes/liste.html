@@ -1,0 +1,77 @@
+{% extends 'template_base.html' %}
+{% load static %}
+
+{% block titre %}Gestion des commandes — Teyilawson{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{% static 'css/order-management.css' %}">
+{% endblock %}
+
+{% block contenu %}
+<section class="orders-admin-page">
+  <header class="orders-admin-hero">
+    <div>
+      <span class="orders-admin-eyebrow">Espace staff · Boutique</span>
+      <h1>Gestion des commandes</h1>
+      <p>Suivez les paiements, retrouvez rapidement une commande et consultez son contenu sans modifier manuellement l’état fourni par les prestataires de paiement.</p>
+    </div>
+    <a class="orders-admin-back" href="{% url 'shop:liste' %}"><i class="fa-solid fa-arrow-left" aria-hidden="true"></i> Retour à la boutique</a>
+  </header>
+
+  <div class="orders-admin-stats">
+    <a class="orders-stat {% if not statut_actif %}is-active{% endif %}" href="{% url 'shop:commande_gestion_liste' %}"><span>Toutes</span><strong>{{ compteurs.ALL }}</strong></a>
+    <a class="orders-stat {% if statut_actif == 'PENDING' %}is-active{% endif %}" href="?statut=PENDING"><span>En attente</span><strong>{{ compteurs.PENDING }}</strong></a>
+    <a class="orders-stat {% if statut_actif == 'PROCESSING' %}is-active{% endif %}" href="?statut=PROCESSING"><span>En cours</span><strong>{{ compteurs.PROCESSING }}</strong></a>
+    <a class="orders-stat {% if statut_actif == 'SUCCESS' %}is-active{% endif %}" href="?statut=SUCCESS"><span>Payées</span><strong>{{ compteurs.SUCCESS }}</strong></a>
+    <a class="orders-stat {% if statut_actif == 'FAILED' %}is-active{% endif %}" href="?statut=FAILED"><span>Échouées</span><strong>{{ compteurs.FAILED }}</strong></a>
+    <a class="orders-stat {% if statut_actif == 'CANCELED' %}is-active{% endif %}" href="?statut=CANCELED"><span>Annulées</span><strong>{{ compteurs.CANCELED }}</strong></a>
+  </div>
+
+  <form class="orders-admin-search" method="get">
+    {% if statut_actif %}<input type="hidden" name="statut" value="{{ statut_actif }}">{% endif %}
+    <label for="order-search">Rechercher</label>
+    <div class="orders-search-row">
+      <div class="orders-search-input">
+        <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+        <input id="order-search" name="q" type="search" value="{{ recherche }}" placeholder="N° de commande, client, email ou transaction">
+      </div>
+      <button type="submit">Rechercher</button>
+      {% if recherche %}<a href="{% url 'shop:commande_gestion_liste' %}{% if statut_actif %}?statut={{ statut_actif }}{% endif %}">Réinitialiser</a>{% endif %}
+    </div>
+  </form>
+
+  <div class="orders-table-card">
+    {% if commandes %}
+      <div class="table-responsive">
+        <table class="orders-table">
+          <thead>
+            <tr><th>Commande</th><th>Client</th><th>Date</th><th>Paiement</th><th>Montant</th><th></th></tr>
+          </thead>
+          <tbody>
+            {% for commande in commandes %}
+            <tr>
+              <td><strong>#{{ commande.id }}</strong><small>{{ commande.get_payment_channel_display|default:'Canal non choisi' }}</small></td>
+              <td><strong>{{ commande.client.first_name|default:commande.client.email }} {{ commande.client.last_name }}</strong><small>{{ commande.client.email }}</small></td>
+              <td>{{ commande.date_commande|date:'d/m/Y' }}<small>{{ commande.date_commande|date:'H:i' }}</small></td>
+              <td><span class="order-status order-status-{{ commande.payment_status|lower }}">{{ commande.get_payment_status_display }}</span></td>
+              <td><strong>{{ commande.total }} {{ commande.currency }}</strong></td>
+              <td class="orders-table-action"><a href="{% url 'shop:commande_gestion_detail' commande.pk %}" aria-label="Voir la commande {{ commande.id }}">Voir <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a></td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <div class="orders-empty"><i class="fa-regular fa-folder-open" aria-hidden="true"></i><h2>Aucune commande trouvée</h2><p>Modifiez les filtres ou la recherche pour afficher d’autres résultats.</p></div>
+    {% endif %}
+  </div>
+
+  {% if page_obj.paginator.num_pages > 1 %}
+  <nav class="orders-pagination" aria-label="Pagination des commandes">
+    {% if page_obj.has_previous %}<a href="?page={{ page_obj.previous_page_number }}{% if statut_actif %}&statut={{ statut_actif }}{% endif %}{% if recherche %}&q={{ recherche|urlencode }}{% endif %}"><i class="fa-solid fa-arrow-left" aria-hidden="true"></i> Précédent</a>{% endif %}
+    <span>Page {{ page_obj.number }} sur {{ page_obj.paginator.num_pages }}</span>
+    {% if page_obj.has_next %}<a href="?page={{ page_obj.next_page_number }}{% if statut_actif %}&statut={{ statut_actif }}{% endif %}{% if recherche %}&q={{ recherche|urlencode }}{% endif %}">Suivant <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a>{% endif %}
+  </nav>
+  {% endif %}
+</section>
+{% endblock %}
