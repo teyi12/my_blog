@@ -1,17 +1,36 @@
 {% extends "monetization/base.html" %}
-{% block title %}Abonnements Premium{% endblock %}
+{% block title %}Abonnements Premium — Teyilawson{% endblock %}
 
 {% block content %}
-<h1 class="text-2xl font-bold mb-6">Abonnements Premium</h1>
-
-<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-    {% for abo in abonnements %}
-    <div class="bg-white shadow-lg rounded-2xl p-6 flex flex-col justify-between">
-        <h2 class="text-xl font-semibold">{{ abo.nom }}</h2>
-        <p class="my-2">{{ abo.description }}</p>
-        <p class="font-bold">{{ abo.prix }} € pour {{ abo.duree_jours }} jours</p>
-        <a href="{% url 'monetization:souscrire_abonnement' abo.slug %}" class="mt-4 bg-pink-500 text-white px-4 py-2 rounded hover:bg-pink-600 text-center">Souscrire</a>
+<section class="monetization-section">
+  <div class="monetization-section-heading">
+    <div>
+      <span class="monetization-eyebrow">Premium</span>
+      <h2>Choisissez la formule qui vous correspond.</h2>
+      <p>Les offres ci-dessous décrivent les formules disponibles. L’activation automatique n’est réalisée qu’après confirmation d’un paiement sécurisé.</p>
     </div>
+  </div>
+
+  {% if abonnements %}
+  <div class="subscription-grid">
+    {% for abo in abonnements %}
+    <article class="subscription-card">
+      <span class="subscription-icon" aria-hidden="true"><i class="fa-solid fa-crown"></i></span>
+      <span class="monetization-eyebrow">Formule Premium</span>
+      <h3>{{ abo.nom }}</h3>
+      <p>{{ abo.description }}</p>
+      <div class="subscription-price"><strong>{{ abo.prix|floatformat:2 }} €</strong><span>pour {{ abo.duree_jours }} jours</span></div>
+      <a href="{% url 'monetization:souscrire_abonnement' abo.slug %}" class="btn btn-primary subscription-button">Choisir cette formule</a>
+      <small class="subscription-note"><i class="fa-solid fa-lock" aria-hidden="true"></i> Activation uniquement après paiement confirmé.</small>
+    </article>
     {% endfor %}
-</div>
+  </div>
+  {% else %}
+  <div class="monetization-empty">
+    <i class="fa-solid fa-crown" aria-hidden="true"></i>
+    <h3>Les offres Premium arrivent bientôt.</h3>
+    <p>Aucune formule n’est actuellement publiée.</p>
+  </div>
+  {% endif %}
+</section>
 {% endblock %}

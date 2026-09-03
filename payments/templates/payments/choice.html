@@ -1,63 +1,143 @@
 {% extends 'template_base.html' %}
-{% block titre %}Choisir un mode de paiement{% endblock %}
+{% load static %}
+
+{% block titre %}Paiement — Teyilawson{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{% static 'css/payment-choice.css' %}">
+<link rel="stylesheet" href="{% static 'css/payment-donation.css' %}">
+{% endblock %}
 
 {% block contenu %}
-<div class="container py-5">
-  <h2 class="text-center mb-4">Choisissez votre mode de paiement</h2>
-  <div class="row g-4 justify-content-center">
+<section class="payment-page">
+  <nav class="payment-steps" aria-label="Progression de la commande">
+    <a href="{% url 'shop:panier' %}"><span>1</span> Panier</a>
+    <span><span>2</span> Coordonnées</span>
+    <span class="payment-step-active"><span>3</span> Paiement</span>
+  </nav>
 
-    <!-- Don ponctuel -->
-    <div class="col-md-4">
-      <div class="card shadow-sm p-4 border-0 rounded-4 text-center">
-        <h4>Don ponctuel</h4>
-        <p class="text-muted">Soutenez le projet avec le montant de votre choix.</p>
-        <form action="{% url 'payments:create_donation_checkout' %}" method="post">
-          {% csrf_token %}
-          <div class="mb-3">
-            <input type="number" name="amount" class="form-control" placeholder="Montant" required min="1">
-          </div>
-          <div class="mb-3">
-            <select name="currency" class="form-select">
-              <option value="eur">EUR €</option>
-              <option value="usd">USD $</option>
-              <option value="xof">XOF CFA</option>
-              <option value="xaf">XAF CFA</option>
-            </select>
-          </div>
-          <button type="submit" class="btn btn-success w-100">💖 Faire un don</button>
-        </form>
-      </div>
+  <header class="payment-header">
+    <div>
+      <span class="eyebrow">Dernière étape</span>
+      <h1>Choisissez votre moyen de paiement</h1>
+      <p>Sélectionnez la méthode qui vous convient pour finaliser votre commande.</p>
     </div>
+    <div class="payment-order-number">
+      <span>Commande</span>
+      <strong>#{{ commande.id }}</strong>
+    </div>
+  </header>
 
-    <!-- Paiement Stripe -->
-    <div class="col-md-4">
-      <div class="card shadow-sm p-4 border-0 rounded-4 text-center">
-        <h4>Paiement par carte</h4>
-        <p class="text-muted">Réglez une commande avec Stripe.</p>
-        <form action="{% url 'payments:stripe_checkout' commande.id %}" method="post">
+  <div class="payment-layout">
+    <div class="payment-methods" aria-label="Moyens de paiement disponibles">
+      <article class="payment-method-card payment-method-featured">
+        <div class="payment-method-topline">
+          <span class="payment-icon"><i class="fa-regular fa-credit-card" aria-hidden="true"></i></span>
+          <span class="payment-recommended">Recommandé</span>
+        </div>
+        <div class="payment-method-copy">
+          <span class="eyebrow">Carte bancaire</span>
+          <h2>Stripe</h2>
+          <p>Payez par carte via la page de paiement sécurisée de Stripe.</p>
+        </div>
+        <ul class="payment-benefits">
+          <li><i class="fa-regular fa-circle-check" aria-hidden="true"></i> Paiement sécurisé</li>
+          <li><i class="fa-regular fa-circle-check" aria-hidden="true"></i> Confirmation rapide</li>
+        </ul>
+        <form action="{% url 'payments:stripe_checkout' commande.id %}" method="post" class="payment-form">
           {% csrf_token %}
-          <button type="submit" class="btn btn-primary w-100">
-            💳 Payer ma commande
+          <button type="submit" class="btn btn-brand btn-lg">
+            <i class="fa-regular fa-credit-card" aria-hidden="true"></i>
+            Payer par carte
+            <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
           </button>
         </form>
-      </div>
-    </div>
+      </article>
 
-    <!-- Paiement Mobile Money (CinetPay) -->
-    <div class="col-md-4">
-      <div class="card shadow-sm p-4 border-0 rounded-4 text-center">
-        <h4>Mobile Money</h4>
-        <p class="text-muted">Orange Money, MTN, Moov, Wave…</p>
-        <form action="{% url 'payments:cinetpay_create' commande.id %}" method="post">
+      <article class="payment-method-card">
+        <div class="payment-method-topline">
+          <span class="payment-icon"><i class="fa-solid fa-mobile-screen-button" aria-hidden="true"></i></span>
+        </div>
+        <div class="payment-method-copy">
+          <span class="eyebrow">Mobile Money</span>
+          <h2>CinetPay</h2>
+          <p>Utilisez les moyens Mobile Money disponibles via CinetPay.</p>
+        </div>
+        <ul class="payment-benefits">
+          <li><i class="fa-regular fa-circle-check" aria-hidden="true"></i> Orange Money, MTN, Moov, Wave…</li>
+          <li><i class="fa-regular fa-circle-check" aria-hidden="true"></i> Validation par le fournisseur</li>
+        </ul>
+        <form action="{% url 'payments:cinetpay_create' commande.id %}" method="post" class="payment-form">
           {% csrf_token %}
           <input type="hidden" name="channel" value="MOBILE_MONEY">
-          <button type="submit" class="btn btn-warning w-100">
-            📱 Payer avec Mobile Money
+          <button type="submit" class="btn btn-soft btn-lg">
+            <i class="fa-solid fa-mobile-screen-button" aria-hidden="true"></i>
+            Payer avec Mobile Money
+            <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
           </button>
         </form>
-      </div>
+      </article>
     </div>
 
+    <aside class="payment-summary" aria-labelledby="payment-summary-title">
+      <span class="eyebrow">Récapitulatif</span>
+      <h2 id="payment-summary-title">Votre commande</h2>
+
+      <div class="payment-summary-line">
+        <span>Numéro</span>
+        <strong>#{{ commande.id }}</strong>
+      </div>
+      <div class="payment-summary-line">
+        <span>Statut</span>
+        <strong>En attente de paiement</strong>
+      </div>
+      <div class="payment-summary-total">
+        <span>Total à payer</span>
+        <strong>{{ commande.total|floatformat:2 }} {{ commande.currency }}</strong>
+      </div>
+
+      <div class="payment-security">
+        <span class="payment-security-icon"><i class="fa-solid fa-shield-halved" aria-hidden="true"></i></span>
+        <div>
+          <strong>Paiement protégé</strong>
+          <p>Le montant et la devise proviennent directement de votre commande.</p>
+        </div>
+      </div>
+
+      <a href="{% url 'shop:panier' %}" class="payment-back-link">
+        <i class="fa-solid fa-arrow-left" aria-hidden="true"></i> Retour au panier
+      </a>
+    </aside>
   </div>
-</div>
+
+  <section class="payment-donation" aria-labelledby="donation-title">
+    <div class="payment-donation-copy">
+      <span class="payment-donation-icon"><i class="fa-regular fa-heart" aria-hidden="true"></i></span>
+      <div>
+        <span class="eyebrow">Soutenir le projet</span>
+        <h2 id="donation-title">Faire un don</h2>
+        <p>Le don est indépendant de votre commande et reste entièrement facultatif.</p>
+      </div>
+    </div>
+    <form action="{% url 'payments:create_donation_checkout' %}" method="post" class="payment-donation-form">
+      {% csrf_token %}
+      <label>
+        <span>Montant</span>
+        <input type="number" name="amount" min="1" step="1" required placeholder="10">
+      </label>
+      <label>
+        <span>Devise</span>
+        <select name="currency">
+          <option value="eur">EUR €</option>
+          <option value="usd">USD $</option>
+          <option value="xof">XOF CFA</option>
+          <option value="xaf">XAF CFA</option>
+        </select>
+      </label>
+      <button type="submit" class="btn btn-soft">
+        <i class="fa-regular fa-heart" aria-hidden="true"></i> Faire un don
+      </button>
+    </form>
+  </section>
+</section>
 {% endblock %}

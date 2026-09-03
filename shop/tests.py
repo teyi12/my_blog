@@ -95,14 +95,13 @@ class CheckoutFlowTests(TestCase):
         response = self.client.get(reverse("shop:confirmation", args=[order.id]))
 
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "Commande confirmée")
-        self.assertContains(
-            response,
-            f"<strong>Numéro de commande :</strong> {order.id}",
-            html=True,
-        )
+        self.assertContains(response, "Votre commande est prête pour le paiement.")
+        self.assertContains(response, f"N° {order.id}")
         self.assertContains(response, self.product.nom)
         self.assertContains(response, "1 rue du Test")
+        self.assertContains(response, "Total à payer")
+        self.assertContains(response, order.currency)
+        self.assertContains(response, "Choisir mon moyen de paiement")
 
     def test_double_checkout_post_reuses_the_same_order(self):
         token = self.get_checkout_token()

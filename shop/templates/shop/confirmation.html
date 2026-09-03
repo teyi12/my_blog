@@ -1,64 +1,85 @@
 {% extends "template_base.html" %}
 {% load static %}
 
+{% block titre %}Commande #{{ commande.id }} — Teyilawson{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{% static 'css/order-confirmation.css' %}">
+{% endblock %}
+
 {% block contenu %}
-<div class="container my-5">
-    <div class="card shadow-lg border-0">
-        <div class="card-body p-4">
-            <h2 class="mb-4 text-success">✅ Commande confirmée</h2>
+<section class="order-confirmation-page">
+  <div class="order-confirmation-shell">
+    <header class="order-confirmation-hero">
+      <span class="order-confirmation-icon" aria-hidden="true"><i class="fa-solid fa-check"></i></span>
+      <div>
+        <span class="order-eyebrow">Commande enregistrée</span>
+        <h1>Votre commande est prête pour le paiement.</h1>
+        <p>Les informations ont bien été enregistrées. Vérifiez le récapitulatif avant de choisir votre moyen de paiement sécurisé.</p>
+      </div>
+    </header>
 
-            <p class="mb-3">
-                Merci <strong>{{ commande.client.username }}</strong>, votre commande a bien été enregistrée.
-            </p>
-
-            <h5 class="mb-3">📦 Détails de la commande</h5>
-            <ul class="list-group mb-3">
-                <li class="list-group-item">
-                    <strong>Numéro de commande :</strong> {{ commande.id }}
-                </li>
-                <li class="list-group-item">
-                    <strong>Date :</strong> {{ commande.date_commande|date:"d/m/Y H:i" }}
-                </li>
-                <li class="list-group-item">
-                    <strong>Total :</strong> {{ commande.total|floatformat:2 }} €
-                </li>
-                <li class="list-group-item">
-                    <strong>Adresse :</strong><br>
-                    {{ commande.adresse.rue }} <br>
-                    {{ commande.adresse.code_postal }} {{ commande.adresse.ville }} <br>
-                    {{ commande.adresse.pays }} <br>
-                    📞 {{ commande.adresse.telephone }}
-                </li>
-            </ul>
-
-            <h5 class="mb-3">🛒 Articles</h5>
-            <table class="table table-striped">
-                <thead>
-                    <tr>
-                        <th>Produit</th>
-                        <th>Quantité</th>
-                        <th>Prix unitaire</th>
-                        <th>Sous-total</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for ligne in commande.lignes.all %}
-                    <tr>
-                        <td>{{ ligne.produit.nom }}</td>
-                        <td>{{ ligne.quantite }}</td>
-                        <td>{{ ligne.prix_unitaire }} €</td>
-                        <td>{{ ligne.sous_total }} €</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-
-            <div class="mt-4">
-                <a href="{% url 'payments:choice' commande.id %}" class="btn btn-primary btn-lg w-100">
-                    💳 Procéder au paiement
-                </a>
-            </div>
+    <div class="order-confirmation-grid">
+      <div class="order-main-card">
+        <div class="order-card-heading">
+          <div>
+            <span class="order-eyebrow">Commande</span>
+            <h2>N° {{ commande.id }}</h2>
+          </div>
+          <span class="order-date"><i class="fa-regular fa-calendar" aria-hidden="true"></i> {{ commande.date_commande|date:"d/m/Y H:i" }}</span>
         </div>
+
+        <div class="order-items" aria-label="Articles de la commande">
+          {% for ligne in commande.lignes.all %}
+          <div class="order-item">
+            <div class="order-item-info">
+              <span class="order-item-icon" aria-hidden="true"><i class="fa-solid fa-box"></i></span>
+              <div>
+                <strong>{{ ligne.produit.nom }}</strong>
+                <small>{{ ligne.quantite }} × {{ ligne.prix_unitaire|floatformat:2 }} {{ commande.currency }}</small>
+              </div>
+            </div>
+            <strong class="order-item-total">{{ ligne.sous_total|floatformat:2 }} {{ commande.currency }}</strong>
+          </div>
+          {% empty %}
+          <p class="order-empty">Aucun article n’est associé à cette commande.</p>
+          {% endfor %}
+        </div>
+
+        <div class="order-total-row">
+          <span>Total à payer</span>
+          <strong>{{ commande.total|floatformat:2 }} {{ commande.currency }}</strong>
+        </div>
+      </div>
+
+      <aside class="order-side-card">
+        <div class="order-address-block">
+          <span class="order-eyebrow">Livraison</span>
+          <h2>Adresse enregistrée</h2>
+          {% if commande.adresse %}
+          <address>
+            {{ commande.adresse.rue }}<br>
+            {{ commande.adresse.code_postal }} {{ commande.adresse.ville }}<br>
+            {{ commande.adresse.pays }}
+          </address>
+          {% if commande.adresse.telephone %}
+          <p class="order-phone"><i class="fa-solid fa-phone" aria-hidden="true"></i> {{ commande.adresse.telephone }}</p>
+          {% endif %}
+          {% else %}
+          <p>Adresse non renseignée.</p>
+          {% endif %}
+        </div>
+
+        <div class="order-security-note">
+          <i class="fa-solid fa-shield-halved" aria-hidden="true"></i>
+          <div><strong>Paiement sécurisé</strong><span>Vous choisirez votre moyen de paiement à l’étape suivante.</span></div>
+        </div>
+
+        <a href="{% url 'payments:choice' commande.id %}" class="btn btn-primary btn-lg order-payment-button">
+          Choisir mon moyen de paiement <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+        </a>
+      </aside>
     </div>
-</div>
+  </div>
+</section>
 {% endblock %}

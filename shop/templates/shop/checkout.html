@@ -1,104 +1,132 @@
 {% extends 'template_base.html' %}
 {% load static %}
 
-{% block titre %}Checkout{% endblock %}
+{% block titre %}Finaliser la commande — Teyilawson{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{% static 'css/checkout.css' %}">
+{% endblock %}
 
 {% block contenu %}
-<div class="container my-5">
+<section class="checkout-page">
+  <nav class="checkout-steps" aria-label="Progression de la commande">
+    <a href="{% url 'shop:panier' %}"><span>1</span> Panier</a>
+    <span class="checkout-step-active"><span>2</span> Coordonnées</span>
+    <span><span>3</span> Paiement</span>
+  </nav>
 
-    <!-- Breadcrumb -->
-    <nav aria-label="breadcrumb">
-        <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="{% url 'shop:liste' %}">Boutique</a></li>
-            <li class="breadcrumb-item"><a href="{% url 'shop:panier' %}">Panier</a></li>
-            <li class="breadcrumb-item active" aria-current="page">Checkout</li>
-        </ol>
-    </nav>
+  <header class="checkout-header">
+    <div>
+      <span class="eyebrow">Commande sécurisée</span>
+      <h1>Finaliser votre commande</h1>
+      <p>Renseignez vos coordonnées avant de choisir votre moyen de paiement.</p>
+    </div>
+    <a href="{% url 'shop:panier' %}" class="btn btn-soft">
+      <i class="fa-solid fa-arrow-left" aria-hidden="true"></i> Retour au panier
+    </a>
+  </header>
 
-    <h2 class="text-center mb-4">🛒 Finaliser votre commande</h2>
-
-    {% if cart and cart.items.exists %}
-        <div class="row">
-            <!-- Formulaire d’adresse -->
-            <div class="col-md-7">
-                <div class="card shadow-sm border-0 mb-4">
-                    <div class="card-body">
-                        <h5 class="card-title mb-3">Adresse de livraison</h5>
-                        <form method="post" action="{% url 'shop:checkout' %}">
-                            {% csrf_token %}
-                            <input type="hidden" name="checkout_token" value="{{ checkout_token }}">
-                            {{ form.non_field_errors }}
-
-                            <div class="mb-3">
-                                <label class="form-label">Rue</label>
-                                {{ form.rue }}
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Ville</label>
-                                {{ form.ville }}
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Code postal</label>
-                                {{ form.code_postal }}
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Pays</label>
-                                {{ form.pays }}
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Téléphone</label>
-                                {{ form.telephone }}
-                            </div>
-
-                            <button type="submit" class="btn btn-primary w-100">Enregistrer et continuer vers le paiement</button>
-                        </form>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Récapitulatif commande -->
-            <div class="col-md-5">
-                <div class="card shadow-sm border-0">
-                    <div class="card-body">
-                        <h5 class="card-title">Résumé de la commande</h5>
-                        <ul class="list-group list-group-flush mb-3">
-                            {% for item in cart.items.all %}
-                            <li class="list-group-item d-flex justify-content-between align-items-center">
-                                <div class="d-flex align-items-center">
-                                    {% if item.produit.image %}
-                                        <img src="{{ item.produit.image.url }}" alt="{{ item.produit.nom }}"
-                                             style="width:50px; height:50px; object-fit:cover; border-radius:5px;" class="me-2">
-                                    {% endif %}
-                                    <div>
-                                        <h6 class="mb-0">{{ item.produit.nom }}</h6>
-                                        <small class="text-muted">x{{ item.quantite }}</small>
-                                    </div>
-                                </div>
-                                <span class="fw-bold">{{ item.sous_total|floatformat:2 }} €</span>
-                            </li>
-                            {% endfor %}
-                        </ul>
-                        <div class="d-flex justify-content-between">
-                            <span>Sous-total :</span>
-                            <span>{{ total|floatformat:2 }} €</span>
-                        </div>
-                        <div class="d-flex justify-content-between">
-                            <span>Livraison :</span>
-                            <span>Gratuite 🚚</span>
-                        </div>
-                        <hr>
-                        <div class="d-flex justify-content-between fw-bold mb-3">
-                            <span>Total :</span>
-                            <span>{{ total|floatformat:2 }} €</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
+  {% if cart and cart.items.exists %}
+  <div class="checkout-layout">
+    <div class="checkout-form-card">
+      <div class="checkout-section-heading">
+        <span class="checkout-section-icon"><i class="fa-regular fa-address-card" aria-hidden="true"></i></span>
+        <div>
+          <span class="eyebrow">Vos coordonnées</span>
+          <h2>Adresse de livraison</h2>
+          <p>Ces informations seront associées à cette commande.</p>
         </div>
-    {% else %}
-        <p class="text-center text-muted">Votre panier est vide. 
-           <a href="{% url 'shop:liste' %}">Retour à la boutique</a>
-        </p>
-    {% endif %}
-</div>
+      </div>
+
+      <form method="post" action="{% url 'shop:checkout' %}" class="checkout-form">
+        {% csrf_token %}
+        <input type="hidden" name="checkout_token" value="{{ checkout_token }}">
+
+        {% if form.non_field_errors %}
+        <div class="alert alert-danger" role="alert">{{ form.non_field_errors }}</div>
+        {% endif %}
+
+        <div class="checkout-field checkout-field-full">
+          <label for="{{ form.rue.id_for_label }}">Rue</label>
+          {{ form.rue }}
+          {% if form.rue.errors %}<div class="checkout-field-error">{{ form.rue.errors }}</div>{% endif %}
+        </div>
+
+        <div class="checkout-field">
+          <label for="{{ form.ville.id_for_label }}">Ville</label>
+          {{ form.ville }}
+          {% if form.ville.errors %}<div class="checkout-field-error">{{ form.ville.errors }}</div>{% endif %}
+        </div>
+
+        <div class="checkout-field">
+          <label for="{{ form.code_postal.id_for_label }}">Code postal</label>
+          {{ form.code_postal }}
+          {% if form.code_postal.errors %}<div class="checkout-field-error">{{ form.code_postal.errors }}</div>{% endif %}
+        </div>
+
+        <div class="checkout-field">
+          <label for="{{ form.pays.id_for_label }}">Pays</label>
+          {{ form.pays }}
+          {% if form.pays.errors %}<div class="checkout-field-error">{{ form.pays.errors }}</div>{% endif %}
+        </div>
+
+        <div class="checkout-field">
+          <label for="{{ form.telephone.id_for_label }}">Téléphone</label>
+          {{ form.telephone }}
+          {% if form.telephone.errors %}<div class="checkout-field-error">{{ form.telephone.errors }}</div>{% endif %}
+        </div>
+
+        <div class="checkout-submit">
+          <button type="submit" class="btn btn-brand btn-lg">
+            Continuer vers le paiement <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+          </button>
+          <p><i class="fa-solid fa-lock" aria-hidden="true"></i> Votre commande sera créée une seule fois, même en cas de double clic.</p>
+        </div>
+      </form>
+    </div>
+
+    <aside class="checkout-summary" aria-labelledby="checkout-summary-title">
+      <span class="eyebrow">Récapitulatif</span>
+      <h2 id="checkout-summary-title">Votre commande</h2>
+
+      <div class="checkout-summary-items">
+        {% for item in cart.items.all %}
+        <div class="checkout-summary-item">
+          <a href="{% url 'shop:detail' slug=item.produit.slug %}" class="checkout-summary-media" aria-label="Voir {{ item.produit.nom }}">
+            {% if item.produit.image %}
+              <img src="{{ item.produit.image.url }}" alt="{{ item.produit.nom }}">
+            {% else %}
+              <img src="{% static 'images/default.jpg' %}" alt="{{ item.produit.nom }}">
+            {% endif %}
+          </a>
+          <div class="checkout-summary-copy">
+            <strong>{{ item.produit.nom }}</strong>
+            <span>Quantité : {{ item.quantite }}</span>
+          </div>
+          <strong class="checkout-summary-price">{{ item.sous_total|floatformat:2 }} €</strong>
+        </div>
+        {% endfor %}
+      </div>
+
+      <div class="checkout-totals">
+        <div><span>Sous-total</span><strong>{{ total|floatformat:2 }} €</strong></div>
+        <div><span>Livraison</span><strong>Gratuite</strong></div>
+        <div class="checkout-total"><span>Total</span><strong>{{ total|floatformat:2 }} €</strong></div>
+      </div>
+
+      <div class="checkout-trust">
+        <span><i class="fa-solid fa-shield-halved" aria-hidden="true"></i> Paiement sécurisé</span>
+        <span><i class="fa-regular fa-circle-check" aria-hidden="true"></i> Vérification avant paiement</span>
+      </div>
+    </aside>
+  </div>
+  {% else %}
+  <div class="empty-state checkout-empty">
+    <span class="empty-state-icon"><i class="fa-solid fa-bag-shopping" aria-hidden="true"></i></span>
+    <h2>Votre panier est vide</h2>
+    <p>Ajoutez un produit avant de poursuivre vers la commande.</p>
+    <a href="{% url 'shop:liste' %}" class="btn btn-brand">Découvrir la boutique</a>
+  </div>
+  {% endif %}
+</section>
 {% endblock %}

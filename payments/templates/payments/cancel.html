@@ -1,9 +1,37 @@
 {% extends 'template_base.html' %}
-{% block titre %}Paiement annulé{% endblock %}
+{% load static %}
+
+{% block titre %}Paiement interrompu — Teyilawson{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{% static 'css/payment-result.css' %}">
+{% endblock %}
+
 {% block contenu %}
-<div class="container text-center py-5">
-  <h1 class="text-warning">⚠️ Paiement annulé</h1>
-  <p class="text-muted">Vous pouvez réessayer quand vous voulez.</p>
-  <a href="{% url 'payments:choice' %}" class="btn btn-outline-secondary mt-3">⬅ Retour aux paiements</a>
-</div>
+<section class="payment-result-page payment-result-cancel">
+  <div class="payment-result-card">
+    <div class="payment-result-icon" aria-hidden="true">
+      <i class="fa-solid fa-arrow-rotate-left"></i>
+    </div>
+
+    <span class="payment-result-eyebrow">Paiement interrompu</span>
+    <h1>Aucun paiement n’a été finalisé.</h1>
+    <p class="payment-result-lead">L’opération a été annulée ou interrompue. Vous pouvez reprendre le parcours de paiement lorsque vous le souhaitez.</p>
+
+    <div class="payment-result-note">
+      <i class="fa-regular fa-circle-info" aria-hidden="true"></i>
+      <div>
+        <strong>Votre commande n’est pas considérée comme payée</strong>
+        <span>Retournez au parcours de commande pour sélectionner à nouveau un moyen de paiement.</span>
+      </div>
+    </div>
+
+    <div class="payment-result-actions">
+      <a href="{% url 'payments:choice' %}" class="btn btn-primary btn-lg">
+        Reprendre le paiement <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+      </a>
+      <a href="{% url 'shop:panier' %}" class="btn btn-soft btn-lg">Retour au panier</a>
+    </div>
+  </div>
+</section>
 {% endblock %}

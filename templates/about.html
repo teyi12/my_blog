@@ -1,87 +1,88 @@
 {% extends "template_base.html" %}
 {% load static %}
-{% block title %}À propos | Vblog{% endblock %}
+
+{% block titre %}À propos — Teyilawson{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{% static 'css/pages.css' %}">
+{% endblock %}
 
 {% block contenu %}
-  <!-- Header -->
-  <header class="bg-dark text-white py-4 mb-4">
-    <div class="container text-center">
-      <h1 class="display-4">À propos de Vblog</h1>
-      <p class="lead">Découvrez notre vision, notre mission et les personnes derrière le projet.</p>
+<section class="about-page">
+  <header class="about-hero">
+    <div class="about-hero-copy">
+      <span class="eyebrow">À propos</span>
+      <h1>Un espace pour explorer, comprendre et choisir avec confiance.</h1>
+      <p>Teyilawson réunit contenus éditoriaux, découvertes et sélection de produits dans une expérience simple, utile et soigneusement construite.</p>
+      <div class="about-hero-actions">
+        <a href="{% url 'articles:articles' %}" class="btn btn-brand">Explorer les articles <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a>
+        <a href="{% url 'contact' %}" class="btn btn-soft">Nous contacter</a>
+      </div>
+    </div>
+
+    <div class="about-brand-card" aria-label="Identité Teyilawson">
+      <img src="{% static 'images/logo.webp' %}" alt="Logo Teyilawson">
+      <div>
+        <span class="eyebrow">Teyilawson</span>
+        <strong>Explorer · Comprendre · Choisir</strong>
+        <p>Une plateforme indépendante à la croisée du contenu, de la découverte et du commerce.</p>
+      </div>
     </div>
   </header>
 
-  <!-- Présentation -->
-  <section class="container my-5">
-    <div class="row">
-      <div class="col-md-6">
-        <h2>Notre mission</h2>
-        <p>
-          Vblog est une plateforme dédiée à partager des articles, des ressources et des produits
-          autour de <strong>[votre thématique]</strong>. 
-          Notre objectif est d’offrir un espace où chacun peut apprendre, découvrir et s’inspirer.
-        </p>
-        <p>
-          Nous croyons en la qualité, la transparence et la collaboration.
-        </p>
-      </div>
-      <div class="col-md-6">
-        <img src="{% static 'images/logo.webp' %}" alt="Notre mission" 
-             class="img-fluid rounded shadow">
+  <section class="about-story section">
+    <div class="section-heading">
+      <span class="eyebrow">Notre vision</span>
+      <h2>Donner plus de valeur à chaque visite.</h2>
+    </div>
+    <div class="about-story-grid">
+      <p>Le projet a été pensé pour proposer une navigation claire entre information, inspiration et sélection de produits. Chaque espace du site doit aider le visiteur à aller à l’essentiel sans sacrifier la qualité de l’expérience.</p>
+      <p>La plateforme évolue autour d’un principe simple : publier des contenus utiles, présenter les offres avec transparence et construire une relation de confiance durable avec les lecteurs, clients et partenaires.</p>
+    </div>
+  </section>
+
+  <section class="about-values section" aria-labelledby="values-title">
+    <div class="section-heading section-heading-centered">
+      <span class="eyebrow">Nos principes</span>
+      <h2 id="values-title">Ce qui guide le projet.</h2>
+    </div>
+    <div class="about-values-grid">
+      <article class="about-value-card">
+        <span class="about-value-icon"><i class="fa-regular fa-lightbulb" aria-hidden="true"></i></span>
+        <h3>Clarté</h3>
+        <p>Une expérience lisible, des parcours simples et des informations présentées sans complexité inutile.</p>
+      </article>
+      <article class="about-value-card">
+        <span class="about-value-icon"><i class="fa-regular fa-gem" aria-hidden="true"></i></span>
+        <h3>Qualité</h3>
+        <p>Un soin particulier porté aux contenus, aux produits présentés et à la cohérence générale de la plateforme.</p>
+      </article>
+      <article class="about-value-card">
+        <span class="about-value-icon"><i class="fa-solid fa-shield-halved" aria-hidden="true"></i></span>
+        <h3>Confiance</h3>
+        <p>Une approche transparente des contenus, des partenariats et des paiements pour construire une relation durable.</p>
+      </article>
+    </div>
+  </section>
+
+  <section class="about-founder section">
+    <div class="about-founder-card">
+      <div class="about-founder-avatar" aria-hidden="true">T</div>
+      <div class="about-founder-copy">
+        <span class="eyebrow">Fondateur & développeur</span>
+        <h2>Teyi Lawson-Somadje</h2>
+        <p>Le projet Teyilawson est développé comme une plateforme éditoriale et e-commerce moderne, avec une attention particulière portée à l’expérience utilisateur, à la fiabilité technique et à l’évolution continue du produit.</p>
       </div>
     </div>
   </section>
 
-  <!-- Valeurs -->
-  <section class="bg-white py-5 border-top border-bottom">
-    <div class="container text-center">
-      <h2 class="mb-4">Nos valeurs</h2>
-      <div class="row">
-        <div class="col-md-4">
-          <i class="fa fa-lightbulb fa-3x text-primary mb-3"></i>
-          <h5>Innovation</h5>
-          <p>Nous cherchons constamment à innover pour proposer du contenu et des services pertinents.</p>
-        </div>
-        <div class="col-md-4">
-          <i class="fa fa-users fa-3x text-success mb-3"></i>
-          <h5>Communauté</h5>
-          <p>Nous mettons en avant l’entraide et le partage d’expériences entre nos utilisateurs.</p>
-        </div>
-        <div class="col-md-4">
-          <i class="fa fa-shield-halved fa-3x text-danger mb-3"></i>
-          <h5>Confiance</h5>
-          <p>Nous respectons nos lecteurs et partenaires en fournissant des informations fiables.</p>
-        </div>
-      </div>
+  <section class="about-cta">
+    <div>
+      <span class="eyebrow">Échangeons</span>
+      <h2>Une idée, une collaboration ou une question ?</h2>
+      <p>Utilisez la page contact pour nous écrire directement.</p>
     </div>
+    <a href="{% url 'contact' %}" class="btn btn-brand btn-lg">Prendre contact <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a>
   </section>
-
-  <!-- Équipe -->
-  <section class="container my-5">
-    <h2 class="text-center mb-4">L’équipe</h2>
-    <div class="row justify-content-center">
-      <div class="col-md-4 text-center">
-        <img src="{% static 'images/team1.jpg' %}" alt="Fondateur" 
-             class="rounded-circle mb-3 shadow" width="150">
-        <h5><span>TEYI LAWSON-SOMADJE</span></h5>
-        <p class="text-muted">Fondateur & Développeur</p>
-        <div>
-          <a href="#" class="text-dark mx-2"><i class="fab fa-linkedin fa-lg"></i></a>
-          <a href="#" class="text-dark mx-2"><i class="fab fa-github fa-lg"></i></a>
-          <a href="#" class="text-dark mx-2"><i class="fab fa-twitter fa-lg"></i></a>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Call to action -->
-  <section class="bg-primary text-white py-5 text-center">
-    <div class="container">
-      <h2>Rejoignez-nous dans cette aventure !</h2>
-      <p>Contactez-nous pour collaborer, partager vos idées ou simplement dire bonjour.</p>
-      <a href="{% url 'contact' %}" class="btn btn-light btn-lg mt-3">
-        <i class="fa fa-envelope"></i> Nous contacter
-      </a>
-    </div>
-  </section>
+</section>
 {% endblock %}

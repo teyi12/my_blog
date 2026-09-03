@@ -1,36 +1,91 @@
+{% extends "template_base.html" %}
 {% load static %}
 
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <title>Créer un article</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-</head>
-<body>
-    <div class="container mt-5">
-        <h1 class="mb-4">Créer un nouvel article</h1>
+{% block titre %}Créer un article — Teyilawson{% endblock %}
 
-        <form method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
-            {% csrf_token %}
-            {% for field in form %}
-                <div class="mb-3">
-                    <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
-                    {{ field }}
-                    {% if field.help_text %}
-                        <div class="form-text">{{ field.help_text }}</div>
-                    {% endif %}
-                    {% for error in field.errors %}
-                        <div class="text-danger small">{{ error }}</div>
-                    {% endfor %}
-                </div>
-            {% endfor %}
-            
-            <button type="submit" class="btn btn-primary">Publier</button>
-            <a href="{% url 'home' %}" class="btn btn-secondary">Annuler</a>
-        </form>
+{% block styles %}
+<link rel="stylesheet" href="{% static 'css/article-editor.css' %}">
+{% endblock %}
+
+{% block contenu %}
+<section class="editor-page">
+  <div class="editor-heading">
+    <div>
+      <span class="eyebrow">Espace éditorial</span>
+      <h1>Créer un nouvel article</h1>
+      <p>Préparez un contenu clair, structuré et prêt à être publié dans le magazine.</p>
     </div>
+    <a href="{% url 'articles:articles' %}" class="btn btn-soft">
+      <i class="fa-solid fa-arrow-left" aria-hidden="true"></i> Retour aux articles
+    </a>
+  </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
+  <form method="post" enctype="multipart/form-data" class="editor-form">
+    {% csrf_token %}
+
+    {% if form.non_field_errors %}
+      <div class="alert alert-danger" role="alert">{{ form.non_field_errors }}</div>
+    {% endif %}
+
+    <div class="editor-layout">
+      <div class="editor-card editor-card-main">
+        <div class="editor-card-heading">
+          <span class="eyebrow">Contenu</span>
+          <h2>Informations principales</h2>
+        </div>
+
+        {% for field in form %}
+          {% if field.name == 'titre' or field.name == 'contenu' or field.name == 'slug' %}
+          <div class="editor-field">
+            <label for="{{ field.id_for_label }}">
+              {% if field.name == 'titre' %}Titre{% elif field.name == 'contenu' %}Contenu{% elif field.name == 'slug' %}Slug{% else %}{{ field.label }}{% endif %}
+            </label>
+            {{ field }}
+            {% if field.help_text %}<small>{{ field.help_text|safe }}</small>{% endif %}
+            {% for error in field.errors %}<div class="editor-error">{{ error }}</div>{% endfor %}
+          </div>
+          {% endif %}
+        {% endfor %}
+      </div>
+
+      <aside class="editor-sidebar">
+        <div class="editor-card">
+          <div class="editor-card-heading compact">
+            <span class="eyebrow">Publication</span>
+            <h2>Options</h2>
+          </div>
+
+          {% for field in form %}
+            {% if field.name == 'image' or field.name == 'sponsor' %}
+            <div class="editor-field">
+              <label for="{{ field.id_for_label }}">
+                {% if field.name == 'image' %}Image principale{% elif field.name == 'sponsor' %}Sponsor{% else %}{{ field.label }}{% endif %}
+              </label>
+              {{ field }}
+              {% if field.help_text %}<small>{{ field.help_text|safe }}</small>{% endif %}
+              {% for error in field.errors %}<div class="editor-error">{{ error }}</div>{% endfor %}
+            </div>
+            {% elif field.name == 'est_sponsorise' or field.name == 'is_premium' %}
+            <label class="editor-toggle" for="{{ field.id_for_label }}">
+              {{ field }}
+              <span>
+                <strong>{% if field.name == 'est_sponsorise' %}Article sponsorisé{% else %}Contenu premium{% endif %}</strong>
+                <small>{% if field.name == 'est_sponsorise' %}Signale qu’un partenaire soutient ce contenu.{% else %}Réserve ce contenu aux accès premium.{% endif %}</small>
+              </span>
+            </label>
+            {% for error in field.errors %}<div class="editor-error">{{ error }}</div>{% endfor %}
+            {% endif %}
+          {% endfor %}
+        </div>
+
+        <div class="editor-actions">
+          <button type="submit" class="btn btn-brand btn-lg">
+            Publier l’article <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+          </button>
+          <a href="{% url 'articles:articles' %}" class="btn btn-soft">Annuler</a>
+        </div>
+      </aside>
+    </div>
+  </form>
+</section>
+{% endblock %}

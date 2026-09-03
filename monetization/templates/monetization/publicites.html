@@ -1,28 +1,40 @@
-{% extends "template_base.html" %}
-{% block titre %}Publicités{% endblock %}
+{% extends "monetization/base.html" %}
+{% block title %}Publicités — Teyilawson{% endblock %}
 
-{% block contenu %}
-<div class="container my-5">
-    <h2 class="mb-4 text-center">Publicités Actives</h2>
-    <div class="row">
-        {% for pub in publicites %}
-            {% if pub.actif %}
-                <div class="col-md-4 mb-4">
-                    <div class="card shadow-sm h-100">
-                        <a href="{{ pub.lien }}" target="_blank">
-                            <img src="{{ pub.image.url }}" class="card-img-top" alt="{{ pub.titre }}">
-                        </a>
-                        <div class="card-body">
-                            <h5 class="card-title">{{ pub.titre }}</h5>
-                            <p class="text-muted">Sponsor : {{ pub.partenaire.nom }}</p>
-                            <p class="text-sm">Valable du {{ pub.date_debut }} au {{ pub.date_fin }}</p>
-                        </div>
-                    </div>
-                </div>
-            {% endif %}
-        {% empty %}
-            <p class="text-center text-muted">Aucune publicité active pour le moment.</p>
-        {% endfor %}
+{% block content %}
+<section class="monetization-section">
+  <div class="monetization-section-heading">
+    <div>
+      <span class="monetization-eyebrow">Publicité</span>
+      <h2>Partenaires et campagnes actuellement visibles.</h2>
+      <p>Les contenus commerciaux sont présentés comme tels afin de préserver une lecture claire et transparente.</p>
     </div>
-</div>
+    <a href="{% url 'monetization:partenariat' %}" class="btn btn-soft">Proposer un partenariat</a>
+  </div>
+
+  {% if publicites %}
+  <div class="advertising-grid">
+    {% for pub in publicites %}
+    <article class="advertising-card">
+      <a href="{{ pub.lien }}" target="_blank" rel="noopener sponsored" class="advertising-media">
+        {% if pub.image %}<img src="{{ pub.image.url }}" alt="{{ pub.titre }}">{% endif %}
+        <span class="advertising-badge">Sponsorisé</span>
+      </a>
+      <div class="advertising-body">
+        <span class="monetization-eyebrow">{{ pub.partenaire.nom }}</span>
+        <h3>{{ pub.titre }}</h3>
+        <p>Campagne active du {{ pub.date_debut|date:"d/m/Y" }} au {{ pub.date_fin|date:"d/m/Y" }}.</p>
+        <a href="{{ pub.lien }}" target="_blank" rel="noopener sponsored" class="advertising-link">Découvrir <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></a>
+      </div>
+    </article>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="monetization-empty">
+    <i class="fa-regular fa-rectangle-ad" aria-hidden="true"></i>
+    <h3>Aucune campagne active pour le moment.</h3>
+    <p>Les prochaines collaborations apparaîtront ici.</p>
+  </div>
+  {% endif %}
+</section>
 {% endblock %}

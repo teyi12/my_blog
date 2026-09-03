@@ -97,7 +97,7 @@ class ProduitDetailView(DetailView):
 def produits_par_categorie(request, slug):
     categorie = get_object_or_404(Categorie, slug=slug)
     produits = Produit.objects.filter(categorie=categorie)
-    return render(request, "shop/liste.html", {"produits": produits, "categorie": categorie})
+    return render(request, "shop/produits_par_categorie.html", {"produits": produits, "categorie": categorie})
 
 
 import stripe
