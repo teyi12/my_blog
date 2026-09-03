@@ -1,5 +1,5 @@
 from django.urls import path
-from . import views
+from . import views, customer_views
 
 app_name = "shop"
 
@@ -8,6 +8,10 @@ urlpatterns = [
     path("", views.ProduitListView.as_view(), name="liste"),
     path("produit/<slug:slug>/", views.ProduitDetailView.as_view(), name="detail"),
     path("categorie/<slug:slug>/", views.produits_par_categorie, name="par_categorie"),
+
+    # Espace client
+    path("mes-commandes/", customer_views.mes_commandes, name="mes_commandes"),
+    path("mes-commandes/<int:pk>/", customer_views.ma_commande_detail, name="ma_commande_detail"),
 
     # Gestion des catégories (staff)
     path("categories/", views.categorie_gestion_liste, name="categorie_gestion_liste"),
