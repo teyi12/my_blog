@@ -170,3 +170,51 @@ class OrderManagementTests(TestCase):
         order.refresh_from_db()
         self.assertEqual(order.payment_status, "SUCCESS")
         self.assertEqual(order.fulfillment_status, "TO_PREPARE")
+
+    def test_shipping_requires_carrier_and_tracking_number(self):
+        self.order.fulfillment_status = "PREPARING"
+        self.order.save(update_fields=["fulfillment_status"])
+        self.client.force_login(self.staff)
+        self.client.post(
+            reverse("shop:commande_traitement_modifier", args=[self.order.pk]),
+            {"statut": "SHIPPED"},
+        )
+        self.order.refresh_from_db()
+        self.assertEqual(self.order.fulfillment_status, "PREPARING")
+        self.assertEqual(self.order.carrier, "")
+        self.assertEqual(self.order.tracking_number, "")
+        self.assertIsNone(self.order.shipped_at)
+
+    def test_shipping_saves_tracking_and_timestamp(self):
+        self.order.fulfillment_status = "PREPARING"
+        self.order.save(update_fields=["fulfillment_status"])
+        self.client.force_login(self.staff)
+        self.client.post(
+            reverse("shop:commande_traitement_modifier", args=[self.order.pk]),
+            {
+                "statut": "SHIPPED",
+                "carrier": "DHL",
+                "tracking_number": "TRACK-12345",
+            },
+        )
+        self.order.refresh_from_db()
+        self.assertEqual(self.order.fulfillment_status, "SHIPPED")
+        self.assertEqual(self.order.carrier, "DHL")
+        self.assertEqual(self.order.tracking_number, "TRACK-12345")
+        self.assertIsNotNone(self.order.shipped_at)
+        self.assertEqual(self.order.payment_status, "SUCCESS")
+
+    def test_delivery_sets_delivery_timestamp(self):
+        self.order.fulfillment_status = "SHIPPED"
+        self.order.carrier = "DHL"
+        self.order.tracking_number = "TRACK-12345"
+        self.order.save(update_fields=["fulfillment_status", "carrier", "tracking_number"])
+        self.client.force_login(self.staff)
+        self.client.post(
+            reverse("shop:commande_traitement_modifier", args=[self.order.pk]),
+            {"statut": "DELIVERED"},
+        )
+        self.order.refresh_from_db()
+        self.assertEqual(self.order.fulfillment_status, "DELIVERED")
+        self.assertIsNotNone(self.order.delivered_at)
+        self.assertEqual(self.order.payment_status, "SUCCESS")
