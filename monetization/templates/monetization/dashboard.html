@@ -1,141 +1,48 @@
-{% load static %}
+{% extends "monetization/base.html" %}
+{% block title %}Dashboard monétisation — Teyilawson{% endblock %}
 
-<!doctype html>
-<html lang="fr">
-  <head>
-    <meta charset="UTF-8" />
-    <title>Dashboard - Revenus</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link
-      href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
-      rel="stylesheet"
-    />
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
-    />
-  </head>
-  <body class="bg-gray-100 text-gray-800">
-    <!-- 🔹 Navbar simple -->
-    <nav class="bg-white shadow p-4 mb-6 flex justify-between">
-      <div class="font-bold text-xl">Mon Dashboard</div>
-      <div>
-        {% if user.is_authenticated %}
-        <form
-          method="post"
-          action="{% url 'accounts:logout' %}"
-          style="display: inline"
-        >
-          {% csrf_token %}
-          <button type="submit" class="btn btn-link nav-link" style="padding: 0">
-            LOGOUT
-          </button>
-        </form>
-        {% endif %}
-      </div>
-    </nav>
+{% block content %}
+<section class="monetization-section">
+  <div class="monetization-section-heading">
+    <div>
+      <span class="monetization-eyebrow">Administration</span>
+      <h2>Vue d’ensemble des revenus enregistrés.</h2>
+      <p>Les montants affichés proviennent désormais des données réellement présentes dans la base, sans statistiques de démonstration.</p>
+    </div>
+  </div>
 
-    <div class="container mx-auto p-6">
-      <!-- 🔹 KPI Cards -->
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        <div
-          class="bg-white shadow-lg rounded-2xl p-6 flex items-center space-x-4 transform hover:scale-105 transition duration-300"
-        >
-          <i class="fa-solid fa-bullhorn text-blue-500 text-4xl animate-bounce"></i>
-          <div>
-            <p class="text-gray-500">Publicité</p>
-            <h2 class="text-2xl font-bold">{{ totaux.total_publicite }} €</h2>
-          </div>
-        </div>
+  <div class="revenue-kpis">
+    <article class="revenue-kpi"><span class="revenue-kpi-icon"><i class="fa-solid fa-coins"></i></span><small>Total</small><strong>{{ totaux.global|floatformat:2 }} €</strong></article>
+    <article class="revenue-kpi"><span class="revenue-kpi-icon"><i class="fa-solid fa-rectangle-ad"></i></span><small>Publicité</small><strong>{{ totaux.publicite|floatformat:2 }} €</strong></article>
+    <article class="revenue-kpi"><span class="revenue-kpi-icon"><i class="fa-solid fa-link"></i></span><small>Affiliation</small><strong>{{ totaux.affiliation|floatformat:2 }} €</strong></article>
+    <article class="revenue-kpi"><span class="revenue-kpi-icon"><i class="fa-solid fa-crown"></i></span><small>Premium</small><strong>{{ totaux.premium|floatformat:2 }} €</strong></article>
+    <article class="revenue-kpi"><span class="revenue-kpi-icon"><i class="fa-solid fa-heart"></i></span><small>Dons</small><strong>{{ totaux.dons|floatformat:2 }} €</strong></article>
+  </div>
 
-        <div
-          class="bg-white shadow-lg rounded-2xl p-6 flex items-center space-x-4 transform hover:scale-105 transition duration-300"
-        >
-          <i class="fa-solid fa-handshake text-yellow-500 text-4xl animate-pulse"></i>
-          <div>
-            <p class="text-gray-500">Affiliation</p>
-            <h2 class="text-2xl font-bold">{{ totaux.total_affiliation }} €</h2>
-          </div>
-        </div>
-
-        <div
-          class="bg-white shadow-lg rounded-2xl p-6 flex items-center space-x-4 transform hover:scale-105 transition duration-300"
-        >
-          <i class="fa-solid fa-crown text-pink-500 text-4xl animate-spin"></i>
-          <div>
-            <p class="text-gray-500">Premium</p>
-            <h2 class="text-2xl font-bold">{{ totaux.total_premium }} €</h2>
-          </div>
-        </div>
-      </div>
-
-      <!-- 🔹 Graphiques -->
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <div class="bg-white shadow-lg rounded-2xl p-6">
-          <h4 class="text-center font-semibold mb-2">Évolution Mensuelle</h4>
-          <canvas id="lineChart" height="120"></canvas>
-        </div>
-
-        <div class="bg-white shadow-lg rounded-2xl p-6">
-          <h4 class="text-center font-semibold mb-2">Répartition des Revenus</h4>
-          <canvas id="pieChart" height="120"></canvas>
-        </div>
-
-        <div class="bg-white shadow-lg rounded-2xl p-6">
-          <h4 class="text-center font-semibold mb-2">Revenus Mensuels par Source</h4>
-          <canvas id="barChart" height="120"></canvas>
-        </div>
-      </div>
+  <div class="revenue-table-card">
+    <div class="monetization-card-heading">
+      <span class="monetization-eyebrow">Activité récente</span>
+      <h3>Derniers revenus enregistrés</h3>
     </div>
 
-    <!-- 🔹 Scripts Chart.js -->
-    <script>
-      const labels = {{ revenus_mensuels.labels|safe }};
-      const publicite = {{ revenus_mensuels.publicite|safe }};
-      const affiliation = {{ revenus_mensuels.affiliation|safe }};
-      const premium = {{ revenus_mensuels.premium|safe }};
-      const totaux = {
-          publicite: {{ totaux.total_publicite }},
-          affiliation: {{ totaux.total_affiliation }},
-          premium: {{ totaux.total_premium }}
-      };
-
-      // 📈 Courbe
-      new Chart(document.getElementById('lineChart'), {
-          type: 'line',
-          data: {
-              labels: labels,
-              datasets: [
-                  { label: "Publicité", data: publicite, borderColor: "blue", fill: false },
-                  { label: "Affiliation", data: affiliation, borderColor: "orange", fill: false },
-                  { label: "Premium", data: premium, borderColor: "pink", fill: false }
-              ]
-          },
-          options: { responsive: true, plugins: { legend: { position: "bottom" } } }
-      });
-
-      // 🥧 Camembert
-      new Chart(document.getElementById('pieChart'), {
-          type: 'pie',
-          data: {
-              labels: ["Publicité", "Affiliation", "Premium"],
-              datasets: [{ data: [totaux.publicite, totaux.affiliation, totaux.premium], backgroundColor: ["blue", "orange", "pink"] }]
-          }
-      });
-
-      // 📊 Barres Comparatives
-      new Chart(document.getElementById('barChart'), {
-          type: 'bar',
-          data: {
-              labels: labels,
-              datasets: [
-                  { label: "Publicité", data: publicite, backgroundColor: "blue" },
-                  { label: "Affiliation", data: affiliation, backgroundColor: "orange" },
-                  { label: "Premium", data: premium, backgroundColor: "pink" }
-              ]
-          },
-          options: { responsive: true, plugins: { legend: { position: "bottom" } } }
-      });
-    </script>
-  </body>
-</html>
+    {% if revenus_recents %}
+    <div class="revenue-table-wrap">
+      <table class="revenue-table">
+        <thead><tr><th>Source</th><th>Date</th><th>Montant</th></tr></thead>
+        <tbody>
+          {% for revenu in revenus_recents %}
+          <tr>
+            <td><span class="revenue-source">{{ revenu.get_type_display }}</span></td>
+            <td>{{ revenu.date|date:"d/m/Y H:i" }}</td>
+            <td><strong>{{ revenu.montant|floatformat:2 }} €</strong></td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <div class="monetization-empty compact"><p>Aucun revenu n’a encore été enregistré dans la base.</p></div>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}
