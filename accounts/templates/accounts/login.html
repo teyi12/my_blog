@@ -32,7 +32,9 @@
       {% if form.non_field_errors %}<div class="alert alert-danger" role="alert">{{ form.non_field_errors }}</div>{% endif %}
       {% for field in form %}
       <div class="auth-field">
-        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+        <label for="{{ field.id_for_label }}">
+          {% if field.name == 'username' or field.name == 'email' %}Adresse e-mail{% elif field.name == 'password' %}Mot de passe{% else %}{{ field.label }}{% endif %}
+        </label>
         {{ field }}
         {% if field.help_text %}<small>{{ field.help_text|safe }}</small>{% endif %}
         {% if field.errors %}<div class="auth-field-error">{{ field.errors }}</div>{% endif %}
