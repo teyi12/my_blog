@@ -9,11 +9,19 @@ from django.utils.translation import gettext as _
 
 from shop.models import Produit
 from .forms import ContactForm
+from .home_media import home_hero_image_url
 
 
 def home_view(request):
     produits_vedettes = Produit.objects.filter(en_vedette=True)[:6]
-    return render(request, "home.html", {"produits_vedettes": produits_vedettes})
+    return render(
+        request,
+        "home.html",
+        {
+            "produits_vedettes": produits_vedettes,
+            "hero_image_url": home_hero_image_url(),
+        },
+    )
 
 
 def contact_view(request):

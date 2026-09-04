@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 480" role="img" aria-labelledby="title description">
+  <title id="title">Travel notebook and map illustration</title>
+  <desc id="description">An abstract editorial illustration of a notebook, a map and a compass.</desc>
+  <defs>
+    <linearGradient id="background" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#143b31"/>
+      <stop offset="1" stop-color="#326b59"/>
+    </linearGradient>
+    <linearGradient id="paper" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#f8f0dc"/>
+      <stop offset="1" stop-color="#d9c69d"/>
+    </linearGradient>
+  </defs>
+  <rect width="640" height="480" fill="url(#background)"/>
+  <path d="M0 88C87 48 140 143 222 103S360 45 445 92s116 15 195-27v415H0Z" fill="#215142" opacity=".72"/>
+  <path d="m66 104 122-40 113 39 125-42 145 48-126 48-128-37-113 38Z" fill="none" stroke="#c5aa6d" stroke-width="5" opacity=".72"/>
+  <g transform="translate(154 123) rotate(-8 174 126)">
+    <rect x="0" y="20" width="348" height="254" rx="18" fill="#0e2c24" opacity=".28" transform="translate(12 14)"/>
+    <rect width="348" height="254" rx="18" fill="url(#paper)"/>
+    <path d="M174 0v254" stroke="#b8a274" stroke-width="3"/>
+    <path d="M34 58h112M34 88h112M34 118h93M202 58h112M202 88h112M202 118h93" stroke="#9a875d" stroke-width="5" stroke-linecap="round" opacity=".55"/>
+    <path d="m214 173 52-39 40 42-52 39Z" fill="#d49e4d" opacity=".85"/>
+    <circle cx="72" cy="192" r="38" fill="#f4e6c6" stroke="#9b8051" stroke-width="6"/>
+    <path d="m72 165 13 28-13 27-13-27Z" fill="#a86e30"/>
+  </g>
+  <circle cx="536" cy="359" r="58" fill="#f5e8ca" opacity=".94"/>
+  <circle cx="536" cy="359" r="42" fill="none" stroke="#a17843" stroke-width="5"/>
+  <path d="m536 324 14 35-14 35-14-35Z" fill="#b56f32"/>
+  <circle cx="536" cy="359" r="7" fill="#143b31"/>
+</svg>

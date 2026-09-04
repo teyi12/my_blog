@@ -374,5 +374,8 @@ msgstr "The message could not be sent at the moment. Please try again in a few m
 msgid "Votre message a bien été envoyé. Merci pour votre prise de contact."
 msgstr "Your message has been sent. Thank you for getting in touch."
 
+msgid "Un carnet de voyage posé sur une carte, symbole de récits et de découvertes"
+msgstr "A travel notebook on a map, symbolising stories and discoveries"
+
 msgid "Merci pour votre message."
 msgstr "Thank you for your message."

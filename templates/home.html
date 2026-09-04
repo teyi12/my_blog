@@ -33,19 +33,19 @@
       </div>
     </div>
 
-    <div class="home-hero-visual" aria-hidden="true">
+    <div class="home-hero-visual">
       <div class="hero-visual-card hero-visual-main">
-        <img src="{% get_media_prefix %}voyages.jpg" alt="">
-        <div class="hero-visual-overlay">
+        <img src="{{ hero_image_url }}" alt="{% translate "Un carnet de voyage posé sur une carte, symbole de récits et de découvertes" %}">
+        <div class="hero-visual-overlay" aria-hidden="true">
           <span>{% translate "Récits & découvertes" %}</span>
           <strong>{% translate "Voir le monde autrement" %}</strong>
         </div>
       </div>
-      <div class="hero-floating-card hero-floating-top">
+      <div class="hero-floating-card hero-floating-top" aria-hidden="true">
         <span class="hero-floating-icon"><i class="fa-solid fa-compass"></i></span>
         <span><small>{% translate "Inspiration" %}</small><strong>{% translate "Explorer" %}</strong></span>
       </div>
-      <div class="hero-floating-card hero-floating-bottom">
+      <div class="hero-floating-card hero-floating-bottom" aria-hidden="true">
         <span class="hero-floating-icon"><i class="fa-solid fa-bag-shopping"></i></span>
         <span><small>{% translate "Sélection" %}</small><strong>{% translate "Boutique" %}</strong></span>
       </div>

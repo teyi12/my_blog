@@ -374,5 +374,8 @@ msgstr "Die Nachricht konnte vorübergehend nicht gesendet werden. Bitte versuch
 msgid "Votre message a bien été envoyé. Merci pour votre prise de contact."
 msgstr "Ihre Nachricht wurde erfolgreich gesendet. Vielen Dank für Ihre Kontaktaufnahme."
 
+msgid "Un carnet de voyage posé sur une carte, symbole de récits et de découvertes"
+msgstr "Ein Reisetagebuch auf einer Karte, Sinnbild für Geschichten und Entdeckungen"
+
 msgid "Merci pour votre message."
 msgstr "Vielen Dank für Ihre Nachricht."
