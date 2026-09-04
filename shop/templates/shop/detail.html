@@ -40,10 +40,13 @@
       </div>
 
       <div class="product-primary-actions">
-        <a href="{% url 'shop:ajouter_panier' slug=produit.slug %}" class="btn btn-brand btn-lg product-add-main">
-          <i class="fa-solid fa-bag-shopping" aria-hidden="true"></i>
-          Ajouter au panier
-        </a>
+        <form method="post" action="{% url 'shop:ajouter_panier' slug=produit.slug %}">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-brand btn-lg product-add-main">
+            <i class="fa-solid fa-bag-shopping" aria-hidden="true"></i>
+            Ajouter au panier
+          </button>
+        </form>
         <a href="{% url 'shop:panier' %}" class="btn btn-outline-primary btn-lg">Voir le panier</a>
       </div>
 

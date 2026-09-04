@@ -15,6 +15,7 @@ from django.views.generic import ListView, DetailView, View
 from django.urls import reverse, reverse_lazy
 from django.contrib import messages
 from django.utils import timezone
+from django.utils.http import url_has_allowed_host_and_scheme
 
 from .models import Produit, Categorie, Cart, CartItem, Commande, LigneCommande
 from payments.models import Adresse
@@ -68,6 +69,7 @@ def update_panier(request):
         return JsonResponse({"success": False}, status=400)
 
 
+@require_POST
 @login_required
 def ajouter_panier(request, slug):
     produit = get_object_or_404(Produit, slug=slug)
@@ -77,6 +79,15 @@ def ajouter_panier(request, slug):
     if not created:
         CartItem.objects.filter(pk=item.pk).update(quantite=F("quantite") + 1)
 
+    messages.success(request, f'« {produit.nom} » a été ajouté à votre panier.')
+
+    next_url = request.POST.get("next")
+    if next_url and url_has_allowed_host_and_scheme(
+        url=next_url,
+        allowed_hosts={request.get_host()},
+        require_https=request.is_secure(),
+    ):
+        return redirect(next_url)
     return redirect("shop:panier")
 
 

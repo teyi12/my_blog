@@ -52,9 +52,12 @@
         {% if produit.description %}<p>{{ produit.description|truncatewords:15 }}</p>{% endif %}
         <div class="shop-card-footer">
           <span class="shop-price">{{ produit.prix }} €</span>
-          <a class="shop-add-button" href="{% url 'shop:ajouter_panier' slug=produit.slug %}" aria-label="Ajouter {{ produit.nom }} au panier">
-            <i class="fa-solid fa-plus" aria-hidden="true"></i><span>Ajouter</span>
-          </a>
+          <form method="post" action="{% url 'shop:ajouter_panier' slug=produit.slug %}">
+            {% csrf_token %}
+            <button class="shop-add-button" type="submit" aria-label="Ajouter {{ produit.nom }} au panier">
+              <i class="fa-solid fa-plus" aria-hidden="true"></i><span>Ajouter</span>
+            </button>
+          </form>
         </div>
       </div>
     </article>
