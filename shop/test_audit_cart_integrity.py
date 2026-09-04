@@ -84,6 +84,10 @@ class AuditCartIntegrityCommandTests(TestCase):
             "Commandes non finalisées utilisant un panier source : 2",
             report,
         )
+        self.assertIn(
+            "Utilisateurs possédant plusieurs paniers actifs : 0",
+            report,
+        )
 
     def test_command_does_not_create_update_or_delete_rows(self):
         before = {

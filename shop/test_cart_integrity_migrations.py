@@ -7,6 +7,69 @@ from django.db.migrations.executor import MigrationExecutor
 from django.test import TransactionTestCase
 
 
+class PreActifAuditCommandTests(TransactionTestCase):
+    migrate_from = [("shop", "0011_commande_shipping_tracking")]
+    migrate_to = [("shop", "0014_cart_integrity_constraints")]
+
+    def setUp(self):
+        super().setUp()
+        self.executor = MigrationExecutor(connection)
+        self.executor.migrate(self.migrate_from)
+        apps = self.executor.loader.project_state(self.migrate_from).apps
+        User = apps.get_model("accounts", "CustomUser")
+        Produit = apps.get_model("shop", "Produit")
+        Cart = apps.get_model("shop", "Cart")
+        CartItem = apps.get_model("shop", "CartItem")
+        self.user = User.objects.create(email="pre-actif@example.com")
+        product = Produit.objects.create(
+            nom="Produit pré-migration",
+            slug="produit-pre-migration",
+            prix=Decimal("10.00"),
+        )
+        self.first_cart = Cart.objects.create(user=self.user)
+        self.second_cart = Cart.objects.create(user=self.user)
+        Cart.objects.create(user=None)
+        CartItem.objects.create(
+            cart=self.first_cart,
+            produit=product,
+            quantite=2,
+            prix_unitaire=Decimal("10.00"),
+        )
+        CartItem.objects.create(
+            cart=self.first_cart,
+            produit=product,
+            quantite=3,
+            prix_unitaire=Decimal("10.00"),
+        )
+
+    def tearDown(self):
+        MigrationExecutor(connection).migrate(self.migrate_to)
+        super().tearDown()
+
+    def test_audit_works_without_the_actif_column(self):
+        statements = []
+
+        def collect_sql(execute, sql, params, many, context):
+            statements.append(sql)
+            return execute(sql, params, many, context)
+
+        output = StringIO()
+        with connection.execute_wrapper(collect_sql):
+            call_command("audit_cart_integrity", stdout=output)
+
+        report = output.getvalue()
+        self.assertIn("Schéma pré-migration : colonne Cart.actif absente", report)
+        self.assertIn("Nombre total de paniers : 3", report)
+        self.assertIn("Utilisateurs possédant plusieurs paniers : 1", report)
+        self.assertIn("Couples (cart, produit) dupliqués : 1", report)
+        self.assertIn("quantité_fusionnée=5", report)
+        self.assertIn(
+            "Utilisateurs possédant plusieurs paniers actifs : ignoré",
+            report,
+        )
+        self.assertNotIn("actif", " ".join(str(sql) for sql in statements).lower())
+
+
 class CartIntegrityMigrationTests(TransactionTestCase):
     migrate_from = [("shop", "0012_cart_actif")]
     migrate_to = [("shop", "0014_cart_integrity_constraints")]
