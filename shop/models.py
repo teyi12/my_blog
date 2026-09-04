@@ -176,6 +176,16 @@ class Cart(models.Model):
         related_name="carts"
     )
     created_at = models.DateTimeField(auto_now_add=True)
+    actif = models.BooleanField(default=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["user"],
+                condition=models.Q(actif=True, user__isnull=False),
+                name="one_active_cart_per_user",
+            )
+        ]
 
     def __str__(self):
         return f"Panier #{self.id} ({self.user})"
@@ -199,6 +209,14 @@ class CartItem(models.Model):
     produit = models.ForeignKey(Produit, on_delete=models.CASCADE)
     quantite = models.PositiveIntegerField(default=1)
     prix_unitaire = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["cart", "produit"],
+                name="unique_product_per_cart",
+            )
+        ]
 
     def save(self, *args, **kwargs):
         if not self.prix_unitaire:

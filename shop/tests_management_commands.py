@@ -19,6 +19,11 @@ class FixCartsCommandTests(TestCase):
             slug="produit-maintenance",
             prix=Decimal("12.50"),
         )
+        self.zero_price_product = Produit.objects.create(
+            nom="Produit gratuit maintenance",
+            slug="produit-gratuit-maintenance",
+            prix=Decimal("0.00"),
+        )
         self.cart = Cart.objects.create(user=self.user)
         self.missing_price = CartItem.objects.create(
             cart=self.cart,
@@ -28,7 +33,7 @@ class FixCartsCommandTests(TestCase):
         CartItem.objects.filter(pk=self.missing_price.pk).update(prix_unitaire=None)
         self.zero_price = CartItem.objects.create(
             cart=self.cart,
-            produit=self.product,
+            produit=self.zero_price_product,
             quantite=1,
             prix_unitaire=Decimal("0.00"),
         )

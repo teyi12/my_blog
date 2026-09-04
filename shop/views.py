@@ -20,7 +20,11 @@ from django.utils.http import url_has_allowed_host_and_scheme
 from .models import Produit, Categorie, Cart, CartItem, Commande, LigneCommande
 from payments.models import Adresse
 from .forms import AdresseForm, CategorieForm, CommandeTraitementForm
-from .services import SQLiteLockRetryExhausted, execute_with_sqlite_lock_retry
+from .services import (
+    SQLiteLockRetryExhausted,
+    execute_with_sqlite_lock_retry,
+    get_or_create_active_cart,
+)
 
 # --- STRIPE ---
 stripe.api_key = settings.STRIPE_SECRET_KEY
@@ -29,7 +33,7 @@ stripe.api_key = settings.STRIPE_SECRET_KEY
 # ================= PANIER =================
 @login_required
 def panier_view(request):
-    cart, _ = Cart.objects.get_or_create(user=request.user)
+    cart = get_or_create_active_cart(request.user)
     return render(request, "shop/panier.html", {"cart": cart})
 
 
@@ -44,7 +48,7 @@ def update_panier(request):
         item_id = data.get("item_id")
         quantite = int(data.get("quantite", 1))
 
-        cart, _ = Cart.objects.get_or_create(user=request.user)
+        cart = get_or_create_active_cart(request.user)
 
         if action == "modifier" and item_id:
             item = get_object_or_404(CartItem, id=item_id, cart=cart)
@@ -73,7 +77,7 @@ def update_panier(request):
 @login_required
 def ajouter_panier(request, slug):
     produit = get_object_or_404(Produit, slug=slug)
-    cart, _ = Cart.objects.get_or_create(user=request.user)
+    cart = get_or_create_active_cart(request.user)
 
     item, created = CartItem.objects.get_or_create(cart=cart, produit=produit)
     if not created:
@@ -302,7 +306,7 @@ class CheckoutView(LoginRequiredMixin, View):
     """Affichage du formulaire d’adresse et sauvegarde"""
 
     def get(self, request, *args, **kwargs):
-        cart = Cart.objects.filter(user=request.user).first()
+        cart = Cart.objects.filter(user=request.user, actif=True).first()
         if not cart or not cart.items.exists():
             messages.warning(request, "Votre panier est vide.")
             return redirect("shop:panier")
@@ -341,7 +345,7 @@ class CheckoutView(LoginRequiredMixin, View):
 
                     cart = (
                         Cart.objects.select_for_update()
-                        .filter(user=request.user)
+                        .filter(user=request.user, actif=True)
                         .first()
                     )
                     if not cart:
@@ -404,7 +408,7 @@ class CheckoutView(LoginRequiredMixin, View):
                     commande = None
 
                 if not commande:
-                    cart = Cart.objects.filter(user=request.user).first()
+                    cart = Cart.objects.filter(user=request.user, actif=True).first()
                     messages.warning(
                         request,
                         "Le checkout est momentanément occupé. Veuillez réessayer.",
@@ -423,7 +427,7 @@ class CheckoutView(LoginRequiredMixin, View):
             url = reverse("shop:adresse_enregistree")
             return redirect(f"{url}?order_id={commande.id}")
 
-        cart = Cart.objects.filter(user=request.user).first()
+        cart = Cart.objects.filter(user=request.user, actif=True).first()
         if not cart or not cart.items.exists():
             messages.warning(request, "Votre panier est vide.")
             return redirect("shop:panier")

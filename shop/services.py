@@ -1,15 +1,31 @@
 import time
 
-from django.db import OperationalError, connection
+from django.db import IntegrityError, OperationalError, connection
 from django.db import transaction
 from django.db.models import F
 from django.utils import timezone
 
-from .models import CartItem, Commande
+from .models import Cart, CartItem, Commande
 
 
 class SQLiteLockRetryExhausted(Exception):
     """Un verrou SQLite persiste après toutes les tentatives autorisées."""
+
+
+def get_or_create_active_cart(user):
+    """Return the sole active cart for an authenticated user."""
+    if not user.is_authenticated:
+        raise ValueError("Un panier utilisateur nécessite un utilisateur authentifié.")
+
+    try:
+        with transaction.atomic():
+            cart = Cart.objects.filter(user=user, actif=True).first()
+            if cart is not None:
+                return cart
+            return Cart.objects.create(user=user, actif=True)
+    except IntegrityError:
+        # Une transaction concurrente a pu créer le panier entre SELECT et INSERT.
+        return Cart.objects.get(user=user, actif=True)
 
 
 def _is_sqlite_lock_error(exc):
