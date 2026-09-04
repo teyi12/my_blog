@@ -8,6 +8,8 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib import messages
 from django.http import JsonResponse
+from django.contrib.auth.views import redirect_to_login
+from monetization.services import utilisateur_a_acces_premium
 
 
 
@@ -23,10 +25,14 @@ def articles_view(request):
 def article_view(request, slug):
     article = get_object_or_404(Article, slug=slug)
 
-    # Gestion des articles premium
-    if article.is_premium and not request.user.is_authenticated:
+    if article.is_premium and not utilisateur_a_acces_premium(request.user):
         messages.warning(request, "Cet article est réservé aux abonnés.")
-        return redirect("login")
+        if not request.user.is_authenticated:
+            return redirect_to_login(
+                request.get_full_path(),
+                reverse("accounts:login"),
+            )
+        return redirect("monetization:abonnements")
 
     return render(request, "articles/detail.html", {"article": article})
 
