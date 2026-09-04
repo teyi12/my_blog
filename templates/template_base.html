@@ -1,6 +1,7 @@
-{% load static %}
+{% load i18n static %}
+{% get_current_language as CURRENT_LANGUAGE %}
 <!doctype html>
-<html lang="fr">
+<html lang="{{ CURRENT_LANGUAGE }}">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -39,6 +40,17 @@
             <li class="nav-item"><a class="nav-link" href="{% url 'contact' %}">Contact</a></li>
           </ul>
           <div class="header-actions">
+            <form method="post" action="{% url 'set_language' %}" class="d-flex align-items-center gap-1">
+              {% csrf_token %}
+              <input type="hidden" name="next" value="{{ request.get_full_path }}">
+              <label class="visually-hidden" for="language-select">{% translate "Langue" %}</label>
+              <select id="language-select" name="language" class="form-select form-select-sm" aria-label="{% translate "Choisir la langue" %}">
+                <option value="fr"{% if CURRENT_LANGUAGE == "fr" %} selected{% endif %}>FR</option>
+                <option value="de"{% if CURRENT_LANGUAGE == "de" %} selected{% endif %}>DE</option>
+                <option value="en"{% if CURRENT_LANGUAGE == "en" %} selected{% endif %}>EN</option>
+              </select>
+              <button type="submit" class="btn btn-soft btn-sm">{% translate "Changer" %}</button>
+            </form>
             <a class="header-icon d-none d-lg-inline-flex" href="{% url 'shop:panier' %}" aria-label="Voir le panier{% if panier_items_count %}, {{ panier_items_count }} article{{ panier_items_count|pluralize }}{% endif %}">
               <i class="fa-solid fa-bag-shopping" aria-hidden="true"></i>
               {% if panier_items_count and panier_items_count > 0 %}<span class="cart-count">{{ panier_items_count }}</span>{% endif %}
