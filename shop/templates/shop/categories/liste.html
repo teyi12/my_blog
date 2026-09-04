@@ -1,7 +1,7 @@
 {% extends "template_base.html" %}
-{% load static %}
+{% load i18n static %}
 
-{% block titre %}Gestion des catégories — Teyilawson{% endblock %}
+{% block titre %}{% translate "Gestion des catégories — Teyilawson" %}{% endblock %}
 
 {% block styles %}
 <link rel="stylesheet" href="{% static 'css/categories.css' %}">
@@ -12,12 +12,12 @@
   <div class="container-xl category-admin-shell">
     <header class="category-admin-header">
       <div>
-        <span class="category-eyebrow">Administration boutique</span>
-        <h1>Catégories produits</h1>
-        <p>Organisez le catalogue et gardez une navigation claire pour les visiteurs.</p>
+        <span class="category-eyebrow">{% translate "Administration boutique" %}</span>
+        <h1>{% translate "Catégories produits" %}</h1>
+        <p>{% translate "Organisez le catalogue et gardez une navigation claire pour les visiteurs." %}</p>
       </div>
       <a class="btn btn-primary" href="{% url 'shop:categorie_creer' %}">
-        <i class="fa-solid fa-plus" aria-hidden="true"></i> Nouvelle catégorie
+        <i class="fa-solid fa-plus" aria-hidden="true"></i> {% translate "Nouvelle catégorie" %}
       </a>
     </header>
 
@@ -27,10 +27,10 @@
         <table class="category-table">
           <thead>
             <tr>
-              <th>Catégorie</th>
+              <th>{% translate "Catégorie" %}</th>
               <th>Slug</th>
-              <th>Produits</th>
-              <th class="category-actions-heading">Actions</th>
+              <th>{% translate "Produits" %}</th>
+              <th class="category-actions-heading">{% translate "Actions" %}</th>
             </tr>
           </thead>
           <tbody>
@@ -41,9 +41,9 @@
               <td><span class="category-count">{{ categorie.nombre_produits }}</span></td>
               <td>
                 <div class="category-actions">
-                  <a href="{% url 'shop:par_categorie' categorie.slug %}" class="btn btn-outline-secondary btn-sm">Voir</a>
-                  <a href="{% url 'shop:categorie_modifier' categorie.slug %}" class="btn btn-outline-secondary btn-sm">Modifier</a>
-                  <a href="{% url 'shop:categorie_supprimer' categorie.slug %}" class="btn btn-outline-danger btn-sm">Supprimer</a>
+                  <a href="{% url 'shop:par_categorie' categorie.slug %}" class="btn btn-outline-secondary btn-sm">{% translate "Voir" %}</a>
+                  <a href="{% url 'shop:categorie_modifier' categorie.slug %}" class="btn btn-outline-secondary btn-sm">{% translate "Modifier" %}</a>
+                  <a href="{% url 'shop:categorie_supprimer' categorie.slug %}" class="btn btn-outline-danger btn-sm">{% translate "Supprimer" %}</a>
                 </div>
               </td>
             </tr>
@@ -54,9 +54,9 @@
       {% else %}
       <div class="category-empty-state">
         <i class="fa-solid fa-tags" aria-hidden="true"></i>
-        <h2>Aucune catégorie</h2>
-        <p>Créez votre première catégorie pour mieux structurer la boutique.</p>
-        <a class="btn btn-primary" href="{% url 'shop:categorie_creer' %}">Créer une catégorie</a>
+        <h2>{% translate "Aucune catégorie" %}</h2>
+        <p>{% translate "Créez votre première catégorie pour mieux structurer la boutique." %}</p>
+        <a class="btn btn-primary" href="{% url 'shop:categorie_creer' %}">{% translate "Créer une catégorie" %}</a>
       </div>
       {% endif %}
     </div>

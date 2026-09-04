@@ -85,6 +85,7 @@ SITE_BASE_URL = os.getenv("SITE_BASE_URL", "http://127.0.0.1:8800").rstrip("/")
 # Applications
 # -----------------------------------------------------------------------------
 INSTALLED_APPS = [
+    "modeltranslation",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -180,6 +181,9 @@ LANGUAGES = [
     ("en", "English"),
 ]
 LOCALE_PATHS = [BASE_DIR / "locale"]
+MODELTRANSLATION_AUTO_POPULATE = "default"
+MODELTRANSLATION_FALLBACK_LANGUAGES = {"default": ("fr",)}
+MODELTRANSLATION_PREPOPULATE_LANGUAGE = "fr"
 TIME_ZONE = os.getenv("TIME_ZONE", "Europe/Berlin")
 USE_I18N = True
 USE_TZ = True

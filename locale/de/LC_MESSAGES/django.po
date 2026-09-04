@@ -1,381 +1,1033 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Teyilawson\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-09-05 00:42+0200\n"
+"PO-Revision-Date: 2026-09-05 00:11+0200\n"
+"Last-Translator: Teyilawson\n"
+"Language-Team: German\n"
 "Language: de\n"
+"MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-msgid "Aller au contenu principal"
-msgstr "Zum Hauptinhalt springen"
+#: accounts/admin.py:20
+msgid "Informations personnelles"
+msgstr ""
 
-msgid "Navigation principale"
-msgstr "Hauptnavigation"
+#: accounts/admin.py:24
+msgid "Permissions"
+msgstr ""
 
-msgid "Teyilawson — Accueil"
-msgstr "Teyilawson — Startseite"
+#: accounts/admin.py:35
+msgid "Dates importantes"
+msgstr ""
 
-msgid "Explorer · Comprendre · Choisir"
-msgstr "Entdecken · Verstehen · Auswählen"
+#: blog/forms.py:5
+msgid "Ce champ est obligatoire."
+msgstr "Dieses Feld ist erforderlich."
 
+#: blog/forms.py:12
+msgid "Nom"
+msgstr "Nachname"
+
+#: blog/forms.py:17
+msgid "Prénom"
+msgstr "Vorname"
+
+#: blog/forms.py:21
+msgid "Adresse e-mail"
+msgstr "E-Mail-Adresse"
+
+#: blog/forms.py:25
+msgid "Message"
+msgstr "Nachricht"
+
+#: blog/views.py:42
+msgid ""
+"Le service de contact est momentanément indisponible. Merci de réessayer "
+"plus tard."
+msgstr ""
+"Der Kontaktservice ist derzeit nicht verfügbar. Bitte versuchen Sie es "
+"später erneut."
+
+#: blog/views.py:59
+msgid ""
+"L’envoi du message a momentanément échoué. Merci de réessayer dans quelques "
+"instants."
+msgstr ""
+"Die Nachricht konnte vorübergehend nicht gesendet werden. Bitte versuchen "
+"Sie es in wenigen Augenblicken erneut."
+
+#: blog/views.py:63
+msgid "Votre message a bien été envoyé. Merci pour votre prise de contact."
+msgstr ""
+"Ihre Nachricht wurde erfolgreich gesendet. Vielen Dank für Ihre "
+"Kontaktaufnahme."
+
+#: blog/views.py:70
+msgid "Merci pour votre message."
+msgstr "Vielen Dank für Ihre Nachricht."
+
+#: shop/forms.py:20
+msgid "Nom de la catégorie"
+msgstr "Name der Kategorie"
+
+#: shop/forms.py:25
+msgid "Ex. Mode, Livres, Accessoires"
+msgstr "Z. B. Mode, Bücher, Accessoires"
+
+#: shop/forms.py:35
+msgid "Une catégorie portant ce nom existe déjà."
+msgstr "Eine Kategorie mit diesem Namen ist bereits vorhanden."
+
+#: shop/forms.py:41
+msgid "Ce nom produit un identifiant déjà utilisé par une autre catégorie."
+msgstr ""
+"Dieser Name erzeugt eine Kennung, die bereits von einer anderen Kategorie "
+"verwendet wird."
+
+#: shop/templates/shop/categories/form.html:4
+msgid "Modifier une catégorie — Teyilawson"
+msgstr "Kategorie bearbeiten — Teyilawson"
+
+#: shop/templates/shop/categories/form.html:4
+msgid "Créer une catégorie — Teyilawson"
+msgstr "Kategorie erstellen — Teyilawson"
+
+#: shop/templates/shop/categories/form.html:14
+msgid "Retour aux catégories"
+msgstr "Zurück zu den Kategorien"
+
+#: shop/templates/shop/categories/form.html:19
+#: shop/templates/shop/categories/liste.html:15
+msgid "Administration boutique"
+msgstr "Shop-Verwaltung"
+
+#: shop/templates/shop/categories/form.html:20
+msgid "Modifier la catégorie"
+msgstr "Kategorie bearbeiten"
+
+#: shop/templates/shop/categories/form.html:20
+#: shop/templates/shop/categories/liste.html:20
+msgid "Nouvelle catégorie"
+msgstr "Neue Kategorie"
+
+#: shop/templates/shop/categories/form.html:21
+msgid "Le slug public est généré automatiquement à partir du nom."
+msgstr "Der öffentliche Slug wird automatisch aus dem Namen erzeugt."
+
+#: shop/templates/shop/categories/form.html:40
+#: shop/templates/shop/categories/supprimer.html:25
+#: shop/templates/shop/creer.html:12
+msgid "Annuler"
+msgstr "Abbrechen"
+
+#: shop/templates/shop/categories/form.html:43
+msgid "Enregistrer les modifications"
+msgstr "Änderungen speichern"
+
+#: shop/templates/shop/categories/form.html:43
+msgid "Créer la catégorie"
+msgstr "Kategorie erstellen"
+
+#: shop/templates/shop/categories/liste.html:4
+msgid "Gestion des catégories — Teyilawson"
+msgstr "Kategorien verwalten — Teyilawson"
+
+#: shop/templates/shop/categories/liste.html:16
+msgid "Catégories produits"
+msgstr "Produktkategorien"
+
+#: shop/templates/shop/categories/liste.html:17
+msgid ""
+"Organisez le catalogue et gardez une navigation claire pour les visiteurs."
+msgstr ""
+"Ordnen Sie den Katalog und sorgen Sie für eine übersichtliche Navigation für "
+"Ihre Besucher."
+
+#: shop/templates/shop/categories/liste.html:30
+#: shop/templates/shop/produits_par_categorie.html:15
+msgid "Catégorie"
+msgstr "Kategorie"
+
+#: shop/templates/shop/categories/liste.html:32
+#: shop/templates/shop/liste.html:47
+msgid "Produits"
+msgstr "Produkte"
+
+#: shop/templates/shop/categories/liste.html:33
+msgid "Actions"
+msgstr "Aktionen"
+
+#: shop/templates/shop/categories/liste.html:44
+msgid "Voir"
+msgstr "Ansehen"
+
+#: shop/templates/shop/categories/liste.html:45
+msgid "Modifier"
+msgstr "Bearbeiten"
+
+#: shop/templates/shop/categories/liste.html:46
+msgid "Supprimer"
+msgstr "Löschen"
+
+#: shop/templates/shop/categories/liste.html:57
+msgid "Aucune catégorie"
+msgstr "Keine Kategorien"
+
+#: shop/templates/shop/categories/liste.html:58
+msgid "Créez votre première catégorie pour mieux structurer la boutique."
+msgstr ""
+"Erstellen Sie Ihre erste Kategorie, um den Shop besser zu strukturieren."
+
+#: shop/templates/shop/categories/liste.html:59
+msgid "Créer une catégorie"
+msgstr "Kategorie erstellen"
+
+#: shop/templates/shop/categories/supprimer.html:4
+#, python-format
+msgid "Supprimer %(category_name)s — Teyilawson"
+msgstr "%(category_name)s löschen — Teyilawson"
+
+#: shop/templates/shop/categories/supprimer.html:15
+msgid "Suppression"
+msgstr "Löschen"
+
+#: shop/templates/shop/categories/supprimer.html:16
+#, python-format
+msgid "Supprimer « %(category_name)s » ?"
+msgstr "„%(category_name)s“ löschen?"
+
+#: shop/templates/shop/categories/supprimer.html:18
+#, python-format
+msgid ""
+"Cette catégorie contient <strong>%(counter)s produit</strong>. Le produit ne "
+"sera pas supprimé, mais il deviendra sans catégorie."
+msgid_plural ""
+"Cette catégorie contient <strong>%(counter)s produits</strong>. Les produits "
+"ne seront pas supprimés, mais ils deviendront sans catégorie."
+msgstr[0] ""
+"Diese Kategorie enthält <strong>%(counter)s Produkt</strong>. Das Produkt "
+"wird nicht gelöscht, ist anschließend jedoch keiner Kategorie mehr "
+"zugeordnet."
+msgstr[1] ""
+"Diese Kategorie enthält <strong>%(counter)s Produkte</strong>. Die Produkte "
+"werden nicht gelöscht, sind anschließend jedoch keiner Kategorie mehr "
+"zugeordnet."
+
+#: shop/templates/shop/categories/supprimer.html:20
+msgid "Cette catégorie ne contient actuellement aucun produit."
+msgstr "Diese Kategorie enthält derzeit keine Produkte."
+
+#: shop/templates/shop/categories/supprimer.html:27
+msgid "Supprimer définitivement"
+msgstr "Endgültig löschen"
+
+#: shop/templates/shop/creer.html:3
+msgid "Créer un produit"
+msgstr "Produkt erstellen"
+
+#: shop/templates/shop/creer.html:7
+msgid "Ajouter un nouveau produit"
+msgstr "Neues Produkt hinzufügen"
+
+#: shop/templates/shop/creer.html:11
+msgid "Enregistrer"
+msgstr "Speichern"
+
+#: shop/templates/shop/detail.html:4
+#, python-format
+msgid "%(product_name)s — Boutique Teyilawson"
+msgstr "%(product_name)s — Teyilawson Shop"
+
+#: shop/templates/shop/detail.html:14
+msgid "Retour à la boutique"
+msgstr "Zurück zum Shop"
+
+#: shop/templates/shop/detail.html:20 shop/templates/shop/detail.html:22
+#: shop/templates/shop/liste.html:52 shop/templates/shop/liste.html:54
+#: shop/templates/shop/produits_par_categorie.html:41
+#: shop/templates/shop/produits_par_categorie.html:43
+msgid "Image du produit"
+msgstr "Produktbild"
+
+#: shop/templates/shop/detail.html:24
+msgid "Produit sélectionné"
+msgstr "Ausgewähltes Produkt"
+
+#: shop/templates/shop/detail.html:30 shop/templates/shop/liste.html:66
+#: shop/templates/shop/produits_par_categorie.html:54
+#, python-format
+msgid "Prix : %(price)s euros"
+msgstr "Preis: %(price)s Euro"
+
+#: shop/templates/shop/detail.html:36
+msgid "Informations d’achat"
+msgstr "Informationen zum Kauf"
+
+#: shop/templates/shop/detail.html:37 shop/templates/shop/liste.html:42
+#: shop/templates/shop/produits_par_categorie.html:32 templates/home.html:32
+msgid "Paiement sécurisé"
+msgstr "Sichere Zahlung"
+
+#: shop/templates/shop/detail.html:38
+msgid "Ajout simple au panier"
+msgstr "Einfach zum Warenkorb hinzufügen"
+
+#: shop/templates/shop/detail.html:39
+msgid "Aperçu disponible"
+msgstr "Vorschau verfügbar"
+
+#: shop/templates/shop/detail.html:47
+msgid "Ajouter au panier"
+msgstr "In den Warenkorb"
+
+#: shop/templates/shop/detail.html:50 shop/templates/shop/liste.html:19
+#: shop/templates/shop/produits_par_categorie.html:20
+#: templates/template_base.html:28 templates/template_base.html:54
 msgid "Voir le panier"
 msgstr "Warenkorb ansehen"
 
+#: shop/templates/shop/detail.html:57
+msgid "Ressource associée"
+msgstr "Zugehörige Ressource"
+
+#: shop/templates/shop/detail.html:57
+msgid "Aperçu du produit"
+msgstr "Produktvorschau"
+
+#: shop/templates/shop/detail.html:59
+msgid "Télécharger"
+msgstr "Herunterladen"
+
+#: shop/templates/shop/detail.html:65
+msgid "Pourquoi acheter ici"
+msgstr "Warum hier kaufen"
+
+#: shop/templates/shop/detail.html:66
+msgid "Paiement protégé"
+msgstr "Geschützte Zahlung"
+
+#: shop/templates/shop/detail.html:66
+msgid "Parcours de commande sécurisé."
+msgstr "Sicherer Bestellvorgang."
+
+#: shop/templates/shop/detail.html:67
+msgid "Sélection claire"
+msgstr "Übersichtliche Auswahl"
+
+#: shop/templates/shop/detail.html:67
+msgid "Des produits présentés sans surcharge."
+msgstr "Produkte klar und ohne Überladung präsentiert."
+
+#: shop/templates/shop/detail.html:68
+msgid "Univers Teyilawson"
+msgstr "Die Teyilawson-Welt"
+
+#: shop/templates/shop/detail.html:68
+msgid "Une sélection cohérente avec nos contenus."
+msgstr "Eine Auswahl, die zu unseren Inhalten passt."
+
+#: shop/templates/shop/liste.html:4
+msgid "Boutique — Teyilawson"
+msgstr "Shop — Teyilawson"
+
+#: shop/templates/shop/liste.html:14
+msgid "Sélection Teyilawson"
+msgstr "Teyilawson-Auswahl"
+
+#: shop/templates/shop/liste.html:15
+msgid "Une boutique pensée pour aller à l’essentiel."
+msgstr "Ein Shop, der sich auf das Wesentliche konzentriert."
+
+#: shop/templates/shop/liste.html:16
+msgid ""
+"Découvrez une sélection claire et soignée de produits, avec une expérience "
+"d’achat simple du choix au paiement."
+msgstr ""
+"Entdecken Sie eine übersichtliche, sorgfältig zusammengestellte "
+"Produktauswahl und ein einfaches Einkaufserlebnis – von der Auswahl bis zur "
+"Bezahlung."
+
+#: shop/templates/shop/liste.html:21
+#: shop/templates/shop/produits_par_categorie.html:22
+msgid "Votre panier"
+msgstr "Ihr Warenkorb"
+
+#: shop/templates/shop/liste.html:21
+#: shop/templates/shop/produits_par_categorie.html:22
+#, python-format
+msgid "%(counter)s article"
+msgid_plural "%(counter)s articles"
+msgstr[0] "%(counter)s Artikel"
+msgstr[1] "%(counter)s Artikel"
+
+#: shop/templates/shop/liste.html:28
+msgid "Catalogue"
+msgstr "Katalog"
+
+#: shop/templates/shop/liste.html:29
+#: shop/templates/shop/produits_par_categorie.html:30
+#, python-format
+msgid "%(counter)s produit"
+msgid_plural "%(counter)s produits"
+msgstr[0] "%(counter)s Produkt"
+msgstr[1] "%(counter)s Produkte"
+
+#: shop/templates/shop/liste.html:35
+msgid "Gérer les commandes"
+msgstr "Bestellungen verwalten"
+
+#: shop/templates/shop/liste.html:39
+msgid "Gérer les catégories"
+msgstr "Kategorien verwalten"
+
+#: shop/templates/shop/liste.html:56
+#: shop/templates/shop/produits_par_categorie.html:29
+#: shop/templates/shop/produits_par_categorie.html:45 templates/home.html:50
+msgid "Sélection"
+msgstr "Auswahl"
+
+#: shop/templates/shop/liste.html:57
+#: shop/templates/shop/produits_par_categorie.html:46
+msgid "Voir le produit"
+msgstr "Produkt ansehen"
+
+#: shop/templates/shop/liste.html:69
+#: shop/templates/shop/produits_par_categorie.html:57
+#, python-format
+msgid "Ajouter %(product_name)s au panier"
+msgstr "%(product_name)s in den Warenkorb legen"
+
+#: shop/templates/shop/liste.html:69
+#: shop/templates/shop/produits_par_categorie.html:57
+msgid "Ajouter ce produit au panier"
+msgstr "Dieses Produkt in den Warenkorb legen"
+
+#: shop/templates/shop/liste.html:71
+#: shop/templates/shop/produits_par_categorie.html:58
+msgid "Ajouter"
+msgstr "Hinzufügen"
+
+#: shop/templates/shop/liste.html:82
+msgid "La sélection arrive bientôt."
+msgstr "Unsere Auswahl ist bald verfügbar."
+
+#: shop/templates/shop/liste.html:83
+msgid ""
+"Aucun produit n’est disponible pour le moment. Revenez prochainement pour "
+"découvrir la boutique."
+msgstr ""
+"Derzeit sind keine Produkte verfügbar. Schauen Sie bald wieder vorbei und "
+"entdecken Sie unseren Shop."
+
+#: shop/templates/shop/liste.html:88
+msgid "Pagination de la boutique"
+msgstr "Seitennavigation des Shops"
+
+#: shop/templates/shop/liste.html:91
+msgid "Page précédente"
+msgstr "Vorherige Seite"
+
+#: shop/templates/shop/liste.html:97
+msgid "Page suivante"
+msgstr "Nächste Seite"
+
+#: shop/templates/shop/produits_par_categorie.html:4
+#, python-format
+msgid "%(category_name)s — Boutique Teyilawson"
+msgstr "%(category_name)s — Teyilawson Shop"
+
+#: shop/templates/shop/produits_par_categorie.html:14
+msgid "Toute la boutique"
+msgstr "Gesamter Shop"
+
+#: shop/templates/shop/produits_par_categorie.html:17
+msgid "Découvrez les produits disponibles dans cette sélection."
+msgstr "Entdecken Sie die Produkte in dieser Auswahl."
+
+#: shop/templates/shop/produits_par_categorie.html:36
+#, python-format
+msgid "Produits de la catégorie %(category_name)s"
+msgstr "Produkte der Kategorie %(category_name)s"
+
+#: shop/templates/shop/produits_par_categorie.html:69
+msgid "Aucun produit dans cette catégorie."
+msgstr "Keine Produkte in dieser Kategorie."
+
+#: shop/templates/shop/produits_par_categorie.html:70
+msgid ""
+"Explorez le reste de la boutique pour découvrir les produits actuellement "
+"disponibles."
+msgstr "Entdecken Sie im übrigen Shop die aktuell verfügbaren Produkte."
+
+#: shop/templates/shop/produits_par_categorie.html:71 templates/home.html:104
+msgid "Voir toute la boutique"
+msgstr "Den ganzen Shop ansehen"
+
+#: shop/views.py:140
+#, python-format
+msgid "La catégorie « %(category)s » a été créée."
+msgstr "Die Kategorie „%(category)s“ wurde erstellt."
+
+#: shop/views.py:159
+#, python-format
+msgid "La catégorie « %(category)s » a été mise à jour."
+msgstr "Die Kategorie „%(category)s“ wurde aktualisiert."
+
+#: shop/views.py:181
+#, python-format
+msgid ""
+"La catégorie « %(category)s » a été supprimée. %(count)s produit est "
+"maintenant sans catégorie."
+msgid_plural ""
+"La catégorie « %(category)s » a été supprimée. %(count)s produits sont "
+"maintenant sans catégorie."
+msgstr[0] ""
+"Die Kategorie „%(category)s“ wurde gelöscht. %(count)s Produkt ist jetzt "
+"keiner Kategorie zugeordnet."
+msgstr[1] ""
+"Die Kategorie „%(category)s“ wurde gelöscht. %(count)s Produkte sind jetzt "
+"keiner Kategorie zugeordnet."
+
+#: shop/views.py:190
+#, python-format
+msgid "La catégorie « %(category)s » a été supprimée."
+msgstr "Die Kategorie „%(category)s“ wurde gelöscht."
+
+#: templates/about.html:4
+msgid "À propos — Teyilawson"
+msgstr "Über uns — Teyilawson"
+
+#: templates/about.html:14 templates/template_base.html:39
+#: templates/template_base.html:102
+msgid "À propos"
+msgstr "Über uns"
+
+#: templates/about.html:15
+msgid "Un espace pour explorer, comprendre et choisir avec confiance."
+msgstr "Ein Ort, um mit Vertrauen zu entdecken, zu verstehen und auszuwählen."
+
+#: templates/about.html:16
+msgid ""
+"Teyilawson réunit contenus éditoriaux, découvertes et sélection de produits "
+"dans une expérience simple, utile et soigneusement construite."
+msgstr ""
+"Teyilawson verbindet redaktionelle Inhalte, Entdeckungen und eine "
+"Produktauswahl zu einem klaren, nützlichen und sorgfältig gestalteten "
+"Erlebnis."
+
+#: templates/about.html:18 templates/home.html:22
+msgid "Explorer les articles"
+msgstr "Artikel entdecken"
+
+#: templates/about.html:19 templates/home.html:158
+#: templates/template_base.html:103
+msgid "Nous contacter"
+msgstr "Kontakt aufnehmen"
+
+#: templates/about.html:23
+msgid "Identité Teyilawson"
+msgstr "Die Identität von Teyilawson"
+
+#: templates/about.html:24
+msgid "Logo Teyilawson"
+msgstr "Teyilawson-Logo"
+
+#: templates/about.html:27 templates/home.html:15
+#: templates/template_base.html:25
+msgid "Explorer · Comprendre · Choisir"
+msgstr "Entdecken · Verstehen · Auswählen"
+
+#: templates/about.html:28
+msgid ""
+"Une plateforme indépendante à la croisée du contenu, de la découverte et du "
+"commerce."
+msgstr ""
+"Eine unabhängige Plattform an der Schnittstelle von Inhalten, Entdeckungen "
+"und Handel."
+
+#: templates/about.html:35
+msgid "Notre vision"
+msgstr "Unsere Vision"
+
+#: templates/about.html:36
+msgid "Donner plus de valeur à chaque visite."
+msgstr "Jeden Besuch wertvoller machen."
+
+#: templates/about.html:39
+msgid ""
+"Le projet a été pensé pour proposer une navigation claire entre information, "
+"inspiration et sélection de produits. Chaque espace du site doit aider le "
+"visiteur à aller à l’essentiel sans sacrifier la qualité de l’expérience."
+msgstr ""
+"Das Projekt wurde entwickelt, um klar zwischen Information, Inspiration und "
+"Produktauswahl zu führen. Jeder Bereich der Website soll dabei helfen, sich "
+"auf das Wesentliche zu konzentrieren, ohne Abstriche beim Erlebnis zu machen."
+
+#: templates/about.html:40
+msgid ""
+"La plateforme évolue autour d’un principe simple : publier des contenus "
+"utiles, présenter les offres avec transparence et construire une relation de "
+"confiance durable avec les lecteurs, clients et partenaires."
+msgstr ""
+"Die Plattform folgt einem einfachen Grundsatz: nützliche Inhalte "
+"veröffentlichen, Angebote transparent vorstellen und dauerhaftes Vertrauen "
+"bei Leserinnen und Lesern, Kundinnen und Kunden sowie Partnern schaffen."
+
+#: templates/about.html:46
+msgid "Nos principes"
+msgstr "Unsere Grundsätze"
+
+#: templates/about.html:47
+msgid "Ce qui guide le projet."
+msgstr "Was das Projekt leitet."
+
+#: templates/about.html:52
+msgid "Clarté"
+msgstr "Klarheit"
+
+#: templates/about.html:53
+msgid ""
+"Une expérience lisible, des parcours simples et des informations présentées "
+"sans complexité inutile."
+msgstr ""
+"Ein verständliches Erlebnis, einfache Wege und Informationen ohne unnötige "
+"Komplexität."
+
+#: templates/about.html:57
+msgid "Qualité"
+msgstr "Qualität"
+
+#: templates/about.html:58
+msgid ""
+"Un soin particulier porté aux contenus, aux produits présentés et à la "
+"cohérence générale de la plateforme."
+msgstr ""
+"Besondere Sorgfalt für Inhalte, vorgestellte Produkte und die stimmige "
+"Gesamtwirkung der Plattform."
+
+#: templates/about.html:62
+msgid "Confiance"
+msgstr "Vertrauen"
+
+#: templates/about.html:63
+msgid ""
+"Une approche transparente des contenus, des partenariats et des paiements "
+"pour construire une relation durable."
+msgstr ""
+"Ein transparenter Umgang mit Inhalten, Partnerschaften und Zahlungen schafft "
+"eine dauerhafte Beziehung."
+
+#: templates/about.html:72
+msgid "Fondateur & développeur"
+msgstr "Gründer & Entwickler"
+
+#: templates/about.html:74
+msgid ""
+"Le projet Teyilawson est développé comme une plateforme éditoriale et e-"
+"commerce moderne, avec une attention particulière portée à l’expérience "
+"utilisateur, à la fiabilité technique et à l’évolution continue du produit."
+msgstr ""
+"Teyilawson wird als moderne redaktionelle und E-Commerce-Plattform "
+"entwickelt, mit besonderem Augenmerk auf Nutzererlebnis, technische "
+"Zuverlässigkeit und die kontinuierliche Weiterentwicklung des Produkts."
+
+#: templates/about.html:81
+msgid "Échangeons"
+msgstr "Lassen Sie uns sprechen"
+
+#: templates/about.html:82
+msgid "Une idée, une collaboration ou une question ?"
+msgstr "Eine Idee, eine Zusammenarbeit oder eine Frage?"
+
+#: templates/about.html:83
+msgid "Utilisez la page contact pour nous écrire directement."
+msgstr "Nutzen Sie die Kontaktseite, um uns direkt zu schreiben."
+
+#: templates/about.html:85
+msgid "Prendre contact"
+msgstr "Kontakt aufnehmen"
+
+#: templates/contact.html:4
+msgid "Contact — Teyilawson"
+msgstr "Kontakt — Teyilawson"
+
+#: templates/contact.html:14 templates/template_base.html:40
+#: templates/template_base.html:103
+msgid "Contact"
+msgstr "Kontakt"
+
+#: templates/contact.html:15
+msgid "Parlons de votre idée."
+msgstr "Sprechen wir über Ihre Idee."
+
+#: templates/contact.html:16
+msgid ""
+"Une question, une proposition de partenariat ou simplement un message ? "
+"Écrivez-nous directement via ce formulaire."
+msgstr ""
+"Eine Frage, ein Partnerschaftsvorschlag oder einfach eine Nachricht? "
+"Schreiben Sie uns direkt über dieses Formular."
+
+#: templates/contact.html:23
+msgid "Nous sommes à votre écoute."
+msgstr "Wir sind für Sie da."
+
+#: templates/contact.html:24
+msgid ""
+"Votre message sera transmis via le formulaire ci-contre. Renseignez vos "
+"coordonnées afin que nous puissions vous répondre."
+msgstr ""
+"Ihre Nachricht wird über das nebenstehende Formular übermittelt. Geben Sie "
+"Ihre Kontaktdaten an, damit wir Ihnen antworten können."
+
+#: templates/contact.html:26
+msgid "Message sécurisé par CSRF"
+msgstr "Nachricht durch CSRF geschützt"
+
+#: templates/contact.html:27
+msgid "Formulaire simple et direct"
+msgstr "Einfaches, direktes Formular"
+
+#: templates/contact.html:28
+msgid "Réponse à l’adresse indiquée"
+msgstr "Antwort an die angegebene Adresse"
+
+#: templates/contact.html:34
+msgid "Votre message"
+msgstr "Ihre Nachricht"
+
+#: templates/contact.html:35
+msgid "Nous écrire"
+msgstr "Schreiben Sie uns"
+
+#: templates/contact.html:67
+msgid "Envoyer le message"
+msgstr "Nachricht senden"
+
+#: templates/contact.html:68
+msgid "Vos informations sont utilisées uniquement pour traiter votre demande."
+msgstr ""
+"Ihre Angaben werden ausschließlich zur Bearbeitung Ihrer Anfrage verwendet."
+
+#: templates/home.html:4
+msgid "Teyilawson — Articles, découvertes et boutique"
+msgstr "Teyilawson — Artikel, Entdeckungen und Shop"
+
+#: templates/home.html:16
+msgid "Des idées, des découvertes et une sélection pensée avec soin."
+msgstr ""
+"Ideen, Entdeckungen und eine Auswahl, die mit Sorgfalt zusammengestellt "
+"wurde."
+
+#: templates/home.html:18
+msgid ""
+"Retrouvez des articles inspirants, des expériences à découvrir et une "
+"boutique sélectionnée pour aller à l’essentiel."
+msgstr ""
+"Entdecken Sie inspirierende Artikel, neue Erlebnisse und einen ausgewählten "
+"Shop, der sich aufs Wesentliche konzentriert."
+
+#: templates/home.html:26
+msgid "Découvrir la boutique"
+msgstr "Shop entdecken"
+
+#: templates/home.html:29
+msgid "Points forts"
+msgstr "Unsere Stärken"
+
+#: templates/home.html:30
+msgid "Contenus choisis"
+msgstr "Ausgewählte Inhalte"
+
+#: templates/home.html:31
+msgid "Navigation simple"
+msgstr "Einfache Navigation"
+
+#: templates/home.html:38
+msgid ""
+"Un carnet de voyage posé sur une carte, symbole de récits et de découvertes"
+msgstr ""
+"Ein Reisetagebuch auf einer Karte, Sinnbild für Geschichten und Entdeckungen"
+
+#: templates/home.html:40
+msgid "Récits & découvertes"
+msgstr "Geschichten & Entdeckungen"
+
+#: templates/home.html:41
+msgid "Voir le monde autrement"
+msgstr "Die Welt neu entdecken"
+
+#: templates/home.html:46
+msgid "Inspiration"
+msgstr "Inspiration"
+
+#: templates/home.html:46 templates/template_base.html:102
+msgid "Explorer"
+msgstr "Entdecken"
+
+#: templates/home.html:50 templates/template_base.html:38
+#: templates/template_base.html:102
+msgid "Boutique"
+msgstr "Shop"
+
+#: templates/home.html:58
+msgid "L’univers Teyilawson"
+msgstr "Die Welt von Teyilawson"
+
+#: templates/home.html:59
+msgid "Explorer selon vos envies"
+msgstr "Entdecken, was zu Ihnen passt"
+
+#: templates/home.html:61
+msgid ""
+"Trois portes d’entrée pour découvrir le contenu, les idées et les sélections "
+"du site."
+msgstr ""
+"Drei Wege, um die Inhalte, Ideen und Auswahl dieser Website zu entdecken."
+
+#: templates/home.html:68
+msgid "Lire"
+msgstr "Lesen"
+
+#: templates/home.html:69
+msgid "Articles & récits"
+msgstr "Artikel & Geschichten"
+
+#: templates/home.html:70
+msgid ""
+"Des contenus utiles, des expériences et des histoires qui donnent envie "
+"d’aller plus loin."
+msgstr ""
+"Nützliche Inhalte, Erlebnisse und Geschichten, die neugierig auf mehr machen."
+
+#: templates/home.html:71
+msgid "Découvrir les articles"
+msgstr "Artikel entdecken"
+
+#: templates/home.html:78
+msgid "Choisir"
+msgstr "Auswählen"
+
+#: templates/home.html:79
+msgid "Boutique sélectionnée"
+msgstr "Sorgfältig ausgewählter Shop"
+
+#: templates/home.html:80
+msgid ""
+"Une sélection de produits présentés simplement, sans surcharge et avec une "
+"expérience d’achat claire."
+msgstr ""
+"Eine Produktauswahl, klar präsentiert und ohne Überladung – für ein "
+"angenehmes Einkaufserlebnis."
+
+#: templates/home.html:81
+msgid "Voir la boutique"
+msgstr "Zum Shop"
+
+#: templates/home.html:88
+msgid "Comprendre"
+msgstr "Verstehen"
+
+#: templates/home.html:89
+msgid "Découvertes & inspiration"
+msgstr "Entdeckungen & Inspiration"
+
+#: templates/home.html:90
+msgid ""
+"Voyages, saveurs, idées et nouvelles perspectives réunies dans un même "
+"univers éditorial."
+msgstr ""
+"Reisen, Genuss, Ideen und neue Perspektiven in einer redaktionellen Welt."
+
+#: templates/home.html:91
+msgid "En savoir plus"
+msgstr "Mehr erfahren"
+
+#: templates/home.html:101
+msgid "Sélection du moment"
+msgstr "Unsere aktuelle Auswahl"
+
+#: templates/home.html:102
+msgid "Produits en vedette"
+msgstr "Empfohlene Produkte"
+
+#: templates/home.html:116
+msgid "En vedette"
+msgstr "Empfohlen"
+
+#: templates/home.html:124
+#, python-format
+msgid "Voir %(product_name)s"
+msgstr "%(product_name)s ansehen"
+
+#: templates/home.html:137
+msgid "Une autre manière de découvrir"
+msgstr "Eine andere Art zu entdecken"
+
+#: templates/home.html:138
+msgid "Curiosité, simplicité et qualité."
+msgstr "Neugier, Einfachheit und Qualität."
+
+#: templates/home.html:140
+msgid ""
+"Teyilawson rassemble des contenus et des sélections qui donnent envie de "
+"découvrir, comprendre et choisir avec plus de confiance."
+msgstr ""
+"Teyilawson vereint Inhalte und Auswahl, die dazu einladen, mit mehr "
+"Vertrauen zu entdecken, zu verstehen und auszuwählen."
+
+#: templates/home.html:142
+msgid "Découvrir notre univers"
+msgstr "Unsere Welt entdecken"
+
+#: templates/home.html:144
+msgid "Nos valeurs"
+msgstr "Unsere Werte"
+
+#: templates/home.html:145
+msgid "Curiosité"
+msgstr "Neugier"
+
+#: templates/home.html:146
+msgid "Authenticité"
+msgstr "Authentizität"
+
+#: templates/home.html:147
+msgid "Simplicité"
+msgstr "Einfachheit"
+
+#: templates/home.html:153
+msgid "Restons connectés"
+msgstr "Bleiben wir in Kontakt"
+
+#: templates/home.html:154
+msgid "Une question, une idée ou un projet ?"
+msgstr "Eine Frage, eine Idee oder ein Projekt?"
+
+#: templates/home.html:155
+msgid ""
+"Échangeons autour d’un partenariat, d’une collaboration ou simplement d’une "
+"suggestion."
+msgstr ""
+"Sprechen wir über eine Partnerschaft, Zusammenarbeit oder einfach über einen "
+"Vorschlag."
+
+#: templates/home.html:159 templates/template_base.html:83
+#: templates/template_base.html:103
+msgid "Partenariats"
+msgstr "Partnerschaften"
+
+#: templates/template_base.html:19
+msgid "Aller au contenu principal"
+msgstr "Zum Hauptinhalt springen"
+
+#: templates/template_base.html:21
+msgid "Navigation principale"
+msgstr "Hauptnavigation"
+
+#: templates/template_base.html:23
+msgid "Teyilawson — Accueil"
+msgstr "Teyilawson — Startseite"
+
+#: templates/template_base.html:28 templates/template_base.html:54
+#, python-format
 msgid "Voir le panier, %(counter)s article"
 msgid_plural "Voir le panier, %(counter)s articles"
 msgstr[0] "Warenkorb ansehen, %(counter)s Artikel"
 msgstr[1] "Warenkorb ansehen, %(counter)s Artikel"
 
+#: templates/template_base.html:32
 msgid "Ouvrir le menu"
 msgstr "Menü öffnen"
 
+#: templates/template_base.html:36
 msgid "Accueil"
 msgstr "Startseite"
 
+#: templates/template_base.html:37 templates/template_base.html:102
 msgid "Articles"
 msgstr "Artikel"
 
-msgid "Boutique"
-msgstr "Shop"
-
-msgid "À propos"
-msgstr "Über uns"
-
-msgid "Contact"
-msgstr "Kontakt"
-
+#: templates/template_base.html:46
 msgid "Langue"
 msgstr "Sprache"
 
+#: templates/template_base.html:47
 msgid "Choisir la langue"
 msgstr "Sprache auswählen"
 
+#: templates/template_base.html:52
 msgid "Changer"
 msgstr "Ändern"
 
+#: templates/template_base.html:64
 msgid "Mon profil"
 msgstr "Mein Profil"
 
+#: templates/template_base.html:65
 msgid "Mes commandes"
 msgstr "Meine Bestellungen"
 
+#: templates/template_base.html:66
 msgid "Revenus"
 msgstr "Einnahmen"
 
+#: templates/template_base.html:68
 msgid "Déconnexion"
 msgstr "Abmelden"
 
+#: templates/template_base.html:72
 msgid "Connexion"
 msgstr "Anmelden"
 
+#: templates/template_base.html:72
 msgid "S’inscrire"
 msgstr "Registrieren"
 
+#: templates/template_base.html:78
 msgid "Soutenir et collaborer"
 msgstr "Unterstützen und zusammenarbeiten"
 
+#: templates/template_base.html:80
 msgid "Soutenir le projet"
 msgstr "Projekt unterstützen"
 
+#: templates/template_base.html:82
 msgid "Faire un don"
 msgstr "Spenden"
 
+#: templates/template_base.html:83
 msgid "Premium"
 msgstr "Premium"
 
+#: templates/template_base.html:83
 msgid "Affiliation"
 msgstr "Partnerprogramm"
 
-msgid "Partenariats"
-msgstr "Partnerschaften"
-
+#: templates/template_base.html:83
 msgid "Publicité"
 msgstr "Werbung"
 
+#: templates/template_base.html:92
 msgid "Fermer"
 msgstr "Schließen"
 
+#: templates/template_base.html:101
 msgid "Des récits, des idées et une boutique choisie."
 msgstr "Geschichten, Ideen und ein sorgfältig ausgewählter Shop."
 
-msgid "Explorer"
-msgstr "Entdecken"
-
-msgid "Nous contacter"
-msgstr "Kontakt aufnehmen"
-
+#: templates/template_base.html:104
 msgid "Suivre"
 msgstr "Folgen"
 
+#: templates/template_base.html:108
 msgid "Tous droits réservés."
 msgstr "Alle Rechte vorbehalten."
 
+#: templates/template_base.html:108
 msgid "Retour en haut"
 msgstr "Nach oben"
-
-msgid "Teyilawson — Articles, découvertes et boutique"
-msgstr "Teyilawson — Artikel, Entdeckungen und Shop"
-
-msgid "Des idées, des découvertes et une sélection pensée avec soin."
-msgstr "Ideen, Entdeckungen und eine Auswahl, die mit Sorgfalt zusammengestellt wurde."
-
-msgid "Retrouvez des articles inspirants, des expériences à découvrir et une boutique sélectionnée pour aller à l’essentiel."
-msgstr "Entdecken Sie inspirierende Artikel, neue Erlebnisse und einen ausgewählten Shop, der sich aufs Wesentliche konzentriert."
-
-msgid "Explorer les articles"
-msgstr "Artikel entdecken"
-
-msgid "Découvrir la boutique"
-msgstr "Shop entdecken"
-
-msgid "Points forts"
-msgstr "Unsere Stärken"
-
-msgid "Contenus choisis"
-msgstr "Ausgewählte Inhalte"
-
-msgid "Navigation simple"
-msgstr "Einfache Navigation"
-
-msgid "Paiement sécurisé"
-msgstr "Sichere Zahlung"
-
-msgid "Récits & découvertes"
-msgstr "Geschichten & Entdeckungen"
-
-msgid "Voir le monde autrement"
-msgstr "Die Welt neu entdecken"
-
-msgid "Inspiration"
-msgstr "Inspiration"
-
-msgid "Sélection"
-msgstr "Auswahl"
-
-msgid "L’univers Teyilawson"
-msgstr "Die Welt von Teyilawson"
-
-msgid "Explorer selon vos envies"
-msgstr "Entdecken, was zu Ihnen passt"
-
-msgid "Trois portes d’entrée pour découvrir le contenu, les idées et les sélections du site."
-msgstr "Drei Wege, um die Inhalte, Ideen und Auswahl dieser Website zu entdecken."
-
-msgid "Lire"
-msgstr "Lesen"
-
-msgid "Articles & récits"
-msgstr "Artikel & Geschichten"
-
-msgid "Des contenus utiles, des expériences et des histoires qui donnent envie d’aller plus loin."
-msgstr "Nützliche Inhalte, Erlebnisse und Geschichten, die neugierig auf mehr machen."
-
-msgid "Découvrir les articles"
-msgstr "Artikel entdecken"
-
-msgid "Choisir"
-msgstr "Auswählen"
-
-msgid "Boutique sélectionnée"
-msgstr "Sorgfältig ausgewählter Shop"
-
-msgid "Une sélection de produits présentés simplement, sans surcharge et avec une expérience d’achat claire."
-msgstr "Eine Produktauswahl, klar präsentiert und ohne Überladung – für ein angenehmes Einkaufserlebnis."
-
-msgid "Voir la boutique"
-msgstr "Zum Shop"
-
-msgid "Comprendre"
-msgstr "Verstehen"
-
-msgid "Découvertes & inspiration"
-msgstr "Entdeckungen & Inspiration"
-
-msgid "Voyages, saveurs, idées et nouvelles perspectives réunies dans un même univers éditorial."
-msgstr "Reisen, Genuss, Ideen und neue Perspektiven in einer redaktionellen Welt."
-
-msgid "En savoir plus"
-msgstr "Mehr erfahren"
-
-msgid "Sélection du moment"
-msgstr "Unsere aktuelle Auswahl"
-
-msgid "Produits en vedette"
-msgstr "Empfohlene Produkte"
-
-msgid "Voir toute la boutique"
-msgstr "Den ganzen Shop ansehen"
-
-msgid "En vedette"
-msgstr "Empfohlen"
-
-msgid "Voir %(product_name)s"
-msgstr "%(product_name)s ansehen"
-
-msgid "Une autre manière de découvrir"
-msgstr "Eine andere Art zu entdecken"
-
-msgid "Curiosité, simplicité et qualité."
-msgstr "Neugier, Einfachheit und Qualität."
-
-msgid "Teyilawson rassemble des contenus et des sélections qui donnent envie de découvrir, comprendre et choisir avec plus de confiance."
-msgstr "Teyilawson vereint Inhalte und Auswahl, die dazu einladen, mit mehr Vertrauen zu entdecken, zu verstehen und auszuwählen."
-
-msgid "Découvrir notre univers"
-msgstr "Unsere Welt entdecken"
-
-msgid "Nos valeurs"
-msgstr "Unsere Werte"
-
-msgid "Curiosité"
-msgstr "Neugier"
-
-msgid "Authenticité"
-msgstr "Authentizität"
-
-msgid "Simplicité"
-msgstr "Einfachheit"
-
-msgid "Restons connectés"
-msgstr "Bleiben wir in Kontakt"
-
-msgid "Une question, une idée ou un projet ?"
-msgstr "Eine Frage, eine Idee oder ein Projekt?"
-
-msgid "Échangeons autour d’un partenariat, d’une collaboration ou simplement d’une suggestion."
-msgstr "Sprechen wir über eine Partnerschaft, Zusammenarbeit oder einfach über einen Vorschlag."
-
-msgid "À propos — Teyilawson"
-msgstr "Über uns — Teyilawson"
-
-msgid "Un espace pour explorer, comprendre et choisir avec confiance."
-msgstr "Ein Ort, um mit Vertrauen zu entdecken, zu verstehen und auszuwählen."
-
-msgid "Teyilawson réunit contenus éditoriaux, découvertes et sélection de produits dans une expérience simple, utile et soigneusement construite."
-msgstr "Teyilawson verbindet redaktionelle Inhalte, Entdeckungen und eine Produktauswahl zu einem klaren, nützlichen und sorgfältig gestalteten Erlebnis."
-
-msgid "Identité Teyilawson"
-msgstr "Die Identität von Teyilawson"
-
-msgid "Logo Teyilawson"
-msgstr "Teyilawson-Logo"
-
-msgid "Une plateforme indépendante à la croisée du contenu, de la découverte et du commerce."
-msgstr "Eine unabhängige Plattform an der Schnittstelle von Inhalten, Entdeckungen und Handel."
-
-msgid "Notre vision"
-msgstr "Unsere Vision"
-
-msgid "Donner plus de valeur à chaque visite."
-msgstr "Jeden Besuch wertvoller machen."
-
-msgid "Le projet a été pensé pour proposer une navigation claire entre information, inspiration et sélection de produits. Chaque espace du site doit aider le visiteur à aller à l’essentiel sans sacrifier la qualité de l’expérience."
-msgstr "Das Projekt wurde entwickelt, um klar zwischen Information, Inspiration und Produktauswahl zu führen. Jeder Bereich der Website soll dabei helfen, sich auf das Wesentliche zu konzentrieren, ohne Abstriche beim Erlebnis zu machen."
-
-msgid "La plateforme évolue autour d’un principe simple : publier des contenus utiles, présenter les offres avec transparence et construire une relation de confiance durable avec les lecteurs, clients et partenaires."
-msgstr "Die Plattform folgt einem einfachen Grundsatz: nützliche Inhalte veröffentlichen, Angebote transparent vorstellen und dauerhaftes Vertrauen bei Leserinnen und Lesern, Kundinnen und Kunden sowie Partnern schaffen."
-
-msgid "Nos principes"
-msgstr "Unsere Grundsätze"
-
-msgid "Ce qui guide le projet."
-msgstr "Was das Projekt leitet."
-
-msgid "Clarté"
-msgstr "Klarheit"
-
-msgid "Une expérience lisible, des parcours simples et des informations présentées sans complexité inutile."
-msgstr "Ein verständliches Erlebnis, einfache Wege und Informationen ohne unnötige Komplexität."
-
-msgid "Qualité"
-msgstr "Qualität"
-
-msgid "Un soin particulier porté aux contenus, aux produits présentés et à la cohérence générale de la plateforme."
-msgstr "Besondere Sorgfalt für Inhalte, vorgestellte Produkte und die stimmige Gesamtwirkung der Plattform."
-
-msgid "Confiance"
-msgstr "Vertrauen"
-
-msgid "Une approche transparente des contenus, des partenariats et des paiements pour construire une relation durable."
-msgstr "Ein transparenter Umgang mit Inhalten, Partnerschaften und Zahlungen schafft eine dauerhafte Beziehung."
-
-msgid "Fondateur & développeur"
-msgstr "Gründer & Entwickler"
-
-msgid "Le projet Teyilawson est développé comme une plateforme éditoriale et e-commerce moderne, avec une attention particulière portée à l’expérience utilisateur, à la fiabilité technique et à l’évolution continue du produit."
-msgstr "Teyilawson wird als moderne redaktionelle und E-Commerce-Plattform entwickelt, mit besonderem Augenmerk auf Nutzererlebnis, technische Zuverlässigkeit und die kontinuierliche Weiterentwicklung des Produkts."
-
-msgid "Échangeons"
-msgstr "Lassen Sie uns sprechen"
-
-msgid "Une idée, une collaboration ou une question ?"
-msgstr "Eine Idee, eine Zusammenarbeit oder eine Frage?"
-
-msgid "Utilisez la page contact pour nous écrire directement."
-msgstr "Nutzen Sie die Kontaktseite, um uns direkt zu schreiben."
-
-msgid "Prendre contact"
-msgstr "Kontakt aufnehmen"
-
-msgid "Contact — Teyilawson"
-msgstr "Kontakt — Teyilawson"
-
-msgid "Parlons de votre idée."
-msgstr "Sprechen wir über Ihre Idee."
-
-msgid "Une question, une proposition de partenariat ou simplement un message ? Écrivez-nous directement via ce formulaire."
-msgstr "Eine Frage, ein Partnerschaftsvorschlag oder einfach eine Nachricht? Schreiben Sie uns direkt über dieses Formular."
-
-msgid "Nous sommes à votre écoute."
-msgstr "Wir sind für Sie da."
-
-msgid "Votre message sera transmis via le formulaire ci-contre. Renseignez vos coordonnées afin que nous puissions vous répondre."
-msgstr "Ihre Nachricht wird über das nebenstehende Formular übermittelt. Geben Sie Ihre Kontaktdaten an, damit wir Ihnen antworten können."
-
-msgid "Message sécurisé par CSRF"
-msgstr "Nachricht durch CSRF geschützt"
-
-msgid "Formulaire simple et direct"
-msgstr "Einfaches, direktes Formular"
-
-msgid "Réponse à l’adresse indiquée"
-msgstr "Antwort an die angegebene Adresse"
-
-msgid "Votre message"
-msgstr "Ihre Nachricht"
-
-msgid "Nous écrire"
-msgstr "Schreiben Sie uns"
-
-msgid "Envoyer le message"
-msgstr "Nachricht senden"
-
-msgid "Vos informations sont utilisées uniquement pour traiter votre demande."
-msgstr "Ihre Angaben werden ausschließlich zur Bearbeitung Ihrer Anfrage verwendet."
-
-msgid "Nom"
-msgstr "Nachname"
-
-msgid "Prénom"
-msgstr "Vorname"
-
-msgid "Adresse e-mail"
-msgstr "E-Mail-Adresse"
-
-msgid "Message"
-msgstr "Nachricht"
-
-msgid "Le service de contact est momentanément indisponible. Merci de réessayer plus tard."
-msgstr "Der Kontaktservice ist derzeit nicht verfügbar. Bitte versuchen Sie es später erneut."
-
-msgid "L’envoi du message a momentanément échoué. Merci de réessayer dans quelques instants."
-msgstr "Die Nachricht konnte vorübergehend nicht gesendet werden. Bitte versuchen Sie es in wenigen Augenblicken erneut."
-
-msgid "Votre message a bien été envoyé. Merci pour votre prise de contact."
-msgstr "Ihre Nachricht wurde erfolgreich gesendet. Vielen Dank für Ihre Kontaktaufnahme."
-
-msgid "Un carnet de voyage posé sur une carte, symbole de récits et de découvertes"
-msgstr "Ein Reisetagebuch auf einer Karte, Sinnbild für Geschichten und Entdeckungen"
-
-msgid "Merci pour votre message."
-msgstr "Vielen Dank für Ihre Nachricht."

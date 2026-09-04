@@ -16,6 +16,7 @@ from django.urls import reverse, reverse_lazy
 from django.contrib import messages
 from django.utils import timezone
 from django.utils.http import url_has_allowed_host_and_scheme
+from django.utils.translation import gettext as _, ngettext
 
 from .models import Produit, Categorie, Cart, CartItem, Commande, LigneCommande
 from payments.models import Adresse
@@ -98,6 +99,7 @@ def ajouter_panier(request, slug):
 # ================= PRODUITS =================
 class ProduitListView(ListView):
     model = Produit
+    queryset = Produit.objects.select_related("categorie")
     template_name = "shop/liste.html"
     context_object_name = "produits"
     paginate_by = 12
@@ -113,7 +115,7 @@ class ProduitDetailView(DetailView):
 
 def produits_par_categorie(request, slug):
     categorie = get_object_or_404(Categorie, slug=slug)
-    produits = Produit.objects.filter(categorie=categorie)
+    produits = Produit.objects.filter(categorie=categorie).select_related("categorie")
     return render(request, "shop/produits_par_categorie.html", {"produits": produits, "categorie": categorie})
 
 
@@ -133,7 +135,11 @@ def categorie_creer(request):
     form = CategorieForm(request.POST or None)
     if request.method == "POST" and form.is_valid():
         categorie = form.save()
-        messages.success(request, f"La catégorie « {categorie.nom} » a été créée.")
+        messages.success(
+            request,
+            _("La catégorie « %(category)s » a été créée.")
+            % {"category": categorie.nom},
+        )
         return redirect("shop:categorie_gestion_liste")
     return render(
         request,
@@ -148,7 +154,11 @@ def categorie_modifier(request, slug):
     form = CategorieForm(request.POST or None, instance=categorie)
     if request.method == "POST" and form.is_valid():
         categorie = form.save()
-        messages.success(request, f"La catégorie « {categorie.nom} » a été mise à jour.")
+        messages.success(
+            request,
+            _("La catégorie « %(category)s » a été mise à jour.")
+            % {"category": categorie.nom},
+        )
         return redirect("shop:categorie_gestion_liste")
     return render(
         request,
@@ -167,10 +177,19 @@ def categorie_supprimer(request, slug):
         if nombre_produits:
             messages.warning(
                 request,
-                f"La catégorie « {nom} » a été supprimée. {nombre_produits} produit(s) sont maintenant sans catégorie.",
+                ngettext(
+                    "La catégorie « %(category)s » a été supprimée. %(count)s produit est maintenant sans catégorie.",
+                    "La catégorie « %(category)s » a été supprimée. %(count)s produits sont maintenant sans catégorie.",
+                    nombre_produits,
+                )
+                % {"category": nom, "count": nombre_produits},
             )
         else:
-            messages.success(request, f"La catégorie « {nom} » a été supprimée.")
+            messages.success(
+                request,
+                _("La catégorie « %(category)s » a été supprimée.")
+                % {"category": nom},
+            )
         return redirect("shop:categorie_gestion_liste")
     return render(
         request,

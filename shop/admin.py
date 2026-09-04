@@ -1,20 +1,29 @@
 from django.contrib import admin
+from modeltranslation.admin import TranslationAdmin
+
 from .models import Categorie, Produit, Commande, LigneCommande
 
 
 @admin.register(Categorie)
-class CategorieAdmin(admin.ModelAdmin):
+class CategorieAdmin(TranslationAdmin):
     list_display = ("nom", "slug")
-    prepopulated_fields = {"slug": ("nom",)}
-    search_fields = ("nom",)
+    prepopulated_fields = {"slug": ("nom_fr",)}
+    search_fields = ("nom_fr", "nom_de", "nom_en")
 
 
 @admin.register(Produit)
-class ProduitAdmin(admin.ModelAdmin):
+class ProduitAdmin(TranslationAdmin):
     list_display = ("nom", "categorie", "prix", "en_vedette")
     list_filter = ("categorie", "en_vedette")
-    search_fields = ("nom", "description")
-    prepopulated_fields = {"slug": ("nom",)}
+    search_fields = (
+        "nom_fr",
+        "nom_de",
+        "nom_en",
+        "description_fr",
+        "description_de",
+        "description_en",
+    )
+    prepopulated_fields = {"slug": ("nom_fr",)}
     autocomplete_fields = ("categorie",)
 
 

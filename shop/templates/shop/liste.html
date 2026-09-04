@@ -1,7 +1,7 @@
 {% extends 'template_base.html' %}
-{% load static %}
+{% load i18n static %}
 
-{% block titre %}Boutique — Teyilawson{% endblock %}
+{% block titre %}{% translate "Boutique — Teyilawson" %}{% endblock %}
 
 {% block styles %}
 <link rel="stylesheet" href="{% static 'css/shop.css' %}">
@@ -11,50 +11,50 @@
 <div class="shop-page">
   <header class="shop-header">
     <div>
-      <span class="shop-eyebrow">Sélection Teyilawson</span>
-      <h1>Une boutique pensée pour aller à l’essentiel.</h1>
-      <p>Découvrez une sélection claire et soignée de produits, avec une expérience d’achat simple du choix au paiement.</p>
+      <span class="shop-eyebrow">{% translate "Sélection Teyilawson" %}</span>
+      <h1>{% translate "Une boutique pensée pour aller à l’essentiel." %}</h1>
+      <p>{% translate "Découvrez une sélection claire et soignée de produits, avec une expérience d’achat simple du choix au paiement." %}</p>
     </div>
 
-    <a href="{% url 'shop:panier' %}" class="shop-cart-link" aria-label="Voir le panier">
+    <a href="{% url 'shop:panier' %}" class="shop-cart-link" aria-label="{% translate "Voir le panier" %}">
       <span class="shop-cart-icon"><i class="fa-solid fa-bag-shopping" aria-hidden="true"></i></span>
-      <span><small>Votre panier</small><strong>{{ panier_items_count|default:0 }} article{{ panier_items_count|default:0|pluralize }}</strong></span>
+      <span><small>{% translate "Votre panier" %}</small><strong>{% blocktranslate count counter=panier_items_count|default:0 %}{{ counter }} article{% plural %}{{ counter }} articles{% endblocktranslate %}</strong></span>
       <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
     </a>
   </header>
 
   <div class="shop-toolbar">
     <div>
-      <span class="shop-toolbar-label">Catalogue</span>
-      <strong>{% if page_obj %}{{ page_obj.paginator.count }}{% else %}{{ produits|length }}{% endif %} produit{{ produits|length|pluralize }}</strong>
+      <span class="shop-toolbar-label">{% translate "Catalogue" %}</span>
+      <strong>{% if page_obj %}{% blocktranslate count counter=page_obj.paginator.count %}{{ counter }} produit{% plural %}{{ counter }} produits{% endblocktranslate %}{% else %}{% blocktranslate count counter=produits|length %}{{ counter }} produit{% plural %}{{ counter }} produits{% endblocktranslate %}{% endif %}</strong>
     </div>
     <div class="shop-toolbar-actions">
       {% if user.is_staff %}
         <a href="{% url 'shop:commande_gestion_liste' %}" class="shop-manage-link">
           <i class="fa-solid fa-receipt" aria-hidden="true"></i>
-          Gérer les commandes
+          {% translate "Gérer les commandes" %}
         </a>
         <a href="{% url 'shop:categorie_gestion_liste' %}" class="shop-manage-link">
           <i class="fa-solid fa-tags" aria-hidden="true"></i>
-          Gérer les catégories
+          {% translate "Gérer les catégories" %}
         </a>
       {% endif %}
-      <span class="shop-toolbar-note"><i class="fa-regular fa-circle-check" aria-hidden="true"></i> Paiement sécurisé</span>
+      <span class="shop-toolbar-note"><i class="fa-regular fa-circle-check" aria-hidden="true"></i> {% translate "Paiement sécurisé" %}</span>
     </div>
   </div>
 
   {% if produits %}
-  <section class="shop-grid" aria-label="Produits">
+  <section class="shop-grid" aria-label="{% translate "Produits" %}">
     {% for produit in produits %}
     <article class="shop-card">
       <a class="shop-card-media" href="{% url 'shop:detail' slug=produit.slug %}">
         {% if produit.image %}
-          <img src="{{ produit.image.url }}" alt="{{ produit.nom }}">
+          <img src="{{ produit.image.url }}" alt="{% if produit.nom %}{{ produit.nom }}{% else %}{% translate "Image du produit" %}{% endif %}">
         {% else %}
-          <img src="{% static 'images/default.jpg' %}" alt="{{ produit.nom }}">
+          <img src="{% static 'images/default.jpg' %}" alt="{% if produit.nom %}{{ produit.nom }}{% else %}{% translate "Image du produit" %}{% endif %}">
         {% endif %}
-        {% if produit.en_vedette %}<span class="shop-featured-badge"><i class="fa-solid fa-star" aria-hidden="true"></i> Sélection</span>{% endif %}
-        <span class="shop-view-product">Voir le produit <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></span>
+        {% if produit.en_vedette %}<span class="shop-featured-badge"><i class="fa-solid fa-star" aria-hidden="true"></i> {% translate "Sélection" %}</span>{% endif %}
+        <span class="shop-view-product">{% translate "Voir le produit" %} <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></span>
       </a>
 
       <div class="shop-card-body">
@@ -63,12 +63,12 @@
         {% if produit.description %}<p>{{ produit.description|truncatewords:15 }}</p>{% endif %}
 
         <div class="shop-card-footer">
-          <span class="shop-price">{{ produit.prix }} €</span>
+          <span class="shop-price" aria-label="{% blocktranslate with price=produit.prix %}Prix : {{ price }} euros{% endblocktranslate %}">{{ produit.prix }} €</span>
           <form method="post" action="{% url 'shop:ajouter_panier' slug=produit.slug %}">
             {% csrf_token %}
-            <button class="shop-add-button" type="submit" aria-label="Ajouter {{ produit.nom }} au panier">
+            <button class="shop-add-button" type="submit" aria-label="{% if produit.nom %}{% blocktranslate with product_name=produit.nom %}Ajouter {{ product_name }} au panier{% endblocktranslate %}{% else %}{% translate "Ajouter ce produit au panier" %}{% endif %}">
               <i class="fa-solid fa-plus" aria-hidden="true"></i>
-              <span>Ajouter</span>
+              <span>{% translate "Ajouter" %}</span>
             </button>
           </form>
         </div>
@@ -79,22 +79,22 @@
   {% else %}
   <div class="empty-state shop-empty-state">
     <span class="shop-empty-icon"><i class="fa-solid fa-bag-shopping" aria-hidden="true"></i></span>
-    <h2>La sélection arrive bientôt.</h2>
-    <p>Aucun produit n’est disponible pour le moment. Revenez prochainement pour découvrir la boutique.</p>
+    <h2>{% translate "La sélection arrive bientôt." %}</h2>
+    <p>{% translate "Aucun produit n’est disponible pour le moment. Revenez prochainement pour découvrir la boutique." %}</p>
   </div>
   {% endif %}
 
   {% if is_paginated %}
-  <nav class="shop-pagination" aria-label="Pagination de la boutique">
+  <nav class="shop-pagination" aria-label="{% translate "Pagination de la boutique" %}">
     <ul class="pagination justify-content-center">
       {% if page_obj.has_previous %}
-        <li class="page-item"><a class="page-link shop-page-arrow" href="?page={{ page_obj.previous_page_number }}" aria-label="Page précédente"><i class="fa-solid fa-arrow-left" aria-hidden="true"></i></a></li>
+        <li class="page-item"><a class="page-link shop-page-arrow" href="?page={{ page_obj.previous_page_number }}" aria-label="{% translate "Page précédente" %}"><i class="fa-solid fa-arrow-left" aria-hidden="true"></i></a></li>
       {% endif %}
       {% for num in page_obj.paginator.page_range %}
         <li class="page-item {% if num == page_obj.number %}active{% endif %}"><a class="page-link" href="?page={{ num }}">{{ num }}</a></li>
       {% endfor %}
       {% if page_obj.has_next %}
-        <li class="page-item"><a class="page-link shop-page-arrow" href="?page={{ page_obj.next_page_number }}" aria-label="Page suivante"><i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a></li>
+        <li class="page-item"><a class="page-link shop-page-arrow" href="?page={{ page_obj.next_page_number }}" aria-label="{% translate "Page suivante" %}"><i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a></li>
       {% endif %}
     </ul>
   </nav>

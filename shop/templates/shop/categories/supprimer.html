@@ -1,7 +1,7 @@
 {% extends "template_base.html" %}
-{% load static %}
+{% load i18n static %}
 
-{% block titre %}Supprimer {{ categorie.nom }} — Teyilawson{% endblock %}
+{% block titre %}{% blocktranslate with category_name=categorie.nom %}Supprimer {{ category_name }} — Teyilawson{% endblocktranslate %}{% endblock %}
 
 {% block styles %}
 <link rel="stylesheet" href="{% static 'css/categories.css' %}">
@@ -12,19 +12,19 @@
   <div class="container-xl category-delete-shell">
     <div class="category-delete-card">
       <span class="category-delete-icon" aria-hidden="true"><i class="fa-solid fa-triangle-exclamation"></i></span>
-      <span class="category-eyebrow">Suppression</span>
-      <h1>Supprimer « {{ categorie.nom }} » ?</h1>
+      <span class="category-eyebrow">{% translate "Suppression" %}</span>
+      <h1>{% blocktranslate with category_name=categorie.nom %}Supprimer « {{ category_name }} » ?{% endblocktranslate %}</h1>
       {% if nombre_produits %}
-      <p>Cette catégorie contient <strong>{{ nombre_produits }} produit{{ nombre_produits|pluralize }}</strong>. Les produits ne seront pas supprimés, mais ils deviendront sans catégorie.</p>
+      <p>{% blocktranslate count counter=nombre_produits %}Cette catégorie contient <strong>{{ counter }} produit</strong>. Le produit ne sera pas supprimé, mais il deviendra sans catégorie.{% plural %}Cette catégorie contient <strong>{{ counter }} produits</strong>. Les produits ne seront pas supprimés, mais ils deviendront sans catégorie.{% endblocktranslate %}</p>
       {% else %}
-      <p>Cette catégorie ne contient actuellement aucun produit.</p>
+      <p>{% translate "Cette catégorie ne contient actuellement aucun produit." %}</p>
       {% endif %}
 
       <form method="post" class="category-delete-actions">
         {% csrf_token %}
-        <a class="btn btn-outline-secondary" href="{% url 'shop:categorie_gestion_liste' %}">Annuler</a>
+        <a class="btn btn-outline-secondary" href="{% url 'shop:categorie_gestion_liste' %}">{% translate "Annuler" %}</a>
         <button class="btn btn-danger" type="submit">
-          <i class="fa-solid fa-trash" aria-hidden="true"></i> Supprimer définitivement
+          <i class="fa-solid fa-trash" aria-hidden="true"></i> {% translate "Supprimer définitivement" %}
         </button>
       </form>
     </div>

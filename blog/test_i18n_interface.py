@@ -64,9 +64,11 @@ class GlobalInterfaceI18nTests(TestCase):
         self.assertContains(english, 'for="id_email">Email address</label>')
 
     def test_contact_validation_errors_use_the_active_language(self):
+        french = self.client.post("/contact/", {"prenom": "Ada"})
         german = self.client.post("/de/contact/", {"prenom": "Ada"})
         english = self.client.post("/en/contact/", {"prenom": "Ada"})
 
+        self.assertContains(french, "Ce champ est obligatoire.")
         self.assertContains(german, "Dieses Feld ist erforderlich.")
         self.assertContains(english, "This field is required.")
 

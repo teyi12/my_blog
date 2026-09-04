@@ -1,7 +1,7 @@
 {% extends 'template_base.html' %}
-{% load static %}
+{% load i18n static %}
 
-{% block titre %}{{ categorie.nom }} — Boutique Teyilawson{% endblock %}
+{% block titre %}{% blocktranslate with category_name=categorie.nom %}{{ category_name }} — Boutique Teyilawson{% endblocktranslate %}{% endblock %}
 
 {% block styles %}
 <link rel="stylesheet" href="{% static 'css/shop.css' %}">
@@ -11,39 +11,39 @@
 <div class="shop-page">
   <header class="shop-header shop-category-header">
     <div>
-      <a class="shop-back-link" href="{% url 'shop:liste' %}"><i class="fa-solid fa-arrow-left" aria-hidden="true"></i> Toute la boutique</a>
-      <span class="shop-eyebrow">Catégorie</span>
+      <a class="shop-back-link" href="{% url 'shop:liste' %}"><i class="fa-solid fa-arrow-left" aria-hidden="true"></i> {% translate "Toute la boutique" %}</a>
+      <span class="shop-eyebrow">{% translate "Catégorie" %}</span>
       <h1>{{ categorie.nom }}</h1>
-      <p>Découvrez les produits disponibles dans cette sélection.</p>
+      <p>{% translate "Découvrez les produits disponibles dans cette sélection." %}</p>
     </div>
 
-    <a href="{% url 'shop:panier' %}" class="shop-cart-link" aria-label="Voir le panier">
+    <a href="{% url 'shop:panier' %}" class="shop-cart-link" aria-label="{% translate "Voir le panier" %}">
       <span class="shop-cart-icon"><i class="fa-solid fa-bag-shopping" aria-hidden="true"></i></span>
-      <span><small>Votre panier</small><strong>{{ panier_items_count|default:0 }} article{{ panier_items_count|default:0|pluralize }}</strong></span>
+      <span><small>{% translate "Votre panier" %}</small><strong>{% blocktranslate count counter=panier_items_count|default:0 %}{{ counter }} article{% plural %}{{ counter }} articles{% endblocktranslate %}</strong></span>
       <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
     </a>
   </header>
 
   <div class="shop-toolbar">
     <div>
-      <span class="shop-toolbar-label">Sélection</span>
-      <strong>{{ produits|length }} produit{{ produits|length|pluralize }}</strong>
+      <span class="shop-toolbar-label">{% translate "Sélection" %}</span>
+      <strong>{% blocktranslate count counter=produits|length %}{{ counter }} produit{% plural %}{{ counter }} produits{% endblocktranslate %}</strong>
     </div>
-    <span class="shop-toolbar-note"><i class="fa-regular fa-circle-check" aria-hidden="true"></i> Paiement sécurisé</span>
+    <span class="shop-toolbar-note"><i class="fa-regular fa-circle-check" aria-hidden="true"></i> {% translate "Paiement sécurisé" %}</span>
   </div>
 
   {% if produits %}
-  <section class="shop-grid" aria-label="Produits de la catégorie {{ categorie.nom }}">
+  <section class="shop-grid" aria-label="{% blocktranslate with category_name=categorie.nom %}Produits de la catégorie {{ category_name }}{% endblocktranslate %}">
     {% for produit in produits %}
     <article class="shop-card">
       <a class="shop-card-media" href="{% url 'shop:detail' slug=produit.slug %}">
         {% if produit.image %}
-          <img src="{{ produit.image.url }}" alt="{{ produit.nom }}">
+          <img src="{{ produit.image.url }}" alt="{% if produit.nom %}{{ produit.nom }}{% else %}{% translate "Image du produit" %}{% endif %}">
         {% else %}
-          <img src="{% static 'images/default.jpg' %}" alt="{{ produit.nom }}">
+          <img src="{% static 'images/default.jpg' %}" alt="{% if produit.nom %}{{ produit.nom }}{% else %}{% translate "Image du produit" %}{% endif %}">
         {% endif %}
-        {% if produit.en_vedette %}<span class="shop-featured-badge"><i class="fa-solid fa-star" aria-hidden="true"></i> Sélection</span>{% endif %}
-        <span class="shop-view-product">Voir le produit <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></span>
+        {% if produit.en_vedette %}<span class="shop-featured-badge"><i class="fa-solid fa-star" aria-hidden="true"></i> {% translate "Sélection" %}</span>{% endif %}
+        <span class="shop-view-product">{% translate "Voir le produit" %} <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></span>
       </a>
 
       <div class="shop-card-body">
@@ -51,11 +51,11 @@
         <h2><a href="{% url 'shop:detail' slug=produit.slug %}">{{ produit.nom }}</a></h2>
         {% if produit.description %}<p>{{ produit.description|truncatewords:15 }}</p>{% endif %}
         <div class="shop-card-footer">
-          <span class="shop-price">{{ produit.prix }} €</span>
+          <span class="shop-price" aria-label="{% blocktranslate with price=produit.prix %}Prix : {{ price }} euros{% endblocktranslate %}">{{ produit.prix }} €</span>
           <form method="post" action="{% url 'shop:ajouter_panier' slug=produit.slug %}">
             {% csrf_token %}
-            <button class="shop-add-button" type="submit" aria-label="Ajouter {{ produit.nom }} au panier">
-              <i class="fa-solid fa-plus" aria-hidden="true"></i><span>Ajouter</span>
+            <button class="shop-add-button" type="submit" aria-label="{% if produit.nom %}{% blocktranslate with product_name=produit.nom %}Ajouter {{ product_name }} au panier{% endblocktranslate %}{% else %}{% translate "Ajouter ce produit au panier" %}{% endif %}">
+              <i class="fa-solid fa-plus" aria-hidden="true"></i><span>{% translate "Ajouter" %}</span>
             </button>
           </form>
         </div>
@@ -66,9 +66,9 @@
   {% else %}
   <div class="empty-state shop-empty-state">
     <span class="shop-empty-icon"><i class="fa-solid fa-box-open" aria-hidden="true"></i></span>
-    <h2>Aucun produit dans cette catégorie.</h2>
-    <p>Explorez le reste de la boutique pour découvrir les produits actuellement disponibles.</p>
-    <a href="{% url 'shop:liste' %}" class="btn btn-primary">Voir toute la boutique</a>
+    <h2>{% translate "Aucun produit dans cette catégorie." %}</h2>
+    <p>{% translate "Explorez le reste de la boutique pour découvrir les produits actuellement disponibles." %}</p>
+    <a href="{% url 'shop:liste' %}" class="btn btn-primary">{% translate "Voir toute la boutique" %}</a>
   </div>
   {% endif %}
 </div>
