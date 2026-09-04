@@ -5,6 +5,7 @@ from django.contrib import messages
 from django.core.mail import EmailMessage
 from django.http import HttpResponse
 from django.shortcuts import redirect, render
+from django.utils.translation import gettext as _
 
 from shop.models import Produit
 from .forms import ContactForm
@@ -30,7 +31,7 @@ def contact_view(request):
         if not recipient or not from_email:
             messages.error(
                 request,
-                "Le service de contact est momentanément indisponible. Merci de réessayer plus tard.",
+                _("Le service de contact est momentanément indisponible. Merci de réessayer plus tard."),
             )
             return render(request, "contact.html", {"form": form}, status=503)
 
@@ -47,18 +48,18 @@ def contact_view(request):
         except (SMTPException, OSError):
             messages.error(
                 request,
-                "L’envoi du message a momentanément échoué. Merci de réessayer dans quelques instants.",
+                _("L’envoi du message a momentanément échoué. Merci de réessayer dans quelques instants."),
             )
             return render(request, "contact.html", {"form": form}, status=503)
 
-        messages.success(request, "Votre message a bien été envoyé. Merci pour votre prise de contact.")
+        messages.success(request, _("Votre message a bien été envoyé. Merci pour votre prise de contact."))
         return redirect("contact")
 
     return render(request, "contact.html", {"form": form})
 
 
 def remerciement_view(request):
-    return HttpResponse("Merci pour votre message.")
+    return HttpResponse(_("Merci pour votre message."))
 
 
 def about(request):

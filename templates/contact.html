@@ -1,7 +1,7 @@
 {% extends 'template_base.html' %}
-{% load static %}
+{% load i18n static %}
 
-{% block titre %}Contact — Teyilawson{% endblock %}
+{% block titre %}{% translate "Contact — Teyilawson" %}{% endblock %}
 
 {% block styles %}
 <link rel="stylesheet" href="{% static 'css/pages.css' %}">
@@ -11,28 +11,28 @@
 <section class="contact-page">
   <header class="contact-header">
     <div>
-      <span class="eyebrow">Contact</span>
-      <h1>Parlons de votre idée.</h1>
-      <p>Une question, une proposition de partenariat ou simplement un message ? Écrivez-nous directement via ce formulaire.</p>
+      <span class="eyebrow">{% translate "Contact" %}</span>
+      <h1>{% translate "Parlons de votre idée." %}</h1>
+      <p>{% translate "Une question, une proposition de partenariat ou simplement un message ? Écrivez-nous directement via ce formulaire." %}</p>
     </div>
   </header>
 
   <div class="contact-layout">
     <aside class="contact-intro-card">
       <span class="contact-icon"><i class="fa-regular fa-paper-plane" aria-hidden="true"></i></span>
-      <h2>Nous sommes à votre écoute.</h2>
-      <p>Votre message sera transmis via le formulaire ci-contre. Renseignez vos coordonnées afin que nous puissions vous répondre.</p>
+      <h2>{% translate "Nous sommes à votre écoute." %}</h2>
+      <p>{% translate "Votre message sera transmis via le formulaire ci-contre. Renseignez vos coordonnées afin que nous puissions vous répondre." %}</p>
       <div class="contact-points">
-        <span><i class="fa-regular fa-circle-check" aria-hidden="true"></i> Message sécurisé par CSRF</span>
-        <span><i class="fa-regular fa-circle-check" aria-hidden="true"></i> Formulaire simple et direct</span>
-        <span><i class="fa-regular fa-circle-check" aria-hidden="true"></i> Réponse à l’adresse indiquée</span>
+        <span><i class="fa-regular fa-circle-check" aria-hidden="true"></i> {% translate "Message sécurisé par CSRF" %}</span>
+        <span><i class="fa-regular fa-circle-check" aria-hidden="true"></i> {% translate "Formulaire simple et direct" %}</span>
+        <span><i class="fa-regular fa-circle-check" aria-hidden="true"></i> {% translate "Réponse à l’adresse indiquée" %}</span>
       </div>
     </aside>
 
     <div class="contact-form-card">
       <div class="contact-form-heading">
-        <span class="eyebrow">Votre message</span>
-        <h2>Nous écrire</h2>
+        <span class="eyebrow">{% translate "Votre message" %}</span>
+        <h2>{% translate "Nous écrire" %}</h2>
       </div>
 
       <form action="{% url 'contact' %}" method="post" class="contact-form">
@@ -40,32 +40,32 @@
         {% if form.non_field_errors %}<div class="alert alert-danger contact-field-full" role="alert">{{ form.non_field_errors }}</div>{% endif %}
 
         <div class="contact-field">
-          <label for="{{ form.prenom.id_for_label }}">Prénom</label>
+          {{ form.prenom.label_tag }}
           {{ form.prenom }}
           {% if form.prenom.errors %}<div class="contact-field-error">{{ form.prenom.errors }}</div>{% endif %}
         </div>
 
         <div class="contact-field">
-          <label for="{{ form.nom.id_for_label }}">Nom</label>
+          {{ form.nom.label_tag }}
           {{ form.nom }}
           {% if form.nom.errors %}<div class="contact-field-error">{{ form.nom.errors }}</div>{% endif %}
         </div>
 
         <div class="contact-field contact-field-full">
-          <label for="{{ form.email.id_for_label }}">Adresse e-mail</label>
+          {{ form.email.label_tag }}
           {{ form.email }}
           {% if form.email.errors %}<div class="contact-field-error">{{ form.email.errors }}</div>{% endif %}
         </div>
 
         <div class="contact-field contact-field-full">
-          <label for="{{ form.message.id_for_label }}">Message</label>
+          {{ form.message.label_tag }}
           {{ form.message }}
           {% if form.message.errors %}<div class="contact-field-error">{{ form.message.errors }}</div>{% endif %}
         </div>
 
         <div class="contact-field-full contact-submit">
-          <button type="submit" class="btn btn-brand btn-lg">Envoyer le message <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></button>
-          <p><i class="fa-solid fa-lock" aria-hidden="true"></i> Vos informations sont utilisées uniquement pour traiter votre demande.</p>
+          <button type="submit" class="btn btn-brand btn-lg">{% translate "Envoyer le message" %} <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></button>
+          <p><i class="fa-solid fa-lock" aria-hidden="true"></i> {% translate "Vos informations sont utilisées uniquement pour traiter votre demande." %}</p>
         </div>
       </form>
     </div>

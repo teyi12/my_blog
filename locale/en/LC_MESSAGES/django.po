@@ -1,0 +1,378 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Teyilawson\n"
+"Language: en\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "Aller au contenu principal"
+msgstr "Skip to main content"
+
+msgid "Navigation principale"
+msgstr "Main navigation"
+
+msgid "Teyilawson — Accueil"
+msgstr "Teyilawson — Home"
+
+msgid "Explorer · Comprendre · Choisir"
+msgstr "Explore · Understand · Choose"
+
+msgid "Voir le panier"
+msgstr "View cart"
+
+msgid "Voir le panier, %(counter)s article"
+msgid_plural "Voir le panier, %(counter)s articles"
+msgstr[0] "View cart, %(counter)s item"
+msgstr[1] "View cart, %(counter)s items"
+
+msgid "Ouvrir le menu"
+msgstr "Open menu"
+
+msgid "Accueil"
+msgstr "Home"
+
+msgid "Articles"
+msgstr "Articles"
+
+msgid "Boutique"
+msgstr "Shop"
+
+msgid "À propos"
+msgstr "About"
+
+msgid "Contact"
+msgstr "Contact"
+
+msgid "Langue"
+msgstr "Language"
+
+msgid "Choisir la langue"
+msgstr "Choose language"
+
+msgid "Changer"
+msgstr "Change"
+
+msgid "Mon profil"
+msgstr "My profile"
+
+msgid "Mes commandes"
+msgstr "My orders"
+
+msgid "Revenus"
+msgstr "Revenue"
+
+msgid "Déconnexion"
+msgstr "Sign out"
+
+msgid "Connexion"
+msgstr "Sign in"
+
+msgid "S’inscrire"
+msgstr "Sign up"
+
+msgid "Soutenir et collaborer"
+msgstr "Support and collaborate"
+
+msgid "Soutenir le projet"
+msgstr "Support the project"
+
+msgid "Faire un don"
+msgstr "Donate"
+
+msgid "Premium"
+msgstr "Premium"
+
+msgid "Affiliation"
+msgstr "Affiliate programme"
+
+msgid "Partenariats"
+msgstr "Partnerships"
+
+msgid "Publicité"
+msgstr "Advertising"
+
+msgid "Fermer"
+msgstr "Close"
+
+msgid "Des récits, des idées et une boutique choisie."
+msgstr "Stories, ideas and a carefully curated shop."
+
+msgid "Explorer"
+msgstr "Explore"
+
+msgid "Nous contacter"
+msgstr "Contact us"
+
+msgid "Suivre"
+msgstr "Follow"
+
+msgid "Tous droits réservés."
+msgstr "All rights reserved."
+
+msgid "Retour en haut"
+msgstr "Back to top"
+
+msgid "Teyilawson — Articles, découvertes et boutique"
+msgstr "Teyilawson — Articles, discoveries and shop"
+
+msgid "Des idées, des découvertes et une sélection pensée avec soin."
+msgstr "Ideas, discoveries and a selection chosen with care."
+
+msgid "Retrouvez des articles inspirants, des expériences à découvrir et une boutique sélectionnée pour aller à l’essentiel."
+msgstr "Discover inspiring articles, experiences worth exploring and a curated shop focused on what matters."
+
+msgid "Explorer les articles"
+msgstr "Explore articles"
+
+msgid "Découvrir la boutique"
+msgstr "Discover the shop"
+
+msgid "Points forts"
+msgstr "Highlights"
+
+msgid "Contenus choisis"
+msgstr "Curated content"
+
+msgid "Navigation simple"
+msgstr "Simple navigation"
+
+msgid "Paiement sécurisé"
+msgstr "Secure payment"
+
+msgid "Récits & découvertes"
+msgstr "Stories & discoveries"
+
+msgid "Voir le monde autrement"
+msgstr "See the world differently"
+
+msgid "Inspiration"
+msgstr "Inspiration"
+
+msgid "Sélection"
+msgstr "Selection"
+
+msgid "L’univers Teyilawson"
+msgstr "The Teyilawson world"
+
+msgid "Explorer selon vos envies"
+msgstr "Explore your interests"
+
+msgid "Trois portes d’entrée pour découvrir le contenu, les idées et les sélections du site."
+msgstr "Three ways to discover the website’s content, ideas and selections."
+
+msgid "Lire"
+msgstr "Read"
+
+msgid "Articles & récits"
+msgstr "Articles & stories"
+
+msgid "Des contenus utiles, des expériences et des histoires qui donnent envie d’aller plus loin."
+msgstr "Useful content, experiences and stories that invite you to delve deeper."
+
+msgid "Découvrir les articles"
+msgstr "Explore articles"
+
+msgid "Choisir"
+msgstr "Choose"
+
+msgid "Boutique sélectionnée"
+msgstr "Curated shop"
+
+msgid "Une sélection de produits présentés simplement, sans surcharge et avec une expérience d’achat claire."
+msgstr "A product selection presented clearly, without clutter, for a straightforward shopping experience."
+
+msgid "Voir la boutique"
+msgstr "Visit the shop"
+
+msgid "Comprendre"
+msgstr "Understand"
+
+msgid "Découvertes & inspiration"
+msgstr "Discoveries & inspiration"
+
+msgid "Voyages, saveurs, idées et nouvelles perspectives réunies dans un même univers éditorial."
+msgstr "Travel, flavours, ideas and fresh perspectives brought together in one editorial world."
+
+msgid "En savoir plus"
+msgstr "Learn more"
+
+msgid "Sélection du moment"
+msgstr "Current selection"
+
+msgid "Produits en vedette"
+msgstr "Featured products"
+
+msgid "Voir toute la boutique"
+msgstr "View the full shop"
+
+msgid "En vedette"
+msgstr "Featured"
+
+msgid "Voir %(product_name)s"
+msgstr "View %(product_name)s"
+
+msgid "Une autre manière de découvrir"
+msgstr "A different way to discover"
+
+msgid "Curiosité, simplicité et qualité."
+msgstr "Curiosity, simplicity and quality."
+
+msgid "Teyilawson rassemble des contenus et des sélections qui donnent envie de découvrir, comprendre et choisir avec plus de confiance."
+msgstr "Teyilawson brings together content and selections that inspire you to discover, understand and choose with greater confidence."
+
+msgid "Découvrir notre univers"
+msgstr "Discover our world"
+
+msgid "Nos valeurs"
+msgstr "Our values"
+
+msgid "Curiosité"
+msgstr "Curiosity"
+
+msgid "Authenticité"
+msgstr "Authenticity"
+
+msgid "Simplicité"
+msgstr "Simplicity"
+
+msgid "Restons connectés"
+msgstr "Let’s stay connected"
+
+msgid "Une question, une idée ou un projet ?"
+msgstr "A question, an idea or a project?"
+
+msgid "Échangeons autour d’un partenariat, d’une collaboration ou simplement d’une suggestion."
+msgstr "Let’s discuss a partnership, a collaboration or simply an idea."
+
+msgid "À propos — Teyilawson"
+msgstr "About — Teyilawson"
+
+msgid "Un espace pour explorer, comprendre et choisir avec confiance."
+msgstr "A place to explore, understand and choose with confidence."
+
+msgid "Teyilawson réunit contenus éditoriaux, découvertes et sélection de produits dans une expérience simple, utile et soigneusement construite."
+msgstr "Teyilawson brings together editorial content, discoveries and a product selection in a clear, useful and thoughtfully designed experience."
+
+msgid "Identité Teyilawson"
+msgstr "Teyilawson identity"
+
+msgid "Logo Teyilawson"
+msgstr "Teyilawson logo"
+
+msgid "Une plateforme indépendante à la croisée du contenu, de la découverte et du commerce."
+msgstr "An independent platform at the crossroads of content, discovery and commerce."
+
+msgid "Notre vision"
+msgstr "Our vision"
+
+msgid "Donner plus de valeur à chaque visite."
+msgstr "Make every visit more valuable."
+
+msgid "Le projet a été pensé pour proposer une navigation claire entre information, inspiration et sélection de produits. Chaque espace du site doit aider le visiteur à aller à l’essentiel sans sacrifier la qualité de l’expérience."
+msgstr "The project was designed to offer clear navigation between information, inspiration and product selection. Every part of the website should help visitors focus on what matters without compromising the quality of the experience."
+
+msgid "La plateforme évolue autour d’un principe simple : publier des contenus utiles, présenter les offres avec transparence et construire une relation de confiance durable avec les lecteurs, clients et partenaires."
+msgstr "The platform follows a simple principle: publish useful content, present offers transparently and build lasting trust with readers, customers and partners."
+
+msgid "Nos principes"
+msgstr "Our principles"
+
+msgid "Ce qui guide le projet."
+msgstr "What guides the project."
+
+msgid "Clarté"
+msgstr "Clarity"
+
+msgid "Une expérience lisible, des parcours simples et des informations présentées sans complexité inutile."
+msgstr "A clear experience, simple journeys and information presented without unnecessary complexity."
+
+msgid "Qualité"
+msgstr "Quality"
+
+msgid "Un soin particulier porté aux contenus, aux produits présentés et à la cohérence générale de la plateforme."
+msgstr "Particular care is given to content, featured products and the platform’s overall consistency."
+
+msgid "Confiance"
+msgstr "Trust"
+
+msgid "Une approche transparente des contenus, des partenariats et des paiements pour construire une relation durable."
+msgstr "A transparent approach to content, partnerships and payments that builds a lasting relationship."
+
+msgid "Fondateur & développeur"
+msgstr "Founder & developer"
+
+msgid "Le projet Teyilawson est développé comme une plateforme éditoriale et e-commerce moderne, avec une attention particulière portée à l’expérience utilisateur, à la fiabilité technique et à l’évolution continue du produit."
+msgstr "Teyilawson is being developed as a modern editorial and e-commerce platform, with particular attention to user experience, technical reliability and continuous product improvement."
+
+msgid "Échangeons"
+msgstr "Let’s talk"
+
+msgid "Une idée, une collaboration ou une question ?"
+msgstr "An idea, a collaboration or a question?"
+
+msgid "Utilisez la page contact pour nous écrire directement."
+msgstr "Use the contact page to write to us directly."
+
+msgid "Prendre contact"
+msgstr "Get in touch"
+
+msgid "Contact — Teyilawson"
+msgstr "Contact — Teyilawson"
+
+msgid "Parlons de votre idée."
+msgstr "Let’s talk about your idea."
+
+msgid "Une question, une proposition de partenariat ou simplement un message ? Écrivez-nous directement via ce formulaire."
+msgstr "A question, a partnership proposal or simply a message? Write to us directly using this form."
+
+msgid "Nous sommes à votre écoute."
+msgstr "We’re here to listen."
+
+msgid "Votre message sera transmis via le formulaire ci-contre. Renseignez vos coordonnées afin que nous puissions vous répondre."
+msgstr "Your message will be sent through the form alongside. Please provide your contact details so we can reply."
+
+msgid "Message sécurisé par CSRF"
+msgstr "CSRF-protected message"
+
+msgid "Formulaire simple et direct"
+msgstr "Simple, direct form"
+
+msgid "Réponse à l’adresse indiquée"
+msgstr "Reply to the address provided"
+
+msgid "Votre message"
+msgstr "Your message"
+
+msgid "Nous écrire"
+msgstr "Write to us"
+
+msgid "Envoyer le message"
+msgstr "Send message"
+
+msgid "Vos informations sont utilisées uniquement pour traiter votre demande."
+msgstr "Your information is used only to process your request."
+
+msgid "Nom"
+msgstr "Last name"
+
+msgid "Prénom"
+msgstr "First name"
+
+msgid "Adresse e-mail"
+msgstr "Email address"
+
+msgid "Message"
+msgstr "Message"
+
+msgid "Le service de contact est momentanément indisponible. Merci de réessayer plus tard."
+msgstr "The contact service is temporarily unavailable. Please try again later."
+
+msgid "L’envoi du message a momentanément échoué. Merci de réessayer dans quelques instants."
+msgstr "The message could not be sent at the moment. Please try again in a few moments."
+
+msgid "Votre message a bien été envoyé. Merci pour votre prise de contact."
+msgstr "Your message has been sent. Thank you for getting in touch."
+
+msgid "Merci pour votre message."
+msgstr "Thank you for your message."

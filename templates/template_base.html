@@ -16,28 +16,28 @@
   {% block scripts %}<script src="{% static 'js/stripe.js' %}" defer></script>{% endblock %}
 </head>
 <body>
-  <a class="skip-link" href="#main-content">Aller au contenu principal</a>
+  <a class="skip-link" href="#main-content">{% translate "Aller au contenu principal" %}</a>
   <header class="site-header">
-    <nav class="navbar navbar-expand-lg" aria-label="Navigation principale">
+    <nav class="navbar navbar-expand-lg" aria-label="{% translate "Navigation principale" %}">
       <div class="container-xl">
-        <a class="navbar-brand brand" href="{% url 'home' %}" aria-label="Teyilawson — Accueil">
+        <a class="navbar-brand brand" href="{% url 'home' %}" aria-label="{% translate "Teyilawson — Accueil" %}">
           <span class="brand-mark"><img src="{% static 'logo.webp' %}" alt="" width="48" height="48"></span>
-          <span class="brand-copy"><strong>Teyilawson</strong><small>Explorer · Comprendre · Choisir</small></span>
+          <span class="brand-copy"><strong>Teyilawson</strong><small>{% translate "Explorer · Comprendre · Choisir" %}</small></span>
         </a>
         <div class="d-flex align-items-center gap-2 ms-auto d-lg-none">
-          <a class="header-icon" href="{% url 'shop:panier' %}" aria-label="Voir le panier{% if panier_items_count %}, {{ panier_items_count }} article{{ panier_items_count|pluralize }}{% endif %}">
+          <a class="header-icon" href="{% url 'shop:panier' %}"{% if panier_items_count %} aria-label="{% blocktranslate count counter=panier_items_count %}Voir le panier, {{ counter }} article{% plural %}Voir le panier, {{ counter }} articles{% endblocktranslate %}"{% else %} aria-label="{% translate "Voir le panier" %}"{% endif %}>
             <i class="fa-solid fa-bag-shopping" aria-hidden="true"></i>
             {% if panier_items_count and panier_items_count > 0 %}<span class="cart-count">{{ panier_items_count }}</span>{% endif %}
           </a>
-          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar" aria-controls="mainNavbar" aria-expanded="false" aria-label="Ouvrir le menu"><span class="navbar-toggler-icon"></span></button>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar" aria-controls="mainNavbar" aria-expanded="false" aria-label="{% translate "Ouvrir le menu" %}"><span class="navbar-toggler-icon"></span></button>
         </div>
         <div class="collapse navbar-collapse" id="mainNavbar">
           <ul class="navbar-nav main-nav mx-lg-auto">
-            <li class="nav-item"><a class="nav-link" href="{% url 'home' %}">Accueil</a></li>
-            <li class="nav-item"><a class="nav-link" href="{% url 'articles:articles' %}">Articles</a></li>
-            <li class="nav-item"><a class="nav-link" href="{% url 'shop:liste' %}">Boutique</a></li>
-            <li class="nav-item"><a class="nav-link" href="{% url 'about' %}">À propos</a></li>
-            <li class="nav-item"><a class="nav-link" href="{% url 'contact' %}">Contact</a></li>
+            <li class="nav-item"><a class="nav-link" href="{% url 'home' %}">{% translate "Accueil" %}</a></li>
+            <li class="nav-item"><a class="nav-link" href="{% url 'articles:articles' %}">{% translate "Articles" %}</a></li>
+            <li class="nav-item"><a class="nav-link" href="{% url 'shop:liste' %}">{% translate "Boutique" %}</a></li>
+            <li class="nav-item"><a class="nav-link" href="{% url 'about' %}">{% translate "À propos" %}</a></li>
+            <li class="nav-item"><a class="nav-link" href="{% url 'contact' %}">{% translate "Contact" %}</a></li>
           </ul>
           <div class="header-actions">
             <form method="post" action="{% url 'set_language' %}" class="d-flex align-items-center gap-1">
@@ -51,7 +51,7 @@
               </select>
               <button type="submit" class="btn btn-soft btn-sm">{% translate "Changer" %}</button>
             </form>
-            <a class="header-icon d-none d-lg-inline-flex" href="{% url 'shop:panier' %}" aria-label="Voir le panier{% if panier_items_count %}, {{ panier_items_count }} article{{ panier_items_count|pluralize }}{% endif %}">
+            <a class="header-icon d-none d-lg-inline-flex" href="{% url 'shop:panier' %}"{% if panier_items_count %} aria-label="{% blocktranslate count counter=panier_items_count %}Voir le panier, {{ counter }} article{% plural %}Voir le panier, {{ counter }} articles{% endblocktranslate %}"{% else %} aria-label="{% translate "Voir le panier" %}"{% endif %}>
               <i class="fa-solid fa-bag-shopping" aria-hidden="true"></i>
               {% if panier_items_count and panier_items_count > 0 %}<span class="cart-count">{{ panier_items_count }}</span>{% endif %}
             </a>
@@ -61,26 +61,26 @@
                   <span class="account-avatar" aria-hidden="true">{{ user.username|default:user.email|first|upper }}</span><span class="account-name">{{ user.username|default:user.email }}</span>
                 </button>
                 <ul class="dropdown-menu dropdown-menu-end">
-                  <li><a class="dropdown-item" href="{% url 'accounts:profile' %}"><i class="fa-regular fa-user" aria-hidden="true"></i> Mon profil</a></li>
-                  <li><a class="dropdown-item" href="{% url 'shop:mes_commandes' %}"><i class="fa-solid fa-box" aria-hidden="true"></i> Mes commandes</a></li>
-                  {% if user.is_staff %}<li><a class="dropdown-item" href="{% url 'monetization:revenus' %}"><i class="fa-solid fa-chart-line" aria-hidden="true"></i> Revenus</a></li>{% endif %}
+                  <li><a class="dropdown-item" href="{% url 'accounts:profile' %}"><i class="fa-regular fa-user" aria-hidden="true"></i> {% translate "Mon profil" %}</a></li>
+                  <li><a class="dropdown-item" href="{% url 'shop:mes_commandes' %}"><i class="fa-solid fa-box" aria-hidden="true"></i> {% translate "Mes commandes" %}</a></li>
+                  {% if user.is_staff %}<li><a class="dropdown-item" href="{% url 'monetization:revenus' %}"><i class="fa-solid fa-chart-line" aria-hidden="true"></i> {% translate "Revenus" %}</a></li>{% endif %}
                   <li><hr class="dropdown-divider"></li>
-                  <li><form method="post" action="{% url 'accounts:logout' %}">{% csrf_token %}<button class="dropdown-item" type="submit"><i class="fa-solid fa-arrow-right-from-bracket" aria-hidden="true"></i> Déconnexion</button></form></li>
+                  <li><form method="post" action="{% url 'accounts:logout' %}">{% csrf_token %}<button class="dropdown-item" type="submit"><i class="fa-solid fa-arrow-right-from-bracket" aria-hidden="true"></i> {% translate "Déconnexion" %}</button></form></li>
                 </ul>
               </div>
             {% else %}
-              <div class="auth-actions"><a class="btn btn-soft" href="{% url 'accounts:login' %}">Connexion</a><a class="btn btn-brand" href="{% url 'accounts:register' %}">S’inscrire</a></div>
+              <div class="auth-actions"><a class="btn btn-soft" href="{% url 'accounts:login' %}">{% translate "Connexion" %}</a><a class="btn btn-brand" href="{% url 'accounts:register' %}">{% translate "S’inscrire" %}</a></div>
             {% endif %}
           </div>
         </div>
       </div>
     </nav>
-    <nav class="support-nav" aria-label="Soutenir et collaborer">
+    <nav class="support-nav" aria-label="{% translate "Soutenir et collaborer" %}">
       <div class="container-xl support-nav-inner">
-        <span class="support-label">Soutenir le projet</span>
+        <span class="support-label">{% translate "Soutenir le projet" %}</span>
         <div class="support-links">
-          <a href="{% url 'monetization:don' %}"><i class="fa-regular fa-heart" aria-hidden="true"></i> Faire un don</a>
-          <a href="{% url 'monetization:abonnements' %}">Premium</a><a href="{% url 'monetization:affiliation' %}">Affiliation</a><a href="{% url 'monetization:partenariat' %}">Partenariats</a><a href="{% url 'monetization:publicites' %}">Publicité</a>
+          <a href="{% url 'monetization:don' %}"><i class="fa-regular fa-heart" aria-hidden="true"></i> {% translate "Faire un don" %}</a>
+          <a href="{% url 'monetization:abonnements' %}">{% translate "Premium" %}</a><a href="{% url 'monetization:affiliation' %}">{% translate "Affiliation" %}</a><a href="{% url 'monetization:partenariat' %}">{% translate "Partenariats" %}</a><a href="{% url 'monetization:publicites' %}">{% translate "Publicité" %}</a>
         </div>
       </div>
     </nav>
@@ -89,7 +89,7 @@
     <div class="container-xl">
       {% if messages %}<div class="messages" aria-live="polite" aria-atomic="true">
         {% for message in messages %}<div class="alert alert-dismissible fade show{% if message.tags %} alert-{{ message.tags }}{% endif %}" role="alert">
-          <i class="fa-solid {% if message.tags == 'success' %}fa-circle-check{% elif message.tags == 'warning' %}fa-triangle-exclamation{% elif message.tags == 'error' %}fa-circle-exclamation{% else %}fa-circle-info{% endif %}" aria-hidden="true"></i><span>{{ message }}</span><button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
+          <i class="fa-solid {% if message.tags == 'success' %}fa-circle-check{% elif message.tags == 'warning' %}fa-triangle-exclamation{% elif message.tags == 'error' %}fa-circle-exclamation{% else %}fa-circle-info{% endif %}" aria-hidden="true"></i><span>{{ message }}</span><button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="{% translate "Fermer" %}"></button>
         </div>{% endfor %}
       </div>{% endif %}
       {% block contenu %}{% block content %}{% endblock %}{% endblock %}
@@ -98,14 +98,14 @@
   <footer class="site-footer">
     <div class="container-xl">
       <div class="footer-grid">
-        <div class="footer-brand"><a class="brand brand-footer" href="{% url 'home' %}"><span class="brand-mark"><img src="{% static 'logo.webp' %}" alt="" width="44" height="44"></span><span class="brand-copy"><strong>Teyilawson</strong><small>Des récits, des idées et une boutique choisie.</small></span></a></div>
-        <div><h2 class="footer-title">Explorer</h2><ul class="footer-links"><li><a href="{% url 'articles:articles' %}">Articles</a></li><li><a href="{% url 'shop:liste' %}">Boutique</a></li><li><a href="{% url 'about' %}">À propos</a></li></ul></div>
-        <div><h2 class="footer-title">Nous contacter</h2><ul class="footer-links"><li><a href="{% url 'contact' %}">Contact</a></li><li><a href="{% url 'monetization:partenariat' %}">Partenariats</a></li></ul></div>
-        <div><h2 class="footer-title">Suivre</h2><div class="social-links">
+        <div class="footer-brand"><a class="brand brand-footer" href="{% url 'home' %}"><span class="brand-mark"><img src="{% static 'logo.webp' %}" alt="" width="44" height="44"></span><span class="brand-copy"><strong>Teyilawson</strong><small>{% translate "Des récits, des idées et une boutique choisie." %}</small></span></a></div>
+        <div><h2 class="footer-title">{% translate "Explorer" %}</h2><ul class="footer-links"><li><a href="{% url 'articles:articles' %}">{% translate "Articles" %}</a></li><li><a href="{% url 'shop:liste' %}">{% translate "Boutique" %}</a></li><li><a href="{% url 'about' %}">{% translate "À propos" %}</a></li></ul></div>
+        <div><h2 class="footer-title">{% translate "Nous contacter" %}</h2><ul class="footer-links"><li><a href="{% url 'contact' %}">{% translate "Contact" %}</a></li><li><a href="{% url 'monetization:partenariat' %}">{% translate "Partenariats" %}</a></li></ul></div>
+        <div><h2 class="footer-title">{% translate "Suivre" %}</h2><div class="social-links">
           <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" aria-label="Facebook"><i class="fab fa-facebook-f" aria-hidden="true"></i></a><a href="https://instagram.com" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><i class="fab fa-instagram" aria-hidden="true"></i></a><a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn"><i class="fab fa-linkedin-in" aria-hidden="true"></i></a><a href="https://youtube.com" target="_blank" rel="noopener noreferrer" aria-label="YouTube"><i class="fab fa-youtube" aria-hidden="true"></i></a>
         </div></div>
       </div>
-      <div class="footer-bottom"><span>&copy; {% now "Y" %} Teyilawson. Tous droits réservés.</span><a href="#main-content">Retour en haut <i class="fa-solid fa-arrow-up" aria-hidden="true"></i></a></div>
+      <div class="footer-bottom"><span>&copy; {% now "Y" %} Teyilawson. {% translate "Tous droits réservés." %}</span><a href="#main-content">{% translate "Retour en haut" %} <i class="fa-solid fa-arrow-up" aria-hidden="true"></i></a></div>
     </div>
   </footer>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>

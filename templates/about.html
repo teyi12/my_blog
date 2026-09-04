@@ -1,7 +1,7 @@
 {% extends "template_base.html" %}
-{% load static %}
+{% load i18n static %}
 
-{% block titre %}À propos — Teyilawson{% endblock %}
+{% block titre %}{% translate "À propos — Teyilawson" %}{% endblock %}
 
 {% block styles %}
 <link rel="stylesheet" href="{% static 'css/pages.css' %}">
@@ -11,56 +11,56 @@
 <section class="about-page">
   <header class="about-hero">
     <div class="about-hero-copy">
-      <span class="eyebrow">À propos</span>
-      <h1>Un espace pour explorer, comprendre et choisir avec confiance.</h1>
-      <p>Teyilawson réunit contenus éditoriaux, découvertes et sélection de produits dans une expérience simple, utile et soigneusement construite.</p>
+      <span class="eyebrow">{% translate "À propos" %}</span>
+      <h1>{% translate "Un espace pour explorer, comprendre et choisir avec confiance." %}</h1>
+      <p>{% translate "Teyilawson réunit contenus éditoriaux, découvertes et sélection de produits dans une expérience simple, utile et soigneusement construite." %}</p>
       <div class="about-hero-actions">
-        <a href="{% url 'articles:articles' %}" class="btn btn-brand">Explorer les articles <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a>
-        <a href="{% url 'contact' %}" class="btn btn-soft">Nous contacter</a>
+        <a href="{% url 'articles:articles' %}" class="btn btn-brand">{% translate "Explorer les articles" %} <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a>
+        <a href="{% url 'contact' %}" class="btn btn-soft">{% translate "Nous contacter" %}</a>
       </div>
     </div>
 
-    <div class="about-brand-card" aria-label="Identité Teyilawson">
-      <img src="{% static 'images/logo.webp' %}" alt="Logo Teyilawson">
+    <div class="about-brand-card" aria-label="{% translate "Identité Teyilawson" %}">
+      <img src="{% static 'images/logo.webp' %}" alt="{% translate "Logo Teyilawson" %}">
       <div>
         <span class="eyebrow">Teyilawson</span>
-        <strong>Explorer · Comprendre · Choisir</strong>
-        <p>Une plateforme indépendante à la croisée du contenu, de la découverte et du commerce.</p>
+        <strong>{% translate "Explorer · Comprendre · Choisir" %}</strong>
+        <p>{% translate "Une plateforme indépendante à la croisée du contenu, de la découverte et du commerce." %}</p>
       </div>
     </div>
   </header>
 
   <section class="about-story section">
     <div class="section-heading">
-      <span class="eyebrow">Notre vision</span>
-      <h2>Donner plus de valeur à chaque visite.</h2>
+      <span class="eyebrow">{% translate "Notre vision" %}</span>
+      <h2>{% translate "Donner plus de valeur à chaque visite." %}</h2>
     </div>
     <div class="about-story-grid">
-      <p>Le projet a été pensé pour proposer une navigation claire entre information, inspiration et sélection de produits. Chaque espace du site doit aider le visiteur à aller à l’essentiel sans sacrifier la qualité de l’expérience.</p>
-      <p>La plateforme évolue autour d’un principe simple : publier des contenus utiles, présenter les offres avec transparence et construire une relation de confiance durable avec les lecteurs, clients et partenaires.</p>
+      <p>{% translate "Le projet a été pensé pour proposer une navigation claire entre information, inspiration et sélection de produits. Chaque espace du site doit aider le visiteur à aller à l’essentiel sans sacrifier la qualité de l’expérience." %}</p>
+      <p>{% translate "La plateforme évolue autour d’un principe simple : publier des contenus utiles, présenter les offres avec transparence et construire une relation de confiance durable avec les lecteurs, clients et partenaires." %}</p>
     </div>
   </section>
 
   <section class="about-values section" aria-labelledby="values-title">
     <div class="section-heading section-heading-centered">
-      <span class="eyebrow">Nos principes</span>
-      <h2 id="values-title">Ce qui guide le projet.</h2>
+      <span class="eyebrow">{% translate "Nos principes" %}</span>
+      <h2 id="values-title">{% translate "Ce qui guide le projet." %}</h2>
     </div>
     <div class="about-values-grid">
       <article class="about-value-card">
         <span class="about-value-icon"><i class="fa-regular fa-lightbulb" aria-hidden="true"></i></span>
-        <h3>Clarté</h3>
-        <p>Une expérience lisible, des parcours simples et des informations présentées sans complexité inutile.</p>
+        <h3>{% translate "Clarté" %}</h3>
+        <p>{% translate "Une expérience lisible, des parcours simples et des informations présentées sans complexité inutile." %}</p>
       </article>
       <article class="about-value-card">
         <span class="about-value-icon"><i class="fa-regular fa-gem" aria-hidden="true"></i></span>
-        <h3>Qualité</h3>
-        <p>Un soin particulier porté aux contenus, aux produits présentés et à la cohérence générale de la plateforme.</p>
+        <h3>{% translate "Qualité" %}</h3>
+        <p>{% translate "Un soin particulier porté aux contenus, aux produits présentés et à la cohérence générale de la plateforme." %}</p>
       </article>
       <article class="about-value-card">
         <span class="about-value-icon"><i class="fa-solid fa-shield-halved" aria-hidden="true"></i></span>
-        <h3>Confiance</h3>
-        <p>Une approche transparente des contenus, des partenariats et des paiements pour construire une relation durable.</p>
+        <h3>{% translate "Confiance" %}</h3>
+        <p>{% translate "Une approche transparente des contenus, des partenariats et des paiements pour construire une relation durable." %}</p>
       </article>
     </div>
   </section>
@@ -69,20 +69,20 @@
     <div class="about-founder-card">
       <div class="about-founder-avatar" aria-hidden="true">T</div>
       <div class="about-founder-copy">
-        <span class="eyebrow">Fondateur & développeur</span>
+        <span class="eyebrow">{% translate "Fondateur & développeur" %}</span>
         <h2>Teyi Lawson-Somadje</h2>
-        <p>Le projet Teyilawson est développé comme une plateforme éditoriale et e-commerce moderne, avec une attention particulière portée à l’expérience utilisateur, à la fiabilité technique et à l’évolution continue du produit.</p>
+        <p>{% translate "Le projet Teyilawson est développé comme une plateforme éditoriale et e-commerce moderne, avec une attention particulière portée à l’expérience utilisateur, à la fiabilité technique et à l’évolution continue du produit." %}</p>
       </div>
     </div>
   </section>
 
   <section class="about-cta">
     <div>
-      <span class="eyebrow">Échangeons</span>
-      <h2>Une idée, une collaboration ou une question ?</h2>
-      <p>Utilisez la page contact pour nous écrire directement.</p>
+      <span class="eyebrow">{% translate "Échangeons" %}</span>
+      <h2>{% translate "Une idée, une collaboration ou une question ?" %}</h2>
+      <p>{% translate "Utilisez la page contact pour nous écrire directement." %}</p>
     </div>
-    <a href="{% url 'contact' %}" class="btn btn-brand btn-lg">Prendre contact <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a>
+    <a href="{% url 'contact' %}" class="btn btn-brand btn-lg">{% translate "Prendre contact" %} <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a>
   </section>
 </section>
 {% endblock %}

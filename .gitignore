@@ -28,6 +28,8 @@ db.sqlite3.backup-*
 *.log
 *.pot
 *.mo
+!locale/de/LC_MESSAGES/django.mo
+!locale/en/LC_MESSAGES/django.mo
 *.swp
 .DS_Store
 *.tmp
