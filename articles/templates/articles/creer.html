@@ -1,7 +1,7 @@
 {% extends "template_base.html" %}
-{% load static %}
+{% load i18n static %}
 
-{% block titre %}Créer un article — Teyilawson{% endblock %}
+{% block titre %}{% if article %}{% translate "Modifier un article — Teyilawson" %}{% else %}{% translate "Créer un article — Teyilawson" %}{% endif %}{% endblock %}
 
 {% block styles %}
 <link rel="stylesheet" href="{% static 'css/article-editor.css' %}">
@@ -11,12 +11,12 @@
 <section class="editor-page">
   <div class="editor-heading">
     <div>
-      <span class="eyebrow">Espace éditorial</span>
-      <h1>Créer un nouvel article</h1>
-      <p>Préparez un contenu clair, structuré et prêt à être publié dans le magazine.</p>
+      <span class="eyebrow">{% translate "Espace éditorial" %}</span>
+      <h1>{% if article %}{% translate "Modifier l’article" %}{% else %}{% translate "Créer un nouvel article" %}{% endif %}</h1>
+      <p>{% translate "Préparez un contenu clair, structuré et prêt à être publié dans le magazine." %}</p>
     </div>
     <a href="{% url 'articles:articles' %}" class="btn btn-soft">
-      <i class="fa-solid fa-arrow-left" aria-hidden="true"></i> Retour aux articles
+      <i class="fa-solid fa-arrow-left" aria-hidden="true"></i> {% translate "Retour aux articles" %}
     </a>
   </div>
 
@@ -30,16 +30,14 @@
     <div class="editor-layout">
       <div class="editor-card editor-card-main">
         <div class="editor-card-heading">
-          <span class="eyebrow">Contenu</span>
-          <h2>Informations principales</h2>
+          <span class="eyebrow">{% translate "Contenu" %}</span>
+          <h2>{% translate "Informations principales" %}</h2>
         </div>
 
         {% for field in form %}
-          {% if field.name == 'titre' or field.name == 'contenu' or field.name == 'slug' %}
+          {% if field.name == 'titre_fr' or field.name == 'titre_de' or field.name == 'titre_en' or field.name == 'contenu_fr' or field.name == 'contenu_de' or field.name == 'contenu_en' %}
           <div class="editor-field">
-            <label for="{{ field.id_for_label }}">
-              {% if field.name == 'titre' %}Titre{% elif field.name == 'contenu' %}Contenu{% elif field.name == 'slug' %}Slug{% else %}{{ field.label }}{% endif %}
-            </label>
+            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
             {{ field }}
             {% if field.help_text %}<small>{{ field.help_text|safe }}</small>{% endif %}
             {% for error in field.errors %}<div class="editor-error">{{ error }}</div>{% endfor %}
@@ -51,15 +49,15 @@
       <aside class="editor-sidebar">
         <div class="editor-card">
           <div class="editor-card-heading compact">
-            <span class="eyebrow">Publication</span>
-            <h2>Options</h2>
+            <span class="eyebrow">{% translate "Publication" %}</span>
+            <h2>{% translate "Options" %}</h2>
           </div>
 
           {% for field in form %}
             {% if field.name == 'image' or field.name == 'sponsor' %}
             <div class="editor-field">
               <label for="{{ field.id_for_label }}">
-                {% if field.name == 'image' %}Image principale{% elif field.name == 'sponsor' %}Sponsor{% else %}{{ field.label }}{% endif %}
+                {{ field.label }}
               </label>
               {{ field }}
               {% if field.help_text %}<small>{{ field.help_text|safe }}</small>{% endif %}
@@ -69,8 +67,8 @@
             <label class="editor-toggle" for="{{ field.id_for_label }}">
               {{ field }}
               <span>
-                <strong>{% if field.name == 'est_sponsorise' %}Article sponsorisé{% else %}Contenu premium{% endif %}</strong>
-                <small>{% if field.name == 'est_sponsorise' %}Signale qu’un partenaire soutient ce contenu.{% else %}Réserve ce contenu aux accès premium.{% endif %}</small>
+                <strong>{{ field.label }}</strong>
+                <small>{% if field.name == 'est_sponsorise' %}{% translate "Signale qu’un partenaire soutient ce contenu." %}{% else %}{% translate "Réserve ce contenu aux accès premium." %}{% endif %}</small>
               </span>
             </label>
             {% for error in field.errors %}<div class="editor-error">{{ error }}</div>{% endfor %}
@@ -80,9 +78,9 @@
 
         <div class="editor-actions">
           <button type="submit" class="btn btn-brand btn-lg">
-            Publier l’article <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+            {% if article %}{% translate "Enregistrer les modifications" %}{% else %}{% translate "Publier l’article" %}{% endif %} <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
           </button>
-          <a href="{% url 'articles:articles' %}" class="btn btn-soft">Annuler</a>
+          <a href="{% url 'articles:articles' %}" class="btn btn-soft">{% translate "Annuler" %}</a>
         </div>
       </aside>
     </div>

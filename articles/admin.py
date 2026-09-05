@@ -1,4 +1,6 @@
 from django.contrib import admin
+from modeltranslation.admin import TranslationAdmin
+
 from .models import Article, ArticleMedia
 
 
@@ -8,12 +10,30 @@ class ArticleMediaInline(admin.TabularInline):
 
 
 @admin.register(Article)
-class ArticleAdmin(admin.ModelAdmin):
+class ArticleAdmin(TranslationAdmin):
     list_display = ("titre", "auteur", "date_publication", "est_sponsorise", "is_premium")
-    prepopulated_fields = {"slug": ("titre",)}
-    search_fields = ("titre", "contenu", "auteur__username")
+    prepopulated_fields = {"slug": ("titre_fr",)}
+    search_fields = (
+        "titre_fr",
+        "titre_de",
+        "titre_en",
+        "contenu_fr",
+        "contenu_de",
+        "contenu_en",
+        "auteur__email",
+    )
     list_filter = ("est_sponsorise", "is_premium", "date_publication")
     inlines = [ArticleMediaInline]
+
+    def get_readonly_fields(self, request, obj=None):
+        if obj:
+            return ("slug",)
+        return ()
+
+    def get_prepopulated_fields(self, request, obj=None):
+        if obj:
+            return {}
+        return super().get_prepopulated_fields(request, obj)
 
 
 @admin.register(ArticleMedia)

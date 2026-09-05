@@ -1,7 +1,7 @@
 {% extends "template_base.html" %}
-{% load static %}
+{% load i18n static %}
 
-{% block titre %}Supprimer un article — Teyilawson{% endblock %}
+{% block titre %}{% translate "Supprimer un article — Teyilawson" %}{% endblock %}
 
 {% block styles %}
 <link rel="stylesheet" href="{% static 'css/article-editor.css' %}">
@@ -13,19 +13,19 @@
     <div class="delete-icon" aria-hidden="true">
       <i class="fa-regular fa-trash-can"></i>
     </div>
-    <span class="eyebrow">Suppression définitive</span>
-    <h1>Supprimer cet article ?</h1>
-    <p>Vous êtes sur le point de supprimer <strong>« {{ article.titre }} »</strong>. Cette action est irréversible.</p>
+    <span class="eyebrow">{% translate "Suppression définitive" %}</span>
+    <h1>{% translate "Supprimer cet article ?" %}</h1>
+    <p>{% blocktranslate with article_title=article.titre %}Vous êtes sur le point de supprimer <strong>« {{ article_title }} »</strong>. Cette action est irréversible.{% endblocktranslate %}</p>
 
     <div class="delete-warning">
       <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>
-      <span>Le contenu ne pourra pas être restauré depuis cette page après confirmation.</span>
+      <span>{% translate "Le contenu ne pourra pas être restauré depuis cette page après confirmation." %}</span>
     </div>
 
     <form method="post" class="delete-actions">
       {% csrf_token %}
-      <button type="submit" class="btn btn-danger btn-lg">Oui, supprimer définitivement</button>
-      <a href="{% url 'articles:article_detail' article.slug %}" class="btn btn-soft btn-lg">Annuler</a>
+      <button type="submit" class="btn btn-danger btn-lg">{% translate "Oui, supprimer définitivement" %}</button>
+      <a href="{% url 'articles:article_detail' article.slug %}" class="btn btn-soft btn-lg">{% translate "Annuler" %}</a>
     </form>
   </div>
 </section>

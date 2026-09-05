@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Teyilawson\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-05 00:42+0200\n"
+"POT-Creation-Date: 2026-09-05 13:20+0200\n"
 "PO-Revision-Date: 2026-09-05 00:11+0200\n"
 "Last-Translator: Teyilawson\n"
 "Language-Team: German\n"
@@ -23,6 +23,377 @@ msgstr ""
 #: accounts/admin.py:35
 msgid "Dates importantes"
 msgstr ""
+
+#: articles/forms.py:23
+msgid "Titre [fr]"
+msgstr "Titel [fr]"
+
+#: articles/forms.py:24
+msgid "Titre [de]"
+msgstr "Titel [de]"
+
+#: articles/forms.py:25
+msgid "Titre [en]"
+msgstr "Titel [en]"
+
+#: articles/forms.py:26
+msgid "Contenu [fr]"
+msgstr "Inhalt [fr]"
+
+#: articles/forms.py:27
+msgid "Contenu [de]"
+msgstr "Inhalt [de]"
+
+#: articles/forms.py:28
+msgid "Contenu [en]"
+msgstr "Inhalt [en]"
+
+#: articles/forms.py:29
+msgid "Image principale"
+msgstr "Hauptbild"
+
+#: articles/forms.py:30
+msgid "Sponsor"
+msgstr "Sponsor"
+
+#: articles/forms.py:31
+msgid "Article sponsorisé"
+msgstr "Gesponserter Artikel"
+
+#: articles/forms.py:32
+msgid "Contenu premium"
+msgstr "Premium-Inhalt"
+
+#: articles/forms.py:36
+msgid ""
+"Facultatif : le titre français sera utilisé en allemand si ce champ est vide."
+msgstr ""
+"Optional: Wenn dieses Feld leer ist, wird auf Deutsch der französische Titel "
+"verwendet."
+
+#: articles/forms.py:39
+msgid ""
+"Facultatif : le titre français sera utilisé en anglais si ce champ est vide."
+msgstr ""
+"Optional: Wenn dieses Feld leer ist, wird auf Englisch der französische "
+"Titel verwendet."
+
+#: articles/forms.py:42
+msgid ""
+"Facultatif : le contenu français sera utilisé en allemand si ce champ est "
+"vide."
+msgstr ""
+"Optional: Wenn dieses Feld leer ist, wird auf Deutsch der französische "
+"Inhalt verwendet."
+
+#: articles/forms.py:45
+msgid ""
+"Facultatif : le contenu français sera utilisé en anglais si ce champ est "
+"vide."
+msgstr ""
+"Optional: Wenn dieses Feld leer ist, wird auf Englisch der französische "
+"Inhalt verwendet."
+
+#: articles/forms.py:49
+msgid "Le titre français est obligatoire."
+msgstr "Der französische Titel ist erforderlich."
+
+#: articles/forms.py:50
+msgid "Le contenu français est obligatoire."
+msgstr "Der französische Inhalt ist erforderlich."
+
+#: articles/templates/articles/creer.html:4
+msgid "Modifier un article — Teyilawson"
+msgstr "Artikel bearbeiten — Teyilawson"
+
+#: articles/templates/articles/creer.html:4
+msgid "Créer un article — Teyilawson"
+msgstr "Artikel erstellen — Teyilawson"
+
+#: articles/templates/articles/creer.html:14
+msgid "Espace éditorial"
+msgstr "Redaktionsbereich"
+
+#: articles/templates/articles/creer.html:15
+msgid "Modifier l’article"
+msgstr "Artikel bearbeiten"
+
+#: articles/templates/articles/creer.html:15
+msgid "Créer un nouvel article"
+msgstr "Neuen Artikel erstellen"
+
+#: articles/templates/articles/creer.html:16
+msgid ""
+"Préparez un contenu clair, structuré et prêt à être publié dans le magazine."
+msgstr ""
+"Bereiten Sie einen klaren, strukturierten und veröffentlichungsfertigen "
+"Inhalt für das Magazin vor."
+
+#: articles/templates/articles/creer.html:19
+#: articles/templates/articles/detail.html:119
+msgid "Retour aux articles"
+msgstr "Zurück zu den Artikeln"
+
+#: articles/templates/articles/creer.html:33
+msgid "Contenu"
+msgstr "Inhalt"
+
+#: articles/templates/articles/creer.html:34
+msgid "Informations principales"
+msgstr "Hauptinformationen"
+
+#: articles/templates/articles/creer.html:52
+#: articles/templates/articles/detail.html:63
+msgid "Publication"
+msgstr "Veröffentlichung"
+
+#: articles/templates/articles/creer.html:53
+msgid "Options"
+msgstr "Optionen"
+
+#: articles/templates/articles/creer.html:71
+msgid "Signale qu’un partenaire soutient ce contenu."
+msgstr "Kennzeichnet, dass ein Partner diesen Inhalt unterstützt."
+
+#: articles/templates/articles/creer.html:71
+msgid "Réserve ce contenu aux accès premium."
+msgstr "Beschränkt diesen Inhalt auf Premium-Zugänge."
+
+#: articles/templates/articles/creer.html:81
+#: shop/templates/shop/categories/form.html:43
+msgid "Enregistrer les modifications"
+msgstr "Änderungen speichern"
+
+#: articles/templates/articles/creer.html:81
+msgid "Publier l’article"
+msgstr "Artikel veröffentlichen"
+
+#: articles/templates/articles/creer.html:83
+#: articles/templates/articles/supprimer.html:28
+#: shop/templates/shop/categories/form.html:40
+#: shop/templates/shop/categories/supprimer.html:25
+#: shop/templates/shop/creer.html:12
+msgid "Annuler"
+msgstr "Abbrechen"
+
+#: articles/templates/articles/detail.html:15
+msgid "Tous les articles"
+msgstr "Alle Artikel"
+
+#: articles/templates/articles/detail.html:19
+#: articles/templates/articles/list.html:43 templates/template_base.html:83
+msgid "Premium"
+msgstr "Premium"
+
+#: articles/templates/articles/detail.html:20
+#: articles/templates/articles/list.html:47
+msgid "Sponsorisé"
+msgstr "Gesponsert"
+
+#: articles/templates/articles/detail.html:35
+#: articles/templates/articles/detail.html:37
+#: articles/templates/articles/list.html:35
+#: articles/templates/articles/list.html:37
+msgid "Illustration de l’article"
+msgstr "Artikelbild"
+
+#: articles/templates/articles/detail.html:48
+#: articles/templates/articles/detail.html:49
+msgid "Gestion de l’article"
+msgstr "Artikelverwaltung"
+
+#: articles/templates/articles/detail.html:52
+#: articles/templates/articles/list.html:79
+#: shop/templates/shop/categories/liste.html:45
+msgid "Modifier"
+msgstr "Bearbeiten"
+
+#: articles/templates/articles/detail.html:55
+#: articles/templates/articles/list.html:82
+#: shop/templates/shop/categories/liste.html:46
+msgid "Supprimer"
+msgstr "Löschen"
+
+#: articles/templates/articles/detail.html:62
+msgid "À propos de cette publication"
+msgstr "Über diese Veröffentlichung"
+
+#: articles/templates/articles/detail.html:65
+msgid ""
+"Explorer, comprendre et découvrir à travers des contenus sélectionnés avec "
+"soin."
+msgstr ""
+"Entdecken, verstehen und Neues kennenlernen mit sorgfältig ausgewählten "
+"Inhalten."
+
+#: articles/templates/articles/detail.html:66
+msgid "Découvrir les autres articles"
+msgstr "Weitere Artikel entdecken"
+
+#: articles/templates/articles/detail.html:73
+msgid "Partenariat"
+msgstr "Partnerschaft"
+
+#: articles/templates/articles/detail.html:74
+#: articles/templates/articles/detail.html:83
+#: articles/templates/articles/detail.html:108
+msgid "Contenu sponsorisé"
+msgstr "Gesponserter Inhalt"
+
+#: articles/templates/articles/detail.html:75
+#, python-format
+msgid "Cet article est sponsorisé par <strong>%(sponsor)s</strong>."
+msgstr "Dieser Artikel wird von <strong>%(sponsor)s</strong> gesponsert."
+
+#: articles/templates/articles/detail.html:96
+#: articles/templates/articles/detail.html:111
+#, python-format
+msgid "Média associé à %(article_title)s"
+msgstr "Medium zu %(article_title)s"
+
+#: articles/templates/articles/detail.html:103
+msgid "Média précédent"
+msgstr "Vorheriges Medium"
+
+#: articles/templates/articles/detail.html:104
+msgid "Média suivant"
+msgstr "Nächstes Medium"
+
+#: articles/templates/articles/list.html:4
+msgid "Articles — Teyilawson"
+msgstr "Artikel — Teyilawson"
+
+#: articles/templates/articles/list.html:14
+msgid "Journal · idées · découvertes"
+msgstr "Journal · Ideen · Entdeckungen"
+
+#: articles/templates/articles/list.html:15
+msgid "Des lectures pour voir plus loin."
+msgstr "Lesestoff für neue Perspektiven."
+
+#: articles/templates/articles/list.html:17
+msgid ""
+"Récits, expériences et réflexions réunis dans un espace éditorial clair, "
+"pensé pour prendre le temps de découvrir et de comprendre."
+msgstr ""
+"Geschichten, Erfahrungen und Gedanken in einem übersichtlichen "
+"redaktionellen Bereich, der Zeit zum Entdecken und Verstehen bietet."
+
+#: articles/templates/articles/list.html:24
+msgid "Nouvel article"
+msgstr "Neuer Artikel"
+
+#: articles/templates/articles/list.html:30
+msgid "Liste des articles"
+msgstr "Artikelliste"
+
+#: articles/templates/articles/list.html:33
+#, python-format
+msgid "Lire %(article_title)s"
+msgstr "%(article_title)s lesen"
+
+#: articles/templates/articles/list.html:40
+msgid "Informations de l’article"
+msgstr "Artikelinformationen"
+
+#: articles/templates/articles/list.html:73
+msgid "Lire l’article"
+msgstr "Artikel lesen"
+
+#: articles/templates/articles/list.html:78
+msgid "Actions de gestion"
+msgstr "Verwaltungsaktionen"
+
+#: articles/templates/articles/list.html:79
+#, python-format
+msgid "Modifier %(article_title)s"
+msgstr "%(article_title)s bearbeiten"
+
+#: articles/templates/articles/list.html:82
+#, python-format
+msgid "Supprimer %(article_title)s"
+msgstr "%(article_title)s löschen"
+
+#: articles/templates/articles/list.html:93
+#: articles/templates/articles/list.html:101
+msgid "Aucun article pour le moment"
+msgstr "Derzeit keine Artikel"
+
+#: articles/templates/articles/list.html:94
+#: articles/templates/articles/list.html:102
+msgid "Les prochains récits et découvertes apparaîtront ici."
+msgstr "Die nächsten Geschichten und Entdeckungen erscheinen hier."
+
+#: articles/templates/articles/list.html:107
+msgid "Pagination des articles"
+msgstr "Seitennavigation der Artikel"
+
+#: articles/templates/articles/list.html:111
+#: articles/templates/articles/list.html:116
+msgid "Précédent"
+msgstr "Zurück"
+
+#: articles/templates/articles/list.html:120
+msgid "Pages"
+msgstr "Seiten"
+
+#: articles/templates/articles/list.html:125
+#, python-format
+msgid "Page %(num)s"
+msgstr "Seite %(num)s"
+
+#: articles/templates/articles/list.html:132
+#: articles/templates/articles/list.html:137
+msgid "Suivant"
+msgstr "Weiter"
+
+#: articles/templates/articles/supprimer.html:4
+msgid "Supprimer un article — Teyilawson"
+msgstr "Artikel löschen — Teyilawson"
+
+#: articles/templates/articles/supprimer.html:16
+msgid "Suppression définitive"
+msgstr "Endgültige Löschung"
+
+#: articles/templates/articles/supprimer.html:17
+msgid "Supprimer cet article ?"
+msgstr "Diesen Artikel löschen?"
+
+#: articles/templates/articles/supprimer.html:18
+#, python-format
+msgid ""
+"Vous êtes sur le point de supprimer <strong>« %(article_title)s »</strong>. "
+"Cette action est irréversible."
+msgstr ""
+"Sie sind dabei, <strong>„%(article_title)s“</strong> zu löschen. Diese "
+"Aktion kann nicht rückgängig gemacht werden."
+
+#: articles/templates/articles/supprimer.html:22
+msgid ""
+"Le contenu ne pourra pas être restauré depuis cette page après confirmation."
+msgstr ""
+"Nach der Bestätigung kann der Inhalt über diese Seite nicht "
+"wiederhergestellt werden."
+
+#: articles/templates/articles/supprimer.html:27
+msgid "Oui, supprimer définitivement"
+msgstr "Ja, endgültig löschen"
+
+#: articles/views.py:32
+msgid "Cet article est réservé aux abonnés."
+msgstr "Dieser Artikel ist Abonnenten vorbehalten."
+
+#: articles/views.py:52
+msgid "✅ Article créé avec succès."
+msgstr "✅ Artikel erfolgreich erstellt."
+
+#: articles/views.py:68
+msgid "✏️ Article modifié avec succès."
+msgstr "✏️ Artikel erfolgreich bearbeitet."
+
+#: articles/views.py:82
+msgid "🗑 Article supprimé avec succès."
+msgstr "🗑 Artikel erfolgreich gelöscht."
 
 #: blog/forms.py:5
 msgid "Ce champ est obligatoire."
@@ -118,16 +489,6 @@ msgstr "Neue Kategorie"
 msgid "Le slug public est généré automatiquement à partir du nom."
 msgstr "Der öffentliche Slug wird automatisch aus dem Namen erzeugt."
 
-#: shop/templates/shop/categories/form.html:40
-#: shop/templates/shop/categories/supprimer.html:25
-#: shop/templates/shop/creer.html:12
-msgid "Annuler"
-msgstr "Abbrechen"
-
-#: shop/templates/shop/categories/form.html:43
-msgid "Enregistrer les modifications"
-msgstr "Änderungen speichern"
-
 #: shop/templates/shop/categories/form.html:43
 msgid "Créer la catégorie"
 msgstr "Kategorie erstellen"
@@ -164,14 +525,6 @@ msgstr "Aktionen"
 #: shop/templates/shop/categories/liste.html:44
 msgid "Voir"
 msgstr "Ansehen"
-
-#: shop/templates/shop/categories/liste.html:45
-msgid "Modifier"
-msgstr "Bearbeiten"
-
-#: shop/templates/shop/categories/liste.html:46
-msgid "Supprimer"
-msgstr "Löschen"
 
 #: shop/templates/shop/categories/liste.html:57
 msgid "Aucune catégorie"
@@ -999,10 +1352,6 @@ msgstr "Projekt unterstützen"
 #: templates/template_base.html:82
 msgid "Faire un don"
 msgstr "Spenden"
-
-#: templates/template_base.html:83
-msgid "Premium"
-msgstr "Premium"
 
 #: templates/template_base.html:83
 msgid "Affiliation"

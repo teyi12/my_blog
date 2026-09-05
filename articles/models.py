@@ -21,8 +21,8 @@ class Article(models.Model):
     is_premium = models.BooleanField(default=False)
 
     def save(self, *args, **kwargs):
-        if not self.slug:
-            self.slug = slugify(self.titre)
+        if self._state.adding and not self.slug:
+            self.slug = slugify(self.titre_fr)
         super().save(*args, **kwargs)
 
     def __str__(self):

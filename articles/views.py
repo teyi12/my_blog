@@ -1,20 +1,20 @@
-from django.shortcuts import render, redirect, get_object_or_404
-from django.http import HttpResponseRedirect
-from django.urls import reverse
-from .forms import ArticleForm
-from .models import Article, ArticleMedia
-from django.core.paginator import Paginator
-from django.contrib.auth.decorators import login_required
-from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib import messages
-from django.http import JsonResponse
+from django.contrib.admin.views.decorators import staff_member_required
+from django.core.paginator import Paginator
+from django.http import HttpResponseRedirect, JsonResponse
 from django.contrib.auth.views import redirect_to_login
+from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse
+from django.utils.translation import gettext as _
+
 from monetization.services import utilisateur_a_acces_premium
 
+from .forms import ArticleForm
+from .models import Article
 
 
 def articles_view(request):
-    article_list = Article.objects.all().order_by("-date_publication")
+    article_list = Article.objects.select_related("auteur").order_by("-date_publication")
     paginator = Paginator(article_list, 6)  # 6 articles par page
     page_number = request.GET.get("page")
     page_obj = paginator.get_page(page_number)
@@ -23,10 +23,13 @@ def articles_view(request):
 
 
 def article_view(request, slug):
-    article = get_object_or_404(Article, slug=slug)
+    article = get_object_or_404(
+        Article.objects.select_related("auteur").prefetch_related("medias"),
+        slug=slug,
+    )
 
     if article.is_premium and not utilisateur_a_acces_premium(request.user):
-        messages.warning(request, "Cet article est réservé aux abonnés.")
+        messages.warning(request, _("Cet article est réservé aux abonnés."))
         if not request.user.is_authenticated:
             return redirect_to_login(
                 request.get_full_path(),
@@ -46,7 +49,7 @@ def creer_view(request):
             article = form.save(commit=False)
             article.auteur = request.user  # Ajout de l’auteur
             article.save()
-            messages.success(request, "✅ Article créé avec succès.")
+            messages.success(request, _("✅ Article créé avec succès."))
             return HttpResponseRedirect(reverse("articles:articles"))
     else:
         form = ArticleForm()
@@ -62,7 +65,7 @@ def modifier_view(request, slug):
         form = ArticleForm(request.POST, request.FILES, instance=article)
         if form.is_valid():
             form.save()
-            messages.success(request, "✏️ Article modifié avec succès.")
+            messages.success(request, _("✏️ Article modifié avec succès."))
             return HttpResponseRedirect(reverse("articles:articles"))
     else:
         form = ArticleForm(instance=article)
@@ -76,10 +79,11 @@ def supprimer_view(request, slug):
 
     if request.method == "POST":
         article.delete()
-        messages.success(request, "🗑 Article supprimé avec succès.")
+        messages.success(request, _("🗑 Article supprimé avec succès."))
         return HttpResponseRedirect(reverse("articles:articles"))
 
     return render(request, "articles/supprimer.html", {"article": article})
+
 
 def article_media_json(request, slug):
     article = get_object_or_404(Article, slug=slug)
