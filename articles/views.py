@@ -1,8 +1,9 @@
 from django.contrib import messages
 from django.contrib.admin.views.decorators import staff_member_required
-from django.core.paginator import Paginator
-from django.http import HttpResponseRedirect, JsonResponse
 from django.contrib.auth.views import redirect_to_login
+from django.core.paginator import Paginator
+from django.db.models import F
+from django.http import HttpResponseRedirect, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils.translation import gettext as _
@@ -14,17 +15,29 @@ from .models import Article
 
 
 def articles_view(request):
-    article_list = Article.objects.select_related("auteur").order_by("-date_publication")
+    article_list = Article.objects.select_related("auteur", "categorie").order_by(
+        F("ordre_affichage").asc(nulls_last=True),
+        "-date_publication",
+        "-pk",
+    )
+    featured_article = article_list.filter(en_vedette=True).first()
+    if featured_article:
+        article_list = article_list.exclude(pk=featured_article.pk)
+
     paginator = Paginator(article_list, 6)  # 6 articles par page
     page_number = request.GET.get("page")
     page_obj = paginator.get_page(page_number)
 
-    return render(request, "articles/list.html", {"page_obj": page_obj})
+    return render(
+        request,
+        "articles/list.html",
+        {"featured_article": featured_article, "page_obj": page_obj},
+    )
 
 
 def article_view(request, slug):
     article = get_object_or_404(
-        Article.objects.select_related("auteur").prefetch_related("medias"),
+        Article.objects.select_related("auteur", "categorie").prefetch_related("medias"),
         slug=slug,
     )
 

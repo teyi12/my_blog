@@ -53,6 +53,10 @@
   gap: 1.4rem;
 }
 
+.articles-featured {
+  display: grid;
+}
+
 .article-card {
   display: grid;
   grid-template-columns: minmax(180px, .88fr) minmax(0, 1.12fr);
@@ -137,6 +141,16 @@
 .article-badge-premium {
   color: #6d4513;
   background: rgba(248,234,212,.96);
+}
+
+.article-badge-featured {
+  color: var(--brand-900);
+  background: rgba(232, 246, 239, .96);
+}
+
+.article-category {
+  color: var(--brand-700);
+  font-weight: 800;
 }
 
 .article-card-body {

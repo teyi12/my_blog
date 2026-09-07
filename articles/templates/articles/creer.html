@@ -35,11 +35,11 @@
         </div>
 
         {% for field in form %}
-          {% if field.name == 'titre_fr' or field.name == 'titre_de' or field.name == 'titre_en' or field.name == 'contenu_fr' or field.name == 'contenu_de' or field.name == 'contenu_en' %}
+          {% if field.name == 'titre_fr' or field.name == 'titre_de' or field.name == 'titre_en' or field.name == 'contenu_fr' or field.name == 'contenu_de' or field.name == 'contenu_en' or field.name == 'image_alt_fr' or field.name == 'image_alt_de' or field.name == 'image_alt_en' %}
           <div class="editor-field">
             <label for="{{ field.id_for_label }}">{{ field.label }}</label>
             {{ field }}
-            {% if field.help_text %}<small>{{ field.help_text|safe }}</small>{% endif %}
+            {% if field.help_text %}<small>{{ field.help_text }}</small>{% endif %}
             {% for error in field.errors %}<div class="editor-error">{{ error }}</div>{% endfor %}
           </div>
           {% endif %}
@@ -54,21 +54,21 @@
           </div>
 
           {% for field in form %}
-            {% if field.name == 'image' or field.name == 'sponsor' %}
+            {% if field.name == 'image' or field.name == 'categorie' or field.name == 'sponsor' or field.name == 'ordre_affichage' %}
             <div class="editor-field">
               <label for="{{ field.id_for_label }}">
                 {{ field.label }}
               </label>
               {{ field }}
-              {% if field.help_text %}<small>{{ field.help_text|safe }}</small>{% endif %}
+              {% if field.help_text %}<small>{{ field.help_text }}</small>{% endif %}
               {% for error in field.errors %}<div class="editor-error">{{ error }}</div>{% endfor %}
             </div>
-            {% elif field.name == 'est_sponsorise' or field.name == 'is_premium' %}
+            {% elif field.name == 'est_sponsorise' or field.name == 'is_premium' or field.name == 'en_vedette' %}
             <label class="editor-toggle" for="{{ field.id_for_label }}">
               {{ field }}
               <span>
                 <strong>{{ field.label }}</strong>
-                <small>{% if field.name == 'est_sponsorise' %}{% translate "Signale qu’un partenaire soutient ce contenu." %}{% else %}{% translate "Réserve ce contenu aux accès premium." %}{% endif %}</small>
+                <small>{% if field.name == 'est_sponsorise' %}{% translate "Signale qu’un partenaire soutient ce contenu." %}{% elif field.name == 'en_vedette' %}{% translate "Affiche cet article en grand dans la liste." %}{% else %}{% translate "Réserve ce contenu aux accès premium." %}{% endif %}</small>
               </span>
             </label>
             {% for error in field.errors %}<div class="editor-error">{{ error }}</div>{% endfor %}

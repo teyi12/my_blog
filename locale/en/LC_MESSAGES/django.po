@@ -2968,5 +2968,44 @@ msgstr "All rights reserved."
 msgid "Retour en haut"
 msgstr "Back to top"
 
+msgid "Texte alternatif [fr]"
+msgstr "Alternative text [fr]"
+
+msgid "Texte alternatif [de]"
+msgstr "Alternative text [de]"
+
+msgid "Texte alternatif [en]"
+msgstr "Alternative text [en]"
+
+msgid "Article à la une"
+msgstr "Featured article"
+
+msgid "Ordre d’affichage"
+msgstr "Display order"
+
+msgid "Facultatif : le titre de l’article sera utilisé si ce champ est vide."
+msgstr "Optional: the article title will be used if this field is empty."
+
+msgid "Facultatif : le texte français, puis le titre, seront utilisés si ce champ est vide."
+msgstr "Optional: the French text, then the title, will be used if this field is empty."
+
+msgid "Les valeurs les plus petites apparaissent en premier."
+msgstr "Lower values are displayed first."
+
+msgid "Catégorie d’article"
+msgstr "Article category"
+
+msgid "Catégories d’articles"
+msgstr "Article categories"
+
+msgid "Texte alternatif de l’image"
+msgstr "Image alternative text"
+
+msgid "À la une"
+msgstr "Featured"
+
+msgid "Affiche cet article en grand dans la liste."
+msgstr "Displays this article prominently in the list."
+
 #~ msgid "Changer"
 #~ msgstr "Change"

@@ -9,6 +9,7 @@ class ArticleTranslationMigrationTests(TransactionTestCase):
     migrate_from = [("articles", "0004_articlemedia")]
     schema_target = [("articles", "0005_article_translations")]
     migrate_to = [("articles", "0006_populate_french_article_translations")]
+    restore_to = [("articles", "0007_categoriearticle_article_en_vedette_and_more")]
 
     def setUp(self):
         super().setUp()
@@ -55,7 +56,7 @@ class ArticleTranslationMigrationTests(TransactionTestCase):
         )
 
     def tearDown(self):
-        MigrationExecutor(connection).migrate(self.migrate_to)
+        MigrationExecutor(connection).migrate(self.restore_to)
         super().tearDown()
 
     def _migrate_and_get_apps(self):
@@ -111,3 +112,79 @@ class ArticleTranslationMigrationTests(TransactionTestCase):
         self.assertIsNone(article.titre_en)
         self.assertIsNone(article.contenu_de)
         self.assertIsNone(article.contenu_en)
+
+
+class ArticleOrganizationMigrationTests(TransactionTestCase):
+    migrate_from = [("articles", "0006_populate_french_article_translations")]
+    migrate_to = [("articles", "0007_categoriearticle_article_en_vedette_and_more")]
+
+    def setUp(self):
+        super().setUp()
+        executor = MigrationExecutor(connection)
+        executor.migrate(self.migrate_from)
+        old_apps = executor.loader.project_state(self.migrate_from).apps
+
+        User = old_apps.get_model("accounts", "CustomUser")
+        Article = old_apps.get_model("articles", "Article")
+        ArticleMedia = old_apps.get_model("articles", "ArticleMedia")
+
+        self.author = User.objects.create(email="organization-migration@example.com")
+        self.article = Article.objects.create(
+            titre="Article historique organisé",
+            titre_fr="Article historique organisé",
+            titre_de="Historischer Artikel",
+            contenu="Contenu historique exact",
+            contenu_fr="Contenu historique exact",
+            slug="article-historique-organise",
+            image="articles/cloudinary-organization.jpg",
+            auteur=self.author,
+            sponsor="Partenaire historique",
+            est_sponsorise=True,
+            is_premium=True,
+        )
+        self.publication_date = self.article.date_publication
+        self.media = ArticleMedia.objects.create(
+            article=self.article,
+            type="image",
+            fichier="medias/cloudinary-organization-media.jpg",
+        )
+
+    def tearDown(self):
+        MigrationExecutor(connection).migrate(self.migrate_to)
+        super().tearDown()
+
+    def test_existing_articles_gain_empty_organization_fields_without_data_loss(self):
+        executor = MigrationExecutor(connection)
+        executor.migrate(self.migrate_to)
+        apps = executor.loader.project_state(self.migrate_to).apps
+
+        Article = apps.get_model("articles", "Article")
+        ArticleMedia = apps.get_model("articles", "ArticleMedia")
+        CategorieArticle = apps.get_model("articles", "CategorieArticle")
+        article = Article.objects.get(pk=self.article.pk)
+
+        self.assertIsNone(article.categorie_id)
+        self.assertFalse(article.en_vedette)
+        self.assertIsNone(article.ordre_affichage)
+        self.assertEqual(article.image_alt, "")
+        self.assertEqual(article.image_alt_fr, "")
+        self.assertEqual(article.image_alt_de, "")
+        self.assertEqual(article.image_alt_en, "")
+        self.assertEqual(article.titre_fr, "Article historique organisé")
+        self.assertEqual(article.titre_de, "Historischer Artikel")
+        self.assertEqual(article.contenu_fr, "Contenu historique exact")
+        self.assertEqual(article.slug, "article-historique-organise")
+        self.assertEqual(article.image.name, "articles/cloudinary-organization.jpg")
+        self.assertEqual(article.auteur_id, self.author.pk)
+        self.assertEqual(article.date_publication, self.publication_date)
+        self.assertEqual(article.sponsor, "Partenaire historique")
+        self.assertTrue(article.est_sponsorise)
+        self.assertTrue(article.is_premium)
+        self.assertEqual(CategorieArticle.objects.count(), 0)
+
+        media = ArticleMedia.objects.get(pk=self.media.pk)
+        self.assertEqual(media.article_id, article.pk)
+        self.assertEqual(
+            media.fichier.name,
+            "medias/cloudinary-organization-media.jpg",
+        )

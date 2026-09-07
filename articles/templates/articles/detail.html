@@ -23,6 +23,9 @@
     <h1>{{ article.titre }}</h1>
 
     <div class="article-detail-meta">
+      {% if article.categorie %}
+      <span><i class="fa-regular fa-folder" aria-hidden="true"></i> {{ article.categorie.nom }}</span>
+      {% endif %}
       <span><i class="fa-regular fa-calendar" aria-hidden="true"></i> {{ article.date_publication|date:"d F Y" }}</span>
       {% if article.auteur %}
       <span><i class="fa-regular fa-user" aria-hidden="true"></i> {{ article.auteur.get_full_name|default:article.auteur.email }}</span>
@@ -32,9 +35,9 @@
 
   <figure class="article-hero-media">
     {% if article.image %}
-      <img src="{{ article.image.url }}" alt="{% if article.titre %}{{ article.titre }}{% else %}{% translate 'Illustration de l’article' %}{% endif %}">
+      <img src="{{ article.image.url }}" alt="{{ article.resolved_image_alt }}">
     {% else %}
-      <img src="{% static 'images/default.jpg' %}" alt="{% if article.titre %}{{ article.titre }}{% else %}{% translate 'Illustration de l’article' %}{% endif %}">
+      <img src="{% static 'images/default.jpg' %}" alt="{{ article.resolved_image_alt }}">
     {% endif %}
   </figure>
 
