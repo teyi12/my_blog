@@ -1,6 +1,7 @@
 from django.db import models
 from django.conf import settings
 from django.utils.text import slugify
+from django.utils.translation import gettext_lazy as _
 
 
 class Partenaire(models.Model):
@@ -32,12 +33,12 @@ class Abonnement(models.Model):
     nom = models.CharField(max_length=100)
     slug = models.SlugField(unique=True, blank=True)
     prix = models.DecimalField(max_digits=10, decimal_places=2)
-    duree_jours = models.PositiveIntegerField(help_text="Durée en jours")
+    duree_jours = models.PositiveIntegerField(help_text=_("Durée en jours"))
     description = models.TextField()
 
     def save(self, *args, **kwargs):
-        if not self.slug:
-            self.slug = slugify(self.nom)
+        if self._state.adding and not self.slug:
+            self.slug = slugify(self.nom_fr)
         super().save(*args, **kwargs)
 
     def __str__(self):
@@ -83,10 +84,10 @@ class LienAffiliation(models.Model):
 class Revenu(models.Model):
     """Centralisation des revenus"""
     TYPE_CHOICES = [
-        ("PUB", "Publicité"),
-        ("SUB", "Abonnement"),
-        ("DON", "Don"),
-        ("AFF", "Affiliation"),
+        ("PUB", _("Publicité")),
+        ("SUB", _("Abonnement")),
+        ("DON", _("Don")),
+        ("AFF", _("Affiliation")),
     ]
     type = models.CharField(max_length=3, choices=TYPE_CHOICES)
     montant = models.DecimalField(max_digits=10, decimal_places=2)
@@ -119,4 +120,3 @@ class DemandeAffiliation(models.Model):
 
     def __str__(self):
         return f"Affiliation - {self.nom} ({self.plateforme})"
-

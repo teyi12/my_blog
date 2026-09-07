@@ -1,5 +1,5 @@
 {% extends "admin/change_list.html" %}
-{% load static %}
+{% load i18n static %}
 
 {% block content %}
 <div class="container mt-4">
@@ -7,7 +7,7 @@
     <!-- En-tête -->
     <div class="row mb-3">
         <div class="col">
-            <h2 class="text-primary">📊 Tableau de bord des revenus</h2>
+            <h2 class="text-primary">📊 {% translate "Tableau de bord des revenus" %}</h2>
         </div>
     </div>
 
@@ -15,9 +15,9 @@
     <div class="row mb-4 justify-content-center">
         <div class="col-md-8 text-center">
             {% if chart %}
-                <img src="data:image/png;base64,{{ chart }}" class="img-fluid shadow-sm" alt="Graphique des revenus">
+                <img src="data:image/png;base64,{{ chart }}" class="img-fluid shadow-sm" alt="{% translate 'Graphique des revenus' %}">
             {% else %}
-                <div class="alert alert-warning">Aucun graphique disponible pour le moment.</div>
+                <div class="alert alert-warning">{% translate "Aucun graphique disponible pour le moment." %}</div>
             {% endif %}
         </div>
     </div>
@@ -27,7 +27,7 @@
     <div class="row mb-4">
         <div class="col">
             <div class="alert alert-info">
-                <strong>Revenus du mois en cours:</strong> {{ revenus_mois }} €
+                <strong>{% translate "Revenus du mois en cours :" %}</strong> {{ revenus_mois }} €
             </div>
         </div>
     </div>

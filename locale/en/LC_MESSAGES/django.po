@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Teyilawson\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-05 13:20+0200\n"
-"PO-Revision-Date: 2026-09-05 00:11+0200\n"
+"POT-Creation-Date: 2026-09-07 12:34+0200\n"
+"PO-Revision-Date: 2026-09-07 12:25+0200\n"
 "Last-Translator: Teyilawson\n"
 "Language-Team: English\n"
 "Language: en\n"
@@ -176,12 +176,16 @@ msgid "Tous les articles"
 msgstr "All articles"
 
 #: articles/templates/articles/detail.html:19
-#: articles/templates/articles/list.html:43 templates/template_base.html:83
+#: articles/templates/articles/list.html:43
+#: monetization/templates/monetization/abonnements.html:9
+#: monetization/templates/monetization/dashboard.html:19
+#: templates/template_base.html:83
 msgid "Premium"
 msgstr "Premium"
 
 #: articles/templates/articles/detail.html:20
 #: articles/templates/articles/list.html:47
+#: monetization/templates/monetization/publicites.html:22
 msgid "Sponsorisé"
 msgstr "Sponsored"
 
@@ -224,6 +228,8 @@ msgid "Découvrir les autres articles"
 msgstr "Discover more articles"
 
 #: articles/templates/articles/detail.html:73
+#: monetization/templates/monetization/base.html:23
+#: monetization/templates/monetization/partenariat.html:8
 msgid "Partenariat"
 msgstr "Partnership"
 
@@ -398,7 +404,9 @@ msgstr "Last name"
 msgid "Prénom"
 msgstr "First name"
 
-#: blog/forms.py:21
+#: blog/forms.py:21 monetization/forms.py:13 monetization/forms.py:25
+#: monetization/templates/monetization/affiliation.html:28
+#: monetization/templates/monetization/partenariat.html:28
 msgid "Adresse e-mail"
 msgstr "Email address"
 
@@ -428,6 +436,456 @@ msgstr "Your message has been sent. Thank you for getting in touch."
 #: blog/views.py:70
 msgid "Merci pour votre message."
 msgstr "Thank you for your message."
+
+#: monetization/admin.py:84
+msgid "Commission estimée"
+msgstr "Estimated commission"
+
+#: monetization/admin.py:126
+msgid "Revenus mensuels par type"
+msgstr "Monthly revenue by type"
+
+#: monetization/admin.py:127
+msgid "Mois"
+msgstr "Month"
+
+#: monetization/admin.py:128 monetization/templates/monetization/don.html:28
+msgid "Montant (€)"
+msgstr "Amount (€)"
+
+#: monetization/admin.py:151
+msgid "Administration du Blog & Shop"
+msgstr "Blog & Shop administration"
+
+#: monetization/admin.py:152
+msgid "Tableau de bord"
+msgstr "Dashboard"
+
+#: monetization/admin.py:153
+msgid "Bienvenue sur le tableau de bord"
+msgstr "Welcome to the dashboard"
+
+#: monetization/forms.py:12 monetization/forms.py:24
+#: monetization/templates/monetization/affiliation.html:27
+#: monetization/templates/monetization/partenariat.html:27
+msgctxt "monetization form"
+msgid "Nom"
+msgstr "Name"
+
+#: monetization/forms.py:14
+#: monetization/templates/monetization/partenariat.html:29
+msgid "Entreprise"
+msgstr "Company"
+
+#: monetization/forms.py:15 monetization/forms.py:28
+#: monetization/templates/monetization/affiliation.html:20
+#: monetization/templates/monetization/affiliation.html:31
+#: monetization/templates/monetization/partenariat.html:30
+msgid "Votre proposition"
+msgstr "Your proposal"
+
+#: monetization/forms.py:26
+#: monetization/templates/monetization/affiliation.html:29
+msgid "Plateforme"
+msgstr "Platform"
+
+#: monetization/forms.py:27
+#: monetization/templates/monetization/affiliation.html:30
+msgid "Produit ou service"
+msgstr "Product or service"
+
+#: monetization/models.py:36
+msgid "Durée en jours"
+msgstr "Duration in days"
+
+#: monetization/models.py:87
+#: monetization/templates/monetization/dashboard.html:17
+#: monetization/templates/monetization/publicites.html:9
+#: templates/template_base.html:83
+msgid "Publicité"
+msgstr "Advertising"
+
+#: monetization/models.py:88
+msgid "Abonnement"
+msgstr "Subscription"
+
+#: monetization/models.py:89
+msgid "Don"
+msgstr "Donation"
+
+#: monetization/models.py:90
+#: monetization/templates/monetization/affiliation.html:8
+#: monetization/templates/monetization/base.html:24
+#: monetization/templates/monetization/dashboard.html:18
+#: templates/template_base.html:83
+msgid "Affiliation"
+msgstr "Affiliate programme"
+
+#: monetization/templates/admin/revenu_change_list.html:10
+msgid "Tableau de bord des revenus"
+msgstr "Revenue dashboard"
+
+#: monetization/templates/admin/revenu_change_list.html:18
+msgid "Graphique des revenus"
+msgstr "Revenue chart"
+
+#: monetization/templates/admin/revenu_change_list.html:20
+msgid "Aucun graphique disponible pour le moment."
+msgstr "No chart is available at the moment."
+
+#: monetization/templates/admin/revenu_change_list.html:30
+msgid "Revenus du mois en cours :"
+msgstr "Revenue for the current month:"
+
+#: monetization/templates/monetization/abonnements.html:3
+msgid "Abonnements Premium — Teyilawson"
+msgstr "Premium subscriptions — Teyilawson"
+
+#: monetization/templates/monetization/abonnements.html:10
+msgid "Choisissez la formule qui vous correspond."
+msgstr "Choose the plan that suits you."
+
+#: monetization/templates/monetization/abonnements.html:11
+msgid ""
+"Les offres ci-dessous décrivent les formules disponibles. L’activation "
+"automatique n’est réalisée qu’après confirmation d’un paiement sécurisé."
+msgstr ""
+"The offers below describe the available plans. Automatic activation only "
+"takes place after a secure payment has been confirmed."
+
+#: monetization/templates/monetization/abonnements.html:20
+msgid "Formule Premium"
+msgstr "Premium plan"
+
+#: monetization/templates/monetization/abonnements.html:23
+#, python-format
+msgid "pour %(days)s jour"
+msgid_plural "pour %(days)s jours"
+msgstr[0] "for %(days)s day"
+msgstr[1] "for %(days)s days"
+
+#: monetization/templates/monetization/abonnements.html:24
+msgid "Choisir cette formule"
+msgstr "Choose this plan"
+
+#: monetization/templates/monetization/abonnements.html:25
+msgid "Activation uniquement après paiement confirmé."
+msgstr "Activation only after payment is confirmed."
+
+#: monetization/templates/monetization/abonnements.html:32
+msgid "Les offres Premium arrivent bientôt."
+msgstr "Premium plans are coming soon."
+
+#: monetization/templates/monetization/abonnements.html:33
+msgid "Aucune formule n’est actuellement publiée."
+msgstr "No plan is currently available."
+
+#: monetization/templates/monetization/affiliation.html:3
+msgid "Affiliation — Teyilawson"
+msgstr "Affiliate programme — Teyilawson"
+
+#: monetization/templates/monetization/affiliation.html:9
+msgid "Proposer un produit ou service réellement pertinent."
+msgstr "Suggest a genuinely relevant product or service."
+
+#: monetization/templates/monetization/affiliation.html:10
+msgid ""
+"L’affiliation doit rester utile au lecteur. Présentez la plateforme, le "
+"produit concerné et le contexte dans lequel vous imaginez la collaboration."
+msgstr ""
+"Affiliate content should remain useful to readers. Introduce the platform, "
+"the relevant product and the context in which you envisage the collaboration."
+
+#: monetization/templates/monetization/affiliation.html:12
+msgid "Pertinence éditoriale avant tout"
+msgstr "Editorial relevance comes first"
+
+#: monetization/templates/monetization/affiliation.html:13
+msgid "Liens commerciaux identifiables"
+msgstr "Clearly identified commercial links"
+
+#: monetization/templates/monetization/affiliation.html:14
+msgid "Sélection indépendante"
+msgstr "Independent selection"
+
+#: monetization/templates/monetization/affiliation.html:21
+msgid "Soumettre une demande d’affiliation"
+msgstr "Submit an affiliate request"
+
+#: monetization/templates/monetization/affiliation.html:33
+msgid "Envoyer ma proposition"
+msgstr "Send my proposal"
+
+#: monetization/templates/monetization/base.html:4
+msgid "Monétisation — Teyilawson"
+msgstr "Monetisation — Teyilawson"
+
+#: monetization/templates/monetization/base.html:16
+msgid "Teyilawson · Monétisation"
+msgstr "Teyilawson · Monetisation"
+
+#: monetization/templates/monetization/base.html:17
+msgid "Des collaborations claires, utiles et durables."
+msgstr "Clear, useful and lasting collaborations."
+
+#: monetization/templates/monetization/base.html:18
+msgid ""
+"Partenariats, affiliation, abonnements et soutien : chaque canal est "
+"présenté séparément pour garder une expérience simple et transparente."
+msgstr ""
+"Partnerships, affiliate programmes, subscriptions and support: each channel "
+"is presented separately to keep the experience simple and transparent."
+
+#: monetization/templates/monetization/base.html:22
+msgid "Navigation monétisation"
+msgstr "Monetisation navigation"
+
+#: monetization/templates/monetization/base.html:25
+msgid "Abonnements"
+msgstr "Subscriptions"
+
+#: monetization/templates/monetization/base.html:26
+msgid "Soutenir"
+msgstr "Support"
+
+#: monetization/templates/monetization/base.html:27
+msgid "Publicités"
+msgstr "Advertising"
+
+#: monetization/templates/monetization/base.html:28
+msgid "Dashboard"
+msgstr "Dashboard"
+
+#: monetization/templates/monetization/dashboard.html:3
+msgid "Dashboard monétisation — Teyilawson"
+msgstr "Monetisation dashboard — Teyilawson"
+
+#: monetization/templates/monetization/dashboard.html:9
+msgid "Administration"
+msgstr "Administration"
+
+#: monetization/templates/monetization/dashboard.html:10
+msgid "Vue d’ensemble des revenus enregistrés."
+msgstr "Overview of recorded revenue."
+
+#: monetization/templates/monetization/dashboard.html:11
+msgid ""
+"Les montants affichés proviennent désormais des données réellement présentes "
+"dans la base, sans statistiques de démonstration."
+msgstr ""
+"The amounts shown now come from the data actually stored in the database, "
+"with no demonstration statistics."
+
+#: monetization/templates/monetization/dashboard.html:16
+msgid "Total"
+msgstr "Total"
+
+#: monetization/templates/monetization/dashboard.html:20
+msgid "Dons"
+msgstr "Donations"
+
+#: monetization/templates/monetization/dashboard.html:25
+msgid "Activité récente"
+msgstr "Recent activity"
+
+#: monetization/templates/monetization/dashboard.html:26
+msgid "Derniers revenus enregistrés"
+msgstr "Latest recorded revenue"
+
+#: monetization/templates/monetization/dashboard.html:32
+msgid "Source"
+msgstr "Source"
+
+#: monetization/templates/monetization/dashboard.html:32
+#: monetization/templates/monetization/revenus.html:28
+msgid "Date"
+msgstr "Date"
+
+#: monetization/templates/monetization/dashboard.html:32
+#: monetization/templates/monetization/revenus.html:27
+msgid "Montant"
+msgstr "Amount"
+
+#: monetization/templates/monetization/dashboard.html:45
+msgid "Aucun revenu n’a encore été enregistré dans la base."
+msgstr "No revenue has been recorded in the database yet."
+
+#: monetization/templates/monetization/don.html:3
+msgid "Soutenir Teyilawson"
+msgstr "Support Teyilawson"
+
+#: monetization/templates/monetization/don.html:8
+#: templates/template_base.html:80
+msgid "Soutenir le projet"
+msgstr "Support the project"
+
+#: monetization/templates/monetization/don.html:9
+msgid "Contribuez librement au développement de Teyilawson."
+msgstr ""
+"Choose how much you would like to contribute to Teyilawson’s development."
+
+#: monetization/templates/monetization/don.html:10
+msgid ""
+"Votre soutien aide à faire évoluer les contenus, l’expérience utilisateur et "
+"les nouveaux services de la plateforme."
+msgstr ""
+"Your support helps improve the content, user experience and new services on "
+"the platform."
+
+#: monetization/templates/monetization/don.html:12
+msgid "Paiement traité par Stripe"
+msgstr "Payment processed by Stripe"
+
+#: monetization/templates/monetization/don.html:13
+msgid "Aucune donnée bancaire stockée ici"
+msgstr "No bank details stored here"
+
+#: monetization/templates/monetization/don.html:14
+msgid "Montant libre"
+msgstr "Choose your amount"
+
+#: monetization/templates/monetization/don.html:20
+msgid "Don ponctuel"
+msgstr "One-off donation"
+
+#: monetization/templates/monetization/don.html:21
+msgid "Choisissez votre montant"
+msgstr "Choose your amount"
+
+#: monetization/templates/monetization/don.html:22
+msgid "Vous serez redirigé vers la page de paiement sécurisée."
+msgstr "You will be redirected to the secure payment page."
+
+#: monetization/templates/monetization/don.html:33
+msgid "Continuer vers le paiement"
+msgstr "Continue to payment"
+
+#: monetization/templates/monetization/don.html:37
+msgid "Connectez-vous pour effectuer un don de façon sécurisée."
+msgstr "Sign in to make a secure donation."
+
+#: monetization/templates/monetization/don.html:38
+msgid "Se connecter"
+msgstr "Sign in"
+
+#: monetization/templates/monetization/partenariat.html:3
+msgid "Partenariat — Teyilawson"
+msgstr "Partnership — Teyilawson"
+
+#: monetization/templates/monetization/partenariat.html:9
+msgid "Construisons une collaboration cohérente avec votre marque."
+msgstr "Let’s build a collaboration that fits your brand."
+
+#: monetization/templates/monetization/partenariat.html:10
+msgid ""
+"Présentez votre projet, votre entreprise et le type de collaboration "
+"envisagé. Chaque demande est examinée avant toute mise en avant."
+msgstr ""
+"Introduce your project, your company and the type of collaboration you have "
+"in mind. Every request is reviewed before anything is promoted."
+
+#: monetization/templates/monetization/partenariat.html:12
+msgid "Proposition étudiée individuellement"
+msgstr "Every proposal reviewed individually"
+
+#: monetization/templates/monetization/partenariat.html:13
+msgid "Présentation transparente au public"
+msgstr "Transparent presentation to the public"
+
+#: monetization/templates/monetization/partenariat.html:14
+msgid "Intégration adaptée au contenu"
+msgstr "Integration tailored to the content"
+
+#: monetization/templates/monetization/partenariat.html:20
+msgid "Votre demande"
+msgstr "Your request"
+
+#: monetization/templates/monetization/partenariat.html:21
+msgid "Parlez-nous de votre projet"
+msgstr "Tell us about your project"
+
+#: monetization/templates/monetization/partenariat.html:29
+msgid "facultatif"
+msgstr "optional"
+
+#: monetization/templates/monetization/partenariat.html:32
+msgid "Envoyer ma demande"
+msgstr "Send my request"
+
+#: monetization/templates/monetization/publicites.html:3
+msgid "Publicités — Teyilawson"
+msgstr "Advertising — Teyilawson"
+
+#: monetization/templates/monetization/publicites.html:10
+msgid "Partenaires et campagnes actuellement visibles."
+msgstr "Partners and campaigns currently on display."
+
+#: monetization/templates/monetization/publicites.html:11
+msgid ""
+"Les contenus commerciaux sont présentés comme tels afin de préserver une "
+"lecture claire et transparente."
+msgstr ""
+"Commercial content is identified as such to keep the experience clear and "
+"transparent."
+
+#: monetization/templates/monetization/publicites.html:13
+msgid "Proposer un partenariat"
+msgstr "Propose a partnership"
+
+#: monetization/templates/monetization/publicites.html:27
+#, python-format
+msgid "Campagne active du %(start)s au %(end)s."
+msgstr "Campaign active from %(start)s to %(end)s."
+
+#: monetization/templates/monetization/publicites.html:28
+msgid "Découvrir"
+msgstr "Discover"
+
+#: monetization/templates/monetization/publicites.html:36
+msgid "Aucune campagne active pour le moment."
+msgstr "There are no active campaigns at the moment."
+
+#: monetization/templates/monetization/publicites.html:37
+msgid "Les prochaines collaborations apparaîtront ici."
+msgstr "Upcoming collaborations will appear here."
+
+#: monetization/templates/monetization/revenus.html:3
+#: templates/template_base.html:66
+msgid "Revenus"
+msgstr "Revenue"
+
+#: monetization/templates/monetization/revenus.html:7
+msgid "Revenus du Blog"
+msgstr "Blog revenue"
+
+#: monetization/templates/monetization/revenus.html:22
+msgid "Historique des revenus"
+msgstr "Revenue history"
+
+#: monetization/templates/monetization/revenus.html:26
+msgid "Type"
+msgstr "Type"
+
+#: monetization/templates/monetization/revenus.html:39
+msgid "Aucun revenu enregistré."
+msgstr "No revenue recorded."
+
+#: monetization/views.py:42
+msgid "Votre demande de partenariat a été envoyée avec succès."
+msgstr "Your partnership request has been sent successfully."
+
+#: monetization/views.py:57
+msgid "Votre demande d’affiliation a été envoyée avec succès."
+msgstr "Your affiliate request has been sent successfully."
+
+#: monetization/views.py:77
+#, python-format
+msgid ""
+"L’activation sécurisée de l’abonnement %(subscription)s sera disponible "
+"après intégration complète du paiement récurrent."
+msgstr ""
+"Secure activation of the %(subscription)s subscription will be available "
+"once recurring payments have been fully integrated."
 
 #: shop/forms.py:20
 msgid "Nom de la catégorie"
@@ -1299,10 +1757,6 @@ msgstr "My profile"
 msgid "Mes commandes"
 msgstr "My orders"
 
-#: templates/template_base.html:66
-msgid "Revenus"
-msgstr "Revenue"
-
 #: templates/template_base.html:68
 msgid "Déconnexion"
 msgstr "Sign out"
@@ -1319,21 +1773,9 @@ msgstr "Sign up"
 msgid "Soutenir et collaborer"
 msgstr "Support and collaborate"
 
-#: templates/template_base.html:80
-msgid "Soutenir le projet"
-msgstr "Support the project"
-
 #: templates/template_base.html:82
 msgid "Faire un don"
 msgstr "Donate"
-
-#: templates/template_base.html:83
-msgid "Affiliation"
-msgstr "Affiliate programme"
-
-#: templates/template_base.html:83
-msgid "Publicité"
-msgstr "Advertising"
 
 #: templates/template_base.html:92
 msgid "Fermer"

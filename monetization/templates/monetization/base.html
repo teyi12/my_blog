@@ -1,7 +1,7 @@
 {% extends "template_base.html" %}
-{% load static %}
+{% load i18n static %}
 
-{% block titre %}{% block title %}Monétisation — Teyilawson{% endblock %}{% endblock %}
+{% block titre %}{% block title %}{% translate "Monétisation — Teyilawson" %}{% endblock %}{% endblock %}
 
 {% block styles %}
 <link rel="stylesheet" href="{% static 'css/monetization.css' %}">
@@ -13,19 +13,19 @@
   <div class="monetization-shell">
     <header class="monetization-header">
       <div>
-        <span class="monetization-eyebrow">Teyilawson · Monétisation</span>
-        <h1>Des collaborations claires, utiles et durables.</h1>
-        <p>Partenariats, affiliation, abonnements et soutien : chaque canal est présenté séparément pour garder une expérience simple et transparente.</p>
+        <span class="monetization-eyebrow">{% translate "Teyilawson · Monétisation" %}</span>
+        <h1>{% translate "Des collaborations claires, utiles et durables." %}</h1>
+        <p>{% translate "Partenariats, affiliation, abonnements et soutien : chaque canal est présenté séparément pour garder une expérience simple et transparente." %}</p>
       </div>
     </header>
 
-    <nav class="monetization-nav" aria-label="Navigation monétisation">
-      <a href="{% url 'monetization:partenariat' %}">Partenariat</a>
-      <a href="{% url 'monetization:affiliation' %}">Affiliation</a>
-      <a href="{% url 'monetization:abonnements' %}">Abonnements</a>
-      <a href="{% url 'monetization:don' %}">Soutenir</a>
-      <a href="{% url 'monetization:publicites' %}">Publicités</a>
-      {% if user.is_staff %}<a href="{% url 'monetization:dashboard' %}">Dashboard</a>{% endif %}
+    <nav class="monetization-nav" aria-label="{% translate 'Navigation monétisation' %}">
+      <a href="{% url 'monetization:partenariat' %}">{% translate "Partenariat" %}</a>
+      <a href="{% url 'monetization:affiliation' %}">{% translate "Affiliation" %}</a>
+      <a href="{% url 'monetization:abonnements' %}">{% translate "Abonnements" %}</a>
+      <a href="{% url 'monetization:don' %}">{% translate "Soutenir" %}</a>
+      <a href="{% url 'monetization:publicites' %}">{% translate "Publicités" %}</a>
+      {% if user.is_staff %}<a href="{% url 'monetization:dashboard' %}">{% translate "Dashboard" %}</a>{% endif %}
     </nav>
 
     {% block content %}{% endblock %}
