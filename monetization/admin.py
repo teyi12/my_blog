@@ -33,9 +33,6 @@ class AbonnementAdmin(TranslationAdmin):
         "nom_fr",
         "nom_de",
         "nom_en",
-        "description_fr",
-        "description_de",
-        "description_en",
     )
 
     def get_readonly_fields(self, request, obj=None):

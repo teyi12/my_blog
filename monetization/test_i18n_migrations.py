@@ -1,10 +1,11 @@
-from datetime import date
+from datetime import date, timedelta
 from decimal import Decimal
 from importlib import import_module
 
 from django.db import connection
 from django.db.migrations.executor import MigrationExecutor
 from django.test import TransactionTestCase
+from django.utils import timezone
 
 
 class MonetizationTranslationMigrationTests(TransactionTestCase):
@@ -20,7 +21,12 @@ class MonetizationTranslationMigrationTests(TransactionTestCase):
 
         Partenaire = old_apps.get_model("monetization", "Partenaire")
         Abonnement = old_apps.get_model("monetization", "Abonnement")
+        AbonnementUtilisateur = old_apps.get_model(
+            "monetization",
+            "AbonnementUtilisateur",
+        )
         Publicite = old_apps.get_model("monetization", "Publicite")
+        User = old_apps.get_model("accounts", "CustomUser")
 
         self.partner = Partenaire.objects.create(
             nom="Marque historique",
@@ -40,6 +46,13 @@ class MonetizationTranslationMigrationTests(TransactionTestCase):
             prix=Decimal("5.00"),
             duree_jours=7,
             description="Description source à ne pas recopier.",
+        )
+        self.user = User.objects.create(email="premium-migration@example.test")
+        self.user_subscription = AbonnementUtilisateur.objects.create(
+            utilisateur=self.user,
+            abonnement=self.subscription,
+            date_fin=timezone.now() + timedelta(days=90),
+            actif=True,
         )
         self.campaign = Publicite.objects.create(
             titre="Campagne historique exacte",
@@ -85,6 +98,10 @@ class MonetizationTranslationMigrationTests(TransactionTestCase):
     def test_migration_only_copies_historical_content_to_french_fields(self):
         apps = self._migrate_and_get_apps()
         Abonnement = apps.get_model("monetization", "Abonnement")
+        AbonnementUtilisateur = apps.get_model(
+            "monetization",
+            "AbonnementUtilisateur",
+        )
         Publicite = apps.get_model("monetization", "Publicite")
 
         subscription = Abonnement.objects.get(pk=self.subscription.pk)
@@ -97,6 +114,18 @@ class MonetizationTranslationMigrationTests(TransactionTestCase):
         self.assertEqual(subscription.slug, "abonnement-historique-exact")
         self.assertEqual(subscription.prix, Decimal("19.90"))
         self.assertEqual(subscription.duree_jours, 90)
+
+        user_subscription = AbonnementUtilisateur.objects.get(
+            pk=self.user_subscription.pk,
+        )
+        self.assertEqual(user_subscription.utilisateur_id, self.user.pk)
+        self.assertEqual(user_subscription.abonnement_id, self.subscription.pk)
+        self.assertEqual(
+            user_subscription.date_debut,
+            self.user_subscription.date_debut,
+        )
+        self.assertEqual(user_subscription.date_fin, self.user_subscription.date_fin)
+        self.assertTrue(user_subscription.actif)
 
         campaign = Publicite.objects.get(pk=self.campaign.pk)
         self.assertEqual(campaign.titre_fr, "Campagne historique exacte")
