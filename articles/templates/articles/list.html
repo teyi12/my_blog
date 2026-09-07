@@ -26,76 +26,19 @@
     {% endif %}
   </header>
 
+  {% if featured_article %}
+    <section class="articles-featured" aria-label="{% translate 'Article à la une' %}">
+      {% include "articles/_article_card.html" with article=featured_article featured=True %}
+    </section>
+  {% endif %}
+
   {% if page_obj %}
     <section class="articles-grid" aria-label="{% translate 'Liste des articles' %}">
       {% for article in page_obj %}
-        <article class="article-card {% if forloop.first %}article-card-featured{% endif %}">
-          <a class="article-card-media" href="{% url 'articles:article_detail' slug=article.slug %}" aria-label="{% blocktranslate with article_title=article.titre %}Lire {{ article_title }}{% endblocktranslate %}">
-            {% if article.image %}
-              <img src="{{ article.image.url }}" alt="{% if article.titre %}{{ article.titre }}{% else %}{% translate 'Illustration de l’article' %}{% endif %}">
-            {% else %}
-              <img src="{% static 'images/default.jpg' %}" alt="{% if article.titre %}{{ article.titre }}{% else %}{% translate 'Illustration de l’article' %}{% endif %}">
-            {% endif %}
-
-            <div class="article-badges" aria-label="{% translate 'Informations de l’article' %}">
-              {% if article.is_premium %}
-                <span class="article-badge article-badge-premium">
-                  <i class="fa-solid fa-star" aria-hidden="true"></i> {% translate "Premium" %}
-                </span>
-              {% endif %}
-              {% if article.est_sponsorise %}
-                <span class="article-badge">{% translate "Sponsorisé" %}</span>
-              {% endif %}
-            </div>
-          </a>
-
-          <div class="article-card-body">
-            <div class="article-meta">
-              <time datetime="{{ article.date_publication|date:'Y-m-d' }}">
-                {{ article.date_publication|date:"d F Y" }}
-              </time>
-              {% if article.auteur %}
-                <span aria-hidden="true">·</span>
-                <span>{{ article.auteur.username|default:article.auteur.email }}</span>
-              {% endif %}
-            </div>
-
-            <h2>
-              <a href="{% url 'articles:article_detail' slug=article.slug %}">
-                {{ article.titre }}
-              </a>
-            </h2>
-
-            <p class="article-excerpt">{{ article.contenu|striptags|truncatewords:30 }}</p>
-
-            <div class="article-card-footer">
-              <a class="article-read-link" href="{% url 'articles:article_detail' slug=article.slug %}">
-                {% translate "Lire l’article" %}
-                <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
-              </a>
-
-              {% if user.is_authenticated and user.is_staff or article.auteur == user %}
-                <div class="article-admin-actions" aria-label="{% translate 'Actions de gestion' %}">
-                  <a href="{% url 'articles:article_modifier' slug=article.slug %}" aria-label="{% blocktranslate with article_title=article.titre %}Modifier {{ article_title }}{% endblocktranslate %}" title="{% translate 'Modifier' %}">
-                    <i class="fa-regular fa-pen-to-square" aria-hidden="true"></i>
-                  </a>
-                  <a class="article-delete-link" href="{% url 'articles:article_supprimer' slug=article.slug %}" aria-label="{% blocktranslate with article_title=article.titre %}Supprimer {{ article_title }}{% endblocktranslate %}" title="{% translate 'Supprimer' %}">
-                    <i class="fa-regular fa-trash-can" aria-hidden="true"></i>
-                  </a>
-                </div>
-              {% endif %}
-            </div>
-          </div>
-        </article>
-      {% empty %}
-        <div class="articles-empty">
-          <span class="articles-empty-icon"><i class="fa-regular fa-newspaper" aria-hidden="true"></i></span>
-          <h2>{% translate "Aucun article pour le moment" %}</h2>
-          <p>{% translate "Les prochains récits et découvertes apparaîtront ici." %}</p>
-        </div>
+        {% include "articles/_article_card.html" with article=article featured=False %}
       {% endfor %}
     </section>
-  {% else %}
+  {% elif not featured_article %}
     <div class="articles-empty">
       <span class="articles-empty-icon"><i class="fa-regular fa-newspaper" aria-hidden="true"></i></span>
       <h2>{% translate "Aucun article pour le moment" %}</h2>
