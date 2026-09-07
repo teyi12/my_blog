@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Teyilawson\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-07 12:34+0200\n"
+"POT-Creation-Date: 2026-09-07 17:42+0200\n"
 "PO-Revision-Date: 2026-09-07 12:25+0200\n"
 "Last-Translator: Teyilawson\n"
 "Language-Team: English\n"
@@ -179,7 +179,7 @@ msgstr "All articles"
 #: articles/templates/articles/list.html:43
 #: monetization/templates/monetization/abonnements.html:9
 #: monetization/templates/monetization/dashboard.html:19
-#: templates/template_base.html:83
+#: templates/template_base.html:82
 msgid "Premium"
 msgstr "Premium"
 
@@ -329,6 +329,8 @@ msgstr "Article pagination"
 
 #: articles/templates/articles/list.html:111
 #: articles/templates/articles/list.html:116
+#: shop/templates/shop/client/mes_commandes.html:62
+#: shop/templates/shop/commandes/liste.html:73
 msgid "Précédent"
 msgstr "Previous"
 
@@ -343,6 +345,8 @@ msgstr "Page %(num)s"
 
 #: articles/templates/articles/list.html:132
 #: articles/templates/articles/list.html:137
+#: shop/templates/shop/client/mes_commandes.html:64
+#: shop/templates/shop/commandes/liste.html:75
 msgid "Suivant"
 msgstr "Next"
 
@@ -392,7 +396,7 @@ msgstr "✏️ Article updated successfully."
 msgid "🗑 Article supprimé avec succès."
 msgstr "🗑 Article deleted successfully."
 
-#: blog/forms.py:5
+#: blog/forms.py:5 monetization/forms.py:7 shop/forms.py:53
 msgid "Ce champ est obligatoire."
 msgstr "This field is required."
 
@@ -404,7 +408,7 @@ msgstr "Last name"
 msgid "Prénom"
 msgstr "First name"
 
-#: blog/forms.py:21 monetization/forms.py:13 monetization/forms.py:25
+#: blog/forms.py:21 monetization/forms.py:16 monetization/forms.py:33
 #: monetization/templates/monetization/affiliation.html:28
 #: monetization/templates/monetization/partenariat.html:28
 msgid "Adresse e-mail"
@@ -465,31 +469,31 @@ msgstr "Dashboard"
 msgid "Bienvenue sur le tableau de bord"
 msgstr "Welcome to the dashboard"
 
-#: monetization/forms.py:12 monetization/forms.py:24
+#: monetization/forms.py:15 monetization/forms.py:32
 #: monetization/templates/monetization/affiliation.html:27
 #: monetization/templates/monetization/partenariat.html:27
 msgctxt "monetization form"
 msgid "Nom"
 msgstr "Name"
 
-#: monetization/forms.py:14
+#: monetization/forms.py:17
 #: monetization/templates/monetization/partenariat.html:29
 msgid "Entreprise"
 msgstr "Company"
 
-#: monetization/forms.py:15 monetization/forms.py:28
+#: monetization/forms.py:18 monetization/forms.py:36
 #: monetization/templates/monetization/affiliation.html:20
 #: monetization/templates/monetization/affiliation.html:31
 #: monetization/templates/monetization/partenariat.html:30
 msgid "Votre proposition"
 msgstr "Your proposal"
 
-#: monetization/forms.py:26
+#: monetization/forms.py:34
 #: monetization/templates/monetization/affiliation.html:29
 msgid "Plateforme"
 msgstr "Platform"
 
-#: monetization/forms.py:27
+#: monetization/forms.py:35
 #: monetization/templates/monetization/affiliation.html:30
 msgid "Produit ou service"
 msgstr "Product or service"
@@ -501,7 +505,7 @@ msgstr "Duration in days"
 #: monetization/models.py:87
 #: monetization/templates/monetization/dashboard.html:17
 #: monetization/templates/monetization/publicites.html:9
-#: templates/template_base.html:83
+#: templates/template_base.html:82
 msgid "Publicité"
 msgstr "Advertising"
 
@@ -517,7 +521,7 @@ msgstr "Donation"
 #: monetization/templates/monetization/affiliation.html:8
 #: monetization/templates/monetization/base.html:24
 #: monetization/templates/monetization/dashboard.html:18
-#: templates/template_base.html:83
+#: templates/template_base.html:82
 msgid "Affiliation"
 msgstr "Affiliate programme"
 
@@ -677,6 +681,11 @@ msgstr ""
 "with no demonstration statistics."
 
 #: monetization/templates/monetization/dashboard.html:16
+#: shop/templates/shop/checkout.html:114
+#: shop/templates/shop/client/commande_detail.html:39
+#: shop/templates/shop/commandes/detail.html:40
+#: shop/templates/shop/emails/fulfillment_status.html:39
+#: shop/templates/shop/panier.html:80
 msgid "Total"
 msgstr "Total"
 
@@ -698,11 +707,14 @@ msgstr "Source"
 
 #: monetization/templates/monetization/dashboard.html:32
 #: monetization/templates/monetization/revenus.html:28
+#: shop/templates/shop/commandes/liste.html:48
 msgid "Date"
 msgstr "Date"
 
 #: monetization/templates/monetization/dashboard.html:32
 #: monetization/templates/monetization/revenus.html:27
+#: payments/templates/payments/choice.html:125
+#: shop/templates/shop/commandes/liste.html:48
 msgid "Montant"
 msgstr "Amount"
 
@@ -715,7 +727,7 @@ msgid "Soutenir Teyilawson"
 msgstr "Support Teyilawson"
 
 #: monetization/templates/monetization/don.html:8
-#: templates/template_base.html:80
+#: payments/templates/payments/choice.html:117 templates/template_base.html:79
 msgid "Soutenir le projet"
 msgstr "Support the project"
 
@@ -757,6 +769,8 @@ msgid "Vous serez redirigé vers la page de paiement sécurisée."
 msgstr "You will be redirected to the secure payment page."
 
 #: monetization/templates/monetization/don.html:33
+#: shop/templates/shop/adresse_enregistree.html:12
+#: shop/templates/shop/checkout.html:81
 msgid "Continuer vers le paiement"
 msgstr "Continue to payment"
 
@@ -850,7 +864,7 @@ msgid "Les prochaines collaborations apparaîtront ici."
 msgstr "Upcoming collaborations will appear here."
 
 #: monetization/templates/monetization/revenus.html:3
-#: templates/template_base.html:66
+#: templates/template_base.html:65
 msgid "Revenus"
 msgstr "Revenue"
 
@@ -887,6 +901,299 @@ msgstr ""
 "Secure activation of the %(subscription)s subscription will be available "
 "once recurring payments have been fully integrated."
 
+#: payments/models.py:11 shop/models.py:103
+#: shop/templates/shop/commandes/liste.html:23
+msgid "En attente"
+msgstr "Pending"
+
+#: payments/models.py:12 shop/templates/shop/commandes/liste.html:24
+msgid "En cours"
+msgstr "Processing"
+
+#: payments/models.py:13
+msgid "Réussi"
+msgstr "Successful"
+
+#: payments/models.py:14
+msgid "Échoué"
+msgstr "Failed"
+
+#: payments/models.py:15
+msgid "Annulé"
+msgstr "Canceled"
+
+#: payments/models.py:22 payments/templates/payments/choice.html:39
+#: shop/models.py:114
+msgid "Carte bancaire"
+msgstr "Credit card"
+
+#: payments/models.py:23
+msgid "Autre"
+msgstr "Other"
+
+#: payments/models.py:70 shop/templates/shop/checkout.html:36
+#: shop/templates/shop/client/commande_detail.html:77
+#: shop/templates/shop/commandes/detail.html:127
+#: shop/templates/shop/emails/fulfillment_status.html:29
+msgid "Adresse de livraison"
+msgstr "Shipping address"
+
+#: payments/models.py:71
+msgid "Adresse de facturation"
+msgstr "Billing address"
+
+#: payments/templates/payments/cancel.html:4
+#: payments/templates/payments/cancel.html:17
+msgid "Paiement interrompu"
+msgstr "Payment interrupted"
+
+#: payments/templates/payments/cancel.html:18
+msgid "Aucun paiement n’a été finalisé."
+msgstr "No payment was completed."
+
+#: payments/templates/payments/cancel.html:19
+msgid ""
+"L’opération a été annulée ou interrompue. Vous pouvez reprendre le parcours "
+"de paiement lorsque vous le souhaitez."
+msgstr ""
+"The operation was canceled or interrupted. You can resume the payment "
+"process whenever you wish."
+
+#: payments/templates/payments/cancel.html:25
+msgid "Votre commande n’est pas considérée comme payée"
+msgstr "Your order is not considered paid"
+
+#: payments/templates/payments/cancel.html:26
+msgid ""
+"Retournez au parcours de commande pour sélectionner à nouveau un moyen de "
+"paiement."
+msgstr "Return to the order process to select a payment method again."
+
+#: payments/templates/payments/cancel.html:32
+msgid "Reprendre le paiement"
+msgstr "Resume payment"
+
+#: payments/templates/payments/cancel.html:34
+#: payments/templates/payments/choice.html:108
+#: shop/templates/shop/checkout.html:25
+msgid "Retour au panier"
+msgstr "Back to cart"
+
+#: payments/templates/payments/choice.html:4
+#: payments/templates/payments/choice.html:16
+#: shop/templates/shop/checkout.html:15
+#: shop/templates/shop/client/commande_detail.html:21
+#: shop/templates/shop/client/mes_commandes.html:34
+#: shop/templates/shop/commandes/detail.html:20
+#: shop/templates/shop/commandes/detail.html:107
+#: shop/templates/shop/commandes/liste.html:48
+msgid "Paiement"
+msgstr "Payment"
+
+#: payments/templates/payments/choice.html:13
+#: shop/templates/shop/checkout.html:12
+msgid "Progression de la commande"
+msgstr "Order progress"
+
+#: payments/templates/payments/choice.html:14
+#: shop/templates/shop/checkout.html:13
+msgid "Panier"
+msgstr "Cart"
+
+#: payments/templates/payments/choice.html:15
+#: shop/templates/shop/checkout.html:14
+msgid "Coordonnées"
+msgstr "Contact details"
+
+#: payments/templates/payments/choice.html:21
+msgid "Dernière étape"
+msgstr "Final step"
+
+#: payments/templates/payments/choice.html:22
+msgid "Choisissez votre moyen de paiement"
+msgstr "Choose your payment method"
+
+#: payments/templates/payments/choice.html:23
+msgid ""
+"Sélectionnez la méthode qui vous convient pour finaliser votre commande."
+msgstr "Select the method that suits you to complete your order."
+
+#: payments/templates/payments/choice.html:26
+#: shop/templates/shop/commandes/liste.html:48
+#: shop/templates/shop/confirmation.html:26
+msgid "Commande"
+msgstr "Order"
+
+#: payments/templates/payments/choice.html:32
+msgid "Moyens de paiement disponibles"
+msgstr "Available payment methods"
+
+#: payments/templates/payments/choice.html:36
+msgid "Recommandé"
+msgstr "Recommended"
+
+#: payments/templates/payments/choice.html:41
+msgid "Payez par carte via la page de paiement sécurisée de Stripe."
+msgstr "Pay by card through Stripe’s secure payment page."
+
+#: payments/templates/payments/choice.html:44
+#: shop/templates/shop/checkout.html:118
+#: shop/templates/shop/confirmation.html:75 shop/templates/shop/detail.html:37
+#: shop/templates/shop/liste.html:42 shop/templates/shop/panier.html:90
+#: shop/templates/shop/produits_par_categorie.html:32 templates/home.html:32
+msgid "Paiement sécurisé"
+msgstr "Secure payment"
+
+#: payments/templates/payments/choice.html:45
+msgid "Confirmation rapide"
+msgstr "Quick confirmation"
+
+#: payments/templates/payments/choice.html:51
+msgid "Payer par carte"
+msgstr "Pay by card"
+
+#: payments/templates/payments/choice.html:64
+msgid "Utilisez les moyens Mobile Money disponibles via CinetPay."
+msgstr "Use the Mobile Money payment methods available through CinetPay."
+
+#: payments/templates/payments/choice.html:68
+msgid "Validation par le fournisseur"
+msgstr "Provider confirmation"
+
+#: payments/templates/payments/choice.html:75
+msgid "Payer avec Mobile Money"
+msgstr "Pay with Mobile Money"
+
+#: payments/templates/payments/choice.html:83
+#: shop/templates/shop/checkout.html:89
+#: shop/templates/shop/emails/fulfillment_status.html:36
+#: shop/templates/shop/panier.html:72
+msgid "Récapitulatif"
+msgstr "Summary"
+
+#: payments/templates/payments/choice.html:84
+#: shop/templates/shop/checkout.html:90 shop/templates/shop/panier.html:73
+msgid "Votre commande"
+msgstr "Your order"
+
+#: payments/templates/payments/choice.html:87
+msgid "Numéro"
+msgstr "Number"
+
+#: payments/templates/payments/choice.html:91
+msgid "Statut"
+msgstr "Status"
+
+#: payments/templates/payments/choice.html:92 shop/models.py:16
+msgid "En attente de paiement"
+msgstr "Awaiting payment"
+
+#: payments/templates/payments/choice.html:95
+#: shop/templates/shop/confirmation.html:50
+msgid "Total à payer"
+msgstr "Total to pay"
+
+#: payments/templates/payments/choice.html:102
+#: shop/templates/shop/detail.html:66
+msgid "Paiement protégé"
+msgstr "Protected payment"
+
+#: payments/templates/payments/choice.html:103
+msgid "Le montant et la devise proviennent directement de votre commande."
+msgstr "The amount and currency come directly from your order."
+
+#: payments/templates/payments/choice.html:118
+#: payments/templates/payments/choice.html:138 templates/template_base.html:81
+msgid "Faire un don"
+msgstr "Donate"
+
+#: payments/templates/payments/choice.html:119
+msgid ""
+"Le don est indépendant de votre commande et reste entièrement facultatif."
+msgstr ""
+"The donation is separate from your order and remains entirely optional."
+
+#: payments/templates/payments/choice.html:129
+msgid "Devise"
+msgstr "Currency"
+
+#: payments/templates/payments/success.html:4
+msgid "Paiement réussi"
+msgstr "Payment successful"
+
+#: payments/templates/payments/success.html:17
+msgid "Paiement terminé"
+msgstr "Payment complete"
+
+#: payments/templates/payments/success.html:18
+msgid "Merci, votre paiement a bien été enregistré."
+msgstr "Thank you, your payment has been recorded."
+
+#: payments/templates/payments/success.html:19
+msgid ""
+"Votre opération est terminée. La confirmation définitive de la commande est "
+"traitée de manière sécurisée par le système de paiement."
+msgstr ""
+"The operation is complete. The final order confirmation is processed "
+"securely by the payment system."
+
+#: payments/templates/payments/success.html:24
+msgid "Confirmation sécurisée"
+msgstr "Secure confirmation"
+
+#: payments/templates/payments/success.html:25
+msgid "Vous pouvez maintenant poursuivre votre navigation sur le site."
+msgstr "You can now continue browsing the site."
+
+#: payments/templates/payments/success.html:31
+msgid "Retour à l’accueil"
+msgstr "Back to home"
+
+#: payments/templates/payments/success.html:33
+#: shop/templates/shop/panier.html:19
+msgid "Continuer mes achats"
+msgstr "Continue shopping"
+
+#: payments/views.py:101
+#, python-format
+msgid "Aucun montant minimum configuré pour %(currency)s."
+msgstr "No minimum payment amount is configured for %(currency)s."
+
+#: payments/views.py:104
+#, python-format
+msgid "Le minimum configuré pour %(currency)s doit être positif."
+msgstr "The minimum configured for %(currency)s must be positive."
+
+#: payments/views.py:121
+#, python-format
+msgid ""
+"Le montant minimum de paiement est de %(minimum)s %(currency)s. Le total "
+"actuel est de %(amount)s %(currency)s."
+msgstr ""
+"The minimum payment amount is %(minimum)s %(currency)s. The current total is "
+"%(amount)s %(currency)s."
+
+#: payments/views.py:263
+#, python-format
+msgid "Le montant %(amount)s n'est pas valide pour %(currency)s."
+msgstr "The amount %(amount)s is not valid for %(currency)s."
+
+#: payments/views.py:450 payments/views.py:631
+msgid "Une autre tentative de paiement est déjà active."
+msgstr "Another payment attempt is already active."
+
+#: payments/views.py:637
+msgid "Initialisation CinetPay déjà en cours."
+msgstr "CinetPay initialization is already in progress."
+
+#: payments/views.py:647
+msgid "Erreur de connexion à CinetPay."
+msgstr "Could not connect to CinetPay."
+
+#: payments/views.py:658
+msgid "Initialisation CinetPay remplacée."
+msgstr "CinetPay initialization was replaced."
+
 #: shop/forms.py:20
 msgid "Nom de la catégorie"
 msgstr "Category name"
@@ -902,6 +1209,248 @@ msgstr "A category with this name already exists."
 #: shop/forms.py:41
 msgid "Ce nom produit un identifiant déjà utilisé par une autre catégorie."
 msgstr "This name generates an identifier already used by another category."
+
+#: shop/forms.py:57
+msgid "Nouveau statut"
+msgstr "New status"
+
+#: shop/forms.py:59 shop/forms.py:111
+#: shop/templates/shop/client/commande_detail.html:61
+#: shop/templates/shop/commandes/detail.html:95
+#: shop/templates/shop/commandes/expedition_form.html:55
+#: shop/templates/shop/emails/fulfillment_status.html:23
+msgid "Transporteur"
+msgstr "Carrier"
+
+#: shop/forms.py:65 shop/forms.py:118
+msgid "Ex. DHL, Deutsche Post, UPS"
+msgstr "E.g. DHL, Deutsche Post, UPS"
+
+#: shop/forms.py:71 shop/forms.py:112
+#: shop/templates/shop/client/commande_detail.html:62
+#: shop/templates/shop/commandes/detail.html:96
+#: shop/templates/shop/commandes/expedition_form.html:56
+#: shop/templates/shop/emails/fulfillment_status.html:24
+msgid "Numéro de suivi"
+msgstr "Tracking number"
+
+#: shop/forms.py:77
+msgid "Ex. 00340434161094000000"
+msgstr "E.g. 00340434161094000000"
+
+#: shop/forms.py:100
+msgid "Indiquez le transporteur avant de marquer la commande comme expédiée."
+msgstr "Enter the carrier before marking the order as shipped."
+
+#: shop/forms.py:102
+msgid ""
+"Indiquez le numéro de suivi avant de marquer la commande comme expédiée."
+msgstr "Enter the tracking number before marking the order as shipped."
+
+#: shop/forms.py:125
+msgid "Ex. TEST-71-2026"
+msgstr "E.g. TEST-71-2026"
+
+#: shop/forms.py:134
+msgid "Indiquez le transporteur."
+msgstr "Enter the carrier."
+
+#: shop/forms.py:140
+msgid "Indiquez le numéro de suivi."
+msgstr "Enter the tracking number."
+
+#: shop/forms.py:145 shop/templates/shop/panier.html:45
+msgid "Quantité"
+msgstr "Quantity"
+
+#: shop/forms.py:153
+msgid "Rue"
+msgstr "Street address"
+
+#: shop/forms.py:154
+msgid "Ville"
+msgstr "City"
+
+#: shop/forms.py:155
+msgid "Code postal"
+msgstr "Postal code"
+
+#: shop/forms.py:156
+msgid "Pays"
+msgstr "Country"
+
+#: shop/forms.py:157
+msgid "Téléphone"
+msgstr "Phone"
+
+#: shop/forms.py:166
+msgid "12 rue de Paris"
+msgstr "12 Main Street"
+
+#: shop/forms.py:167
+msgid "Paris"
+msgstr "London"
+
+#: shop/forms.py:169
+msgid "France"
+msgstr "United Kingdom"
+
+#: shop/models.py:9
+msgid "Euro"
+msgstr "Euro"
+
+#: shop/models.py:10
+msgid "Dollar"
+msgstr "Dollar"
+
+#: shop/models.py:11
+msgid "Franc CFA"
+msgstr "CFA franc"
+
+#: shop/models.py:17
+msgid "À préparer"
+msgstr "To prepare"
+
+#: shop/models.py:18
+msgid "En préparation"
+msgstr "Preparing"
+
+#: shop/models.py:19
+msgid "Expédiée"
+msgstr "Shipped"
+
+#: shop/models.py:20
+msgid "Livrée"
+msgstr "Delivered"
+
+#: shop/models.py:21
+msgid "Traitement annulé"
+msgstr "Fulfillment canceled"
+
+#: shop/models.py:25 templates/template_base.html:47
+msgid "Français"
+msgstr "French"
+
+#: shop/models.py:26 templates/template_base.html:49
+msgid "Allemand"
+msgstr "German"
+
+#: shop/models.py:27 templates/template_base.html:51
+msgid "Anglais"
+msgstr "English"
+
+#: shop/models.py:104
+msgid "Paiement en cours"
+msgstr "Payment processing"
+
+#: shop/models.py:105
+msgid "Payée"
+msgstr "Paid"
+
+#: shop/models.py:106
+msgid "Échouée"
+msgstr "Failed"
+
+#: shop/models.py:107
+msgid "Annulée"
+msgstr "Canceled"
+
+#: shop/models.py:115
+msgid "Mobile Money"
+msgstr "Mobile Money"
+
+#: shop/models.py:116
+msgid "Stripe"
+msgstr "Stripe"
+
+#: shop/models.py:117
+msgid "CinetPay"
+msgstr "CinetPay"
+
+#: shop/order_views.py:23
+msgid ""
+"Les informations d’expédition peuvent être modifiées uniquement après "
+"l’expédition de la commande."
+msgstr ""
+"Shipping information can only be changed after the order has been shipped."
+
+#: shop/order_views.py:32
+#, python-format
+msgid ""
+"Les informations d’expédition de la commande #%(order)s ont été mises à jour."
+msgstr "Shipping information for order #%(order)s has been updated."
+
+#: shop/shipping.py:54
+msgid "cher client"
+msgstr "valued customer"
+
+#: shop/shipping.py:58
+#, python-format
+msgid "Votre commande #%(order)s a été expédiée"
+msgstr "Your order #%(order)s has shipped"
+
+#: shop/shipping.py:60 shop/shipping.py:73
+#: shop/templates/shop/emails/fulfillment_status.html:19
+#, python-format
+msgid "Bonjour %(name)s,"
+msgstr "Hello %(name)s,"
+
+#: shop/shipping.py:62
+#, python-format
+msgid "Votre commande #%(order)s a été expédiée."
+msgstr "Your order #%(order)s has shipped."
+
+#: shop/shipping.py:65
+#, python-format
+msgid "Transporteur : %(carrier)s"
+msgstr "Carrier: %(carrier)s"
+
+#: shop/shipping.py:67
+#, python-format
+msgid "Numéro de suivi : %(tracking)s"
+msgstr "Tracking number: %(tracking)s"
+
+#: shop/shipping.py:69
+#, python-format
+msgid "Suivre le colis : %(url)s"
+msgstr "Track your parcel: %(url)s"
+
+#: shop/shipping.py:71
+#, python-format
+msgid "Votre commande #%(order)s a été livrée"
+msgstr "Your order #%(order)s has been delivered"
+
+#: shop/shipping.py:75
+#, python-format
+msgid "Votre commande #%(order)s est indiquée comme livrée."
+msgstr "Your order #%(order)s is marked as delivered."
+
+#: shop/shipping.py:79
+#, python-format
+msgid "Consulter votre commande : %(url)s"
+msgstr "View your order: %(url)s"
+
+#: shop/shipping.py:80 shop/templates/shop/emails/fulfillment_status.html:43
+msgid "Merci pour votre confiance."
+msgstr "Thank you for your trust."
+
+#: shop/shipping.py:80 shop/templates/shop/emails/fulfillment_status.html:43
+msgid "L'équipe My Blog Shop"
+msgstr "The My Blog Shop team"
+
+#: shop/templates/shop/adresse_enregistree.html:4
+#: shop/templates/shop/confirmation.html:58
+msgid "Adresse enregistrée"
+msgstr "Address saved"
+
+#: shop/templates/shop/adresse_enregistree.html:9
+msgid "Adresse enregistrée avec succès !"
+msgstr "Address saved successfully!"
+
+#: shop/templates/shop/adresse_enregistree.html:10
+msgid ""
+"Vous allez être redirigé vers la page de paiement dans quelques secondes…"
+msgstr "You will be redirected to the payment page in a few seconds…"
 
 #: shop/templates/shop/categories/form.html:4
 msgid "Modifier une catégorie — Teyilawson"
@@ -965,6 +1514,7 @@ msgid "Actions"
 msgstr "Actions"
 
 #: shop/templates/shop/categories/liste.html:44
+#: shop/templates/shop/commandes/liste.html:60
 msgid "Voir"
 msgstr "View"
 
@@ -1017,6 +1567,540 @@ msgstr "This category currently contains no products."
 msgid "Supprimer définitivement"
 msgstr "Delete permanently"
 
+#: shop/templates/shop/checkout.html:4
+msgid "Finaliser la commande"
+msgstr "Complete order"
+
+#: shop/templates/shop/checkout.html:20
+msgid "Commande sécurisée"
+msgstr "Secure order"
+
+#: shop/templates/shop/checkout.html:21
+msgid "Finaliser votre commande"
+msgstr "Complete your order"
+
+#: shop/templates/shop/checkout.html:22
+msgid "Renseignez vos coordonnées avant de choisir votre moyen de paiement."
+msgstr "Enter your contact details before choosing your payment method."
+
+#: shop/templates/shop/checkout.html:35
+msgid "Vos coordonnées"
+msgstr "Your contact details"
+
+#: shop/templates/shop/checkout.html:37
+msgid "Ces informations seront associées à cette commande."
+msgstr "This information will be associated with this order."
+
+#: shop/templates/shop/checkout.html:83
+msgid "Votre commande sera créée une seule fois, même en cas de double clic."
+msgstr "Your order will only be created once, even if you double-click."
+
+#: shop/templates/shop/checkout.html:95
+#, python-format
+msgid "Voir %(product)s"
+msgstr "View %(product)s"
+
+#: shop/templates/shop/checkout.html:104
+#, python-format
+msgid "Quantité : %(quantity)s"
+msgstr "Quantity: %(quantity)s"
+
+#: shop/templates/shop/checkout.html:112 shop/templates/shop/panier.html:57
+msgid "Sous-total"
+msgstr "Subtotal"
+
+#: shop/templates/shop/checkout.html:113
+#: shop/templates/shop/client/commande_detail.html:51
+#: shop/templates/shop/commandes/detail.html:111
+#: shop/templates/shop/confirmation.html:57
+msgid "Livraison"
+msgstr "Delivery"
+
+#: shop/templates/shop/checkout.html:113
+msgid "Gratuite"
+msgstr "Free"
+
+#: shop/templates/shop/checkout.html:119
+msgid "Vérification avant paiement"
+msgstr "Review before payment"
+
+#: shop/templates/shop/checkout.html:126 shop/templates/shop/panier.html:98
+#: shop/templates/shop/panier.html:111
+msgid "Votre panier est vide"
+msgstr "Your cart is empty"
+
+#: shop/templates/shop/checkout.html:127
+msgid "Ajoutez un produit avant de poursuivre vers la commande."
+msgstr "Add a product before proceeding with your order."
+
+#: shop/templates/shop/checkout.html:128
+#: shop/templates/shop/client/mes_commandes.html:72
+#: shop/templates/shop/panier.html:100 shop/templates/shop/panier.html:113
+#: templates/home.html:26
+msgid "Découvrir la boutique"
+msgstr "Discover the shop"
+
+#: shop/templates/shop/client/commande_detail.html:12
+#: shop/templates/shop/client/mes_commandes.html:4
+#: shop/templates/shop/client/mes_commandes.html:15
+#: templates/template_base.html:64
+msgid "Mes commandes"
+msgstr "My orders"
+
+#: shop/templates/shop/client/commande_detail.html:16
+#: shop/templates/shop/client/mes_commandes.html:27
+#: shop/templates/shop/commandes/detail.html:15
+#: shop/templates/shop/commandes/expedition_form.html:15
+#: shop/templates/shop/emails/fulfillment_status.html:16
+#, python-format
+msgid "Commande #%(order)s"
+msgstr "Order #%(order)s"
+
+#: shop/templates/shop/client/commande_detail.html:17
+msgid "Suivi de votre commande"
+msgstr "Track your order"
+
+#: shop/templates/shop/client/commande_detail.html:18
+#: shop/templates/shop/commandes/detail.html:17
+#, python-format
+msgid "Créée le %(date)s · %(total)s %(currency)s"
+msgstr "Created on %(date)s · %(total)s %(currency)s"
+
+#: shop/templates/shop/client/commande_detail.html:22
+#: shop/templates/shop/client/mes_commandes.html:35
+#: shop/templates/shop/commandes/detail.html:21
+#: shop/templates/shop/commandes/detail.html:108
+#: shop/templates/shop/commandes/expedition_form.html:54
+#: shop/templates/shop/commandes/liste.html:48
+msgid "Traitement"
+msgstr "Fulfillment"
+
+#: shop/templates/shop/client/commande_detail.html:29
+#: shop/templates/shop/commandes/detail.html:28
+msgid "Articles commandés"
+msgstr "Items ordered"
+
+#: shop/templates/shop/client/commande_detail.html:29
+#: shop/templates/shop/commandes/detail.html:28
+#, python-format
+msgid "%(count)s ligne"
+msgid_plural "%(count)s lignes"
+msgstr[0] "%(count)s line"
+msgstr[1] "%(count)s lines"
+
+#: shop/templates/shop/client/commande_detail.html:43
+msgid "Progression"
+msgstr "Progress"
+
+#: shop/templates/shop/client/commande_detail.html:45
+msgid "Paiement confirmé"
+msgstr "Payment confirmed"
+
+#: shop/templates/shop/client/commande_detail.html:45
+msgid "Votre paiement a été validé."
+msgstr "Your payment has been confirmed."
+
+#: shop/templates/shop/client/commande_detail.html:45
+msgid "En attente de confirmation du paiement."
+msgstr "Awaiting payment confirmation."
+
+#: shop/templates/shop/client/commande_detail.html:46
+msgid "Préparation"
+msgstr "Preparation"
+
+#: shop/templates/shop/client/commande_detail.html:46
+msgid "Votre commande est prise en charge par la boutique."
+msgstr "Your order is being handled by the shop."
+
+#: shop/templates/shop/client/commande_detail.html:49
+#: shop/templates/shop/commandes/detail.html:92
+#: shop/templates/shop/commandes/detail.html:110
+#: shop/templates/shop/commandes/expedition_form.html:4
+msgid "Expédition"
+msgstr "Shipping"
+
+#: shop/templates/shop/client/commande_detail.html:49
+#, python-format
+msgid "Expédiée le %(date)s"
+msgstr "Shipped on %(date)s"
+
+#: shop/templates/shop/client/commande_detail.html:49
+msgid "Suivi"
+msgstr "Tracking"
+
+#: shop/templates/shop/client/commande_detail.html:49
+msgid "Commande expédiée"
+msgstr "Order shipped"
+
+#: shop/templates/shop/client/commande_detail.html:49
+msgid "Le suivi apparaîtra ici dès l’expédition."
+msgstr "Tracking will appear here as soon as the order ships."
+
+#: shop/templates/shop/client/commande_detail.html:51
+#, python-format
+msgid "Livrée le %(date)s."
+msgstr "Delivered on %(date)s."
+
+#: shop/templates/shop/client/commande_detail.html:51
+msgid "En attente de livraison."
+msgstr "Awaiting delivery."
+
+#: shop/templates/shop/client/commande_detail.html:59
+msgid "Suivi de livraison"
+msgstr "Delivery tracking"
+
+#: shop/templates/shop/client/commande_detail.html:63
+#: shop/templates/shop/commandes/detail.html:97
+#: shop/templates/shop/emails/fulfillment_status.html:25
+msgid "Expédiée le"
+msgstr "Shipped on"
+
+#: shop/templates/shop/client/commande_detail.html:63
+#: shop/templates/shop/commandes/detail.html:97
+#: shop/templates/shop/commandes/expedition_form.html:57
+msgid "Date non enregistrée"
+msgstr "Date not recorded"
+
+#: shop/templates/shop/client/commande_detail.html:64
+#: shop/templates/shop/commandes/detail.html:98
+msgid "Livrée le"
+msgstr "Delivered on"
+
+#: shop/templates/shop/client/commande_detail.html:68
+#: shop/templates/shop/emails/fulfillment_status.html:27
+msgid "Suivre mon colis"
+msgstr "Track my parcel"
+
+#: shop/templates/shop/client/commande_detail.html:71
+msgid ""
+"Utilisez le numéro de suivi ci-dessus sur le site officiel du transporteur."
+msgstr "Use the tracking number above on the carrier’s official website."
+
+#: shop/templates/shop/client/commande_detail.html:78
+#: shop/templates/shop/commandes/detail.html:135
+msgid "Aucune adresse associée."
+msgstr "No address associated."
+
+#: shop/templates/shop/client/commande_detail.html:83
+msgid "Besoin d’aide ?"
+msgstr "Need help?"
+
+#: shop/templates/shop/client/commande_detail.html:83
+#, python-format
+msgid ""
+"Pour une question sur cette commande, contactez-nous en indiquant le numéro "
+"#%(order)s."
+msgstr ""
+"For questions about this order, contact us and quote number #%(order)s."
+
+#: shop/templates/shop/client/commande_detail.html:83
+msgid "Contacter Teyilawson"
+msgstr "Contact Teyilawson"
+
+#: shop/templates/shop/client/mes_commandes.html:14
+msgid "Mon espace · Boutique"
+msgstr "My account · Shop"
+
+#: shop/templates/shop/client/mes_commandes.html:16
+msgid ""
+"Retrouvez vos achats, leur état de paiement et l’avancement de leur "
+"livraison."
+msgstr "Find your purchases, their payment status and delivery progress."
+
+#: shop/templates/shop/client/mes_commandes.html:18
+#: shop/templates/shop/commandes/liste.html:18
+#: shop/templates/shop/detail.html:14
+msgid "Retour à la boutique"
+msgstr "Back to the shop"
+
+#: shop/templates/shop/client/mes_commandes.html:45
+#, python-format
+msgid "+ %(extra)s autre article"
+msgid_plural "+ %(extra)s autres articles"
+msgstr[0] "+ %(extra)s other item"
+msgstr[1] "+ %(extra)s other items"
+
+#: shop/templates/shop/client/mes_commandes.html:54
+msgid "Voir le détail"
+msgstr "View details"
+
+#: shop/templates/shop/client/mes_commandes.html:61
+msgid "Pagination de mes commandes"
+msgstr "My orders pagination"
+
+#: shop/templates/shop/client/mes_commandes.html:63
+#: shop/templates/shop/commandes/liste.html:74
+#, python-format
+msgid "Page %(current)s sur %(total)s"
+msgstr "Page %(current)s of %(total)s"
+
+#: shop/templates/shop/client/mes_commandes.html:70
+msgid "Vous n’avez encore aucune commande."
+msgstr "You do not have any orders yet."
+
+#: shop/templates/shop/client/mes_commandes.html:71
+msgid "Découvrez la boutique et retrouvez ici vos prochains achats."
+msgstr "Explore the shop and find your future purchases here."
+
+#: shop/templates/shop/commandes/detail.html:14
+msgid "Toutes les commandes"
+msgstr "All orders"
+
+#: shop/templates/shop/commandes/detail.html:38
+msgid "Aucune ligne de commande."
+msgstr "No order lines."
+
+#: shop/templates/shop/commandes/detail.html:44
+msgid "Historique de paiement"
+msgstr "Payment history"
+
+#: shop/templates/shop/commandes/detail.html:44
+#, python-format
+msgid "%(count)s tentative"
+msgid_plural "%(count)s tentatives"
+msgstr[0] "%(count)s attempt"
+msgstr[1] "%(count)s attempts"
+
+#: shop/templates/shop/commandes/detail.html:51
+#: shop/templates/shop/commandes/detail.html:122
+msgid "Transaction"
+msgstr "Transaction"
+
+#: shop/templates/shop/commandes/detail.html:55
+msgid "Aucune tentative de paiement enregistrée."
+msgstr "No payment attempt recorded."
+
+#: shop/templates/shop/commandes/detail.html:61
+msgid "Traitement de la commande"
+msgstr "Order fulfillment"
+
+#: shop/templates/shop/commandes/detail.html:63
+msgid ""
+"Le traitement logistique sera disponible lorsque le paiement aura été "
+"confirmé."
+msgstr "Order fulfillment will be available once payment has been confirmed."
+
+#: shop/templates/shop/commandes/detail.html:80
+msgid ""
+"Le transporteur et le numéro de suivi sont requis pour passer la commande à "
+"« Expédiée »."
+msgstr ""
+"The carrier and tracking number are required to mark the order as shipped."
+
+#: shop/templates/shop/commandes/detail.html:82
+msgid "Mettre à jour le traitement"
+msgstr "Update fulfillment"
+
+#: shop/templates/shop/commandes/detail.html:84
+msgid ""
+"Les étapes avancent dans l’ordre. Annuler le traitement n’effectue aucun "
+"remboursement."
+msgstr ""
+"Steps progress in order. Canceling fulfillment does not issue a refund."
+
+#: shop/templates/shop/commandes/detail.html:86
+msgid "Aucune transition supplémentaire n’est disponible pour cette commande."
+msgstr "No further status change is available for this order."
+
+#: shop/templates/shop/commandes/detail.html:94
+#: shop/templates/shop/commandes/expedition_form.html:53
+msgid "Non renseigné"
+msgstr "Not provided"
+
+#: shop/templates/shop/commandes/detail.html:100
+msgid "Modifier les informations d’expédition"
+msgstr "Edit shipping information"
+
+#: shop/templates/shop/commandes/detail.html:105
+msgid "Résumé opérationnel"
+msgstr "Operational summary"
+
+#: shop/templates/shop/commandes/detail.html:109
+msgid "Panier finalisé"
+msgstr "Cart finalized"
+
+#: shop/templates/shop/commandes/detail.html:109
+msgid "Non"
+msgstr "No"
+
+#: shop/templates/shop/commandes/detail.html:116
+#: shop/templates/shop/commandes/liste.html:48
+msgid "Client"
+msgstr "Customer"
+
+#: shop/templates/shop/commandes/detail.html:118
+msgid "Nom du client"
+msgstr "Customer name"
+
+#: shop/templates/shop/commandes/detail.html:120
+msgid "Non choisi"
+msgstr "Not selected"
+
+#: shop/templates/shop/commandes/detail.html:121
+msgid "Canal"
+msgstr "Channel"
+
+#: shop/templates/shop/commandes/detail.html:140
+msgid "Statut de paiement protégé"
+msgstr "Protected payment status"
+
+#: shop/templates/shop/commandes/detail.html:140
+msgid ""
+"Le paiement reste piloté par Stripe/CinetPay. Cette interface ne modifie que "
+"le traitement logistique."
+msgstr ""
+"Payment remains controlled by Stripe/CinetPay. This interface only changes "
+"order fulfillment."
+
+#: shop/templates/shop/commandes/expedition_form.html:4
+#, python-format
+msgid "commande #%(order)s"
+msgstr "order #%(order)s"
+
+#: shop/templates/shop/commandes/expedition_form.html:14
+msgid "Retour à la commande"
+msgstr "Back to order"
+
+#: shop/templates/shop/commandes/expedition_form.html:16
+msgid "Informations d’expédition"
+msgstr "Shipping information"
+
+#: shop/templates/shop/commandes/expedition_form.html:17
+msgid ""
+"Ces informations sont affichées dynamiquement dans l’espace client « Mes "
+"commandes »."
+msgstr ""
+"This information is displayed dynamically in the customer’s My Orders area."
+
+#: shop/templates/shop/commandes/expedition_form.html:25
+msgid "Suivi du colis"
+msgstr "Parcel tracking"
+
+#: shop/templates/shop/commandes/expedition_form.html:44
+msgid "Enregistrer les informations d’expédition"
+msgstr "Save shipping information"
+
+#: shop/templates/shop/commandes/expedition_form.html:51
+msgid "État actuel"
+msgstr "Current status"
+
+#: shop/templates/shop/commandes/expedition_form.html:57
+msgid "Date d’expédition"
+msgstr "Shipping date"
+
+#: shop/templates/shop/commandes/expedition_form.html:63
+msgid "Données dynamiques"
+msgstr "Dynamic data"
+
+#: shop/templates/shop/commandes/expedition_form.html:63
+msgid ""
+"Dès l’enregistrement, le transporteur et le numéro de suivi sont lus depuis "
+"la commande et apparaissent automatiquement dans l’espace client."
+msgstr ""
+"Once saved, the carrier and tracking number are read from the order and "
+"automatically appear in the customer area."
+
+#: shop/templates/shop/commandes/liste.html:4
+#: shop/templates/shop/commandes/liste.html:15
+msgid "Gestion des commandes"
+msgstr "Order management"
+
+#: shop/templates/shop/commandes/liste.html:14
+msgid "Espace staff · Boutique"
+msgstr "Staff area · Shop"
+
+#: shop/templates/shop/commandes/liste.html:16
+msgid ""
+"Suivez séparément l’état du paiement et le traitement logistique de chaque "
+"commande."
+msgstr "Track the payment status and fulfillment of each order separately."
+
+#: shop/templates/shop/commandes/liste.html:22
+msgid "Toutes"
+msgstr "All"
+
+#: shop/templates/shop/commandes/liste.html:25
+msgid "Payées"
+msgstr "Paid"
+
+#: shop/templates/shop/commandes/liste.html:26
+msgid "Échouées"
+msgstr "Failed"
+
+#: shop/templates/shop/commandes/liste.html:27
+msgid "Annulées"
+msgstr "Canceled"
+
+#: shop/templates/shop/commandes/liste.html:32
+#: shop/templates/shop/commandes/liste.html:38
+msgid "Rechercher"
+msgstr "Search"
+
+#: shop/templates/shop/commandes/liste.html:36
+msgid "N° de commande, client, email ou transaction"
+msgstr "Order no., customer, email or transaction"
+
+#: shop/templates/shop/commandes/liste.html:39
+msgid "Réinitialiser"
+msgstr "Reset"
+
+#: shop/templates/shop/commandes/liste.html:53
+msgid "Canal non choisi"
+msgstr "No channel selected"
+
+#: shop/templates/shop/commandes/liste.html:60
+#, python-format
+msgid "Voir la commande %(order)s"
+msgstr "View order %(order)s"
+
+#: shop/templates/shop/commandes/liste.html:67
+msgid "Aucune commande trouvée"
+msgstr "No orders found"
+
+#: shop/templates/shop/commandes/liste.html:67
+msgid "Modifiez les filtres ou la recherche pour afficher d’autres résultats."
+msgstr "Change the filters or search to display other results."
+
+#: shop/templates/shop/commandes/liste.html:72
+msgid "Pagination des commandes"
+msgstr "Orders pagination"
+
+#: shop/templates/shop/confirmation.html:16
+msgid "Commande enregistrée"
+msgstr "Order saved"
+
+#: shop/templates/shop/confirmation.html:17
+msgid "Votre commande est prête pour le paiement."
+msgstr "Your order is ready for payment."
+
+#: shop/templates/shop/confirmation.html:18
+msgid ""
+"Les informations ont bien été enregistrées. Vérifiez le récapitulatif avant "
+"de choisir votre moyen de paiement sécurisé."
+msgstr ""
+"Your information has been saved. Review the summary before choosing your "
+"secure payment method."
+
+#: shop/templates/shop/confirmation.html:32
+msgid "Articles de la commande"
+msgstr "Order items"
+
+#: shop/templates/shop/confirmation.html:45
+msgid "Aucun article n’est associé à cette commande."
+msgstr "No items are associated with this order."
+
+#: shop/templates/shop/confirmation.html:69
+msgid "Adresse non renseignée."
+msgstr "No address provided."
+
+#: shop/templates/shop/confirmation.html:75
+msgid "Vous choisirez votre moyen de paiement à l’étape suivante."
+msgstr "You will choose your payment method in the next step."
+
+#: shop/templates/shop/confirmation.html:79
+msgid "Choisir mon moyen de paiement"
+msgstr "Choose my payment method"
+
 #: shop/templates/shop/creer.html:3
 msgid "Créer un produit"
 msgstr "Create a product"
@@ -1033,10 +2117,6 @@ msgstr "Save"
 #, python-format
 msgid "%(product_name)s — Boutique Teyilawson"
 msgstr "%(product_name)s — Teyilawson Shop"
-
-#: shop/templates/shop/detail.html:14
-msgid "Retour à la boutique"
-msgstr "Back to the shop"
 
 #: shop/templates/shop/detail.html:20 shop/templates/shop/detail.html:22
 #: shop/templates/shop/liste.html:52 shop/templates/shop/liste.html:54
@@ -1059,11 +2139,6 @@ msgstr "Price: %(price)s euros"
 msgid "Informations d’achat"
 msgstr "Purchase information"
 
-#: shop/templates/shop/detail.html:37 shop/templates/shop/liste.html:42
-#: shop/templates/shop/produits_par_categorie.html:32 templates/home.html:32
-msgid "Paiement sécurisé"
-msgstr "Secure payment"
-
 #: shop/templates/shop/detail.html:38
 msgid "Ajout simple au panier"
 msgstr "Easy to add to your cart"
@@ -1078,7 +2153,7 @@ msgstr "Add to cart"
 
 #: shop/templates/shop/detail.html:50 shop/templates/shop/liste.html:19
 #: shop/templates/shop/produits_par_categorie.html:20
-#: templates/template_base.html:28 templates/template_base.html:54
+#: templates/template_base.html:28 templates/template_base.html:53
 msgid "Voir le panier"
 msgstr "View cart"
 
@@ -1097,10 +2172,6 @@ msgstr "Download"
 #: shop/templates/shop/detail.html:65
 msgid "Pourquoi acheter ici"
 msgstr "Why shop here"
-
-#: shop/templates/shop/detail.html:66
-msgid "Paiement protégé"
-msgstr "Protected payment"
 
 #: shop/templates/shop/detail.html:66
 msgid "Parcours de commande sécurisé."
@@ -1122,6 +2193,42 @@ msgstr "The Teyilawson world"
 msgid "Une sélection cohérente avec nos contenus."
 msgstr "A selection aligned with our content."
 
+#: shop/templates/shop/emails/fulfillment_status.html:15
+msgid "Votre commande est en route"
+msgstr "Your order is on its way"
+
+#: shop/templates/shop/emails/fulfillment_status.html:15
+msgid "Votre commande a été livrée"
+msgstr "Your order has been delivered"
+
+#: shop/templates/shop/emails/fulfillment_status.html:21
+msgid ""
+"Bonne nouvelle : votre commande a été expédiée. Elle est maintenant confiée "
+"au transporteur et vous pouvez suivre son acheminement ci-dessous."
+msgstr ""
+"Good news: your order has shipped. It is now with the carrier and you can "
+"track its progress below."
+
+#: shop/templates/shop/emails/fulfillment_status.html:33
+#, python-format
+msgid ""
+"Votre commande #%(order)s est maintenant indiquée comme livrée. Nous "
+"espérons que tout est arrivé dans les meilleures conditions."
+msgstr ""
+"Your order #%(order)s is now marked as delivered. We hope everything arrived "
+"in excellent condition."
+
+#: shop/templates/shop/emails/fulfillment_status.html:42
+msgid "Consulter les détails de ma commande"
+msgstr "View my order details"
+
+#: shop/templates/shop/emails/fulfillment_status.html:45
+#, python-format
+msgid ""
+"Cet e-mail a été envoyé automatiquement au sujet de votre commande "
+"#%(order)s."
+msgstr "This email was sent automatically regarding your order #%(order)s."
+
 #: shop/templates/shop/liste.html:4
 msgid "Boutique — Teyilawson"
 msgstr "Shop — Teyilawson"
@@ -1142,7 +2249,8 @@ msgstr ""
 "Discover a clear, carefully curated product selection and a straightforward "
 "shopping experience, from choosing to paying."
 
-#: shop/templates/shop/liste.html:21
+#: shop/templates/shop/liste.html:21 shop/templates/shop/panier.html:3
+#: shop/templates/shop/panier.html:14
 #: shop/templates/shop/produits_par_categorie.html:22
 msgid "Votre panier"
 msgstr "Your cart"
@@ -1226,6 +2334,48 @@ msgstr "Previous page"
 msgid "Page suivante"
 msgstr "Next page"
 
+#: shop/templates/shop/panier.html:13
+msgid "Votre sélection"
+msgstr "Your selection"
+
+#: shop/templates/shop/panier.html:15
+msgid "Vérifiez vos articles avant de poursuivre vers la commande."
+msgstr "Review your items before proceeding with your order."
+
+#: shop/templates/shop/panier.html:41
+msgid "unité"
+msgstr "unit"
+
+#: shop/templates/shop/panier.html:64
+#, python-format
+msgid "Supprimer %(product)s du panier"
+msgstr "Remove %(product)s from cart"
+
+#: shop/templates/shop/panier.html:76 templates/template_base.html:37
+#: templates/template_base.html:101
+msgid "Articles"
+msgstr "Articles"
+
+#: shop/templates/shop/panier.html:85
+msgid "Passer à la caisse"
+msgstr "Proceed to checkout"
+
+#: shop/templates/shop/panier.html:91
+msgid "Récapitulatif avant paiement"
+msgstr "Summary before payment"
+
+#: shop/templates/shop/panier.html:99 shop/templates/shop/panier.html:112
+msgid "Découvrez la boutique et ajoutez les produits qui vous intéressent."
+msgstr "Explore the shop and add products that interest you."
+
+#: shop/templates/shop/panier.html:109
+msgid "Quantité mise à jour."
+msgstr "Quantity updated."
+
+#: shop/templates/shop/panier.html:110
+msgid "Article supprimé du panier."
+msgstr "Item removed from cart."
+
 #: shop/templates/shop/produits_par_categorie.html:4
 #, python-format
 msgid "%(category_name)s — Boutique Teyilawson"
@@ -1259,17 +2409,22 @@ msgstr ""
 msgid "Voir toute la boutique"
 msgstr "View the full shop"
 
-#: shop/views.py:140
+#: shop/views.py:89
+#, python-format
+msgid "« %(product)s » a été ajouté à votre panier."
+msgstr "“%(product)s” was added to your cart."
+
+#: shop/views.py:143
 #, python-format
 msgid "La catégorie « %(category)s » a été créée."
 msgstr "The “%(category)s” category has been created."
 
-#: shop/views.py:159
+#: shop/views.py:162
 #, python-format
 msgid "La catégorie « %(category)s » a été mise à jour."
 msgstr "The “%(category)s” category has been updated."
 
-#: shop/views.py:181
+#: shop/views.py:184
 #, python-format
 msgid ""
 "La catégorie « %(category)s » a été supprimée. %(count)s produit est "
@@ -1284,17 +2439,48 @@ msgstr[1] ""
 "The “%(category)s” category has been deleted. %(count)s products are now "
 "uncategorised."
 
-#: shop/views.py:190
+#: shop/views.py:193
 #, python-format
 msgid "La catégorie « %(category)s » a été supprimée."
 msgstr "The “%(category)s” category has been deleted."
+
+#: shop/views.py:292
+msgid ""
+"Le traitement logistique ne peut avancer qu’après confirmation du paiement."
+msgstr "Order fulfillment can only proceed after payment has been confirmed."
+
+#: shop/views.py:297
+msgid ""
+"Transition de traitement invalide. Vérifiez les informations d’expédition."
+msgstr "Invalid fulfillment status change. Check the shipping information."
+
+#: shop/views.py:302
+msgid "Cette transition de traitement n’est pas autorisée."
+msgstr "This fulfillment status change is not allowed."
+
+#: shop/views.py:321
+#, python-format
+msgid "Le traitement de la commande #%(order)s est maintenant « %(status)s »."
+msgstr "Order #%(order)s fulfillment is now “%(status)s”."
+
+#: shop/views.py:334 shop/views.py:448 shop/views.py:456
+msgid "Votre panier est vide."
+msgstr "Your cart is empty."
+
+#: shop/views.py:351
+msgid "Session de checkout invalide. Veuillez réessayer."
+msgstr "Invalid checkout session. Please try again."
+
+#: shop/views.py:438
+msgid "Le checkout est momentanément occupé. Veuillez réessayer."
+msgstr "Checkout is temporarily busy. Please try again."
 
 #: templates/about.html:4
 msgid "À propos — Teyilawson"
 msgstr "About — Teyilawson"
 
 #: templates/about.html:14 templates/template_base.html:39
-#: templates/template_base.html:102
+#: templates/template_base.html:101
 msgid "À propos"
 msgstr "About"
 
@@ -1315,7 +2501,7 @@ msgid "Explorer les articles"
 msgstr "Explore articles"
 
 #: templates/about.html:19 templates/home.html:158
-#: templates/template_base.html:103
+#: templates/template_base.html:102
 msgid "Nous contacter"
 msgstr "Contact us"
 
@@ -1447,7 +2633,7 @@ msgid "Contact — Teyilawson"
 msgstr "Contact — Teyilawson"
 
 #: templates/contact.html:14 templates/template_base.html:40
-#: templates/template_base.html:103
+#: templates/template_base.html:102
 msgid "Contact"
 msgstr "Contact"
 
@@ -1519,10 +2705,6 @@ msgstr ""
 "Discover inspiring articles, experiences worth exploring and a curated shop "
 "focused on what matters."
 
-#: templates/home.html:26
-msgid "Découvrir la boutique"
-msgstr "Discover the shop"
-
 #: templates/home.html:29
 msgid "Points forts"
 msgstr "Highlights"
@@ -1552,12 +2734,12 @@ msgstr "See the world differently"
 msgid "Inspiration"
 msgstr "Inspiration"
 
-#: templates/home.html:46 templates/template_base.html:102
+#: templates/home.html:46 templates/template_base.html:101
 msgid "Explorer"
 msgstr "Explore"
 
 #: templates/home.html:50 templates/template_base.html:38
-#: templates/template_base.html:102
+#: templates/template_base.html:101
 msgid "Boutique"
 msgstr "Shop"
 
@@ -1701,8 +2883,8 @@ msgid ""
 "suggestion."
 msgstr "Let’s discuss a partnership, a collaboration or simply an idea."
 
-#: templates/home.html:159 templates/template_base.html:83
-#: templates/template_base.html:103
+#: templates/home.html:159 templates/template_base.html:82
+#: templates/template_base.html:102
 msgid "Partenariats"
 msgstr "Partnerships"
 
@@ -1718,7 +2900,7 @@ msgstr "Main navigation"
 msgid "Teyilawson — Accueil"
 msgstr "Teyilawson — Home"
 
-#: templates/template_base.html:28 templates/template_base.html:54
+#: templates/template_base.html:28 templates/template_base.html:53
 #, python-format
 msgid "Voir le panier, %(counter)s article"
 msgid_plural "Voir le panier, %(counter)s articles"
@@ -1733,66 +2915,58 @@ msgstr "Open menu"
 msgid "Accueil"
 msgstr "Home"
 
-#: templates/template_base.html:37 templates/template_base.html:102
-msgid "Articles"
-msgstr "Articles"
+#: templates/template_base.html:43
+msgid "Choisir la langue"
+msgstr "Choose language"
 
 #: templates/template_base.html:46
 msgid "Langue"
 msgstr "Language"
 
-#: templates/template_base.html:47
-msgid "Choisir la langue"
-msgstr "Choose language"
+#: templates/template_base.html:47 templates/template_base.html:49
+#: templates/template_base.html:51
+msgid "langue active"
+msgstr "active language"
 
-#: templates/template_base.html:52
-msgid "Changer"
-msgstr "Change"
-
-#: templates/template_base.html:64
+#: templates/template_base.html:63
 msgid "Mon profil"
 msgstr "My profile"
 
-#: templates/template_base.html:65
-msgid "Mes commandes"
-msgstr "My orders"
-
-#: templates/template_base.html:68
+#: templates/template_base.html:67
 msgid "Déconnexion"
 msgstr "Sign out"
 
-#: templates/template_base.html:72
+#: templates/template_base.html:71
 msgid "Connexion"
 msgstr "Sign in"
 
-#: templates/template_base.html:72
+#: templates/template_base.html:71
 msgid "S’inscrire"
 msgstr "Sign up"
 
-#: templates/template_base.html:78
+#: templates/template_base.html:77
 msgid "Soutenir et collaborer"
 msgstr "Support and collaborate"
 
-#: templates/template_base.html:82
-msgid "Faire un don"
-msgstr "Donate"
-
-#: templates/template_base.html:92
+#: templates/template_base.html:91
 msgid "Fermer"
 msgstr "Close"
 
-#: templates/template_base.html:101
+#: templates/template_base.html:100
 msgid "Des récits, des idées et une boutique choisie."
 msgstr "Stories, ideas and a carefully curated shop."
 
-#: templates/template_base.html:104
+#: templates/template_base.html:103
 msgid "Suivre"
 msgstr "Follow"
 
-#: templates/template_base.html:108
+#: templates/template_base.html:107
 msgid "Tous droits réservés."
 msgstr "All rights reserved."
 
-#: templates/template_base.html:108
+#: templates/template_base.html:107
 msgid "Retour en haut"
 msgstr "Back to top"
+
+#~ msgid "Changer"
+#~ msgstr "Change"

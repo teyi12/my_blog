@@ -16,6 +16,7 @@ from django.shortcuts import redirect, render, get_object_or_404
 from django.http import HttpResponse
 from django.urls import reverse
 from django.utils import timezone
+from django.utils.translation import gettext as _
 from django.views.decorators.http import require_POST
 
 from shop.models import Commande
@@ -97,10 +98,10 @@ def _minimum_payment_amount(currency):
     defaults = {"EUR": "0.50", "USD": "0.50", "XOF": "500"}
     value = configured.get(currency.upper(), defaults.get(currency.upper()))
     if value is None:
-        raise ValueError(f"Aucun montant minimum configuré pour {currency.upper()}.")
+        raise ValueError(_("Aucun montant minimum configuré pour %(currency)s.") % {"currency": currency.upper()})
     minimum = Decimal(str(value))
     if minimum <= 0:
-        raise ValueError(f"Le minimum configuré pour {currency.upper()} doit être positif.")
+        raise ValueError(_("Le minimum configuré pour %(currency)s doit être positif.") % {"currency": currency.upper()})
     return minimum
 
 
@@ -117,8 +118,8 @@ def _validate_order_payment_amount(commande):
 def _payment_amount_error_response(request, order_id, exc):
     messages.error(
         request,
-        f"Le montant minimum de paiement est de {exc.minimum} {exc.currency}. "
-        f"Le total actuel est de {exc.amount} {exc.currency}.",
+        _("Le montant minimum de paiement est de %(minimum)s %(currency)s. Le total actuel est de %(amount)s %(currency)s.")
+        % {"minimum": exc.minimum, "amount": exc.amount, "currency": exc.currency},
     )
     return redirect("payments:choice", order_id=order_id)
 
@@ -258,7 +259,10 @@ def _minor_amount(amount, currency):
     exponent = Decimal("1") if currency.lower() in zero_decimal else Decimal("0.01")
     normalized = decimal_amount.quantize(exponent)
     if normalized != decimal_amount:
-        raise ValueError(f"Le montant {decimal_amount} n'est pas valide pour {currency.upper()}.")
+        raise ValueError(
+            _("Le montant %(amount)s n'est pas valide pour %(currency)s.")
+            % {"amount": decimal_amount, "currency": currency.upper()}
+        )
     multiplier = 1 if currency.lower() in zero_decimal else 100
     return int(normalized * multiplier)
 
@@ -443,7 +447,7 @@ def stripe_checkout(request, order_id):
         payment = _store_provider_checkout(payment.id, session.id, session.url)
         return redirect(payment.checkout_url, code=303)
     except PaymentChannelConflict:
-        return HttpResponse("Une autre tentative de paiement est déjà active.", status=409)
+        return HttpResponse(_("Une autre tentative de paiement est déjà active."), status=409)
     except OrderAlreadyPaid:
         return redirect("payments:success")
     except PaymentAmountTooLow as exc:
@@ -624,13 +628,13 @@ def cinetpay_create_payment(request, order_id):
         )
         data = r.json()
     except PaymentChannelConflict:
-        return HttpResponse("Une autre tentative de paiement est déjà active.", status=409)
+        return HttpResponse(_("Une autre tentative de paiement est déjà active."), status=409)
     except OrderAlreadyPaid:
         return redirect("payments:success")
     except PaymentAmountTooLow as exc:
         return _payment_amount_error_response(request, order_id, exc)
     except PaymentInitializationInProgress:
-        return HttpResponse("Initialisation CinetPay déjà en cours.", status=409)
+        return HttpResponse(_("Initialisation CinetPay déjà en cours."), status=409)
     except SQLiteLockRetryExhausted:
         return HttpResponse("RETRY", status=409)
     except Exception:
@@ -640,7 +644,7 @@ def cinetpay_create_payment(request, order_id):
             except SQLiteLockRetryExhausted:
                 return HttpResponse("RETRY", status=409)
         logger.exception("Erreur CinetPay")
-        return render(request, "payments/cancel.html", {"message": "Erreur de connexion à CinetPay."})
+        return render(request, "payments/cancel.html", {"message": _("Erreur de connexion à CinetPay.")})
 
     payment_url = (data.get("data") or {}).get("payment_url")
     if str(data.get("code")) in ("201", "200") and payment_url:
@@ -651,7 +655,7 @@ def cinetpay_create_payment(request, order_id):
                 payment_url,
             )
         except PaymentInitializationInProgress:
-            return HttpResponse("Initialisation CinetPay remplacée.", status=409)
+            return HttpResponse(_("Initialisation CinetPay remplacée."), status=409)
         except SQLiteLockRetryExhausted:
             return HttpResponse("RETRY", status=409)
         return redirect(payment.checkout_url)

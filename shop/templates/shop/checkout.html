@@ -1,7 +1,7 @@
 {% extends 'template_base.html' %}
-{% load static %}
+{% load i18n static %}
 
-{% block titre %}Finaliser la commande — Teyilawson{% endblock %}
+{% block titre %}{% translate "Finaliser la commande" %} — Teyilawson{% endblock %}
 
 {% block styles %}
 <link rel="stylesheet" href="{% static 'css/checkout.css' %}">
@@ -9,20 +9,20 @@
 
 {% block contenu %}
 <section class="checkout-page">
-  <nav class="checkout-steps" aria-label="Progression de la commande">
-    <a href="{% url 'shop:panier' %}"><span>1</span> Panier</a>
-    <span class="checkout-step-active"><span>2</span> Coordonnées</span>
-    <span><span>3</span> Paiement</span>
+  <nav class="checkout-steps" aria-label="{% translate 'Progression de la commande' %}">
+    <a href="{% url 'shop:panier' %}"><span>1</span> {% translate "Panier" %}</a>
+    <span class="checkout-step-active"><span>2</span> {% translate "Coordonnées" %}</span>
+    <span><span>3</span> {% translate "Paiement" %}</span>
   </nav>
 
   <header class="checkout-header">
     <div>
-      <span class="eyebrow">Commande sécurisée</span>
-      <h1>Finaliser votre commande</h1>
-      <p>Renseignez vos coordonnées avant de choisir votre moyen de paiement.</p>
+      <span class="eyebrow">{% translate "Commande sécurisée" %}</span>
+      <h1>{% translate "Finaliser votre commande" %}</h1>
+      <p>{% translate "Renseignez vos coordonnées avant de choisir votre moyen de paiement." %}</p>
     </div>
     <a href="{% url 'shop:panier' %}" class="btn btn-soft">
-      <i class="fa-solid fa-arrow-left" aria-hidden="true"></i> Retour au panier
+      <i class="fa-solid fa-arrow-left" aria-hidden="true"></i> {% translate "Retour au panier" %}
     </a>
   </header>
 
@@ -32,9 +32,9 @@
       <div class="checkout-section-heading">
         <span class="checkout-section-icon"><i class="fa-regular fa-address-card" aria-hidden="true"></i></span>
         <div>
-          <span class="eyebrow">Vos coordonnées</span>
-          <h2>Adresse de livraison</h2>
-          <p>Ces informations seront associées à cette commande.</p>
+          <span class="eyebrow">{% translate "Vos coordonnées" %}</span>
+          <h2>{% translate "Adresse de livraison" %}</h2>
+          <p>{% translate "Ces informations seront associées à cette commande." %}</p>
         </div>
       </div>
 
@@ -47,52 +47,52 @@
         {% endif %}
 
         <div class="checkout-field checkout-field-full">
-          <label for="{{ form.rue.id_for_label }}">Rue</label>
+          <label for="{{ form.rue.id_for_label }}">{{ form.rue.label }}</label>
           {{ form.rue }}
           {% if form.rue.errors %}<div class="checkout-field-error">{{ form.rue.errors }}</div>{% endif %}
         </div>
 
         <div class="checkout-field">
-          <label for="{{ form.ville.id_for_label }}">Ville</label>
+          <label for="{{ form.ville.id_for_label }}">{{ form.ville.label }}</label>
           {{ form.ville }}
           {% if form.ville.errors %}<div class="checkout-field-error">{{ form.ville.errors }}</div>{% endif %}
         </div>
 
         <div class="checkout-field">
-          <label for="{{ form.code_postal.id_for_label }}">Code postal</label>
+          <label for="{{ form.code_postal.id_for_label }}">{{ form.code_postal.label }}</label>
           {{ form.code_postal }}
           {% if form.code_postal.errors %}<div class="checkout-field-error">{{ form.code_postal.errors }}</div>{% endif %}
         </div>
 
         <div class="checkout-field">
-          <label for="{{ form.pays.id_for_label }}">Pays</label>
+          <label for="{{ form.pays.id_for_label }}">{{ form.pays.label }}</label>
           {{ form.pays }}
           {% if form.pays.errors %}<div class="checkout-field-error">{{ form.pays.errors }}</div>{% endif %}
         </div>
 
         <div class="checkout-field">
-          <label for="{{ form.telephone.id_for_label }}">Téléphone</label>
+          <label for="{{ form.telephone.id_for_label }}">{{ form.telephone.label }}</label>
           {{ form.telephone }}
           {% if form.telephone.errors %}<div class="checkout-field-error">{{ form.telephone.errors }}</div>{% endif %}
         </div>
 
         <div class="checkout-submit">
           <button type="submit" class="btn btn-brand btn-lg">
-            Continuer vers le paiement <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+            {% translate "Continuer vers le paiement" %} <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
           </button>
-          <p><i class="fa-solid fa-lock" aria-hidden="true"></i> Votre commande sera créée une seule fois, même en cas de double clic.</p>
+          <p><i class="fa-solid fa-lock" aria-hidden="true"></i> {% translate "Votre commande sera créée une seule fois, même en cas de double clic." %}</p>
         </div>
       </form>
     </div>
 
     <aside class="checkout-summary" aria-labelledby="checkout-summary-title">
-      <span class="eyebrow">Récapitulatif</span>
-      <h2 id="checkout-summary-title">Votre commande</h2>
+      <span class="eyebrow">{% translate "Récapitulatif" %}</span>
+      <h2 id="checkout-summary-title">{% translate "Votre commande" %}</h2>
 
       <div class="checkout-summary-items">
         {% for item in cart.items.all %}
         <div class="checkout-summary-item">
-          <a href="{% url 'shop:detail' slug=item.produit.slug %}" class="checkout-summary-media" aria-label="Voir {{ item.produit.nom }}">
+          <a href="{% url 'shop:detail' slug=item.produit.slug %}" class="checkout-summary-media" aria-label="{% blocktranslate with product=item.produit.nom %}Voir {{ product }}{% endblocktranslate %}">
             {% if item.produit.image %}
               <img src="{{ item.produit.image.url }}" alt="{{ item.produit.nom }}">
             {% else %}
@@ -101,7 +101,7 @@
           </a>
           <div class="checkout-summary-copy">
             <strong>{{ item.produit.nom }}</strong>
-            <span>Quantité : {{ item.quantite }}</span>
+            <span>{% blocktranslate with quantity=item.quantite %}Quantité : {{ quantity }}{% endblocktranslate %}</span>
           </div>
           <strong class="checkout-summary-price">{{ item.sous_total|floatformat:2 }} €</strong>
         </div>
@@ -109,23 +109,23 @@
       </div>
 
       <div class="checkout-totals">
-        <div><span>Sous-total</span><strong>{{ total|floatformat:2 }} €</strong></div>
-        <div><span>Livraison</span><strong>Gratuite</strong></div>
-        <div class="checkout-total"><span>Total</span><strong>{{ total|floatformat:2 }} €</strong></div>
+        <div><span>{% translate "Sous-total" %}</span><strong>{{ total|floatformat:2 }} €</strong></div>
+        <div><span>{% translate "Livraison" %}</span><strong>{% translate "Gratuite" %}</strong></div>
+        <div class="checkout-total"><span>{% translate "Total" %}</span><strong>{{ total|floatformat:2 }} €</strong></div>
       </div>
 
       <div class="checkout-trust">
-        <span><i class="fa-solid fa-shield-halved" aria-hidden="true"></i> Paiement sécurisé</span>
-        <span><i class="fa-regular fa-circle-check" aria-hidden="true"></i> Vérification avant paiement</span>
+        <span><i class="fa-solid fa-shield-halved" aria-hidden="true"></i> {% translate "Paiement sécurisé" %}</span>
+        <span><i class="fa-regular fa-circle-check" aria-hidden="true"></i> {% translate "Vérification avant paiement" %}</span>
       </div>
     </aside>
   </div>
   {% else %}
   <div class="empty-state checkout-empty">
     <span class="empty-state-icon"><i class="fa-solid fa-bag-shopping" aria-hidden="true"></i></span>
-    <h2>Votre panier est vide</h2>
-    <p>Ajoutez un produit avant de poursuivre vers la commande.</p>
-    <a href="{% url 'shop:liste' %}" class="btn btn-brand">Découvrir la boutique</a>
+    <h2>{% translate "Votre panier est vide" %}</h2>
+    <p>{% translate "Ajoutez un produit avant de poursuivre vers la commande." %}</p>
+    <a href="{% url 'shop:liste' %}" class="btn btn-brand">{% translate "Découvrir la boutique" %}</a>
   </div>
   {% endif %}
 </section>

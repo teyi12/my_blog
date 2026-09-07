@@ -1,7 +1,7 @@
 {% extends 'template_base.html' %}
-{% load static %}
+{% load i18n static %}
 
-{% block titre %}Paiement — Teyilawson{% endblock %}
+{% block titre %}{% translate "Paiement" %} — Teyilawson{% endblock %}
 
 {% block styles %}
 <link rel="stylesheet" href="{% static 'css/payment-choice.css' %}">
@@ -10,45 +10,45 @@
 
 {% block contenu %}
 <section class="payment-page">
-  <nav class="payment-steps" aria-label="Progression de la commande">
-    <a href="{% url 'shop:panier' %}"><span>1</span> Panier</a>
-    <span><span>2</span> Coordonnées</span>
-    <span class="payment-step-active"><span>3</span> Paiement</span>
+  <nav class="payment-steps" aria-label="{% translate 'Progression de la commande' %}">
+    <a href="{% url 'shop:panier' %}"><span>1</span> {% translate "Panier" %}</a>
+    <span><span>2</span> {% translate "Coordonnées" %}</span>
+    <span class="payment-step-active"><span>3</span> {% translate "Paiement" %}</span>
   </nav>
 
   <header class="payment-header">
     <div>
-      <span class="eyebrow">Dernière étape</span>
-      <h1>Choisissez votre moyen de paiement</h1>
-      <p>Sélectionnez la méthode qui vous convient pour finaliser votre commande.</p>
+      <span class="eyebrow">{% translate "Dernière étape" %}</span>
+      <h1>{% translate "Choisissez votre moyen de paiement" %}</h1>
+      <p>{% translate "Sélectionnez la méthode qui vous convient pour finaliser votre commande." %}</p>
     </div>
     <div class="payment-order-number">
-      <span>Commande</span>
+      <span>{% translate "Commande" %}</span>
       <strong>#{{ commande.id }}</strong>
     </div>
   </header>
 
   <div class="payment-layout">
-    <div class="payment-methods" aria-label="Moyens de paiement disponibles">
+    <div class="payment-methods" aria-label="{% translate 'Moyens de paiement disponibles' %}">
       <article class="payment-method-card payment-method-featured">
         <div class="payment-method-topline">
           <span class="payment-icon"><i class="fa-regular fa-credit-card" aria-hidden="true"></i></span>
-          <span class="payment-recommended">Recommandé</span>
+          <span class="payment-recommended">{% translate "Recommandé" %}</span>
         </div>
         <div class="payment-method-copy">
-          <span class="eyebrow">Carte bancaire</span>
+          <span class="eyebrow">{% translate "Carte bancaire" %}</span>
           <h2>Stripe</h2>
-          <p>Payez par carte via la page de paiement sécurisée de Stripe.</p>
+          <p>{% translate "Payez par carte via la page de paiement sécurisée de Stripe." %}</p>
         </div>
         <ul class="payment-benefits">
-          <li><i class="fa-regular fa-circle-check" aria-hidden="true"></i> Paiement sécurisé</li>
-          <li><i class="fa-regular fa-circle-check" aria-hidden="true"></i> Confirmation rapide</li>
+          <li><i class="fa-regular fa-circle-check" aria-hidden="true"></i> {% translate "Paiement sécurisé" %}</li>
+          <li><i class="fa-regular fa-circle-check" aria-hidden="true"></i> {% translate "Confirmation rapide" %}</li>
         </ul>
         <form action="{% url 'payments:stripe_checkout' commande.id %}" method="post" class="payment-form">
           {% csrf_token %}
           <button type="submit" class="btn btn-brand btn-lg">
             <i class="fa-regular fa-credit-card" aria-hidden="true"></i>
-            Payer par carte
+            {% translate "Payer par carte" %}
             <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
           </button>
         </form>
@@ -61,18 +61,18 @@
         <div class="payment-method-copy">
           <span class="eyebrow">Mobile Money</span>
           <h2>CinetPay</h2>
-          <p>Utilisez les moyens Mobile Money disponibles via CinetPay.</p>
+          <p>{% translate "Utilisez les moyens Mobile Money disponibles via CinetPay." %}</p>
         </div>
         <ul class="payment-benefits">
           <li><i class="fa-regular fa-circle-check" aria-hidden="true"></i> Orange Money, MTN, Moov, Wave…</li>
-          <li><i class="fa-regular fa-circle-check" aria-hidden="true"></i> Validation par le fournisseur</li>
+          <li><i class="fa-regular fa-circle-check" aria-hidden="true"></i> {% translate "Validation par le fournisseur" %}</li>
         </ul>
         <form action="{% url 'payments:cinetpay_create' commande.id %}" method="post" class="payment-form">
           {% csrf_token %}
           <input type="hidden" name="channel" value="MOBILE_MONEY">
           <button type="submit" class="btn btn-soft btn-lg">
             <i class="fa-solid fa-mobile-screen-button" aria-hidden="true"></i>
-            Payer avec Mobile Money
+            {% translate "Payer avec Mobile Money" %}
             <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
           </button>
         </form>
@@ -80,32 +80,32 @@
     </div>
 
     <aside class="payment-summary" aria-labelledby="payment-summary-title">
-      <span class="eyebrow">Récapitulatif</span>
-      <h2 id="payment-summary-title">Votre commande</h2>
+      <span class="eyebrow">{% translate "Récapitulatif" %}</span>
+      <h2 id="payment-summary-title">{% translate "Votre commande" %}</h2>
 
       <div class="payment-summary-line">
-        <span>Numéro</span>
+        <span>{% translate "Numéro" %}</span>
         <strong>#{{ commande.id }}</strong>
       </div>
       <div class="payment-summary-line">
-        <span>Statut</span>
-        <strong>En attente de paiement</strong>
+        <span>{% translate "Statut" %}</span>
+        <strong>{% translate "En attente de paiement" %}</strong>
       </div>
       <div class="payment-summary-total">
-        <span>Total à payer</span>
+        <span>{% translate "Total à payer" %}</span>
         <strong>{{ commande.total|floatformat:2 }} {{ commande.currency }}</strong>
       </div>
 
       <div class="payment-security">
         <span class="payment-security-icon"><i class="fa-solid fa-shield-halved" aria-hidden="true"></i></span>
         <div>
-          <strong>Paiement protégé</strong>
-          <p>Le montant et la devise proviennent directement de votre commande.</p>
+          <strong>{% translate "Paiement protégé" %}</strong>
+          <p>{% translate "Le montant et la devise proviennent directement de votre commande." %}</p>
         </div>
       </div>
 
       <a href="{% url 'shop:panier' %}" class="payment-back-link">
-        <i class="fa-solid fa-arrow-left" aria-hidden="true"></i> Retour au panier
+        <i class="fa-solid fa-arrow-left" aria-hidden="true"></i> {% translate "Retour au panier" %}
       </a>
     </aside>
   </div>
@@ -114,19 +114,19 @@
     <div class="payment-donation-copy">
       <span class="payment-donation-icon"><i class="fa-regular fa-heart" aria-hidden="true"></i></span>
       <div>
-        <span class="eyebrow">Soutenir le projet</span>
-        <h2 id="donation-title">Faire un don</h2>
-        <p>Le don est indépendant de votre commande et reste entièrement facultatif.</p>
+        <span class="eyebrow">{% translate "Soutenir le projet" %}</span>
+        <h2 id="donation-title">{% translate "Faire un don" %}</h2>
+        <p>{% translate "Le don est indépendant de votre commande et reste entièrement facultatif." %}</p>
       </div>
     </div>
     <form action="{% url 'payments:create_donation_checkout' %}" method="post" class="payment-donation-form">
       {% csrf_token %}
       <label>
-        <span>Montant</span>
+        <span>{% translate "Montant" %}</span>
         <input type="number" name="amount" min="1" step="1" required placeholder="10">
       </label>
       <label>
-        <span>Devise</span>
+        <span>{% translate "Devise" %}</span>
         <select name="currency">
           <option value="eur">EUR €</option>
           <option value="usd">USD $</option>
@@ -135,7 +135,7 @@
         </select>
       </label>
       <button type="submit" class="btn btn-soft">
-        <i class="fa-regular fa-heart" aria-hidden="true"></i> Faire un don
+        <i class="fa-regular fa-heart" aria-hidden="true"></i> {% translate "Faire un don" %}
       </button>
     </form>
   </section>

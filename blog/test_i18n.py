@@ -20,6 +20,10 @@ class I18nRoutingTests(TestCase):
             settings.MIDDLEWARE.index("django.middleware.locale.LocaleMiddleware"),
             settings.MIDDLEWARE.index("django.middleware.common.CommonMiddleware"),
         )
+        self.assertLess(
+            settings.MIDDLEWARE.index("django.middleware.locale.LocaleMiddleware"),
+            settings.MIDDLEWARE.index("blog.i18n_middleware.PaymentLanguageCookieMiddleware"),
+        )
 
     def test_default_french_home_and_existing_routes_remain_unprefixed(self):
         self.assertEqual(self.client.get("/").status_code, 200)
@@ -78,7 +82,13 @@ class LanguageSelectorTests(TestCase):
         self.assertContains(response, 'method="post"')
         self.assertContains(response, 'name="csrfmiddlewaretoken"')
         self.assertContains(response, 'name="next" value="/articles/"')
-        self.assertContains(response, 'id="language-select"')
+        self.assertContains(response, 'class="language-switcher"')
+        self.assertContains(response, 'name="language" value="fr"', count=1)
+        self.assertContains(response, 'name="language" value="de"', count=1)
+        self.assertContains(response, 'name="language" value="en"', count=1)
+        self.assertContains(response, 'value="fr" class="language-button is-active" aria-label="Français" aria-pressed="true"')
+        self.assertContains(response, 'value="de" class="language-button" aria-label="Allemand" aria-pressed="false"')
+        self.assertContains(response, 'value="en" class="language-button" aria-label="Anglais" aria-pressed="false"')
 
     def test_language_change_requires_post_and_csrf(self):
         self.assertEqual(
@@ -104,6 +114,10 @@ class LanguageSelectorTests(TestCase):
 
         self.assertRedirects(response, "/de/articles/", fetch_redirect_response=False)
         self.assertEqual(response.cookies[settings.LANGUAGE_COOKIE_NAME].value, "de")
+
+        translated_page = self.csrf_client.get(response.url)
+        self.assertContains(translated_page, 'value="de" class="language-button is-active" aria-label="Deutsch" aria-pressed="true"')
+        self.assertContains(translated_page, 'name="next" value="/de/articles/"')
 
     def test_external_next_is_rejected_with_a_safe_home_fallback(self):
         token = self._csrf_token()

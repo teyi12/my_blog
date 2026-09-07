@@ -1,14 +1,15 @@
 {% extends "template_base.html" %}
+{% load i18n %}
 
-{% block titre %}Adresse enregistrée{% endblock %}
+{% block titre %}{% translate "Adresse enregistrée" %}{% endblock %}
 
 {% block contenu %}
 <div class="container text-center my-5">
     <div class="alert alert-success shadow-sm p-4 rounded-3">
-        <h3 class="mb-3">✅ Adresse enregistrée avec succès !</h3>
-        <p>Vous allez être redirigé vers la page de paiement dans quelques secondes...</p>
+        <h3 class="mb-3">✅ {% translate "Adresse enregistrée avec succès !" %}</h3>
+        <p>{% translate "Vous allez être redirigé vers la page de paiement dans quelques secondes…" %}</p>
         <a href="{% url 'payments:choice' commande.id %}" class="btn btn-primary mt-3">
-            Continuer vers le paiement
+            {% translate "Continuer vers le paiement" %}
         </a>
     </div>
 </div>
@@ -16,6 +17,6 @@
 <script>
     setTimeout(function() {
         window.location.href = "{% url 'payments:choice' commande.id %}";
-    }, 3000); // 3 secondes avant la redirection
+    }, 3000);
 </script>
 {% endblock %}

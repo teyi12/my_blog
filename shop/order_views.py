@@ -2,6 +2,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import user_passes_test
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_http_methods
+from django.utils.translation import gettext as _
 
 from .forms import CommandeExpeditionForm
 from .models import Commande
@@ -19,7 +20,7 @@ def commande_expedition_modifier(request, pk):
     if commande.fulfillment_status not in {"SHIPPED", "DELIVERED"}:
         messages.warning(
             request,
-            "Les informations d’expédition peuvent être modifiées uniquement après l’expédition de la commande.",
+            _("Les informations d’expédition peuvent être modifiées uniquement après l’expédition de la commande."),
         )
         return redirect("shop:commande_gestion_detail", pk=commande.pk)
 
@@ -28,7 +29,8 @@ def commande_expedition_modifier(request, pk):
         form.save()
         messages.success(
             request,
-            f"Les informations d’expédition de la commande #{commande.pk} ont été mises à jour.",
+            _("Les informations d’expédition de la commande #%(order)s ont été mises à jour.")
+            % {"order": commande.pk},
         )
         return redirect("shop:commande_gestion_detail", pk=commande.pk)
 

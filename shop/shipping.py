@@ -5,6 +5,8 @@ from django.conf import settings
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
 from django.urls import reverse
+from django.utils import translation
+from django.utils.translation import gettext as _
 
 logger = logging.getLogger(__name__)
 
@@ -40,64 +42,67 @@ def send_fulfillment_notification(commande, new_status, request=None):
     if not recipient or new_status not in {"SHIPPED", "DELIVERED"}:
         return False
 
-    detail_url = _customer_order_url(commande, request=request)
-    tracking_url = carrier_tracking_url(commande.carrier, commande.tracking_number)
-    customer_name = commande.client.first_name or "cher client"
-    lignes = list(commande.lignes.select_related("produit").all())
-
-    if new_status == "SHIPPED":
-        subject = f"Votre commande #{commande.pk} a été expédiée"
-        lines = [
-            f"Bonjour {customer_name},",
-            "",
-            f"Votre commande #{commande.pk} a été expédiée.",
-        ]
-        if commande.carrier:
-            lines.append(f"Transporteur : {commande.carrier}")
-        if commande.tracking_number:
-            lines.append(f"Numéro de suivi : {commande.tracking_number}")
-        if tracking_url:
-            lines.append(f"Suivre le colis : {tracking_url}")
-    else:
-        subject = f"Votre commande #{commande.pk} a été livrée"
-        lines = [
-            f"Bonjour {customer_name},",
-            "",
-            f"Votre commande #{commande.pk} est indiquée comme livrée.",
-        ]
-
-    if detail_url:
-        lines.extend(["", f"Consulter votre commande : {detail_url}"])
-    lines.extend(["", "Merci pour votre confiance.", "L'équipe My Blog Shop"])
-
     sender = getattr(settings, "DEFAULT_FROM_EMAIL", None) or getattr(settings, "EMAIL_HOST_USER", None)
     if not sender:
         logger.warning("Shipping email skipped for order %s: no sender configured", commande.pk)
         return False
 
-    html_body = render_to_string(
-        "shop/emails/fulfillment_status.html",
-        {
-            "subject": subject,
-            "commande": commande,
-            "new_status": new_status,
-            "customer_name": customer_name,
-            "tracking_url": tracking_url,
-            "detail_url": detail_url,
-            "lignes": lignes,
-        },
-    )
+    language_code = commande.language_code or "fr"
+    with translation.override(language_code):
+        detail_url = _customer_order_url(commande, request=request)
+        tracking_url = carrier_tracking_url(commande.carrier, commande.tracking_number)
+        customer_name = commande.client.first_name or _("cher client")
+        lignes = list(commande.lignes.select_related("produit").all())
 
-    try:
-        message = EmailMultiAlternatives(
-            subject=subject,
-            body="\n".join(lines),
-            from_email=sender,
-            to=[recipient],
+        if new_status == "SHIPPED":
+            subject = _("Votre commande #%(order)s a été expédiée") % {"order": commande.pk}
+            lines = [
+                _("Bonjour %(name)s,") % {"name": customer_name},
+                "",
+                _("Votre commande #%(order)s a été expédiée.") % {"order": commande.pk},
+            ]
+            if commande.carrier:
+                lines.append(_("Transporteur : %(carrier)s") % {"carrier": commande.carrier})
+            if commande.tracking_number:
+                lines.append(_("Numéro de suivi : %(tracking)s") % {"tracking": commande.tracking_number})
+            if tracking_url:
+                lines.append(_("Suivre le colis : %(url)s") % {"url": tracking_url})
+        else:
+            subject = _("Votre commande #%(order)s a été livrée") % {"order": commande.pk}
+            lines = [
+                _("Bonjour %(name)s,") % {"name": customer_name},
+                "",
+                _("Votre commande #%(order)s est indiquée comme livrée.") % {"order": commande.pk},
+            ]
+
+        if detail_url:
+            lines.extend(["", _("Consulter votre commande : %(url)s") % {"url": detail_url}])
+        lines.extend(["", _("Merci pour votre confiance."), _("L'équipe My Blog Shop")])
+
+        html_body = render_to_string(
+            "shop/emails/fulfillment_status.html",
+            {
+                "subject": subject,
+                "commande": commande,
+                "new_status": new_status,
+                "customer_name": customer_name,
+                "tracking_url": tracking_url,
+                "detail_url": detail_url,
+                "lignes": lignes,
+                "email_language": language_code,
+            },
         )
-        message.attach_alternative(html_body, "text/html")
-        message.send(fail_silently=False)
-    except Exception:
-        logger.exception("Unable to send fulfillment email for order %s", commande.pk)
-        return False
+
+        try:
+            message = EmailMultiAlternatives(
+                subject=subject,
+                body="\n".join(lines),
+                from_email=sender,
+                to=[recipient],
+            )
+            message.attach_alternative(html_body, "text/html")
+            message.send(fail_silently=False)
+        except Exception:
+            logger.exception("Unable to send fulfillment email for order %s", commande.pk)
+            return False
     return True

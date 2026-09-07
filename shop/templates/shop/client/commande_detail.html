@@ -1,5 +1,5 @@
 {% extends 'template_base.html' %}
-{% load static %}
+{% load i18n static %}
 
 {% block titre %}Commande #{{ commande.id }} — Teyilawson{% endblock %}
 
@@ -9,24 +9,24 @@
 
 {% block contenu %}
 <section class="customer-order-detail-page">
-  <a class="customer-orders-shop-link" href="{% url 'shop:mes_commandes' %}"><i class="fa-solid fa-arrow-left" aria-hidden="true"></i> Mes commandes</a>
+  <a class="customer-orders-shop-link" href="{% url 'shop:mes_commandes' %}"><i class="fa-solid fa-arrow-left" aria-hidden="true"></i> {% translate "Mes commandes" %}</a>
 
   <header class="customer-order-detail-hero">
     <div>
-      <span class="customer-orders-eyebrow">Commande #{{ commande.id }}</span>
-      <h1>Suivi de votre commande</h1>
-      <p>Créée le {{ commande.date_commande|date:'d/m/Y à H:i' }} · {{ commande.total }} {{ commande.currency }}</p>
+      <span class="customer-orders-eyebrow">{% blocktranslate with order=commande.id %}Commande #{{ order }}{% endblocktranslate %}</span>
+      <h1>{% translate "Suivi de votre commande" %}</h1>
+      <p>{% blocktranslate with date=commande.date_commande|date:'SHORT_DATETIME_FORMAT' total=commande.total currency=commande.currency %}Créée le {{ date }} · {{ total }} {{ currency }}{% endblocktranslate %}</p>
     </div>
     <div class="customer-order-detail-statuses">
-      <span class="customer-order-status payment-{{ commande.payment_status|lower }}">Paiement · {{ commande.get_payment_status_display }}</span>
-      <span class="customer-order-status fulfillment-{{ commande.fulfillment_status|lower }}">Traitement · {{ commande.get_fulfillment_status_display }}</span>
+      <span class="customer-order-status payment-{{ commande.payment_status|lower }}">{% translate "Paiement" %} · {{ commande.get_payment_status_display }}</span>
+      <span class="customer-order-status fulfillment-{{ commande.fulfillment_status|lower }}">{% translate "Traitement" %} · {{ commande.get_fulfillment_status_display }}</span>
     </div>
   </header>
 
   <div class="customer-order-detail-grid">
     <div class="customer-order-detail-main">
       <section class="customer-order-panel">
-        <div class="customer-order-panel-heading"><h2>Articles commandés</h2><span>{{ commande.lignes.count }} ligne{{ commande.lignes.count|pluralize }}</span></div>
+        <div class="customer-order-panel-heading"><h2>{% translate "Articles commandés" %}</h2><span>{% blocktranslate count count=commande.lignes.count %}{{ count }} ligne{% plural %}{{ count }} lignes{% endblocktranslate %}</span></div>
         {% for ligne in commande.lignes.all %}
         <div class="customer-order-line">
           <div class="customer-order-line-product">
@@ -36,19 +36,19 @@
           <strong>{{ ligne.sous_total }} {{ commande.currency }}</strong>
         </div>
         {% endfor %}
-        <div class="customer-order-total"><span>Total</span><strong>{{ commande.total }} {{ commande.currency }}</strong></div>
+        <div class="customer-order-total"><span>{% translate "Total" %}</span><strong>{{ commande.total }} {{ commande.currency }}</strong></div>
       </section>
 
       <section class="customer-order-panel">
-        <div class="customer-order-panel-heading"><h2>Progression</h2><span>{{ commande.get_fulfillment_status_display }}</span></div>
+        <div class="customer-order-panel-heading"><h2>{% translate "Progression" %}</h2><span>{{ commande.get_fulfillment_status_display }}</span></div>
         <div class="customer-order-timeline">
-          <div class="timeline-step {% if commande.payment_status == 'SUCCESS' %}is-done{% endif %}"><span><i class="fa-solid fa-credit-card" aria-hidden="true"></i></span><div><strong>Paiement confirmé</strong><small>{% if commande.payment_status == 'SUCCESS' %}Votre paiement a été validé.{% else %}En attente de confirmation du paiement.{% endif %}</small></div></div>
-          <div class="timeline-step {% if commande.fulfillment_status == 'TO_PREPARE' or commande.fulfillment_status == 'PREPARING' or commande.fulfillment_status == 'SHIPPED' or commande.fulfillment_status == 'DELIVERED' %}is-done{% endif %}"><span><i class="fa-solid fa-box" aria-hidden="true"></i></span><div><strong>Préparation</strong><small>Votre commande est prise en charge par la boutique.</small></div></div>
+          <div class="timeline-step {% if commande.payment_status == 'SUCCESS' %}is-done{% endif %}"><span><i class="fa-solid fa-credit-card" aria-hidden="true"></i></span><div><strong>{% translate "Paiement confirmé" %}</strong><small>{% if commande.payment_status == 'SUCCESS' %}{% translate "Votre paiement a été validé." %}{% else %}{% translate "En attente de confirmation du paiement." %}{% endif %}</small></div></div>
+          <div class="timeline-step {% if commande.fulfillment_status == 'TO_PREPARE' or commande.fulfillment_status == 'PREPARING' or commande.fulfillment_status == 'SHIPPED' or commande.fulfillment_status == 'DELIVERED' %}is-done{% endif %}"><span><i class="fa-solid fa-box" aria-hidden="true"></i></span><div><strong>{% translate "Préparation" %}</strong><small>{% translate "Votre commande est prise en charge par la boutique." %}</small></div></div>
           <div class="timeline-step {% if commande.fulfillment_status == 'SHIPPED' or commande.fulfillment_status == 'DELIVERED' %}is-done{% endif %}">
             <span><i class="fa-solid fa-truck" aria-hidden="true"></i></span>
-            <div><strong>Expédition</strong><small>{% if commande.shipped_at %}Expédiée le {{ commande.shipped_at|date:'d/m/Y à H:i' }}{% if commande.carrier %} · {{ commande.carrier }}{% endif %}{% if commande.tracking_number %} · Suivi {{ commande.tracking_number }}{% endif %}.{% elif commande.fulfillment_status == 'SHIPPED' or commande.fulfillment_status == 'DELIVERED' %}Commande expédiée{% if commande.carrier %} · {{ commande.carrier }}{% endif %}{% if commande.tracking_number %} · Suivi {{ commande.tracking_number }}{% endif %}.{% else %}Le suivi apparaîtra ici dès l’expédition.{% endif %}</small></div>
+            <div><strong>{% translate "Expédition" %}</strong><small>{% if commande.shipped_at %}{% blocktranslate with date=commande.shipped_at|date:'SHORT_DATETIME_FORMAT' %}Expédiée le {{ date }}{% endblocktranslate %}{% if commande.carrier %} · {{ commande.carrier }}{% endif %}{% if commande.tracking_number %} · {% translate "Suivi" %} {{ commande.tracking_number }}{% endif %}.{% elif commande.fulfillment_status == 'SHIPPED' or commande.fulfillment_status == 'DELIVERED' %}{% translate "Commande expédiée" %}{% if commande.carrier %} · {{ commande.carrier }}{% endif %}{% if commande.tracking_number %} · {% translate "Suivi" %} {{ commande.tracking_number }}{% endif %}.{% else %}{% translate "Le suivi apparaîtra ici dès l’expédition." %}{% endif %}</small></div>
           </div>
-          <div class="timeline-step {% if commande.fulfillment_status == 'DELIVERED' %}is-done{% endif %}"><span><i class="fa-solid fa-house-circle-check" aria-hidden="true"></i></span><div><strong>Livraison</strong><small>{% if commande.delivered_at %}Livrée le {{ commande.delivered_at|date:'d/m/Y à H:i' }}.{% else %}En attente de livraison.{% endif %}</small></div></div>
+          <div class="timeline-step {% if commande.fulfillment_status == 'DELIVERED' %}is-done{% endif %}"><span><i class="fa-solid fa-house-circle-check" aria-hidden="true"></i></span><div><strong>{% translate "Livraison" %}</strong><small>{% if commande.delivered_at %}{% blocktranslate with date=commande.delivered_at|date:'SHORT_DATETIME_FORMAT' %}Livrée le {{ date }}.{% endblocktranslate %}{% else %}{% translate "En attente de livraison." %}{% endif %}</small></div></div>
         </div>
       </section>
     </div>
@@ -56,31 +56,31 @@
     <aside class="customer-order-detail-side">
       {% if commande.shipped_at or commande.carrier or commande.tracking_number or commande.fulfillment_status == 'SHIPPED' or commande.fulfillment_status == 'DELIVERED' %}
       <section class="customer-order-panel customer-shipping-panel">
-        <h2>Suivi de livraison</h2>
+        <h2>{% translate "Suivi de livraison" %}</h2>
         <dl>
-          <div><dt>Transporteur</dt><dd>{{ commande.carrier|default:'—' }}</dd></div>
-          <div><dt>Numéro de suivi</dt><dd><code>{{ commande.tracking_number|default:'—' }}</code></dd></div>
-          <div><dt>Expédiée le</dt><dd>{% if commande.shipped_at %}{{ commande.shipped_at|date:'d/m/Y à H:i' }}{% else %}Date non enregistrée{% endif %}</dd></div>
-          {% if commande.delivered_at %}<div><dt>Livrée le</dt><dd>{{ commande.delivered_at|date:'d/m/Y à H:i' }}</dd></div>{% endif %}
+          <div><dt>{% translate "Transporteur" %}</dt><dd>{{ commande.carrier|default:'—' }}</dd></div>
+          <div><dt>{% translate "Numéro de suivi" %}</dt><dd><code>{{ commande.tracking_number|default:'—' }}</code></dd></div>
+          <div><dt>{% translate "Expédiée le" %}</dt><dd>{% if commande.shipped_at %}{{ commande.shipped_at|date:'SHORT_DATETIME_FORMAT' }}{% else %}{% translate "Date non enregistrée" %}{% endif %}</dd></div>
+          {% if commande.delivered_at %}<div><dt>{% translate "Livrée le" %}</dt><dd>{{ commande.delivered_at|date:'SHORT_DATETIME_FORMAT' }}</dd></div>{% endif %}
         </dl>
         {% if tracking_url %}
           <a class="customer-tracking-button" href="{{ tracking_url }}" target="_blank" rel="noopener noreferrer">
-            <i class="fa-solid fa-location-arrow" aria-hidden="true"></i> Suivre mon colis
+            <i class="fa-solid fa-location-arrow" aria-hidden="true"></i> {% translate "Suivre mon colis" %}
           </a>
         {% elif commande.tracking_number %}
-          <p class="customer-order-muted">Utilisez le numéro de suivi ci-dessus sur le site officiel du transporteur.</p>
+          <p class="customer-order-muted">{% translate "Utilisez le numéro de suivi ci-dessus sur le site officiel du transporteur." %}</p>
         {% endif %}
       </section>
       {% endif %}
 
       <section class="customer-order-panel">
-        <h2>Adresse de livraison</h2>
-        {% if commande.adresse %}<address>{{ commande.adresse.rue }}<br>{{ commande.adresse.code_postal }} {{ commande.adresse.ville }}<br>{{ commande.adresse.pays }}</address>{% else %}<p class="customer-order-muted">Aucune adresse associée.</p>{% endif %}
+        <h2>{% translate "Adresse de livraison" %}</h2>
+        {% if commande.adresse %}<address>{{ commande.adresse.rue }}<br>{{ commande.adresse.code_postal }} {{ commande.adresse.ville }}<br>{{ commande.adresse.pays }}</address>{% else %}<p class="customer-order-muted">{% translate "Aucune adresse associée." %}</p>{% endif %}
       </section>
 
       <section class="customer-order-panel customer-help-panel">
         <i class="fa-regular fa-circle-question" aria-hidden="true"></i>
-        <div><strong>Besoin d’aide ?</strong><p>Pour une question sur cette commande, contactez-nous en indiquant le numéro #{{ commande.id }}.</p><a href="{% url 'contact' %}">Contacter Teyilawson</a></div>
+        <div><strong>{% translate "Besoin d’aide ?" %}</strong><p>{% blocktranslate with order=commande.id %}Pour une question sur cette commande, contactez-nous en indiquant le numéro #{{ order }}.{% endblocktranslate %}</p><a href="{% url 'contact' %}">{% translate "Contacter Teyilawson" %}</a></div>
       </section>
     </aside>
   </div>
