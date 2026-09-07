@@ -1,9 +1,10 @@
 {% extends "template_base.html" %}
-{% block titre %}Revenus{% endblock %}
+{% load i18n %}
+{% block titre %}{% translate "Revenus" %}{% endblock %}
 
 {% block contenu %}
 <div class="container my-5">
-    <h2 class="mb-4 text-center">Revenus du Blog</h2>
+    <h2 class="mb-4 text-center">{% translate "Revenus du Blog" %}</h2>
 
     <div class="row">
         {% for type, label in revenus_types %}
@@ -18,13 +19,13 @@
 
     <hr>
 
-    <h4 class="mt-5">Historique des revenus</h4>
+    <h4 class="mt-5">{% translate "Historique des revenus" %}</h4>
     <table class="table table-striped mt-3">
         <thead>
             <tr>
-                <th>Type</th>
-                <th>Montant</th>
-                <th>Date</th>
+                <th>{% translate "Type" %}</th>
+                <th>{% translate "Montant" %}</th>
+                <th>{% translate "Date" %}</th>
             </tr>
         </thead>
         <tbody>
@@ -35,7 +36,7 @@
                     <td>{{ revenu.date }}</td>
                 </tr>
             {% empty %}
-                <tr><td colspan="3" class="text-center text-muted">Aucun revenu enregistré.</td></tr>
+                <tr><td colspan="3" class="text-center text-muted">{% translate "Aucun revenu enregistré." %}</td></tr>
             {% endfor %}
         </tbody>
     </table>

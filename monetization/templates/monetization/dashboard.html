@@ -1,39 +1,40 @@
 {% extends "monetization/base.html" %}
-{% block title %}Dashboard monétisation — Teyilawson{% endblock %}
+{% load i18n %}
+{% block title %}{% translate "Dashboard monétisation — Teyilawson" %}{% endblock %}
 
 {% block content %}
 <section class="monetization-section">
   <div class="monetization-section-heading">
     <div>
-      <span class="monetization-eyebrow">Administration</span>
-      <h2>Vue d’ensemble des revenus enregistrés.</h2>
-      <p>Les montants affichés proviennent désormais des données réellement présentes dans la base, sans statistiques de démonstration.</p>
+      <span class="monetization-eyebrow">{% translate "Administration" %}</span>
+      <h2>{% translate "Vue d’ensemble des revenus enregistrés." %}</h2>
+      <p>{% translate "Les montants affichés proviennent désormais des données réellement présentes dans la base, sans statistiques de démonstration." %}</p>
     </div>
   </div>
 
   <div class="revenue-kpis">
-    <article class="revenue-kpi"><span class="revenue-kpi-icon"><i class="fa-solid fa-coins"></i></span><small>Total</small><strong>{{ totaux.global|floatformat:2 }} €</strong></article>
-    <article class="revenue-kpi"><span class="revenue-kpi-icon"><i class="fa-solid fa-rectangle-ad"></i></span><small>Publicité</small><strong>{{ totaux.publicite|floatformat:2 }} €</strong></article>
-    <article class="revenue-kpi"><span class="revenue-kpi-icon"><i class="fa-solid fa-link"></i></span><small>Affiliation</small><strong>{{ totaux.affiliation|floatformat:2 }} €</strong></article>
-    <article class="revenue-kpi"><span class="revenue-kpi-icon"><i class="fa-solid fa-crown"></i></span><small>Premium</small><strong>{{ totaux.premium|floatformat:2 }} €</strong></article>
-    <article class="revenue-kpi"><span class="revenue-kpi-icon"><i class="fa-solid fa-heart"></i></span><small>Dons</small><strong>{{ totaux.dons|floatformat:2 }} €</strong></article>
+    <article class="revenue-kpi"><span class="revenue-kpi-icon"><i class="fa-solid fa-coins"></i></span><small>{% translate "Total" %}</small><strong>{{ totaux.global|floatformat:2 }} €</strong></article>
+    <article class="revenue-kpi"><span class="revenue-kpi-icon"><i class="fa-solid fa-rectangle-ad"></i></span><small>{% translate "Publicité" %}</small><strong>{{ totaux.publicite|floatformat:2 }} €</strong></article>
+    <article class="revenue-kpi"><span class="revenue-kpi-icon"><i class="fa-solid fa-link"></i></span><small>{% translate "Affiliation" %}</small><strong>{{ totaux.affiliation|floatformat:2 }} €</strong></article>
+    <article class="revenue-kpi"><span class="revenue-kpi-icon"><i class="fa-solid fa-crown"></i></span><small>{% translate "Premium" %}</small><strong>{{ totaux.premium|floatformat:2 }} €</strong></article>
+    <article class="revenue-kpi"><span class="revenue-kpi-icon"><i class="fa-solid fa-heart"></i></span><small>{% translate "Dons" %}</small><strong>{{ totaux.dons|floatformat:2 }} €</strong></article>
   </div>
 
   <div class="revenue-table-card">
     <div class="monetization-card-heading">
-      <span class="monetization-eyebrow">Activité récente</span>
-      <h3>Derniers revenus enregistrés</h3>
+      <span class="monetization-eyebrow">{% translate "Activité récente" %}</span>
+      <h3>{% translate "Derniers revenus enregistrés" %}</h3>
     </div>
 
     {% if revenus_recents %}
     <div class="revenue-table-wrap">
       <table class="revenue-table">
-        <thead><tr><th>Source</th><th>Date</th><th>Montant</th></tr></thead>
+        <thead><tr><th>{% translate "Source" %}</th><th>{% translate "Date" %}</th><th>{% translate "Montant" %}</th></tr></thead>
         <tbody>
           {% for revenu in revenus_recents %}
           <tr>
             <td><span class="revenue-source">{{ revenu.get_type_display }}</span></td>
-            <td>{{ revenu.date|date:"d/m/Y H:i" }}</td>
+            <td>{{ revenu.date|date:"SHORT_DATETIME_FORMAT" }}</td>
             <td><strong>{{ revenu.montant|floatformat:2 }} €</strong></td>
           </tr>
           {% endfor %}
@@ -41,7 +42,7 @@
       </table>
     </div>
     {% else %}
-    <div class="monetization-empty compact"><p>Aucun revenu n’a encore été enregistré dans la base.</p></div>
+    <div class="monetization-empty compact"><p>{% translate "Aucun revenu n’a encore été enregistré dans la base." %}</p></div>
     {% endif %}
   </div>
 </section>

@@ -2,9 +2,11 @@ import io
 import base64
 import matplotlib.pyplot as plt
 from django.utils.html import format_html
+from django.utils.translation import gettext_lazy as _
 from django.contrib import admin
 from django.db.models import Sum
 from django.db.models.functions import TruncMonth
+from modeltranslation.admin import TranslationAdmin
 from .models import (
     Partenaire, Publicite, Abonnement, AbonnementUtilisateur,
     Don, LienAffiliation, Revenu
@@ -17,16 +19,34 @@ class PartenaireAdmin(admin.ModelAdmin):
 
 
 @admin.register(Publicite)
-class PubliciteAdmin(admin.ModelAdmin):
+class PubliciteAdmin(TranslationAdmin):
     list_display = ("titre", "partenaire", "date_debut", "date_fin", "actif")
     list_filter = ("actif", "date_debut", "date_fin")
-    search_fields = ("titre", "partenaire__nom")
+    search_fields = ("titre_fr", "titre_de", "titre_en", "partenaire__nom")
 
 
 @admin.register(Abonnement)
-class AbonnementAdmin(admin.ModelAdmin):
+class AbonnementAdmin(TranslationAdmin):
     list_display = ("nom", "prix", "duree_jours")
-    prepopulated_fields = {"slug": ("nom",)}
+    prepopulated_fields = {"slug": ("nom_fr",)}
+    search_fields = (
+        "nom_fr",
+        "nom_de",
+        "nom_en",
+        "description_fr",
+        "description_de",
+        "description_en",
+    )
+
+    def get_readonly_fields(self, request, obj=None):
+        if obj:
+            return ("slug",)
+        return ()
+
+    def get_prepopulated_fields(self, request, obj=None):
+        if obj:
+            return {}
+        return super().get_prepopulated_fields(request, obj)
 
 
 @admin.register(AbonnementUtilisateur)
@@ -61,7 +81,7 @@ class LienAffiliationAdmin(admin.ModelAdmin):
             commission
         )
 
-    commission_coloree.short_description = "Commission estimée"
+    commission_coloree.short_description = _("Commission estimée")
 
 
 
@@ -103,9 +123,9 @@ class RevenuAdmin(admin.ModelAdmin):
             values = [monthly_data[m].get(t, 0) for m in months]
             ax.plot(months, values, marker="o", label=t)
 
-        ax.set_title("Revenus mensuels par type")
-        ax.set_xlabel("Mois")
-        ax.set_ylabel("Montant (€)")
+        ax.set_title(_("Revenus mensuels par type"))
+        ax.set_xlabel(_("Mois"))
+        ax.set_ylabel(_("Montant (€)"))
         ax.legend()
 
         # Convertir le graphique en base64
@@ -128,9 +148,9 @@ from .models import Revenu
 
 
 class CustomAdminSite(AdminSite):
-    site_header = "Administration du Blog & Shop"
-    site_title = "Tableau de bord"
-    index_title = "Bienvenue sur le tableau de bord"
+    site_header = _("Administration du Blog & Shop")
+    site_title = _("Tableau de bord")
+    index_title = _("Bienvenue sur le tableau de bord")
 
     def each_context(self, request):
         context = super().each_context(request)

@@ -5,6 +5,7 @@ from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth.decorators import login_required
 from django.db.models import Sum
 from django.shortcuts import get_object_or_404, redirect, render
+from django.utils.translation import gettext as _
 
 from .forms import AffiliationForm, PartenariatForm
 from .models import Abonnement, Publicite, Revenu
@@ -36,7 +37,10 @@ def partenariat_view(request):
         form = PartenariatForm(request.POST)
         if form.is_valid():
             form.save()
-            messages.success(request, "Votre demande de partenariat a été envoyée avec succès.")
+            messages.success(
+                request,
+                _("Votre demande de partenariat a été envoyée avec succès."),
+            )
             return redirect("monetization:partenariat")
     else:
         form = PartenariatForm()
@@ -48,7 +52,10 @@ def affiliation_view(request):
         form = AffiliationForm(request.POST)
         if form.is_valid():
             form.save()
-            messages.success(request, "Votre demande d’affiliation a été envoyée avec succès.")
+            messages.success(
+                request,
+                _("Votre demande d’affiliation a été envoyée avec succès."),
+            )
             return redirect("monetization:affiliation")
     else:
         form = AffiliationForm()
@@ -66,7 +73,11 @@ def souscrire_abonnement(request, slug):
     abonnement = get_object_or_404(Abonnement, slug=slug)
     messages.info(
         request,
-        f"L’activation sécurisée de l’abonnement {abonnement.nom} sera disponible après intégration complète du paiement récurrent.",
+        _(
+            "L’activation sécurisée de l’abonnement %(subscription)s sera "
+            "disponible après intégration complète du paiement récurrent."
+        )
+        % {"subscription": abonnement.nom},
     )
     return redirect("monetization:abonnements")
 
