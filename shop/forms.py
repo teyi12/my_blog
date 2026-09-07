@@ -50,28 +50,31 @@ class CategorieForm(forms.ModelForm):
         return instance
 
 
+REQUIRED_ERROR = _("Ce champ est obligatoire.")
+
+
 class CommandeTraitementForm(forms.Form):
-    statut = forms.ChoiceField(label="Nouveau statut")
+    statut = forms.ChoiceField(label=_("Nouveau statut"))
     carrier = forms.CharField(
-        label="Transporteur",
+        label=_("Transporteur"),
         max_length=100,
         required=False,
         widget=forms.TextInput(
             attrs={
                 "class": "form-control",
-                "placeholder": "Ex. DHL, Deutsche Post, UPS",
+                "placeholder": _("Ex. DHL, Deutsche Post, UPS"),
                 "autocomplete": "off",
             }
         ),
     )
     tracking_number = forms.CharField(
-        label="Numéro de suivi",
+        label=_("Numéro de suivi"),
         max_length=150,
         required=False,
         widget=forms.TextInput(
             attrs={
                 "class": "form-control",
-                "placeholder": "Ex. 00340434161094000000",
+                "placeholder": _("Ex. 00340434161094000000"),
                 "autocomplete": "off",
             }
         ),
@@ -94,9 +97,9 @@ class CommandeTraitementForm(forms.Form):
         statut = cleaned_data.get("statut")
         if statut == "SHIPPED":
             if not cleaned_data.get("carrier", "").strip():
-                self.add_error("carrier", "Indiquez le transporteur avant de marquer la commande comme expédiée.")
+                self.add_error("carrier", _("Indiquez le transporteur avant de marquer la commande comme expédiée."))
             if not cleaned_data.get("tracking_number", "").strip():
-                self.add_error("tracking_number", "Indiquez le numéro de suivi avant de marquer la commande comme expédiée.")
+                self.add_error("tracking_number", _("Indiquez le numéro de suivi avant de marquer la commande comme expédiée."))
         return cleaned_data
 
 
@@ -105,21 +108,21 @@ class CommandeExpeditionForm(forms.ModelForm):
         model = Commande
         fields = ["carrier", "tracking_number"]
         labels = {
-            "carrier": "Transporteur",
-            "tracking_number": "Numéro de suivi",
+            "carrier": _("Transporteur"),
+            "tracking_number": _("Numéro de suivi"),
         }
         widgets = {
             "carrier": forms.TextInput(
                 attrs={
                     "class": "form-control",
-                    "placeholder": "Ex. DHL, Deutsche Post, UPS",
+                    "placeholder": _("Ex. DHL, Deutsche Post, UPS"),
                     "autocomplete": "off",
                 }
             ),
             "tracking_number": forms.TextInput(
                 attrs={
                     "class": "form-control",
-                    "placeholder": "Ex. TEST-71-2026",
+                    "placeholder": _("Ex. TEST-71-2026"),
                     "autocomplete": "off",
                 }
             ),
@@ -128,28 +131,41 @@ class CommandeExpeditionForm(forms.ModelForm):
     def clean_carrier(self):
         carrier = self.cleaned_data["carrier"].strip()
         if not carrier:
-            raise forms.ValidationError("Indiquez le transporteur.")
+            raise forms.ValidationError(_("Indiquez le transporteur."))
         return carrier
 
     def clean_tracking_number(self):
         tracking_number = self.cleaned_data["tracking_number"].strip()
         if not tracking_number:
-            raise forms.ValidationError("Indiquez le numéro de suivi.")
+            raise forms.ValidationError(_("Indiquez le numéro de suivi."))
         return tracking_number
 
 
 class AjouterAuPanierForm(forms.Form):
-    quantite = forms.IntegerField(min_value=1, initial=1, label="Quantité")
+    quantite = forms.IntegerField(min_value=1, initial=1, label=_("Quantité"))
 
 
 class AdresseForm(forms.ModelForm):
     class Meta:
         model = Adresse
         fields = ["rue", "ville", "code_postal", "pays", "telephone"]
+        labels = {
+            "rue": _("Rue"),
+            "ville": _("Ville"),
+            "code_postal": _("Code postal"),
+            "pays": _("Pays"),
+            "telephone": _("Téléphone"),
+        }
+        error_messages = {
+            "rue": {"required": REQUIRED_ERROR},
+            "ville": {"required": REQUIRED_ERROR},
+            "code_postal": {"required": REQUIRED_ERROR},
+            "pays": {"required": REQUIRED_ERROR},
+        }
         widgets = {
-            "rue": forms.TextInput(attrs={"class": "form-control", "placeholder": "12 rue de Paris"}),
-            "ville": forms.TextInput(attrs={"class": "form-control", "placeholder": "Paris"}),
+            "rue": forms.TextInput(attrs={"class": "form-control", "placeholder": _("12 rue de Paris")}),
+            "ville": forms.TextInput(attrs={"class": "form-control", "placeholder": _("Paris")}),
             "code_postal": forms.TextInput(attrs={"class": "form-control", "placeholder": "75001"}),
-            "pays": forms.TextInput(attrs={"class": "form-control", "placeholder": "France"}),
+            "pays": forms.TextInput(attrs={"class": "form-control", "placeholder": _("France")}),
             "telephone": forms.TextInput(attrs={"class": "form-control", "placeholder": "+33 6 12 34 56 78"}),
         }

@@ -17,7 +17,7 @@ class GlobalInterfaceI18nTests(TestCase):
         self.assertContains(response, ">Accueil<")
         self.assertContains(response, ">Articles<")
         self.assertContains(response, "Faire un don</a>")
-        self.assertContains(response, ">Changer<")
+        self.assertContains(response, 'value="fr" class="language-button is-active" aria-label="Français" aria-pressed="true"')
         self.assertContains(response, "Des idées, des découvertes et une sélection pensée avec soin.")
 
     def test_german_navigation_selector_and_home_are_translated(self):
@@ -27,7 +27,7 @@ class GlobalInterfaceI18nTests(TestCase):
         self.assertContains(response, ">Startseite<")
         self.assertContains(response, ">Artikel<")
         self.assertContains(response, "Spenden</a>")
-        self.assertContains(response, ">Ändern<")
+        self.assertContains(response, 'value="de" class="language-button is-active" aria-label="Deutsch" aria-pressed="true"')
         self.assertContains(
             response,
             "Ideen, Entdeckungen und eine Auswahl, die mit Sorgfalt zusammengestellt wurde.",
@@ -40,7 +40,7 @@ class GlobalInterfaceI18nTests(TestCase):
         self.assertContains(response, ">Home<")
         self.assertContains(response, ">Shop<")
         self.assertContains(response, "Donate</a>")
-        self.assertContains(response, ">Change<")
+        self.assertContains(response, 'value="en" class="language-button is-active" aria-label="English" aria-pressed="true"')
         self.assertContains(response, "Ideas, discoveries and a selection chosen with care.")
 
     def test_about_page_is_translated_in_german_and_english(self):

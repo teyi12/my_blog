@@ -1,6 +1,6 @@
 {% extends 'template_base.html' %}
-{% load static %}
-{% block titre %}Votre panier — Teyilawson{% endblock %}
+{% load i18n static %}
+{% block titre %}{% translate "Votre panier" %} — Teyilawson{% endblock %}
 
 {% block styles %}
 <link rel="stylesheet" href="{% static 'css/cart.css' %}">
@@ -10,13 +10,13 @@
 <section class="cart-page" aria-labelledby="cart-title">
   <div class="cart-header">
     <div>
-      <span class="eyebrow">Votre sélection</span>
-      <h1 id="cart-title">Votre panier</h1>
-      <p>Vérifiez vos articles avant de poursuivre vers la commande.</p>
+      <span class="eyebrow">{% translate "Votre sélection" %}</span>
+      <h1 id="cart-title">{% translate "Votre panier" %}</h1>
+      <p>{% translate "Vérifiez vos articles avant de poursuivre vers la commande." %}</p>
     </div>
     <a href="{% url 'shop:liste' %}" class="btn btn-soft">
       <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
-      Continuer mes achats
+      {% translate "Continuer mes achats" %}
     </a>
   </div>
 
@@ -38,11 +38,11 @@
         <div class="cart-item-info">
           {% if item.produit.categorie %}<span class="cart-item-category">{{ item.produit.categorie.nom }}</span>{% endif %}
           <h2><a href="{% url 'shop:detail' slug=item.produit.slug %}">{{ item.produit.nom }}</a></h2>
-          <span class="cart-unit-price">{{ item.prix_unitaire|floatformat:2 }} € / unité</span>
+          <span class="cart-unit-price">{{ item.prix_unitaire|floatformat:2 }} € / {% translate "unité" %}</span>
         </div>
 
         <div class="cart-item-quantity">
-          <label for="qty-{{ item.id }}">Quantité</label>
+          <label for="qty-{{ item.id }}">{% translate "Quantité" %}</label>
           <input type="number"
                  id="qty-{{ item.id }}"
                  value="{{ item.quantite }}"
@@ -54,14 +54,14 @@
         </div>
 
         <div class="cart-item-total">
-          <span>Sous-total</span>
+          <span>{% translate "Sous-total" %}</span>
           <strong id="subtotal-{{ item.id }}">{{ item.sous_total|floatformat:2 }} €</strong>
         </div>
 
         <button class="cart-remove-button"
                 type="button"
                 onclick="removeFromCart({{ item.id }})"
-                aria-label="Supprimer {{ item.produit.nom }} du panier">
+                aria-label="{% blocktranslate with product=item.produit.nom %}Supprimer {{ product }} du panier{% endblocktranslate %}">
           <i class="fa-regular fa-trash-can" aria-hidden="true"></i>
         </button>
       </article>
@@ -69,35 +69,35 @@
     </div>
 
     <aside class="cart-summary" id="cart-summary" aria-labelledby="cart-summary-title">
-      <span class="cart-summary-kicker">Récapitulatif</span>
-      <h2 id="cart-summary-title">Votre commande</h2>
+      <span class="cart-summary-kicker">{% translate "Récapitulatif" %}</span>
+      <h2 id="cart-summary-title">{% translate "Votre commande" %}</h2>
 
       <div class="cart-summary-line">
-        <span>Articles</span>
+        <span>{% translate "Articles" %}</span>
         <strong id="cart-count">{{ cart.total_articles }}</strong>
       </div>
       <div class="cart-summary-line cart-summary-total">
-        <span>Total</span>
+        <span>{% translate "Total" %}</span>
         <strong id="cart-total">{{ cart.total|floatformat:2 }} €</strong>
       </div>
 
       <a href="{% url 'shop:checkout' %}" id="checkout-btn" class="btn btn-brand btn-lg cart-checkout-button">
-        Passer à la caisse
+        {% translate "Passer à la caisse" %}
         <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
       </a>
 
       <div class="cart-trust">
-        <span><i class="fa-solid fa-lock" aria-hidden="true"></i> Paiement sécurisé</span>
-        <span><i class="fa-regular fa-circle-check" aria-hidden="true"></i> Récapitulatif avant paiement</span>
+        <span><i class="fa-solid fa-lock" aria-hidden="true"></i> {% translate "Paiement sécurisé" %}</span>
+        <span><i class="fa-regular fa-circle-check" aria-hidden="true"></i> {% translate "Récapitulatif avant paiement" %}</span>
       </div>
     </aside>
   </div>
   {% else %}
   <div class="cart-empty" id="cart-empty">
     <span class="cart-empty-icon"><i class="fa-solid fa-bag-shopping" aria-hidden="true"></i></span>
-    <h2>Votre panier est vide</h2>
-    <p>Découvrez la boutique et ajoutez les produits qui vous intéressent.</p>
-    <a href="{% url 'shop:liste' %}" class="btn btn-brand">Découvrir la boutique</a>
+    <h2>{% translate "Votre panier est vide" %}</h2>
+    <p>{% translate "Découvrez la boutique et ajoutez les produits qui vous intéressent." %}</p>
+    <a href="{% url 'shop:liste' %}" class="btn btn-brand">{% translate "Découvrir la boutique" %}</a>
   </div>
   {% endif %}
 
@@ -106,7 +106,20 @@
 {% endblock %}
 
 {% block extra_js %}
+{% translate "Quantité mise à jour." as cart_updated %}
+{% translate "Article supprimé du panier." as cart_removed %}
+{% translate "Votre panier est vide" as cart_empty_title %}
+{% translate "Découvrez la boutique et ajoutez les produits qui vous intéressent." as cart_empty_text %}
+{% translate "Découvrir la boutique" as cart_discover %}
 <script>
+const cartMessages = {
+  updated: "{{ cart_updated|escapejs }}",
+  removed: "{{ cart_removed|escapejs }}",
+  emptyTitle: "{{ cart_empty_title|escapejs }}",
+  emptyText: "{{ cart_empty_text|escapejs }}",
+  discover: "{{ cart_discover|escapejs }}"
+};
+
 function getCSRFToken() {
   return document.querySelector('[name=csrfmiddlewaretoken]')?.value || '';
 }
@@ -141,7 +154,7 @@ function updateCart(itemId) {
   .then(response => response.json())
   .then(data => {
     updateUI(data);
-    if (data.success) setCartStatus('Quantité mise à jour.');
+    if (data.success) setCartStatus(cartMessages.updated);
   });
 }
 
@@ -159,7 +172,7 @@ function removeFromCart(itemId) {
     if (data.success) {
       document.getElementById('item-' + itemId)?.remove();
       updateUI(data);
-      setCartStatus('Article supprimé du panier.');
+      setCartStatus(cartMessages.removed);
     }
   });
 }
@@ -185,9 +198,9 @@ function updateUI(data) {
       layout.outerHTML = `
         <div class="cart-empty" id="cart-empty">
           <span class="cart-empty-icon"><i class="fa-solid fa-bag-shopping" aria-hidden="true"></i></span>
-          <h2>Votre panier est vide</h2>
-          <p>Découvrez la boutique et ajoutez les produits qui vous intéressent.</p>
-          <a href="{% url 'shop:liste' %}" class="btn btn-brand">Découvrir la boutique</a>
+          <h2>${cartMessages.emptyTitle}</h2>
+          <p>${cartMessages.emptyText}</p>
+          <a href="{% url 'shop:liste' %}" class="btn btn-brand">${cartMessages.discover}</a>
         </div>`;
     }
   }

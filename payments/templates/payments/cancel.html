@@ -1,7 +1,7 @@
 {% extends 'template_base.html' %}
-{% load static %}
+{% load i18n static %}
 
-{% block titre %}Paiement interrompu — Teyilawson{% endblock %}
+{% block titre %}{% translate "Paiement interrompu" %} — Teyilawson{% endblock %}
 
 {% block styles %}
 <link rel="stylesheet" href="{% static 'css/payment-result.css' %}">
@@ -14,23 +14,24 @@
       <i class="fa-solid fa-arrow-rotate-left"></i>
     </div>
 
-    <span class="payment-result-eyebrow">Paiement interrompu</span>
-    <h1>Aucun paiement n’a été finalisé.</h1>
-    <p class="payment-result-lead">L’opération a été annulée ou interrompue. Vous pouvez reprendre le parcours de paiement lorsque vous le souhaitez.</p>
+    <span class="payment-result-eyebrow">{% translate "Paiement interrompu" %}</span>
+    <h1>{% translate "Aucun paiement n’a été finalisé." %}</h1>
+    <p class="payment-result-lead">{% translate "L’opération a été annulée ou interrompue. Vous pouvez reprendre le parcours de paiement lorsque vous le souhaitez." %}</p>
+    {% if message %}<p class="payment-result-lead">{{ message }}</p>{% endif %}
 
     <div class="payment-result-note">
       <i class="fa-regular fa-circle-info" aria-hidden="true"></i>
       <div>
-        <strong>Votre commande n’est pas considérée comme payée</strong>
-        <span>Retournez au parcours de commande pour sélectionner à nouveau un moyen de paiement.</span>
+        <strong>{% translate "Votre commande n’est pas considérée comme payée" %}</strong>
+        <span>{% translate "Retournez au parcours de commande pour sélectionner à nouveau un moyen de paiement." %}</span>
       </div>
     </div>
 
     <div class="payment-result-actions">
       <a href="{% url 'payments:choice' %}" class="btn btn-primary btn-lg">
-        Reprendre le paiement <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+        {% translate "Reprendre le paiement" %} <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
       </a>
-      <a href="{% url 'shop:panier' %}" class="btn btn-soft btn-lg">Retour au panier</a>
+      <a href="{% url 'shop:panier' %}" class="btn btn-soft btn-lg">{% translate "Retour au panier" %}</a>
     </div>
   </div>
 </section>

@@ -1,7 +1,7 @@
 {% extends 'template_base.html' %}
-{% load static %}
+{% load i18n static %}
 
-{% block titre %}Mes commandes — Teyilawson{% endblock %}
+{% block titre %}{% translate "Mes commandes" %} — Teyilawson{% endblock %}
 
 {% block styles %}
 <link rel="stylesheet" href="{% static 'css/customer-orders.css' %}">
@@ -11,11 +11,11 @@
 <section class="customer-orders-page">
   <header class="customer-orders-hero">
     <div>
-      <span class="customer-orders-eyebrow">Mon espace · Boutique</span>
-      <h1>Mes commandes</h1>
-      <p>Retrouvez vos achats, leur état de paiement et l’avancement de leur livraison.</p>
+      <span class="customer-orders-eyebrow">{% translate "Mon espace · Boutique" %}</span>
+      <h1>{% translate "Mes commandes" %}</h1>
+      <p>{% translate "Retrouvez vos achats, leur état de paiement et l’avancement de leur livraison." %}</p>
     </div>
-    <a class="customer-orders-shop-link" href="{% url 'shop:liste' %}"><i class="fa-solid fa-arrow-left" aria-hidden="true"></i> Retour à la boutique</a>
+    <a class="customer-orders-shop-link" href="{% url 'shop:liste' %}"><i class="fa-solid fa-arrow-left" aria-hidden="true"></i> {% translate "Retour à la boutique" %}</a>
   </header>
 
   {% if commandes %}
@@ -24,15 +24,15 @@
       <article class="customer-order-card">
         <div class="customer-order-topline">
           <div>
-            <span class="customer-order-number">Commande #{{ commande.id }}</span>
-            <small>{{ commande.date_commande|date:'d/m/Y à H:i' }}</small>
+            <span class="customer-order-number">{% blocktranslate with order=commande.id %}Commande #{{ order }}{% endblocktranslate %}</span>
+            <small>{{ commande.date_commande|date:'SHORT_DATETIME_FORMAT' }}</small>
           </div>
           <strong>{{ commande.total }} {{ commande.currency }}</strong>
         </div>
 
         <div class="customer-order-statuses">
-          <span class="customer-order-status payment-{{ commande.payment_status|lower }}">Paiement · {{ commande.get_payment_status_display }}</span>
-          <span class="customer-order-status fulfillment-{{ commande.fulfillment_status|lower }}">Traitement · {{ commande.get_fulfillment_status_display }}</span>
+          <span class="customer-order-status payment-{{ commande.payment_status|lower }}">{% translate "Paiement" %} · {{ commande.get_payment_status_display }}</span>
+          <span class="customer-order-status fulfillment-{{ commande.fulfillment_status|lower }}">{% translate "Traitement" %} · {{ commande.get_fulfillment_status_display }}</span>
         </div>
 
         <div class="customer-order-products">
@@ -42,7 +42,7 @@
               <span>{{ ligne.quantite }} × {{ ligne.produit.nom }}</span>
             </div>
           {% endfor %}
-          {% if commande.lignes.count > 3 %}<small>+ {{ commande.lignes.count|add:'-3' }} autre(s) article(s)</small>{% endif %}
+          {% if commande.lignes.count > 3 %}<small>{% blocktranslate count extra=commande.lignes.count|add:'-3' %}+ {{ extra }} autre article{% plural %}+ {{ extra }} autres articles{% endblocktranslate %}</small>{% endif %}
         </div>
 
         <div class="customer-order-actions">
@@ -51,25 +51,25 @@
               <div class="customer-order-tracking"><i class="fa-solid fa-truck-fast" aria-hidden="true"></i><span>{% if commande.carrier %}{{ commande.carrier }}{% endif %}{% if commande.tracking_number %} · {{ commande.tracking_number }}{% endif %}</span></div>
             {% endif %}
           {% endif %}
-          <a href="{% url 'shop:ma_commande_detail' commande.pk %}">Voir le détail <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a>
+          <a href="{% url 'shop:ma_commande_detail' commande.pk %}">{% translate "Voir le détail" %} <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a>
         </div>
       </article>
       {% endfor %}
     </div>
 
     {% if page_obj.paginator.num_pages > 1 %}
-      <nav class="customer-orders-pagination" aria-label="Pagination de mes commandes">
-        {% if page_obj.has_previous %}<a href="?page={{ page_obj.previous_page_number }}"><i class="fa-solid fa-arrow-left" aria-hidden="true"></i> Précédent</a>{% endif %}
-        <span>Page {{ page_obj.number }} sur {{ page_obj.paginator.num_pages }}</span>
-        {% if page_obj.has_next %}<a href="?page={{ page_obj.next_page_number }}">Suivant <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a>{% endif %}
+      <nav class="customer-orders-pagination" aria-label="{% translate 'Pagination de mes commandes' %}">
+        {% if page_obj.has_previous %}<a href="?page={{ page_obj.previous_page_number }}"><i class="fa-solid fa-arrow-left" aria-hidden="true"></i> {% translate "Précédent" %}</a>{% endif %}
+        <span>{% blocktranslate with current=page_obj.number total=page_obj.paginator.num_pages %}Page {{ current }} sur {{ total }}{% endblocktranslate %}</span>
+        {% if page_obj.has_next %}<a href="?page={{ page_obj.next_page_number }}">{% translate "Suivant" %} <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a>{% endif %}
       </nav>
     {% endif %}
   {% else %}
     <div class="customer-orders-empty">
       <i class="fa-solid fa-bag-shopping" aria-hidden="true"></i>
-      <h2>Vous n’avez encore aucune commande.</h2>
-      <p>Découvrez la boutique et retrouvez ici vos prochains achats.</p>
-      <a href="{% url 'shop:liste' %}">Découvrir la boutique</a>
+      <h2>{% translate "Vous n’avez encore aucune commande." %}</h2>
+      <p>{% translate "Découvrez la boutique et retrouvez ici vos prochains achats." %}</p>
+      <a href="{% url 'shop:liste' %}">{% translate "Découvrir la boutique" %}</a>
     </div>
   {% endif %}
 </section>

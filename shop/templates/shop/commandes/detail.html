@@ -1,5 +1,5 @@
 {% extends 'template_base.html' %}
-{% load static %}
+{% load i18n static %}
 
 {% block titre %}Commande #{{ commande.id }} — Teyilawson{% endblock %}
 
@@ -11,21 +11,21 @@
 <section class="order-detail-page">
   <header class="order-detail-hero">
     <div>
-      <a class="orders-admin-back" href="{% url 'shop:commande_gestion_liste' %}"><i class="fa-solid fa-arrow-left" aria-hidden="true"></i> Toutes les commandes</a>
-      <span class="orders-admin-eyebrow">Commande #{{ commande.id }}</span>
+      <a class="orders-admin-back" href="{% url 'shop:commande_gestion_liste' %}"><i class="fa-solid fa-arrow-left" aria-hidden="true"></i> {% translate "Toutes les commandes" %}</a>
+      <span class="orders-admin-eyebrow">{% blocktranslate with order=commande.id %}Commande #{{ order }}{% endblocktranslate %}</span>
       <h1>{{ commande.client.first_name|default:commande.client.email }} {{ commande.client.last_name }}</h1>
-      <p>Créée le {{ commande.date_commande|date:'d/m/Y à H:i' }} · {{ commande.total }} {{ commande.currency }}</p>
+      <p>{% blocktranslate with date=commande.date_commande|date:'SHORT_DATETIME_FORMAT' total=commande.total currency=commande.currency %}Créée le {{ date }} · {{ total }} {{ currency }}{% endblocktranslate %}</p>
     </div>
     <div class="order-hero-statuses">
-      <span class="order-status order-status-{{ commande.payment_status|lower }} order-status-large">Paiement · {{ commande.get_payment_status_display }}</span>
-      <span class="fulfillment-status fulfillment-status-{{ commande.fulfillment_status|lower }} fulfillment-status-large">Traitement · {{ commande.get_fulfillment_status_display }}</span>
+      <span class="order-status order-status-{{ commande.payment_status|lower }} order-status-large">{% translate "Paiement" %} · {{ commande.get_payment_status_display }}</span>
+      <span class="fulfillment-status fulfillment-status-{{ commande.fulfillment_status|lower }} fulfillment-status-large">{% translate "Traitement" %} · {{ commande.get_fulfillment_status_display }}</span>
     </div>
   </header>
 
   <div class="order-detail-grid">
     <div class="order-detail-main">
       <section class="order-panel">
-        <div class="order-panel-heading"><h2>Articles commandés</h2><span>{{ commande.lignes.count }} ligne{{ commande.lignes.count|pluralize }}</span></div>
+        <div class="order-panel-heading"><h2>{% translate "Articles commandés" %}</h2><span>{% blocktranslate count count=commande.lignes.count %}{{ count }} ligne{% plural %}{{ count }} lignes{% endblocktranslate %}</span></div>
         <div class="order-lines">
           {% for ligne in commande.lignes.all %}
           <div class="order-line">
@@ -35,94 +35,96 @@
             </div>
             <strong>{{ ligne.sous_total }} {{ commande.currency }}</strong>
           </div>
-          {% empty %}<p class="order-muted">Aucune ligne de commande.</p>{% endfor %}
+          {% empty %}<p class="order-muted">{% translate "Aucune ligne de commande." %}</p>{% endfor %}
         </div>
-        <div class="order-total"><span>Total</span><strong>{{ commande.total }} {{ commande.currency }}</strong></div>
+        <div class="order-total"><span>{% translate "Total" %}</span><strong>{{ commande.total }} {{ commande.currency }}</strong></div>
       </section>
 
       <section class="order-panel">
-        <div class="order-panel-heading"><h2>Historique de paiement</h2><span>{{ paiements.count }} tentative{{ paiements.count|pluralize }}</span></div>
+        <div class="order-panel-heading"><h2>{% translate "Historique de paiement" %}</h2><span>{% blocktranslate count count=paiements.count %}{{ count }} tentative{% plural %}{{ count }} tentatives{% endblocktranslate %}</span></div>
         {% if paiements %}
           <div class="payment-history">
             {% for paiement in paiements %}
             <div class="payment-history-item">
               <div><strong>{{ paiement.get_channel_display }}</strong><small>{{ paiement.created_at|date:'d/m/Y à H:i' }}</small></div>
               <div><span class="order-status order-status-{{ paiement.status|lower }}">{{ paiement.get_status_display }}</span><small>{{ paiement.montant }} {{ paiement.devise }}</small></div>
-              <div class="payment-transaction"><span>Transaction</span><code>{{ paiement.transaction_id }}</code></div>
+              <div class="payment-transaction"><span>{% translate "Transaction" %}</span><code>{{ paiement.transaction_id }}</code></div>
             </div>
             {% endfor %}
           </div>
-        {% else %}<p class="order-muted">Aucune tentative de paiement enregistrée.</p>{% endif %}
+        {% else %}<p class="order-muted">{% translate "Aucune tentative de paiement enregistrée." %}</p>{% endif %}
       </section>
     </div>
 
     <aside class="order-detail-side">
       <section class="order-panel fulfillment-panel">
-        <div class="order-panel-heading"><h2>Traitement de la commande</h2><span class="fulfillment-status fulfillment-status-{{ commande.fulfillment_status|lower }}">{{ commande.get_fulfillment_status_display }}</span></div>
+        <div class="order-panel-heading"><h2>{% translate "Traitement de la commande" %}</h2><span class="fulfillment-status fulfillment-status-{{ commande.fulfillment_status|lower }}">{{ commande.get_fulfillment_status_display }}</span></div>
         {% if commande.payment_status != 'SUCCESS' %}
-          <p class="fulfillment-note">Le traitement logistique sera disponible lorsque le paiement aura été confirmé.</p>
+          <p class="fulfillment-note">{% translate "Le traitement logistique sera disponible lorsque le paiement aura été confirmé." %}</p>
         {% elif transitions_disponibles %}
           <form class="fulfillment-form" method="post" action="{% url 'shop:commande_traitement_modifier' commande.pk %}">
             {% csrf_token %}
-            <label for="{{ traitement_form.statut.id_for_label }}">Étape suivante</label>
+            <label for="{{ traitement_form.statut.id_for_label }}">{{ traitement_form.statut.label }}</label>
             {{ traitement_form.statut }}
             {% if commande.fulfillment_status == 'PREPARING' %}
               <div class="shipping-fields">
                 <div>
-                  <label for="{{ traitement_form.carrier.id_for_label }}">Transporteur</label>
+                  <label for="{{ traitement_form.carrier.id_for_label }}">{{ traitement_form.carrier.label }}</label>
                   {{ traitement_form.carrier }}
                 </div>
                 <div>
-                  <label for="{{ traitement_form.tracking_number.id_for_label }}">Numéro de suivi</label>
+                  <label for="{{ traitement_form.tracking_number.id_for_label }}">{{ traitement_form.tracking_number.label }}</label>
                   {{ traitement_form.tracking_number }}
                 </div>
               </div>
-              <p class="fulfillment-note"><i class="fa-solid fa-truck" aria-hidden="true"></i> Le transporteur et le numéro de suivi sont requis pour passer la commande à « Expédiée ».</p>
+              <p class="fulfillment-note"><i class="fa-solid fa-truck" aria-hidden="true"></i> {% translate "Le transporteur et le numéro de suivi sont requis pour passer la commande à « Expédiée »." %}</p>
             {% endif %}
-            <button type="submit">Mettre à jour le traitement</button>
+            <button type="submit">{% translate "Mettre à jour le traitement" %}</button>
           </form>
-          <p class="fulfillment-note"><i class="fa-solid fa-circle-info" aria-hidden="true"></i> Les étapes avancent dans l’ordre. Annuler le traitement n’effectue aucun remboursement.</p>
+          <p class="fulfillment-note"><i class="fa-solid fa-circle-info" aria-hidden="true"></i> {% translate "Les étapes avancent dans l’ordre. Annuler le traitement n’effectue aucun remboursement." %}</p>
         {% else %}
-          <p class="fulfillment-note">Aucune transition supplémentaire n’est disponible pour cette commande.</p>
+          <p class="fulfillment-note">{% translate "Aucune transition supplémentaire n’est disponible pour cette commande." %}</p>
         {% endif %}
       </section>
 
       {% if commande.fulfillment_status == 'SHIPPED' or commande.fulfillment_status == 'DELIVERED' %}
       <section class="order-panel shipping-panel">
-        <div class="order-panel-heading"><h2>Expédition</h2><i class="fa-solid fa-truck-fast" aria-hidden="true"></i></div>
+        <div class="order-panel-heading"><h2>{% translate "Expédition" %}</h2><i class="fa-solid fa-truck-fast" aria-hidden="true"></i></div>
         <dl class="order-meta">
-          <div><dt>Transporteur</dt><dd>{{ commande.carrier|default:'Non renseigné' }}</dd></div>
-          <div><dt>Numéro de suivi</dt><dd>{% if commande.tracking_number %}<code>{{ commande.tracking_number }}</code>{% else %}Non renseigné{% endif %}</dd></div>
-          <div><dt>Expédiée le</dt><dd>{% if commande.shipped_at %}{{ commande.shipped_at|date:'d/m/Y à H:i' }}{% else %}Date non enregistrée{% endif %}</dd></div>
-          {% if commande.delivered_at %}<div><dt>Livrée le</dt><dd>{{ commande.delivered_at|date:'d/m/Y à H:i' }}</dd></div>{% endif %}
+          {% translate "Non renseigné" as not_provided %}
+          <div><dt>{% translate "Transporteur" %}</dt><dd>{{ commande.carrier|default:not_provided }}</dd></div>
+          <div><dt>{% translate "Numéro de suivi" %}</dt><dd>{% if commande.tracking_number %}<code>{{ commande.tracking_number }}</code>{% else %}{{ not_provided }}{% endif %}</dd></div>
+          <div><dt>{% translate "Expédiée le" %}</dt><dd>{% if commande.shipped_at %}{{ commande.shipped_at|date:'SHORT_DATETIME_FORMAT' }}{% else %}{% translate "Date non enregistrée" %}{% endif %}</dd></div>
+          {% if commande.delivered_at %}<div><dt>{% translate "Livrée le" %}</dt><dd>{{ commande.delivered_at|date:'SHORT_DATETIME_FORMAT' }}</dd></div>{% endif %}
         </dl>
-        <a class="orders-admin-back" href="{% url 'shop:commande_expedition_modifier' commande.pk %}"><i class="fa-solid fa-pen" aria-hidden="true"></i> Modifier les informations d’expédition</a>
+        <a class="orders-admin-back" href="{% url 'shop:commande_expedition_modifier' commande.pk %}"><i class="fa-solid fa-pen" aria-hidden="true"></i> {% translate "Modifier les informations d’expédition" %}</a>
       </section>
       {% endif %}
 
       <section class="order-panel">
-        <h2>Résumé opérationnel</h2>
+        <h2>{% translate "Résumé opérationnel" %}</h2>
         <dl class="order-meta">
-          <div><dt>Paiement</dt><dd>{{ commande.get_payment_status_display }}</dd></div>
-          <div><dt>Traitement</dt><dd>{{ commande.get_fulfillment_status_display }}</dd></div>
-          <div><dt>Panier finalisé</dt><dd>{% if commande.cart_finalized_at %}{{ commande.cart_finalized_at|date:'d/m/Y à H:i' }}{% else %}Non{% endif %}</dd></div>
-          {% if commande.shipped_at %}<div><dt>Expédition</dt><dd>{{ commande.shipped_at|date:'d/m/Y à H:i' }}</dd></div>{% endif %}
-          {% if commande.delivered_at %}<div><dt>Livraison</dt><dd>{{ commande.delivered_at|date:'d/m/Y à H:i' }}</dd></div>{% endif %}
+          <div><dt>{% translate "Paiement" %}</dt><dd>{{ commande.get_payment_status_display }}</dd></div>
+          <div><dt>{% translate "Traitement" %}</dt><dd>{{ commande.get_fulfillment_status_display }}</dd></div>
+          <div><dt>{% translate "Panier finalisé" %}</dt><dd>{% if commande.cart_finalized_at %}{{ commande.cart_finalized_at|date:'SHORT_DATETIME_FORMAT' }}{% else %}{% translate "Non" %}{% endif %}</dd></div>
+          {% if commande.shipped_at %}<div><dt>{% translate "Expédition" %}</dt><dd>{{ commande.shipped_at|date:'SHORT_DATETIME_FORMAT' }}</dd></div>{% endif %}
+          {% if commande.delivered_at %}<div><dt>{% translate "Livraison" %}</dt><dd>{{ commande.delivered_at|date:'SHORT_DATETIME_FORMAT' }}</dd></div>{% endif %}
         </dl>
       </section>
 
       <section class="order-panel">
-        <h2>Client</h2>
+        <h2>{% translate "Client" %}</h2>
         <dl class="order-meta">
-          <div><dt>Nom</dt><dd>{{ commande.client.first_name }} {{ commande.client.last_name }}</dd></div>
+          <div><dt>{% translate "Nom du client" %}</dt><dd>{{ commande.client.first_name }} {{ commande.client.last_name }}</dd></div>
           <div><dt>Email</dt><dd>{{ commande.client.email }}</dd></div>
-          <div><dt>Canal</dt><dd>{{ commande.get_payment_channel_display|default:'Non choisi' }}</dd></div>
-          <div><dt>Transaction</dt><dd>{{ commande.transaction_id|default:'—' }}</dd></div>
+          {% translate "Non choisi" as not_chosen %}
+          <div><dt>{% translate "Canal" %}</dt><dd>{{ commande.get_payment_channel_display|default:not_chosen }}</dd></div>
+          <div><dt>{% translate "Transaction" %}</dt><dd>{{ commande.transaction_id|default:'—' }}</dd></div>
         </dl>
       </section>
 
       <section class="order-panel">
-        <h2>Adresse de livraison</h2>
+        <h2>{% translate "Adresse de livraison" %}</h2>
         {% if commande.adresse %}
           <address class="order-address">
             {{ commande.adresse.rue }}<br>
@@ -130,12 +132,12 @@
             {{ commande.adresse.pays }}
           </address>
           {% if commande.adresse.telephone %}<p class="order-phone"><i class="fa-solid fa-phone" aria-hidden="true"></i> {{ commande.adresse.telephone }}</p>{% endif %}
-        {% else %}<p class="order-muted">Aucune adresse associée.</p>{% endif %}
+        {% else %}<p class="order-muted">{% translate "Aucune adresse associée." %}</p>{% endif %}
       </section>
 
       <section class="order-panel order-trust-panel">
         <i class="fa-solid fa-shield-halved" aria-hidden="true"></i>
-        <div><strong>Statut de paiement protégé</strong><p>Le paiement reste piloté par Stripe/CinetPay. Cette interface ne modifie que le traitement logistique.</p></div>
+        <div><strong>{% translate "Statut de paiement protégé" %}</strong><p>{% translate "Le paiement reste piloté par Stripe/CinetPay. Cette interface ne modifie que le traitement logistique." %}</p></div>
       </section>
     </aside>
   </div>

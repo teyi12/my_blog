@@ -1,25 +1,26 @@
 from django.db import models
 from django.conf import settings
 from django.db.models import Q
+from django.utils.translation import gettext_lazy as _
 from shop.models import Commande
 import uuid
 
 
 class Payment(models.Model):
     STATUS_CHOICES = [
-        ("PENDING", "En attente"),
-        ("PROCESSING", "En cours"),
-        ("SUCCESS", "Réussi"),
-        ("FAILED", "Échoué"),
-        ("CANCELED", "Annulé"),
+        ("PENDING", _("En attente")),
+        ("PROCESSING", _("En cours")),
+        ("SUCCESS", _("Réussi")),
+        ("FAILED", _("Échoué")),
+        ("CANCELED", _("Annulé")),
     ]
 
     CHANNEL_CHOICES = [
         ("STRIPE", "Stripe"),
         ("MOBILE_MONEY", "Mobile Money"),
         ("CINETPAY", "CinetPay"),
-        ("CARD", "Carte bancaire"),
-        ("OTHER", "Autre"),
+        ("CARD", _("Carte bancaire")),
+        ("OTHER", _("Autre")),
     ]
 
     commande = models.ForeignKey(
@@ -66,8 +67,8 @@ from django.conf import settings
 
 class Adresse(models.Model):
     TYPE_ADRESSE_CHOICES = [
-        ("LIVRAISON", "Adresse de livraison"),
-        ("FACTURATION", "Adresse de facturation"),
+        ("LIVRAISON", _("Adresse de livraison")),
+        ("FACTURATION", _("Adresse de facturation")),
     ]
 
     utilisateur = models.ForeignKey(

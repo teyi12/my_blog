@@ -12,6 +12,7 @@ class ShopCatalogTranslationMigrationTests(TransactionTestCase):
     migrate_from = [("shop", "0014_cart_integrity_constraints")]
     schema_target = [("shop", "0015_product_category_translations")]
     migrate_to = [("shop", "0016_populate_french_product_category_translations")]
+    restore_to = [("shop", "0017_commande_language_code")]
 
     def setUp(self):
         super().setUp()
@@ -98,7 +99,7 @@ class ShopCatalogTranslationMigrationTests(TransactionTestCase):
         )
 
     def tearDown(self):
-        MigrationExecutor(connection).migrate(self.migrate_to)
+        MigrationExecutor(connection).migrate(self.restore_to)
         super().tearDown()
 
     def _migrate_and_get_apps(self):

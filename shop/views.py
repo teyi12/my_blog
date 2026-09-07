@@ -84,7 +84,10 @@ def ajouter_panier(request, slug):
     if not created:
         CartItem.objects.filter(pk=item.pk).update(quantite=F("quantite") + 1)
 
-    messages.success(request, f'« {produit.nom} » a été ajouté à votre panier.')
+    messages.success(
+        request,
+        _("« %(product)s » a été ajouté à votre panier.") % {"product": produit.nom},
+    )
 
     next_url = request.POST.get("next")
     if next_url and url_has_allowed_host_and_scheme(
@@ -286,17 +289,17 @@ def commande_traitement_modifier(request, pk):
         if commande.payment_status != "SUCCESS":
             messages.warning(
                 request,
-                "Le traitement logistique ne peut avancer qu’après confirmation du paiement.",
+                _("Le traitement logistique ne peut avancer qu’après confirmation du paiement."),
             )
             return redirect("shop:commande_gestion_detail", pk=commande.pk)
 
         if not form.is_valid():
-            messages.error(request, "Transition de traitement invalide. Vérifiez les informations d’expédition.")
+            messages.error(request, _("Transition de traitement invalide. Vérifiez les informations d’expédition."))
             return redirect("shop:commande_gestion_detail", pk=commande.pk)
 
         nouveau_statut = form.cleaned_data["statut"]
         if nouveau_statut not in commande.allowed_fulfillment_transitions():
-            messages.error(request, "Cette transition de traitement n’est pas autorisée.")
+            messages.error(request, _("Cette transition de traitement n’est pas autorisée."))
             return redirect("shop:commande_gestion_detail", pk=commande.pk)
 
         update_fields = ["fulfillment_status"]
@@ -315,7 +318,8 @@ def commande_traitement_modifier(request, pk):
 
     messages.success(
         request,
-        f"Le traitement de la commande #{commande.pk} est maintenant « {commande.get_fulfillment_status_display()} ».",
+        _("Le traitement de la commande #%(order)s est maintenant « %(status)s ».")
+        % {"order": commande.pk, "status": commande.get_fulfillment_status_display()},
     )
     return redirect("shop:commande_gestion_detail", pk=commande.pk)
 
@@ -327,7 +331,7 @@ class CheckoutView(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         cart = Cart.objects.filter(user=request.user, actif=True).first()
         if not cart or not cart.items.exists():
-            messages.warning(request, "Votre panier est vide.")
+            messages.warning(request, _("Votre panier est vide."))
             return redirect("shop:panier")
 
         form = AdresseForm()
@@ -344,7 +348,7 @@ class CheckoutView(LoginRequiredMixin, View):
         try:
             checkout_token = uuid.UUID(request.POST.get("checkout_token", ""))
         except (TypeError, ValueError):
-            messages.error(request, "Session de checkout invalide. Veuillez réessayer.")
+            messages.error(request, _("Session de checkout invalide. Veuillez réessayer."))
             return redirect("shop:checkout")
 
         if form.is_valid():
@@ -391,6 +395,7 @@ class CheckoutView(LoginRequiredMixin, View):
                         checkout_token=checkout_token,
                         total=total,
                         payment_status="PENDING",
+                        language_code=request.LANGUAGE_CODE,
                     )
                     LigneCommande.objects.bulk_create(
                         [
@@ -430,7 +435,7 @@ class CheckoutView(LoginRequiredMixin, View):
                     cart = Cart.objects.filter(user=request.user, actif=True).first()
                     messages.warning(
                         request,
-                        "Le checkout est momentanément occupé. Veuillez réessayer.",
+                        _("Le checkout est momentanément occupé. Veuillez réessayer."),
                     )
                     return render(request, "shop/checkout.html", {
                         "cart": cart,
@@ -440,7 +445,7 @@ class CheckoutView(LoginRequiredMixin, View):
                     }, status=409)
 
             if not commande:
-                messages.warning(request, "Votre panier est vide.")
+                messages.warning(request, _("Votre panier est vide."))
                 return redirect("shop:panier")
 
             url = reverse("shop:adresse_enregistree")
@@ -448,7 +453,7 @@ class CheckoutView(LoginRequiredMixin, View):
 
         cart = Cart.objects.filter(user=request.user, actif=True).first()
         if not cart or not cart.items.exists():
-            messages.warning(request, "Votre panier est vide.")
+            messages.warning(request, _("Votre panier est vide."))
             return redirect("shop:panier")
 
         return render(request, "shop/checkout.html", {

@@ -40,16 +40,15 @@
             <li class="nav-item"><a class="nav-link" href="{% url 'contact' %}">{% translate "Contact" %}</a></li>
           </ul>
           <div class="header-actions">
-            <form method="post" action="{% url 'set_language' %}" class="d-flex align-items-center gap-1">
+            <form method="post" action="{% url 'set_language' %}" class="language-switcher" aria-label="{% translate "Choisir la langue" %}">
               {% csrf_token %}
               <input type="hidden" name="next" value="{{ request.get_full_path }}">
-              <label class="visually-hidden" for="language-select">{% translate "Langue" %}</label>
-              <select id="language-select" name="language" class="form-select form-select-sm" aria-label="{% translate "Choisir la langue" %}">
-                <option value="fr"{% if CURRENT_LANGUAGE == "fr" %} selected{% endif %}>FR</option>
-                <option value="de"{% if CURRENT_LANGUAGE == "de" %} selected{% endif %}>DE</option>
-                <option value="en"{% if CURRENT_LANGUAGE == "en" %} selected{% endif %}>EN</option>
-              </select>
-              <button type="submit" class="btn btn-soft btn-sm">{% translate "Changer" %}</button>
+              <span class="visually-hidden">{% translate "Langue" %}</span>
+              <button type="submit" name="language" value="fr" class="language-button{% if CURRENT_LANGUAGE == 'fr' %} is-active{% endif %}" aria-label="{% translate 'Français' %}" aria-pressed="{% if CURRENT_LANGUAGE == 'fr' %}true{% else %}false{% endif %}">FR<span class="visually-hidden">{% if CURRENT_LANGUAGE == 'fr' %} — {% translate "langue active" %}{% endif %}</span></button>
+              <span aria-hidden="true">|</span>
+              <button type="submit" name="language" value="de" class="language-button{% if CURRENT_LANGUAGE == 'de' %} is-active{% endif %}" aria-label="{% translate 'Allemand' %}" aria-pressed="{% if CURRENT_LANGUAGE == 'de' %}true{% else %}false{% endif %}">DE<span class="visually-hidden">{% if CURRENT_LANGUAGE == 'de' %} — {% translate "langue active" %}{% endif %}</span></button>
+              <span aria-hidden="true">|</span>
+              <button type="submit" name="language" value="en" class="language-button{% if CURRENT_LANGUAGE == 'en' %} is-active{% endif %}" aria-label="{% translate 'Anglais' %}" aria-pressed="{% if CURRENT_LANGUAGE == 'en' %}true{% else %}false{% endif %}">EN<span class="visually-hidden">{% if CURRENT_LANGUAGE == 'en' %} — {% translate "langue active" %}{% endif %}</span></button>
             </form>
             <a class="header-icon d-none d-lg-inline-flex" href="{% url 'shop:panier' %}"{% if panier_items_count %} aria-label="{% blocktranslate count counter=panier_items_count %}Voir le panier, {{ counter }} article{% plural %}Voir le panier, {{ counter }} articles{% endblocktranslate %}"{% else %} aria-label="{% translate "Voir le panier" %}"{% endif %}>
               <i class="fa-solid fa-bag-shopping" aria-hidden="true"></i>

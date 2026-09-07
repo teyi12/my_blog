@@ -1,23 +1,30 @@
 from django.db import models
 from django.conf import settings
 from django.utils.text import slugify
+from django.utils.translation import gettext_lazy as _
 from decimal import Decimal
 
 
 ORDER_CURRENCY_CHOICES = [
-    ("EUR", "Euro"),
-    ("USD", "Dollar"),
-    ("XOF", "Franc CFA"),
+    ("EUR", _("Euro")),
+    ("USD", _("Dollar")),
+    ("XOF", _("Franc CFA")),
 ]
 DEFAULT_ORDER_CURRENCY = "EUR"
 
 FULFILLMENT_STATUS_CHOICES = [
-    ("WAITING_PAYMENT", "En attente de paiement"),
-    ("TO_PREPARE", "À préparer"),
-    ("PREPARING", "En préparation"),
-    ("SHIPPED", "Expédiée"),
-    ("DELIVERED", "Livrée"),
-    ("CANCELED", "Traitement annulé"),
+    ("WAITING_PAYMENT", _("En attente de paiement")),
+    ("TO_PREPARE", _("À préparer")),
+    ("PREPARING", _("En préparation")),
+    ("SHIPPED", _("Expédiée")),
+    ("DELIVERED", _("Livrée")),
+    ("CANCELED", _("Traitement annulé")),
+]
+
+ORDER_LANGUAGE_CHOICES = [
+    ("fr", _("Français")),
+    ("de", _("Allemand")),
+    ("en", _("Anglais")),
 ]
 
 FULFILLMENT_TRANSITIONS = {
@@ -93,21 +100,21 @@ class Commande(models.Model):
     payment_status = models.CharField(
         max_length=20,
         choices=[
-            ("PENDING", "En attente"),
-            ("PROCESSING", "Paiement en cours"),
-            ("SUCCESS", "Payée"),
-            ("FAILED", "Échouée"),
-            ("CANCELED", "Annulée"),
+            ("PENDING", _("En attente")),
+            ("PROCESSING", _("Paiement en cours")),
+            ("SUCCESS", _("Payée")),
+            ("FAILED", _("Échouée")),
+            ("CANCELED", _("Annulée")),
         ],
         default="PENDING",
     )
     payment_channel = models.CharField(
         max_length=20,
         choices=[
-            ("CARD", "Carte bancaire"),
-            ("MOBILE_MONEY", "Mobile Money"),
-            ("STRIPE", "Stripe"),
-            ("CINETPAY", "CinetPay"),
+            ("CARD", _("Carte bancaire")),
+            ("MOBILE_MONEY", _("Mobile Money")),
+            ("STRIPE", _("Stripe")),
+            ("CINETPAY", _("CinetPay")),
         ],
         blank=True,
         null=True,
@@ -116,6 +123,11 @@ class Commande(models.Model):
         max_length=10,
         choices=ORDER_CURRENCY_CHOICES,
         default=DEFAULT_ORDER_CURRENCY,
+    )
+    language_code = models.CharField(
+        max_length=10,
+        choices=ORDER_LANGUAGE_CHOICES,
+        default="fr",
     )
     fulfillment_status = models.CharField(
         max_length=20,
