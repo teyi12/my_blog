@@ -76,6 +76,17 @@ class SeoMetadataTests(TestCase):
         self.assertEqual(html.count('<meta name="description"'), 1)
         self.assertContains(response, '<meta name="robots" content="index,follow">')
 
+    def test_google_site_verification_is_present_on_all_homepages(self):
+        verification_tag = (
+            '<meta name="google-site-verification" '
+            'content="YbInrVqq5hfxF1drNcYUQc8CgyvPghXS7tQhGY5ZHlI" />'
+        )
+
+        for url in ("/", "/de/", "/en/"):
+            with self.subTest(url=url):
+                response = self.client.get(url, secure=True)
+                self.assertContains(response, verification_tag, count=1)
+
     def test_static_canonicals_follow_language_and_drop_query_parameters(self):
         expected = {
             "/?utm_source=test&page=2": "https://testserver/",
