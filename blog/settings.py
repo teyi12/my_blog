@@ -99,6 +99,7 @@ INSTALLED_APPS = [
     "rest_framework",
     "sslserver",
     "articles",
+    "videos",
     "accounts",
     "shop",
     "payments",

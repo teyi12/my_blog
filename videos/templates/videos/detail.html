@@ -1,0 +1,51 @@
+{% extends "template_base.html" %}
+{% load i18n static %}
+
+{% block titre %}{{ video.titre }} — Teyilawson{% endblock %}
+
+{% block styles %}<link rel="stylesheet" href="{% static 'css/videos.css' %}">{% endblock %}
+
+{% block contenu %}
+<article class="video-detail">
+  <a class="video-back-link" href="{% url 'videos:list' %}"><i class="fa-solid fa-arrow-left" aria-hidden="true"></i> {% translate "Toutes les vidéos" %}</a>
+
+  <header class="video-detail-header">
+    <div>
+      <div class="video-detail-badges">
+        {% if video.categorie %}<span class="video-badge">{{ video.categorie.nom }}</span>{% endif %}
+        {% if video.is_premium %}<span class="video-badge video-badge-premium"><i class="fa-solid fa-star" aria-hidden="true"></i> {% translate "Premium" %}</span>{% endif %}
+      </div>
+      <h1>{{ video.titre }}</h1>
+      <div class="video-meta">
+        <time datetime="{{ video.date_publication|date:'Y-m-d' }}"><i class="fa-regular fa-calendar" aria-hidden="true"></i> {{ video.date_publication|date:"d F Y" }}</time>
+        {% if video.auteur %}<span><i class="fa-regular fa-user" aria-hidden="true"></i> {{ video.auteur.get_full_name|default:video.auteur.email }}</span>{% endif %}
+      </div>
+    </div>
+    <figure class="video-detail-thumbnail">
+      {% if video.miniature %}
+        <img src="{{ video.miniature.url }}" alt="{{ video.resolved_miniature_alt }}">
+      {% else %}
+        <img src="{% static 'images/video-placeholder.svg' %}" alt="{{ video.resolved_miniature_alt }}">
+      {% endif %}
+    </figure>
+  </header>
+
+  <section class="video-player-section" aria-label="{% translate 'Lecteur vidéo' %}">
+    <div class="video-player">
+      <iframe
+        src="{{ video.embed_url }}"
+        title="{% blocktranslate with video_title=video.titre %}Lecteur vidéo : {{ video_title }}{% endblocktranslate %}"
+        loading="lazy"
+        referrerpolicy="strict-origin-when-cross-origin"
+        allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+        allowfullscreen></iframe>
+    </div>
+  </section>
+
+  <section class="video-description" aria-labelledby="video-description-title">
+    <span class="videos-eyebrow">{% translate "À propos de cette vidéo" %}</span>
+    <h2 id="video-description-title">{% translate "Présentation" %}</h2>
+    <div>{{ video.description|linebreaks }}</div>
+  </section>
+</article>
+{% endblock %}

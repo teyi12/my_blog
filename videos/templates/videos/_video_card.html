@@ -1,0 +1,26 @@
+{% load i18n static %}
+<article class="video-card{% if featured %} video-card-featured{% endif %}" data-video-id="{{ video.pk }}">
+  <a class="video-card-media" href="{% url 'videos:detail' slug=video.slug %}" aria-label="{% blocktranslate with video_title=video.titre %}Regarder {{ video_title }}{% endblocktranslate %}">
+    {% if video.miniature %}
+      <img class="img-fluid" src="{{ video.miniature.url }}" alt="{{ video.resolved_miniature_alt }}" loading="lazy">
+    {% else %}
+      <img class="img-fluid" src="{% static 'images/video-placeholder.svg' %}" alt="{{ video.resolved_miniature_alt }}" loading="lazy">
+    {% endif %}
+    <span class="video-play-icon" aria-hidden="true"><i class="fa-solid fa-play"></i></span>
+    <div class="video-badges" aria-label="{% translate 'Informations de la vidéo' %}">
+      {% if featured %}<span class="video-badge video-badge-featured">{% translate "À la une" %}</span>{% endif %}
+      {% if video.is_premium %}<span class="video-badge video-badge-premium"><i class="fa-solid fa-star" aria-hidden="true"></i> {% translate "Premium" %}</span>{% endif %}
+    </div>
+  </a>
+  <div class="video-card-body">
+    <div class="video-meta">
+      {% if video.categorie %}<span class="video-category">{{ video.categorie.nom }}</span><span aria-hidden="true">·</span>{% endif %}
+      <time datetime="{{ video.date_publication|date:'Y-m-d' }}">{{ video.date_publication|date:"d F Y" }}</time>
+    </div>
+    <h2><a href="{% url 'videos:detail' slug=video.slug %}">{{ video.titre }}</a></h2>
+    <p>{{ video.description|striptags|truncatewords:28 }}</p>
+    <a class="video-watch-link" href="{% url 'videos:detail' slug=video.slug %}">
+      {% translate "Regarder la vidéo" %}<i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+    </a>
+  </div>
+</article>
