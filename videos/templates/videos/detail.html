@@ -31,7 +31,7 @@
   </header>
 
   <section class="video-player-section" aria-label="{% translate 'Lecteur vidéo' %}">
-    <div class="video-player">
+    <div class="video-player{% if video.is_youtube_short %} video-player-short{% endif %}">
       <iframe
         src="{{ video.embed_url }}"
         title="{% blocktranslate with video_title=video.titre %}Lecteur vidéo : {{ video_title }}{% endblocktranslate %}"

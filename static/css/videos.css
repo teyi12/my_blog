@@ -281,6 +281,12 @@
   box-shadow: var(--shadow-md);
 }
 
+.video-player-short {
+  width: min(100%, 420px);
+  margin-inline: auto;
+  aspect-ratio: 9 / 16;
+}
+
 .video-player iframe {
   position: absolute;
   inset: 0;
@@ -337,6 +343,12 @@
     grid-column: 1 / -1;
     grid-row: 1;
     justify-self: center;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .video-player-short {
+    width: 100%;
   }
 }
 

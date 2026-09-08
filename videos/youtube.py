@@ -51,3 +51,15 @@ def extract_youtube_id(value):
 
 def validate_youtube_url(value):
     extract_youtube_id(value)
+
+
+def is_youtube_short_url(value):
+    """Return whether a supported, validated YouTube URL uses the Shorts path."""
+    extract_youtube_id(value)
+    parsed = urlsplit(value)
+    path_parts = [part for part in parsed.path.split("/") if part]
+    return (
+        (parsed.hostname or "").lower() in {"youtube.com", "www.youtube.com"}
+        and len(path_parts) == 2
+        and path_parts[0] == "shorts"
+    )

@@ -5,7 +5,7 @@ from django.utils.translation import gettext_lazy as _
 
 from articles.models import CategorieArticle
 
-from .youtube import extract_youtube_id, validate_youtube_url
+from .youtube import extract_youtube_id, is_youtube_short_url, validate_youtube_url
 
 
 class Video(models.Model):
@@ -75,6 +75,10 @@ class Video(models.Model):
     @property
     def embed_url(self):
         return f"https://www.youtube-nocookie.com/embed/{self.youtube_id}"
+
+    @property
+    def is_youtube_short(self):
+        return is_youtube_short_url(self.youtube_url)
 
     @property
     def resolved_miniature_alt(self):
