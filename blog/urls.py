@@ -1,21 +1,21 @@
 from django.contrib import admin
-from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 from django.conf.urls.i18n import i18n_patterns
-from django.views.generic import TemplateView
-from django.contrib import admin
-from django.urls import path, include
-from monetization.admin import custom_admin_site
-
+from django.contrib.sitemaps.views import sitemap
+from django.urls import include, path
 
 from . import views
 from . import i18n_views
+from .seo_views import robots_txt
+from .sitemaps import sitemaps
 
 urlpatterns = [
     # Infrastructure et intégrations externes : ne jamais préfixer ces URLs.
     path("admin/", admin.site.urls),
     path("i18n/setlang/", i18n_views.set_language, name="set_language"),
+    path("sitemap.xml", sitemap, {"sitemaps": sitemaps}, name="sitemap"),
+    path("robots.txt", robots_txt, name="robots_txt"),
     # Le namespace reste hors i18n pour préserver les retours et callbacks actuels.
     path("payments/", include("payments.urls", namespace="payments")),
 ]
@@ -37,4 +37,3 @@ urlpatterns += i18n_patterns(
 
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-
