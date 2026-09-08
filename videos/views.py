@@ -7,6 +7,7 @@ from django.urls import reverse
 from django.utils.translation import gettext as _
 
 from monetization.services import utilisateur_a_acces_premium
+from blog.seo import build_dynamic_seo
 
 from .models import Video
 
@@ -46,6 +47,17 @@ def video_detail(request, slug):
             return redirect_to_login(request.get_full_path(), reverse("accounts:login"))
         return redirect("monetization:abonnements")
 
-    return render(request, "videos/detail.html", {"video": video})
+    seo = build_dynamic_seo(
+        request,
+        instance=video,
+        view_name="videos:detail",
+        kwargs={"slug": video.slug},
+        title_field="titre",
+        description_field="description",
+        required_fields=("titre", "description"),
+        image_field="miniature",
+        og_type="video.other",
+    )
+    return render(request, "videos/detail.html", {"video": video, "seo": seo})
 
 # Create your views here.

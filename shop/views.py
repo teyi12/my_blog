@@ -20,6 +20,7 @@ from django.utils.translation import gettext as _, ngettext
 
 from .models import Produit, Categorie, Cart, CartItem, Commande, LigneCommande
 from payments.models import Adresse
+from blog.seo import PRODUCT_CATEGORY_DESCRIPTION, build_dynamic_seo
 from .forms import AdresseForm, CategorieForm, CommandeTraitementForm
 from .services import (
     SQLiteLockRetryExhausted,
@@ -115,11 +116,38 @@ class ProduitDetailView(DetailView):
     slug_field = "slug"
     slug_url_kwarg = "slug"
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["seo"] = build_dynamic_seo(
+            self.request,
+            instance=self.object,
+            view_name="shop:detail",
+            kwargs={"slug": self.object.slug},
+            title_field="nom",
+            description_field="description",
+            required_fields=("nom", "description"),
+            image_field="image",
+        )
+        return context
+
 
 def produits_par_categorie(request, slug):
     categorie = get_object_or_404(Categorie, slug=slug)
     produits = Produit.objects.filter(categorie=categorie).select_related("categorie")
-    return render(request, "shop/produits_par_categorie.html", {"produits": produits, "categorie": categorie})
+    seo = build_dynamic_seo(
+        request,
+        instance=categorie,
+        view_name="shop:par_categorie",
+        kwargs={"slug": categorie.slug},
+        title_field="nom",
+        default_description=PRODUCT_CATEGORY_DESCRIPTION,
+        required_fields=("nom",),
+    )
+    return render(
+        request,
+        "shop/produits_par_categorie.html",
+        {"produits": produits, "categorie": categorie, "seo": seo},
+    )
 
 
 # ================= GESTION DES CATÉGORIES =================

@@ -9,6 +9,7 @@ from django.urls import reverse
 from django.utils.translation import gettext as _
 
 from monetization.services import utilisateur_a_acces_premium
+from blog.seo import build_dynamic_seo
 
 from .forms import ArticleForm
 from .models import Article
@@ -50,7 +51,18 @@ def article_view(request, slug):
             )
         return redirect("monetization:abonnements")
 
-    return render(request, "articles/detail.html", {"article": article})
+    seo = build_dynamic_seo(
+        request,
+        instance=article,
+        view_name="articles:article_detail",
+        kwargs={"slug": article.slug},
+        title_field="titre",
+        description_field="contenu",
+        required_fields=("titre", "contenu"),
+        image_field="image",
+        og_type="article",
+    )
+    return render(request, "articles/detail.html", {"article": article, "seo": seo})
 
 
 # ---- Restreindre aux STAFF uniquement ----
