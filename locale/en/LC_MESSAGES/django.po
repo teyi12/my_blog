@@ -3007,5 +3007,109 @@ msgstr "Featured"
 msgid "Affiche cet article en grand dans la liste."
 msgstr "Displays this article prominently in the list."
 
+msgid "Titre"
+msgstr "Title"
+
+msgid "Description"
+msgstr "Description"
+
+msgid "URL YouTube"
+msgstr "YouTube URL"
+
+msgid "Miniature"
+msgstr "Thumbnail"
+
+msgid "Texte alternatif de la miniature"
+msgstr "Thumbnail alt text"
+
+msgid "Auteur"
+msgstr "Author"
+
+msgid "Date de publication"
+msgstr "Publication date"
+
+msgid "Publiée"
+msgstr "Published"
+
+msgid "Vidéo"
+msgstr "Video"
+
+msgid "Vidéos"
+msgstr "Videos"
+
+msgid "Média YouTube"
+msgstr "YouTube media"
+
+msgid "Visibilité"
+msgstr "Visibility"
+
+msgid "Cette vidéo est réservée aux abonnés."
+msgstr "This video is reserved for subscribers."
+
+msgid "Saisissez une URL YouTube HTTPS valide."
+msgstr "Enter a valid HTTPS YouTube URL."
+
+msgid "Le code HTML n’est pas autorisé."
+msgstr "HTML code is not allowed."
+
+msgid "Seules les URLs HTTPS de YouTube sont autorisées."
+msgstr "Only HTTPS YouTube URLs are allowed."
+
+msgid "L’identifiant de la vidéo YouTube est invalide."
+msgstr "The YouTube video ID is invalid."
+
+#, python-format
+msgid "Regarder %(video_title)s"
+msgstr "Watch %(video_title)s"
+
+msgid "Informations de la vidéo"
+msgstr "Video information"
+
+msgid "Regarder la vidéo"
+msgstr "Watch video"
+
+msgid "Vidéos et vlogs — Teyilawson"
+msgstr "Videos and vlogs — Teyilawson"
+
+msgid "Vidéos · vlogs · découvertes"
+msgstr "Videos · vlogs · discoveries"
+
+msgid "Des histoires à vivre en images."
+msgstr "Stories to experience through images."
+
+msgid "Reportages, expériences et perspectives réunis dans un espace vidéo clair et immersif."
+msgstr "Reports, experiences and perspectives brought together in a clear, immersive video space."
+
+msgid "Vidéo à la une"
+msgstr "Featured video"
+
+msgid "Liste des vidéos"
+msgstr "Video list"
+
+msgid "Aucune vidéo pour le moment"
+msgstr "No videos yet"
+
+msgid "Les prochaines vidéos apparaîtront ici."
+msgstr "Upcoming videos will appear here."
+
+msgid "Pagination des vidéos"
+msgstr "Video pagination"
+
+msgid "Toutes les vidéos"
+msgstr "All videos"
+
+msgid "Lecteur vidéo"
+msgstr "Video player"
+
+#, python-format
+msgid "Lecteur vidéo : %(video_title)s"
+msgstr "Video player: %(video_title)s"
+
+msgid "À propos de cette vidéo"
+msgstr "About this video"
+
+msgid "Présentation"
+msgstr "Overview"
+
 #~ msgid "Changer"
 #~ msgstr "Change"

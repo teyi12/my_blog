@@ -3064,5 +3064,109 @@ msgstr "Hervorgehoben"
 msgid "Affiche cet article en grand dans la liste."
 msgstr "Zeigt diesen Artikel groß in der Übersicht an."
 
+msgid "Titre"
+msgstr "Titel"
+
+msgid "Description"
+msgstr "Beschreibung"
+
+msgid "URL YouTube"
+msgstr "YouTube-URL"
+
+msgid "Miniature"
+msgstr "Vorschaubild"
+
+msgid "Texte alternatif de la miniature"
+msgstr "Alternativtext des Vorschaubilds"
+
+msgid "Auteur"
+msgstr "Autor"
+
+msgid "Date de publication"
+msgstr "Veröffentlichungsdatum"
+
+msgid "Publiée"
+msgstr "Veröffentlicht"
+
+msgid "Vidéo"
+msgstr "Video"
+
+msgid "Vidéos"
+msgstr "Videos"
+
+msgid "Média YouTube"
+msgstr "YouTube-Medium"
+
+msgid "Visibilité"
+msgstr "Sichtbarkeit"
+
+msgid "Cette vidéo est réservée aux abonnés."
+msgstr "Dieses Video ist Abonnenten vorbehalten."
+
+msgid "Saisissez une URL YouTube HTTPS valide."
+msgstr "Geben Sie eine gültige YouTube-HTTPS-URL ein."
+
+msgid "Le code HTML n’est pas autorisé."
+msgstr "HTML-Code ist nicht zulässig."
+
+msgid "Seules les URLs HTTPS de YouTube sont autorisées."
+msgstr "Nur HTTPS-URLs von YouTube sind zulässig."
+
+msgid "L’identifiant de la vidéo YouTube est invalide."
+msgstr "Die YouTube-Video-ID ist ungültig."
+
+#, python-format
+msgid "Regarder %(video_title)s"
+msgstr "%(video_title)s ansehen"
+
+msgid "Informations de la vidéo"
+msgstr "Informationen zum Video"
+
+msgid "Regarder la vidéo"
+msgstr "Video ansehen"
+
+msgid "Vidéos et vlogs — Teyilawson"
+msgstr "Videos und Vlogs — Teyilawson"
+
+msgid "Vidéos · vlogs · découvertes"
+msgstr "Videos · Vlogs · Entdeckungen"
+
+msgid "Des histoires à vivre en images."
+msgstr "Geschichten, die man in Bildern erleben kann."
+
+msgid "Reportages, expériences et perspectives réunis dans un espace vidéo clair et immersif."
+msgstr "Reportagen, Erlebnisse und Perspektiven in einem klaren, immersiven Videobereich."
+
+msgid "Vidéo à la une"
+msgstr "Vorgestelltes Video"
+
+msgid "Liste des vidéos"
+msgstr "Videoliste"
+
+msgid "Aucune vidéo pour le moment"
+msgstr "Noch keine Videos"
+
+msgid "Les prochaines vidéos apparaîtront ici."
+msgstr "Die nächsten Videos werden hier erscheinen."
+
+msgid "Pagination des vidéos"
+msgstr "Videoseitennavigation"
+
+msgid "Toutes les vidéos"
+msgstr "Alle Videos"
+
+msgid "Lecteur vidéo"
+msgstr "Videoplayer"
+
+#, python-format
+msgid "Lecteur vidéo : %(video_title)s"
+msgstr "Videoplayer: %(video_title)s"
+
+msgid "À propos de cette vidéo"
+msgstr "Über dieses Video"
+
+msgid "Présentation"
+msgstr "Vorstellung"
+
 #~ msgid "Changer"
 #~ msgstr "Ändern"

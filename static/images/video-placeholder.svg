@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720" role="img" aria-labelledby="title description">
+  <title id="title">Video</title>
+  <desc id="description">Neutral video cover</desc>
+  <defs>
+    <linearGradient id="background" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#12231d"/>
+      <stop offset="1" stop-color="#315e4e"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="75%" cy="20%" r="80%">
+      <stop offset="0" stop-color="#d9b77c" stop-opacity=".45"/>
+      <stop offset="1" stop-color="#d9b77c" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="1280" height="720" fill="url(#background)"/>
+  <rect width="1280" height="720" fill="url(#glow)"/>
+  <circle cx="640" cy="360" r="94" fill="#fff" fill-opacity=".92"/>
+  <path d="M615 306 700 360 615 414Z" fill="#18392f"/>
+</svg>

@@ -26,6 +26,7 @@ urlpatterns += i18n_patterns(
     path("about/", views.about, name="about"),
     path("remerciement/", views.remerciement_view, name="remerciement"),
     path("articles/", include("articles.urls"), name="articles"),
+    path("videos/", include("videos.urls")),
     path("accounts/", include("accounts.urls")),
     path("shop/", include("shop.urls")),
     path("social/", include("social.urls")),

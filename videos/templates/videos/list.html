@@ -1,0 +1,52 @@
+{% extends "template_base.html" %}
+{% load i18n static %}
+
+{% block titre %}{% translate "Vidéos et vlogs — Teyilawson" %}{% endblock %}
+
+{% block styles %}<link rel="stylesheet" href="{% static 'css/videos.css' %}">{% endblock %}
+
+{% block contenu %}
+<div class="videos-page">
+  <header class="videos-hero">
+    <span class="videos-eyebrow">{% translate "Vidéos · vlogs · découvertes" %}</span>
+    <h1>{% translate "Des histoires à vivre en images." %}</h1>
+    <p>{% translate "Reportages, expériences et perspectives réunis dans un espace vidéo clair et immersif." %}</p>
+  </header>
+
+  {% if featured_video %}
+    <section class="videos-featured" aria-label="{% translate 'Vidéo à la une' %}">
+      {% include "videos/_video_card.html" with video=featured_video featured=True %}
+    </section>
+  {% endif %}
+
+  {% if page_obj %}
+    <section class="videos-grid" aria-label="{% translate 'Liste des vidéos' %}">
+      {% for video in page_obj %}
+        {% include "videos/_video_card.html" with video=video featured=False %}
+      {% endfor %}
+    </section>
+  {% elif not featured_video %}
+    <div class="videos-empty">
+      <span aria-hidden="true"><i class="fa-solid fa-video"></i></span>
+      <h2>{% translate "Aucune vidéo pour le moment" %}</h2>
+      <p>{% translate "Les prochaines vidéos apparaîtront ici." %}</p>
+    </div>
+  {% endif %}
+
+  {% if page_obj.has_other_pages %}
+    <nav class="videos-pagination" aria-label="{% translate 'Pagination des vidéos' %}">
+      {% if page_obj.has_previous %}
+        <a href="?page={{ page_obj.previous_page_number }}"><i class="fa-solid fa-arrow-left" aria-hidden="true"></i> {% translate "Précédent" %}</a>
+      {% else %}
+        <span class="is-disabled"><i class="fa-solid fa-arrow-left" aria-hidden="true"></i> {% translate "Précédent" %}</span>
+      {% endif %}
+      <span>{% blocktranslate with current=page_obj.number total=page_obj.paginator.num_pages %}Page {{ current }} sur {{ total }}{% endblocktranslate %}</span>
+      {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}">{% translate "Suivant" %} <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a>
+      {% else %}
+        <span class="is-disabled">{% translate "Suivant" %} <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></span>
+      {% endif %}
+    </nav>
+  {% endif %}
+</div>
+{% endblock %}

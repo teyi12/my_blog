@@ -35,6 +35,7 @@
           <ul class="navbar-nav main-nav mx-lg-auto">
             <li class="nav-item"><a class="nav-link" href="{% url 'home' %}">{% translate "Accueil" %}</a></li>
             <li class="nav-item"><a class="nav-link" href="{% url 'articles:articles' %}">{% translate "Articles" %}</a></li>
+            <li class="nav-item"><a class="nav-link" href="{% url 'videos:list' %}">{% translate "Vidéos" %}</a></li>
             <li class="nav-item"><a class="nav-link" href="{% url 'shop:liste' %}">{% translate "Boutique" %}</a></li>
             <li class="nav-item"><a class="nav-link" href="{% url 'about' %}">{% translate "À propos" %}</a></li>
             <li class="nav-item"><a class="nav-link" href="{% url 'contact' %}">{% translate "Contact" %}</a></li>
@@ -98,7 +99,7 @@
     <div class="container-xl">
       <div class="footer-grid">
         <div class="footer-brand"><a class="brand brand-footer" href="{% url 'home' %}"><span class="brand-mark"><img src="{% static 'logo.webp' %}" alt="" width="44" height="44"></span><span class="brand-copy"><strong>Teyilawson</strong><small>{% translate "Des récits, des idées et une boutique choisie." %}</small></span></a></div>
-        <div><h2 class="footer-title">{% translate "Explorer" %}</h2><ul class="footer-links"><li><a href="{% url 'articles:articles' %}">{% translate "Articles" %}</a></li><li><a href="{% url 'shop:liste' %}">{% translate "Boutique" %}</a></li><li><a href="{% url 'about' %}">{% translate "À propos" %}</a></li></ul></div>
+        <div><h2 class="footer-title">{% translate "Explorer" %}</h2><ul class="footer-links"><li><a href="{% url 'articles:articles' %}">{% translate "Articles" %}</a></li><li><a href="{% url 'videos:list' %}">{% translate "Vidéos" %}</a></li><li><a href="{% url 'shop:liste' %}">{% translate "Boutique" %}</a></li><li><a href="{% url 'about' %}">{% translate "À propos" %}</a></li></ul></div>
         <div><h2 class="footer-title">{% translate "Nous contacter" %}</h2><ul class="footer-links"><li><a href="{% url 'contact' %}">{% translate "Contact" %}</a></li><li><a href="{% url 'monetization:partenariat' %}">{% translate "Partenariats" %}</a></li></ul></div>
         <div><h2 class="footer-title">{% translate "Suivre" %}</h2><div class="social-links">
           <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" aria-label="Facebook"><i class="fab fa-facebook-f" aria-hidden="true"></i></a><a href="https://instagram.com" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><i class="fab fa-instagram" aria-hidden="true"></i></a><a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn"><i class="fab fa-linkedin-in" aria-hidden="true"></i></a><a href="https://youtube.com" target="_blank" rel="noopener noreferrer" aria-label="YouTube"><i class="fab fa-youtube" aria-hidden="true"></i></a>
