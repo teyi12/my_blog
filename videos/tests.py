@@ -85,6 +85,27 @@ class VideoModelAndYouTubeValidationTests(TestCase):
                     f"https://www.youtube-nocookie.com/embed/{YOUTUBE_ID}",
                 )
 
+    def test_only_shorts_path_is_classified_as_youtube_short(self):
+        expectations = {
+            f"https://www.youtube.com/shorts/{YOUTUBE_ID}": True,
+            f"https://www.youtube.com/watch?v={YOUTUBE_ID}": False,
+            f"https://youtu.be/{YOUTUBE_ID}": False,
+        }
+
+        for url, expected in expectations.items():
+            with self.subTest(url=url):
+                video = Video(
+                    titre="Format YouTube",
+                    description="Description",
+                    youtube_url=url,
+                )
+                video.full_clean()
+                self.assertIs(video.is_youtube_short, expected)
+                self.assertEqual(
+                    video.embed_url,
+                    f"https://www.youtube-nocookie.com/embed/{YOUTUBE_ID}",
+                )
+
     def test_invalid_youtube_values_are_rejected_on_save(self):
         invalid_values = (
             f"http://youtube.com/watch?v={YOUTUBE_ID}",
@@ -279,6 +300,41 @@ class VideoPublicPagesAndI18nTests(TestCase):
         self.assertContains(response, "allowfullscreen")
         self.assertNotContains(response, "autoplay")
         self.assertNotContains(response, "youtube.com/iframe_api")
+
+    def test_short_detail_uses_vertical_player_with_safe_accessible_iframe(self):
+        short = create_video(
+            "Journal vertical",
+            slug="journal-vertical",
+            youtube_url=f"https://www.youtube.com/shorts/{YOUTUBE_ID}",
+        )
+
+        response = self.client.get(f"/videos/{short.slug}/")
+
+        self.assertContains(response, 'class="video-player video-player-short"')
+        self.assertContains(
+            response,
+            f'src="https://www.youtube-nocookie.com/embed/{YOUTUBE_ID}"',
+        )
+        self.assertContains(response, 'title="Lecteur vidéo : Journal vertical"')
+        self.assertContains(response, 'loading="lazy"')
+        self.assertContains(response, 'referrerpolicy="strict-origin-when-cross-origin"')
+        self.assertContains(response, "allowfullscreen")
+        self.assertNotContains(response, "autoplay")
+
+    def test_standard_detail_keeps_horizontal_player(self):
+        response = self.client.get(f"/videos/{self.video.slug}/")
+
+        self.assertContains(response, 'class="video-player"')
+        self.assertNotContains(response, "video-player-short")
+
+    def test_video_css_defines_vertical_and_responsive_short_layout(self):
+        with open("static/css/videos.css", encoding="utf-8") as stylesheet:
+            css = stylesheet.read()
+
+        self.assertIn(".video-player-short", css)
+        self.assertIn("aspect-ratio: 9 / 16", css)
+        self.assertIn("width: min(100%, 420px)", css)
+        self.assertIn("@media (max-width: 575.98px)", css)
 
     def test_navigation_is_localized_and_keeps_expected_urls(self):
         expected = {

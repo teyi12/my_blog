@@ -102,7 +102,7 @@ def ajouter_panier(request, slug):
 # ================= PRODUITS =================
 class ProduitListView(ListView):
     model = Produit
-    queryset = Produit.objects.select_related("categorie")
+    queryset = Produit.objects.select_related("categorie").order_by("pk")
     template_name = "shop/liste.html"
     context_object_name = "produits"
     paginate_by = 12
