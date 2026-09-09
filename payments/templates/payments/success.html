@@ -18,6 +18,10 @@
       <span class="payment-result-eyebrow">{% translate "Don en cours de confirmation" %}</span>
       <h1>{% translate "Merci pour votre soutien." %}</h1>
       <p class="payment-result-lead">{% translate "La confirmation définitive de votre don est effectuée par Stripe, indépendamment de cette page." %}</p>
+    {% elif request.GET.payment_kind == "subscription" %}
+      <span class="payment-result-eyebrow">{% translate "Souscription en cours de confirmation" %}</span>
+      <h1>{% translate "Merci pour votre souscription." %}</h1>
+      <p class="payment-result-lead">{% translate "Votre accès Premium sera activé uniquement après confirmation sécurisée du paiement récurrent par Stripe." %}</p>
     {% else %}
       <span class="payment-result-eyebrow">{% translate "Paiement terminé" %}</span>
       <h1>{% translate "Merci, votre paiement a bien été enregistré." %}</h1>

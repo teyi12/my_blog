@@ -3188,3 +3188,63 @@ msgstr "Die endgültige Bestätigung Ihrer Spende erfolgt durch Stripe, unabhän
 
 msgid "Les dons sont temporairement indisponibles. Merci pour votre compréhension."
 msgstr "Spenden sind vorübergehend nicht verfügbar. Vielen Dank für Ihr Verständnis."
+
+#: monetization/models.py
+msgid "L’identifiant Stripe doit commencer par price_."
+msgstr "Die Stripe-Kennung muss mit price_ beginnen."
+
+#: monetization/models.py
+msgid "Identifiant Stripe Price, laissé vide hors facturation."
+msgstr "Stripe-Price-ID; leer lassen, wenn keine Abrechnung erfolgt."
+
+#: payments/models.py
+msgid "Checkout terminé"
+msgstr "Checkout abgeschlossen"
+
+#: payments/models.py
+msgid "Actif"
+msgstr "Aktiv"
+
+#: payments/models.py
+msgid "Paiement en retard"
+msgstr "Zahlung überfällig"
+
+#: monetization/views.py
+msgid "La souscription sécurisée à cette formule est actuellement indisponible. Aucun paiement n’a été déclenché."
+msgstr "Das sichere Abonnement dieses Tarifs ist derzeit nicht verfügbar. Es wurde keine Zahlung ausgelöst."
+
+#: monetization/views.py
+msgid "Vous disposez déjà d’un accès Premium actif."
+msgstr "Sie verfügen bereits über einen aktiven Premium-Zugang."
+
+#: monetization/views.py
+msgid "L’initialisation de votre souscription est déjà en cours. Veuillez réessayer dans quelques instants."
+msgstr "Die Initialisierung Ihres Abonnements läuft bereits. Bitte versuchen Sie es in Kürze erneut."
+
+#: monetization/views.py
+msgid "Une souscription est déjà en cours pour votre compte. Aucun nouveau paiement n’a été déclenché."
+msgstr "Für Ihr Konto läuft bereits ein Abonnement. Es wurde keine neue Zahlung ausgelöst."
+
+#: monetization/views.py
+msgid "La souscription n’a pas pu être initialisée. Aucun accès Premium n’a été activé."
+msgstr "Das Abonnement konnte nicht initialisiert werden. Es wurde kein Premium-Zugang aktiviert."
+
+#: monetization/templates/monetization/abonnements.html
+msgid "Activation uniquement après paiement Stripe confirmé."
+msgstr "Aktivierung erst nach bestätigter Stripe-Zahlung."
+
+#: monetization/templates/monetization/abonnements.html
+msgid "Souscription sécurisée momentanément indisponible. Aucun paiement ne sera déclenché."
+msgstr "Das sichere Abonnement ist vorübergehend nicht verfügbar. Es wird keine Zahlung ausgelöst."
+
+#: payments/templates/payments/success.html
+msgid "Souscription en cours de confirmation"
+msgstr "Abonnement wird bestätigt"
+
+#: payments/templates/payments/success.html
+msgid "Merci pour votre souscription."
+msgstr "Vielen Dank für Ihr Abonnement."
+
+#: payments/templates/payments/success.html
+msgid "Votre accès Premium sera activé uniquement après confirmation sécurisée du paiement récurrent par Stripe."
+msgstr "Ihr Premium-Zugang wird erst nach sicherer Bestätigung der wiederkehrenden Zahlung durch Stripe aktiviert."

@@ -3131,3 +3131,63 @@ msgstr "Your donation is confirmed by Stripe independently of this page."
 
 msgid "Les dons sont temporairement indisponibles. Merci pour votre compréhension."
 msgstr "Donations are temporarily unavailable. Thank you for your understanding."
+
+#: monetization/models.py
+msgid "L’identifiant Stripe doit commencer par price_."
+msgstr "The Stripe identifier must start with price_."
+
+#: monetization/models.py
+msgid "Identifiant Stripe Price, laissé vide hors facturation."
+msgstr "Stripe Price ID; leave blank when billing is disabled."
+
+#: payments/models.py
+msgid "Checkout terminé"
+msgstr "Checkout completed"
+
+#: payments/models.py
+msgid "Actif"
+msgstr "Active"
+
+#: payments/models.py
+msgid "Paiement en retard"
+msgstr "Past due"
+
+#: monetization/views.py
+msgid "La souscription sécurisée à cette formule est actuellement indisponible. Aucun paiement n’a été déclenché."
+msgstr "The secure subscription to this plan is currently unavailable. No payment was initiated."
+
+#: monetization/views.py
+msgid "Vous disposez déjà d’un accès Premium actif."
+msgstr "You already have active Premium access."
+
+#: monetization/views.py
+msgid "L’initialisation de votre souscription est déjà en cours. Veuillez réessayer dans quelques instants."
+msgstr "Your subscription is already being initialized. Please try again shortly."
+
+#: monetization/views.py
+msgid "Une souscription est déjà en cours pour votre compte. Aucun nouveau paiement n’a été déclenché."
+msgstr "A subscription is already in progress for your account. No new payment was initiated."
+
+#: monetization/views.py
+msgid "La souscription n’a pas pu être initialisée. Aucun accès Premium n’a été activé."
+msgstr "The subscription could not be initialized. No Premium access was activated."
+
+#: monetization/templates/monetization/abonnements.html
+msgid "Activation uniquement après paiement Stripe confirmé."
+msgstr "Activation only after Stripe confirms payment."
+
+#: monetization/templates/monetization/abonnements.html
+msgid "Souscription sécurisée momentanément indisponible. Aucun paiement ne sera déclenché."
+msgstr "The secure subscription is temporarily unavailable. No payment will be initiated."
+
+#: payments/templates/payments/success.html
+msgid "Souscription en cours de confirmation"
+msgstr "Subscription awaiting confirmation"
+
+#: payments/templates/payments/success.html
+msgid "Merci pour votre souscription."
+msgstr "Thank you for subscribing."
+
+#: payments/templates/payments/success.html
+msgid "Votre accès Premium sera activé uniquement après confirmation sécurisée du paiement récurrent par Stripe."
+msgstr "Your Premium access will be activated only after Stripe securely confirms the recurring payment."

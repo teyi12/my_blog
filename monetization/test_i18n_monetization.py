@@ -85,7 +85,10 @@ class MonetizationI18nTests(TestCase):
         self.assertContains(response, "Entdecker-Abo")
         self.assertContains(response, "Deutscher Zugang zu Premium-Inhalten.")
         self.assertContains(response, "für 30 Tage")
-        self.assertContains(response, "Dieses Angebot wählen")
+        self.assertContains(
+            response,
+            "Das sichere Abonnement ist vorübergehend nicht verfügbar.",
+        )
 
     def test_english_subscription_page_translates_static_and_dynamic_content(self):
         response = self.client.get("/en/monetization/abonnements/")
@@ -95,7 +98,10 @@ class MonetizationI18nTests(TestCase):
         self.assertContains(response, "Discovery plan")
         self.assertContains(response, "English access to Premium content.")
         self.assertContains(response, "for 30 days")
-        self.assertContains(response, "Choose this plan")
+        self.assertContains(
+            response,
+            "The secure subscription is temporarily unavailable.",
+        )
 
     def test_missing_german_and_english_dynamic_content_falls_back_to_french(self):
         for language in ("de", "en"):
@@ -280,16 +286,17 @@ class MonetizationI18nTests(TestCase):
             "Your affiliate request has been sent successfully.",
         )
 
-    def test_subscription_information_message_uses_active_language(self):
+    def test_disabled_subscription_message_uses_active_language(self):
         self.client.force_login(self.user)
-        response = self.client.get(
+        response = self.client.post(
             "/en/monetization/abonnements/formule-decouverte/souscrire/",
             follow=True,
         )
 
         self.assertContains(
             response,
-            "Secure activation of the Discovery plan subscription will be available",
+            "The secure subscription to this plan is currently unavailable. "
+            "No payment was initiated.",
         )
 
     def test_staff_dashboard_translates_labels_and_revenue_type(self):
@@ -352,14 +359,14 @@ class MonetizationTranslationAdminTests(TestCase):
             self.assertTrue(subscription_form.base_fields[field_name].required)
         for field_name in ("nom_de", "nom_en", "description_de", "description_en"):
             self.assertFalse(subscription_form.base_fields[field_name].required)
-        for field_name in ("slug", "prix", "duree_jours"):
+        for field_name in ("slug", "prix", "duree_jours", "stripe_price_id"):
             self.assertIn(field_name, subscription_form.base_fields)
         for field_name in ("titre_fr", "titre_de", "titre_en"):
             self.assertIn(field_name, advertising_form.base_fields)
         self.assertEqual(subscription_admin.prepopulated_fields, {"slug": ("nom_fr",)})
         self.assertEqual(
             subscription_admin.search_fields,
-            ("nom_fr", "nom_de", "nom_en"),
+            ("nom_fr", "nom_de", "nom_en", "stripe_price_id"),
         )
         self.assertNotIsInstance(user_subscription_admin, TranslationAdmin)
 

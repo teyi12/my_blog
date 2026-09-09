@@ -21,8 +21,15 @@
       <h3>{{ abo.nom }}</h3>
       <p>{{ abo.description }}</p>
       <div class="subscription-price"><strong>{{ abo.prix|floatformat:2 }} €</strong><span>{% blocktranslate count days=abo.duree_jours %}pour {{ days }} jour{% plural %}pour {{ days }} jours{% endblocktranslate %}</span></div>
-      <a href="{% url 'monetization:souscrire_abonnement' abo.slug %}" class="btn btn-primary subscription-button">{% translate "Choisir cette formule" %}</a>
-      <small class="subscription-note"><i class="fa-solid fa-lock" aria-hidden="true"></i> {% translate "Activation uniquement après paiement confirmé." %}</small>
+      {% if abo.stripe_subscription_available %}
+      <form action="{% url 'monetization:souscrire_abonnement' abo.slug %}" method="post">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-primary subscription-button">{% translate "Choisir cette formule" %}</button>
+      </form>
+      <small class="subscription-note"><i class="fa-solid fa-lock" aria-hidden="true"></i> {% translate "Activation uniquement après paiement Stripe confirmé." %}</small>
+      {% else %}
+      <p class="subscription-note" role="status"><i class="fa-solid fa-circle-info" aria-hidden="true"></i> {% translate "Souscription sécurisée momentanément indisponible. Aucun paiement ne sera déclenché." %}</p>
+      {% endif %}
     </article>
     {% endfor %}
   </div>

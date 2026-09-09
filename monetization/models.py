@@ -1,5 +1,6 @@
 from django.db import models
 from django.conf import settings
+from django.core.validators import RegexValidator
 from django.utils.text import slugify
 from django.utils.translation import gettext_lazy as _
 
@@ -35,6 +36,18 @@ class Abonnement(models.Model):
     prix = models.DecimalField(max_digits=10, decimal_places=2)
     duree_jours = models.PositiveIntegerField(help_text=_("Durée en jours"))
     description = models.TextField()
+    stripe_price_id = models.CharField(
+        max_length=255,
+        null=True,
+        blank=True,
+        validators=[
+            RegexValidator(
+                regex=r"^price_[A-Za-z0-9_]+$",
+                message=_("L’identifiant Stripe doit commencer par price_."),
+            )
+        ],
+        help_text=_("Identifiant Stripe Price, laissé vide hors facturation."),
+    )
 
     def save(self, *args, **kwargs):
         if self._state.adding and not self.slug:
@@ -43,6 +56,18 @@ class Abonnement(models.Model):
 
     def __str__(self):
         return f"{self.nom} - {self.prix}€"
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["stripe_price_id"],
+                condition=(
+                    models.Q(stripe_price_id__isnull=False)
+                    & ~models.Q(stripe_price_id="")
+                ),
+                name="unique_configured_subscription_stripe_price",
+            )
+        ]
 
 
 class AbonnementUtilisateur(models.Model):

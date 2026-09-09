@@ -27,12 +27,13 @@ class PubliciteAdmin(TranslationAdmin):
 
 @admin.register(Abonnement)
 class AbonnementAdmin(TranslationAdmin):
-    list_display = ("nom", "prix", "duree_jours")
+    list_display = ("nom", "prix", "duree_jours", "stripe_price_id")
     prepopulated_fields = {"slug": ("nom_fr",)}
     search_fields = (
         "nom_fr",
         "nom_de",
         "nom_en",
+        "stripe_price_id",
     )
 
     def get_readonly_fields(self, request, obj=None):
