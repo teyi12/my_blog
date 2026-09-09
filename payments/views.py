@@ -434,24 +434,16 @@ def create_donation_checkout(request):
 # ================================================================
 @login_required
 def create_subscription_checkout(request):
-    price_id = getattr(settings, "STRIPE_PRICE_MONTHLY", None)
-    if not price_id:
-        return redirect("payments:choice")
-
-    try:
-        session = stripe.checkout.Session.create(
-            mode="subscription",
-            payment_method_types=["card"],
-            line_items=[{"price": price_id, "quantity": 1}],
-            success_url=request.build_absolute_uri(reverse("payments:success")),
-            cancel_url=request.build_absolute_uri(reverse("payments:cancel")),
-            customer_email=request.user.email or None,
-            metadata={"user_id": str(request.user.id)}
+    """Conserve l'ancienne route sans permettre de souscription non suivie."""
+    messages.info(
+        request,
+        _(
+            "L’activation sécurisée de l’abonnement %(subscription)s sera "
+            "disponible après intégration complète du paiement récurrent."
         )
-        return redirect(session.url, code=303)
-    except Exception:
-        logger.exception("Erreur Stripe abonnement")
-        return redirect("payments:cancel")
+        % {"subscription": "Premium"},
+    )
+    return redirect("monetization:abonnements")
 
 
 # ================================================================
