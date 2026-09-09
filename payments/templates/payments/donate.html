@@ -7,18 +7,24 @@
     <div class="col-md-7 col-lg-6">
       <div class="card shadow border-0 rounded-4">
         <div class="card-body p-4">
-          <h3 class="fw-bold mb-3">💖 Soutenir le projet</h3>
-          <p class="text-muted">{% translate "Choisissez un montant en euros." %}</p>
-          <form method="post" action="{% url 'payments:create_donation_checkout' %}">
-            {% csrf_token %}
-            <div class="row g-2">
-              <div class="col-12">
-                <label class="form-label">{% translate "Montant (€)" %}</label>
-                <input type="number" min="1" step="0.01" value="5.00" name="amount" class="form-control" required>
+          <h3 class="fw-bold mb-3">💖 {% translate "Soutenir le projet" %}</h3>
+          {% if donations_available %}
+            <p class="text-muted">{% translate "Choisissez un montant en euros." %}</p>
+            <form method="post" action="{% url 'payments:create_donation_checkout' %}">
+              {% csrf_token %}
+              <div class="row g-2">
+                <div class="col-12">
+                  <label class="form-label">{% translate "Montant (€)" %}</label>
+                  <input type="number" min="1" step="0.01" value="5.00" name="amount" class="form-control" required>
+                </div>
               </div>
+              <button class="btn btn-success w-100 mt-3"><i class="bi bi-credit-card"></i> {% translate "Faire un don" %}</button>
+            </form>
+          {% else %}
+            <div class="alert alert-info" role="status">
+              {% translate "Les dons sont temporairement indisponibles. Merci pour votre compréhension." %}
             </div>
-            <button class="btn btn-success w-100 mt-3"><i class="bi bi-credit-card"></i> {% translate "Faire un don" %}</button>
-          </form>
+          {% endif %}
           <a href="{% url 'payments:choice' %}" class="btn btn-outline-secondary w-100 mt-2">⬅ Retour</a>
         </div>
       </div>

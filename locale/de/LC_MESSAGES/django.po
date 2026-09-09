@@ -3185,3 +3185,6 @@ msgstr "Vielen Dank für Ihre Unterstützung."
 
 msgid "La confirmation définitive de votre don est effectuée par Stripe, indépendamment de cette page."
 msgstr "Die endgültige Bestätigung Ihrer Spende erfolgt durch Stripe, unabhängig von dieser Seite."
+
+msgid "Les dons sont temporairement indisponibles. Merci pour votre compréhension."
+msgstr "Spenden sind vorübergehend nicht verfügbar. Vielen Dank für Ihr Verständnis."

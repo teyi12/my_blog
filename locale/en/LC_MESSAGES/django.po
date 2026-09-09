@@ -3128,3 +3128,6 @@ msgstr "Thank you for your support."
 
 msgid "La confirmation définitive de votre don est effectuée par Stripe, indépendamment de cette page."
 msgstr "Your donation is confirmed by Stripe independently of this page."
+
+msgid "Les dons sont temporairement indisponibles. Merci pour votre compréhension."
+msgstr "Donations are temporarily unavailable. Thank you for your understanding."

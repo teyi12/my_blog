@@ -152,6 +152,7 @@ TEMPLATES = [
                 "django.contrib.messages.context_processors.messages",
                 "shop.context_processors.panier_counter",
                 "blog.context_processors.seo_metadata",
+                "payments.context_processors.donation_availability",
             ],
         },
     },
@@ -274,6 +275,7 @@ STRIPE_PUBLIC_KEY = os.getenv("STRIPE_PUBLIC_KEY", "")
 STRIPE_SECRET_KEY = os.getenv("STRIPE_SECRET_KEY", "")
 STRIPE_WEBHOOK_SECRET = os.getenv("STRIPE_WEBHOOK_SECRET", "")
 STRIPE_PRICE_MONTHLY = os.getenv("STRIPE_PRICE_MONTHLY", "")
+DONATIONS_ENABLED = env_bool("DONATIONS_ENABLED", False)
 PAYMENT_PROCESSING_TIMEOUT_SECONDS = int(
     os.getenv("PAYMENT_PROCESSING_TIMEOUT_SECONDS", "3600")
 )

@@ -4,7 +4,7 @@ from decimal import Decimal
 from django.contrib import admin
 from django.contrib.auth import get_user_model
 from django.core.exceptions import FieldDoesNotExist
-from django.test import RequestFactory, TestCase
+from django.test import RequestFactory, TestCase, override_settings
 from django.urls import reverse
 from django.utils import timezone, translation
 from modeltranslation.admin import TranslationAdmin
@@ -213,6 +213,12 @@ class MonetizationI18nTests(TestCase):
                 self.assertContains(response, self.partner.nom)
                 self.assertContains(response, self.campaign.lien)
 
+    @override_settings(
+        DONATIONS_ENABLED=True,
+        STRIPE_SECRET_KEY="sk_test_configured",
+        STRIPE_WEBHOOK_SECRET="whsec_configured",
+        IS_PRODUCTION=False,
+    )
     def test_donation_page_is_translated_without_changing_payment_endpoint(self):
         german = self.client.get("/de/monetization/don/")
         english = self.client.get("/en/monetization/don/")
