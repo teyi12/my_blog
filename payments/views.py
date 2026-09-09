@@ -10,7 +10,7 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.db import IntegrityError, transaction
-from django.db.models import Q
+from django.db.models import Exists, OuterRef, Q
 from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import redirect, render, get_object_or_404
 from django.http import HttpResponse
@@ -19,7 +19,7 @@ from django.utils import timezone
 from django.utils.translation import gettext as _
 from django.views.decorators.http import require_POST
 
-from shop.models import Commande
+from shop.models import Commande, LigneCommande
 from shop.services import (
     SQLiteLockRetryExhausted,
     execute_with_sqlite_lock_retry,
@@ -155,12 +155,18 @@ def _reserve_payment(request, order_id, channel):
     """
     def reserve_once():
         with transaction.atomic():
+            # PostgreSQL rejects SELECT DISTINCT ... FOR UPDATE. EXISTS keeps
+            # the line-presence check out of the locked Commande relation.
+            locked_orders = Commande.objects.select_for_update().annotate(
+                has_order_lines=Exists(
+                    LigneCommande.objects.filter(commande_id=OuterRef("pk"))
+                )
+            )
             commande = get_object_or_404(
-                Commande.objects.select_for_update().filter(
-                    lignes__isnull=False
-                ).distinct(),
+                locked_orders,
                 id=order_id,
                 client=request.user,
+                has_order_lines=True,
                 payment_status__in=("PENDING", "PROCESSING", "FAILED", "CANCELED"),
                 adresse__isnull=False,
                 total__gt=0,
