@@ -6,6 +6,17 @@ from django.contrib.auth.decorators import login_required
 from django.db.models import Sum
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.translation import gettext as _
+from django.views.decorators.http import require_POST
+
+from payments.subscriptions import (
+    SubscriptionAlreadyActive,
+    SubscriptionConflict,
+    SubscriptionInitializationInProgress,
+    SubscriptionProviderError,
+    SubscriptionUnavailable,
+    initialize_subscription_checkout,
+    subscriptions_are_available,
+)
 
 from .forms import AffiliationForm, PartenariatForm
 from .models import Abonnement, Publicite, Revenu
@@ -63,22 +74,63 @@ def affiliation_view(request):
 
 
 def abonnements_view(request):
-    abonnements = Abonnement.objects.all().order_by("prix", "nom")
-    return render(request, "monetization/abonnements.html", {"abonnements": abonnements})
+    abonnements = list(Abonnement.objects.all().order_by("prix", "nom"))
+    for abonnement in abonnements:
+        abonnement.stripe_subscription_available = subscriptions_are_available(
+            abonnement
+        )
+    return render(
+        request,
+        "monetization/abonnements.html",
+        {"abonnements": abonnements},
+    )
 
 
 @login_required
+@require_POST
 def souscrire_abonnement(request, slug):
-    """Ne jamais activer un abonnement local sans confirmation de paiement."""
+    """Initialise un Checkout sans jamais activer directement l'accès Premium."""
     abonnement = get_object_or_404(Abonnement, slug=slug)
-    messages.info(
-        request,
-        _(
-            "L’activation sécurisée de l’abonnement %(subscription)s sera "
-            "disponible après intégration complète du paiement récurrent."
+    try:
+        subscription = initialize_subscription_checkout(request, abonnement)
+        return redirect(subscription.checkout_url, code=303)
+    except SubscriptionUnavailable:
+        messages.info(
+            request,
+            _(
+                "La souscription sécurisée à cette formule est actuellement "
+                "indisponible. Aucun paiement n’a été déclenché."
+            ),
         )
-        % {"subscription": abonnement.nom},
-    )
+    except SubscriptionAlreadyActive:
+        messages.info(
+            request,
+            _("Vous disposez déjà d’un accès Premium actif."),
+        )
+    except SubscriptionInitializationInProgress:
+        messages.info(
+            request,
+            _(
+                "L’initialisation de votre souscription est déjà en cours. "
+                "Veuillez réessayer dans quelques instants."
+            ),
+        )
+    except SubscriptionConflict:
+        messages.info(
+            request,
+            _(
+                "Une souscription est déjà en cours pour votre compte. "
+                "Aucun nouveau paiement n’a été déclenché."
+            ),
+        )
+    except SubscriptionProviderError:
+        messages.error(
+            request,
+            _(
+                "La souscription n’a pas pu être initialisée. "
+                "Aucun accès Premium n’a été activé."
+            ),
+        )
     return redirect("monetization:abonnements")
 
 

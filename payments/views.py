@@ -28,6 +28,11 @@ from shop.services import (
 from .donations import donations_are_available
 from .forms import DonationCheckoutForm
 from .models import DonationPaymentAttempt, Payment
+from .subscriptions import (
+    SubscriptionWebhookMismatch,
+    SubscriptionWebhookRetry,
+    process_subscription_event,
+)
 
 # --- LOGGING ---
 logger = logging.getLogger(__name__)
@@ -1019,6 +1024,27 @@ def stripe_webhook(request):
                 donation_event_statuses[event["type"]],
             )
 
+    subscription_metadata = event["data"]["object"].get("metadata") or {}
+    is_subscription_checkout = (
+        event["type"] == "checkout.session.completed"
+        and subscription_metadata.get("payment_kind") == "subscription"
+    )
+    if is_subscription_checkout or event["type"] in {
+        "invoice.paid",
+        "invoice.payment_failed",
+        "customer.subscription.updated",
+        "customer.subscription.deleted",
+    }:
+        try:
+            process_subscription_event(event)
+        except SubscriptionWebhookMismatch:
+            return HttpResponse("SUBSCRIPTION_MISMATCH", status=400)
+        except SubscriptionWebhookRetry:
+            return HttpResponse("RETRY", status=409)
+        except IntegrityError:
+            return HttpResponse("RETRY", status=409)
+        return HttpResponse(status=200)
+
     # ✅ Paiement réussi
     if event["type"] == "checkout.session.completed":
         session = event["data"]["object"]
@@ -1026,6 +1052,9 @@ def stripe_webhook(request):
         commande_id = metadata.get("commande_id")
         user_id = metadata.get("user_id")
         payment_id = metadata.get("payment_id")
+
+        if not all((commande_id, user_id, payment_id)):
+            return HttpResponse(status=200)
 
         try:
             payment = Payment.objects.select_related("commande").get(
@@ -1066,6 +1095,9 @@ def stripe_webhook(request):
         metadata = session.get("metadata") or {}
         commande_id = metadata.get("commande_id")
         payment_id = metadata.get("payment_id")
+
+        if not all((commande_id, payment_id)):
+            return HttpResponse(status=200)
 
         try:
             payment = Payment.objects.get(
