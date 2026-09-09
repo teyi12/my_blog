@@ -14,9 +14,15 @@
       <i class="fa-solid fa-check"></i>
     </div>
 
-    <span class="payment-result-eyebrow">{% translate "Paiement terminé" %}</span>
-    <h1>{% translate "Merci, votre paiement a bien été enregistré." %}</h1>
-    <p class="payment-result-lead">{% translate "Votre opération est terminée. La confirmation définitive de la commande est traitée de manière sécurisée par le système de paiement." %}</p>
+    {% if request.GET.payment_kind == "donation" %}
+      <span class="payment-result-eyebrow">{% translate "Don en cours de confirmation" %}</span>
+      <h1>{% translate "Merci pour votre soutien." %}</h1>
+      <p class="payment-result-lead">{% translate "La confirmation définitive de votre don est effectuée par Stripe, indépendamment de cette page." %}</p>
+    {% else %}
+      <span class="payment-result-eyebrow">{% translate "Paiement terminé" %}</span>
+      <h1>{% translate "Merci, votre paiement a bien été enregistré." %}</h1>
+      <p class="payment-result-lead">{% translate "Votre opération est terminée. La confirmation définitive de la commande est traitée de manière sécurisée par le système de paiement." %}</p>
+    {% endif %}
 
     <div class="payment-result-note">
       <i class="fa-solid fa-shield-halved" aria-hidden="true"></i>

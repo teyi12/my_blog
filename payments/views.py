@@ -25,7 +25,8 @@ from shop.services import (
     execute_with_sqlite_lock_retry,
     finalize_paid_order,
 )
-from .models import Payment
+from .forms import DonationCheckoutForm
+from .models import DonationPaymentAttempt, Payment
 
 # --- LOGGING ---
 logger = logging.getLogger(__name__)
@@ -353,37 +354,66 @@ def _cancel_payment(payment_id, raw_response):
 # STRIPE : DON
 # ================================================================
 @login_required
+@require_POST
 def create_donation_checkout(request):
-    if request.method != "POST":
-        return redirect("payments:choice")
+    form = DonationCheckoutForm(request.POST)
+    if not form.is_valid():
+        messages.error(
+            request,
+            _(
+                "Saisissez un montant de don valide d’au moins 1 EUR, "
+                "avec au maximum deux décimales."
+            ),
+        )
+        return redirect("monetization:don")
+
+    attempt = DonationPaymentAttempt.objects.create(
+        utilisateur=request.user,
+        montant=form.cleaned_data["amount"],
+        devise="EUR",
+        status="PROCESSING",
+    )
 
     try:
-        amount = Decimal(request.POST.get("amount", "0"))
-        currency = (request.POST.get("currency") or "eur").lower()
-        if amount <= 0:
-            return redirect("payments:choice")
-
         session = stripe.checkout.Session.create(
             mode="payment",
             payment_method_types=["card"],
             line_items=[{
                 "price_data": {
-                    "currency": currency,
+                    "currency": attempt.devise.lower(),
                     "product_data": {"name": f"Don {request.user.email}"},
-                    "unit_amount": int(amount * 100),
+                    "unit_amount": _minor_amount(
+                        attempt.montant,
+                        attempt.devise,
+                    ),
                 },
                 "quantity": 1,
             }],
-            success_url=request.build_absolute_uri(reverse("payments:success")),
+            success_url=request.build_absolute_uri(
+                f'{reverse("payments:success")}?payment_kind=donation'
+            ),
             cancel_url=request.build_absolute_uri(reverse("payments:cancel")),
             customer_email=request.user.email or None,
             metadata={
-                "donation": "1",
-                "user_id": str(request.user.id)
-            }
+                "payment_kind": "donation",
+                "donation_attempt_id": str(attempt.id),
+                "user_id": str(attempt.utilisateur_id),
+            },
+            idempotency_key=str(attempt.idempotency_key),
         )
-        return redirect(session.url, code=303)
-    except Exception:
+        attempt.stripe_session_id = session.id
+        attempt.checkout_url = session.url
+        attempt.save(
+            update_fields=["stripe_session_id", "checkout_url", "updated_at"]
+        )
+        return redirect(attempt.checkout_url, code=303)
+    except Exception as exc:
+        attempt.status = "FAILED"
+        attempt.raw_response = {
+            "stage": "initialization",
+            "error_type": type(exc).__name__,
+        }
+        attempt.save(update_fields=["status", "raw_response", "updated_at"])
         logger.exception("Erreur Stripe donation")
         return redirect("payments:cancel")
 
@@ -871,6 +901,87 @@ def cinetpay_cancel(request):
 # ================================================================
 # STRIPE WEBHOOK
 # ================================================================
+def _stripe_session_payload(session):
+    if hasattr(session, "to_dict_recursive"):
+        return session.to_dict_recursive()
+    return dict(session)
+
+
+def _complete_donation_payment(session, metadata):
+    attempt_id = metadata.get("donation_attempt_id")
+    user_id = metadata.get("user_id")
+    if not attempt_id or not user_id:
+        return HttpResponse("INVALID_DONATION_METADATA", status=400)
+
+    try:
+        with transaction.atomic():
+            attempt = DonationPaymentAttempt.objects.select_for_update().get(
+                pk=attempt_id,
+                utilisateur_id=user_id,
+            )
+            expected_amount = _minor_amount(attempt.montant, attempt.devise)
+            if (
+                _stripe_value(session, "id") != attempt.stripe_session_id
+                or _stripe_value(session, "payment_status") != "paid"
+                or _stripe_value(session, "amount_total") != expected_amount
+                or str(_stripe_value(session, "currency") or "").upper() != "EUR"
+                or attempt.devise != "EUR"
+            ):
+                return HttpResponse("DONATION_MISMATCH", status=400)
+
+            if attempt.status == "SUCCESS" and attempt.don_id:
+                return HttpResponse(status=200)
+            if attempt.status != "PROCESSING" or attempt.don_id:
+                return HttpResponse("INVALID_DONATION_STATE", status=409)
+
+            from monetization.models import Don
+
+            don = Don.objects.create(
+                utilisateur=attempt.utilisateur,
+                montant=attempt.montant,
+            )
+            attempt.don = don
+            attempt.status = "SUCCESS"
+            attempt.raw_response = _stripe_session_payload(session)
+            attempt.save(
+                update_fields=["don", "status", "raw_response", "updated_at"]
+            )
+    except (DonationPaymentAttempt.DoesNotExist, TypeError, ValueError):
+        return HttpResponse("NO_DONATION_ATTEMPT", status=404)
+
+    return HttpResponse(status=200)
+
+
+def _close_donation_payment(session, metadata, status):
+    attempt_id = metadata.get("donation_attempt_id")
+    user_id = metadata.get("user_id")
+    if not attempt_id or not user_id:
+        return HttpResponse("INVALID_DONATION_METADATA", status=400)
+
+    try:
+        with transaction.atomic():
+            attempt = DonationPaymentAttempt.objects.select_for_update().get(
+                pk=attempt_id,
+                utilisateur_id=user_id,
+            )
+            if _stripe_value(session, "id") != attempt.stripe_session_id:
+                return HttpResponse("DONATION_MISMATCH", status=400)
+            if attempt.status == "SUCCESS":
+                return HttpResponse(status=200)
+            if attempt.status in ("FAILED", "CANCELED"):
+                return HttpResponse(status=200)
+            if attempt.status != "PROCESSING" or attempt.don_id:
+                return HttpResponse("INVALID_DONATION_STATE", status=409)
+
+            attempt.status = status
+            attempt.raw_response = _stripe_session_payload(session)
+            attempt.save(update_fields=["status", "raw_response", "updated_at"])
+    except (DonationPaymentAttempt.DoesNotExist, TypeError, ValueError):
+        return HttpResponse("NO_DONATION_ATTEMPT", status=404)
+
+    return HttpResponse(status=200)
+
+
 @csrf_exempt
 def stripe_webhook(request):
     payload = request.body
@@ -885,6 +996,25 @@ def stripe_webhook(request):
         return HttpResponse(status=400)
     except stripe.error.SignatureVerificationError:
         return HttpResponse(status=400)
+
+    donation_event_statuses = {
+        "checkout.session.async_payment_failed": "FAILED",
+        "checkout.session.expired": "CANCELED",
+    }
+    if event["type"] == "checkout.session.completed" or event["type"] in donation_event_statuses:
+        donation_session = event["data"]["object"]
+        donation_metadata = donation_session.get("metadata") or {}
+        if donation_metadata.get("payment_kind") == "donation":
+            if event["type"] == "checkout.session.completed":
+                return _complete_donation_payment(
+                    donation_session,
+                    donation_metadata,
+                )
+            return _close_donation_payment(
+                donation_session,
+                donation_metadata,
+                donation_event_statuses[event["type"]],
+            )
 
     # ✅ Paiement réussi
     if event["type"] == "checkout.session.completed":

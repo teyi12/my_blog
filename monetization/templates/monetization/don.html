@@ -24,7 +24,6 @@
     {% if user.is_authenticated %}
     <form method="post" action="{% url 'payments:create_donation_checkout' %}" class="donation-form">
       {% csrf_token %}
-      <input type="hidden" name="currency" value="eur">
       <label for="donation-amount">{% translate "Montant (€)" %}</label>
       <div class="donation-input-wrap">
         <input id="donation-amount" type="number" name="amount" min="1" step="0.01" value="5.00" required inputmode="decimal">
