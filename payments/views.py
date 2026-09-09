@@ -25,6 +25,7 @@ from shop.services import (
     execute_with_sqlite_lock_retry,
     finalize_paid_order,
 )
+from .donations import donations_are_available
 from .forms import DonationCheckoutForm
 from .models import DonationPaymentAttempt, Payment
 
@@ -356,6 +357,16 @@ def _cancel_payment(payment_id, raw_response):
 @login_required
 @require_POST
 def create_donation_checkout(request):
+    if not donations_are_available():
+        messages.info(
+            request,
+            _(
+                "Les dons sont temporairement indisponibles. "
+                "Merci pour votre compréhension."
+            ),
+        )
+        return redirect("monetization:don")
+
     form = DonationCheckoutForm(request.POST)
     if not form.is_valid():
         messages.error(

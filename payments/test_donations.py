@@ -1,16 +1,90 @@
 import json
+import os
 from decimal import Decimal
 from types import SimpleNamespace
 from unittest.mock import patch
 
 from django.contrib.auth import get_user_model
-from django.test import TestCase
+from django.template.loader import render_to_string
+from django.test import SimpleTestCase, TestCase, override_settings
 from django.urls import reverse
+from django.utils import translation
 
+from blog.settings import env_bool
 from monetization.models import Don
-from payments.models import DonationPaymentAttempt, Payment
+from payments.donations import donations_are_available
+from payments.models import Adresse, DonationPaymentAttempt, Payment
+from shop.models import Commande, LigneCommande, Produit
 
 
+class DonationAvailabilityTests(SimpleTestCase):
+    def test_absent_environment_value_disables_donations(self):
+        with patch.dict(os.environ, {}, clear=True):
+            self.assertFalse(env_bool("DONATIONS_ENABLED", False))
+
+    def test_only_explicit_true_environment_values_enable_donations(self):
+        for value in ("true", "TRUE", "1", "yes", "Yes", "on", "ON"):
+            with self.subTest(value=value), patch.dict(
+                os.environ,
+                {"DONATIONS_ENABLED": value},
+                clear=True,
+            ):
+                self.assertTrue(env_bool("DONATIONS_ENABLED", False))
+
+    def test_false_and_unknown_environment_values_disable_donations(self):
+        for value in ("false", "0", "no", "off", "unexpected", "", "2"):
+            with self.subTest(value=value), patch.dict(
+                os.environ,
+                {"DONATIONS_ENABLED": value},
+                clear=True,
+            ):
+                self.assertFalse(env_bool("DONATIONS_ENABLED", False))
+
+    def test_missing_stripe_secrets_disable_donations(self):
+        cases = (
+            ("", "whsec_configured"),
+            ("sk_test_configured", ""),
+            ("   ", "whsec_configured"),
+            ("sk_test_configured", "   "),
+        )
+        for secret_key, webhook_secret in cases:
+            with self.subTest(
+                secret_key=bool(secret_key.strip()),
+                webhook_secret=bool(webhook_secret.strip()),
+            ), self.settings(
+                DONATIONS_ENABLED=True,
+                STRIPE_SECRET_KEY=secret_key,
+                STRIPE_WEBHOOK_SECRET=webhook_secret,
+                IS_PRODUCTION=False,
+            ):
+                self.assertFalse(donations_are_available())
+
+    @override_settings(
+        DONATIONS_ENABLED=True,
+        STRIPE_SECRET_KEY="sk_test_configured",
+        STRIPE_WEBHOOK_SECRET="whsec_configured",
+        IS_PRODUCTION=True,
+    )
+    def test_test_key_never_enables_donations_in_production(self):
+        self.assertFalse(donations_are_available())
+
+    def test_live_secret_key_prefixes_enable_donations_in_production(self):
+        for prefix in ("sk_live_", "rk_live_"):
+            with self.subTest(prefix=prefix), self.settings(
+                DONATIONS_ENABLED=True,
+                STRIPE_SECRET_KEY=f"{prefix}configured",
+                STRIPE_WEBHOOK_SECRET="whsec_configured",
+                IS_PRODUCTION=True,
+            ):
+                self.assertTrue(donations_are_available())
+
+
+@override_settings(
+    DONATIONS_ENABLED=True,
+    STRIPE_SECRET_KEY="sk_test_configured",
+    STRIPE_WEBHOOK_SECRET="whsec_configured",
+    IS_PRODUCTION=False,
+)
 class DonationCheckoutTests(TestCase):
     def setUp(self):
         self.user = get_user_model().objects.create_user(
@@ -34,6 +108,54 @@ class DonationCheckoutTests(TestCase):
         self.assertEqual(response.status_code, 405)
         create.assert_not_called()
         self.assertFalse(DonationPaymentAttempt.objects.exists())
+
+    @override_settings(DONATIONS_ENABLED=False)
+    def test_disabled_direct_post_is_blocked_before_validation(self):
+        with patch("payments.views.stripe.checkout.Session.create") as create:
+            response = self.client.post(
+                self.url,
+                {"amount": "invalid"},
+                follow=True,
+            )
+
+        self.assertRedirects(response, reverse("monetization:don"))
+        self.assertContains(
+            response,
+            "Les dons sont temporairement indisponibles. Merci pour votre compréhension.",
+        )
+        create.assert_not_called()
+        self.assertFalse(DonationPaymentAttempt.objects.exists())
+
+    @override_settings(
+        DONATIONS_ENABLED=True,
+        STRIPE_SECRET_KEY="sk_test_configured",
+        STRIPE_WEBHOOK_SECRET="whsec_configured",
+        IS_PRODUCTION=True,
+    )
+    def test_production_test_key_blocks_direct_post(self):
+        with patch("payments.views.stripe.checkout.Session.create") as create:
+            response = self.client.post(self.url, {"amount": "5.00"})
+
+        self.assertEqual(response.status_code, 302)
+        create.assert_not_called()
+        self.assertFalse(DonationPaymentAttempt.objects.exists())
+
+    @override_settings(
+        DONATIONS_ENABLED=True,
+        STRIPE_SECRET_KEY="sk_live_configured",
+        STRIPE_WEBHOOK_SECRET="whsec_configured",
+        IS_PRODUCTION=True,
+    )
+    def test_production_live_configuration_allows_checkout(self):
+        with patch(
+            "payments.views.stripe.checkout.Session.create",
+            return_value=self.stripe_session("cs_live_configuration"),
+        ) as create:
+            response = self.client.post(self.url, {"amount": "5.00"})
+
+        self.assertEqual(response.status_code, 302)
+        create.assert_called_once()
+        self.assertEqual(DonationPaymentAttempt.objects.count(), 1)
 
     def test_eur_is_imposed_and_converted_with_minor_amount(self):
         with patch(
@@ -168,7 +290,8 @@ class DonationWebhookTests(TestCase):
                 HTTP_STRIPE_SIGNATURE="signature",
             )
 
-    def test_valid_webhook_creates_exactly_one_donation_when_repeated(self):
+    @override_settings(DONATIONS_ENABLED=False)
+    def test_disabled_new_donations_do_not_block_existing_attempt_webhook(self):
         attempt = self.create_attempt("success")
         event = self.event(attempt)
 
@@ -270,3 +393,94 @@ class DonationWebhookTests(TestCase):
         self.assertEqual(response.status_code, 200)
         attempt_lock.assert_called_once_with()
         payment_lock.assert_not_called()
+
+
+@override_settings(
+    DONATIONS_ENABLED=False,
+    STRIPE_SECRET_KEY="sk_test_configured",
+    STRIPE_WEBHOOK_SECRET="whsec_configured",
+    IS_PRODUCTION=False,
+)
+class DonationUnavailableTemplateTests(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.user = get_user_model().objects.create_user(
+            email="unavailable-donor@example.com",
+            password="test-password",
+        )
+        address = Adresse.objects.create(
+            utilisateur=cls.user,
+            rue="1 Test Street",
+            ville="Berlin",
+            code_postal="10115",
+            pays="Deutschland",
+        )
+        product = Produit.objects.create(
+            nom="Produit test",
+            slug="produit-donation-indisponible",
+            prix=Decimal("5.00"),
+        )
+        cls.order = Commande.objects.create(
+            client=cls.user,
+            adresse=address,
+            total=Decimal("5.00"),
+            currency="EUR",
+            payment_status="PENDING",
+        )
+        LigneCommande.objects.create(
+            commande=cls.order,
+            produit=product,
+            quantite=1,
+            prix_unitaire=product.prix,
+        )
+
+    def setUp(self):
+        self.addCleanup(translation.activate, "fr")
+        self.client.force_login(self.user)
+
+    def test_public_page_is_accessible_without_active_form_in_each_language(self):
+        cases = {
+            "fr": (
+                "/monetization/don/",
+                "Les dons sont temporairement indisponibles. Merci pour votre compréhension.",
+            ),
+            "de": (
+                "/de/monetization/don/",
+                "Spenden sind vorübergehend nicht verfügbar. Vielen Dank für Ihr Verständnis.",
+            ),
+            "en": (
+                "/en/monetization/don/",
+                "Donations are temporarily unavailable. Thank you for your understanding.",
+            ),
+        }
+        for language, (url, message) in cases.items():
+            with self.subTest(language=language):
+                response = self.client.get(url)
+                self.assertEqual(response.status_code, 200)
+                self.assertContains(response, message)
+                self.assertNotContains(response, 'action="/payments/donate/"')
+
+    def test_payment_choice_has_no_active_donation_form(self):
+        response = self.client.get(
+            reverse("payments:choice", args=[self.order.pk])
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(
+            response,
+            "Les dons sont temporairement indisponibles. Merci pour votre compréhension.",
+        )
+        self.assertNotContains(response, 'action="/payments/donate/"')
+
+    def test_legacy_donation_template_has_no_active_form(self):
+        with translation.override("fr"):
+            html = render_to_string(
+                "payments/donate.html",
+                {"donations_available": False},
+            )
+
+        self.assertIn(
+            "Les dons sont temporairement indisponibles. Merci pour votre compréhension.",
+            html,
+        )
+        self.assertNotIn('action="/payments/donate/"', html)

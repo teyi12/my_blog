@@ -119,20 +119,26 @@
         <p>{% translate "Le don est indépendant de votre commande et reste entièrement facultatif." %}</p>
       </div>
     </div>
-    <form action="{% url 'payments:create_donation_checkout' %}" method="post" class="payment-donation-form">
-      {% csrf_token %}
-      <label>
-        <span>{% translate "Montant" %}</span>
-        <input type="number" name="amount" min="1" step="1" required placeholder="10">
-      </label>
-      <label>
-        <span>{% translate "Devise" %}</span>
-        <strong>EUR €</strong>
-      </label>
-      <button type="submit" class="btn btn-soft">
-        <i class="fa-regular fa-heart" aria-hidden="true"></i> {% translate "Faire un don" %}
-      </button>
-    </form>
+    {% if donations_available %}
+      <form action="{% url 'payments:create_donation_checkout' %}" method="post" class="payment-donation-form">
+        {% csrf_token %}
+        <label>
+          <span>{% translate "Montant" %}</span>
+          <input type="number" name="amount" min="1" step="1" required placeholder="10">
+        </label>
+        <label>
+          <span>{% translate "Devise" %}</span>
+          <strong>EUR €</strong>
+        </label>
+        <button type="submit" class="btn btn-soft">
+          <i class="fa-regular fa-heart" aria-hidden="true"></i> {% translate "Faire un don" %}
+        </button>
+      </form>
+    {% else %}
+      <div class="alert alert-info" role="status">
+        {% translate "Les dons sont temporairement indisponibles. Merci pour votre compréhension." %}
+      </div>
+    {% endif %}
   </section>
 </section>
 {% endblock %}
