@@ -9,6 +9,9 @@ from unittest.mock import Mock, patch
 from django.contrib.auth import get_user_model
 from django.apps import apps
 from django.db import transaction
+from django.db.backends.postgresql.base import DatabaseWrapper
+from django.http import Http404
+from django.shortcuts import get_object_or_404
 from django.test import Client, TestCase
 from django.urls import reverse
 from django.utils import timezone
@@ -18,6 +21,7 @@ from payments.views import (
     _claim_cinetpay_initialization,
     _lock_order_then_payment,
     _minor_amount,
+    _reserve_payment,
 )
 from shop.models import Cart, CartItem, Commande, LigneCommande, Produit
 
@@ -119,6 +123,115 @@ class OrderPaymentSecurityTests(TestCase):
         remaining = expires_at - int(timezone.now().timestamp())
         self.assertGreaterEqual(remaining, 3595)
         self.assertLessEqual(remaining, 3600)
+
+    def test_multiple_line_order_is_reserved_exactly_once(self):
+        second_product = Produit.objects.create(
+            nom="Second produit paiement",
+            slug="second-produit-paiement",
+            prix=Decimal("5.00"),
+        )
+        second_item = CartItem.objects.create(
+            cart=self.cart,
+            produit=second_product,
+            quantite=1,
+            prix_unitaire=second_product.prix,
+        )
+        LigneCommande.objects.create(
+            commande=self.order,
+            produit=second_product,
+            source_cart_item=second_item,
+            quantite=1,
+            prix_unitaire=second_product.prix,
+        )
+        self.order.total = Decimal("25.00")
+        self.order.save(update_fields=["total"])
+        request = SimpleNamespace(user=self.user)
+
+        first_order, first_payment = _reserve_payment(
+            request, self.order.id, "STRIPE"
+        )
+        second_order, second_payment = _reserve_payment(
+            request, self.order.id, "STRIPE"
+        )
+
+        self.assertEqual(first_order, self.order)
+        self.assertEqual(second_order, self.order)
+        self.assertEqual(first_payment, second_payment)
+        self.assertEqual(Payment.objects.filter(commande=self.order).count(), 1)
+        self.assertEqual(
+            Payment.objects.filter(
+                commande=self.order,
+                status="PROCESSING",
+            ).count(),
+            1,
+        )
+
+    def test_order_without_lines_cannot_be_reserved(self):
+        self.order.lignes.all().delete()
+
+        with self.assertRaises(Http404):
+            _reserve_payment(
+                SimpleNamespace(user=self.user), self.order.id, "STRIPE"
+            )
+
+        self.assertFalse(Payment.objects.exists())
+
+    def test_order_owned_by_another_user_cannot_be_reserved(self):
+        other_user = get_user_model().objects.create_user(
+            email="other-payer@example.com",
+            password="test-password",
+        )
+
+        with self.assertRaises(Http404):
+            _reserve_payment(
+                SimpleNamespace(user=other_user), self.order.id, "STRIPE"
+            )
+
+        self.assertFalse(Payment.objects.exists())
+
+    def test_reservation_lock_query_compiles_for_postgresql_without_distinct(self):
+        with patch(
+            "payments.views.get_object_or_404",
+            wraps=get_object_or_404,
+        ) as locked_order_lookup:
+            _reserve_payment(
+                SimpleNamespace(user=self.user),
+                self.order.id,
+                "STRIPE",
+            )
+
+        locked_queryset = locked_order_lookup.call_args.args[0]
+        postgresql_connection = DatabaseWrapper(
+            {
+                "ENGINE": "django.db.backends.postgresql",
+                "NAME": "compile_only",
+                "USER": "",
+                "PASSWORD": "",
+                "HOST": "",
+                "PORT": "",
+                "OPTIONS": {},
+                "TIME_ZONE": None,
+                "CONN_HEALTH_CHECKS": False,
+                "CONN_MAX_AGE": 0,
+                "AUTOCOMMIT": True,
+            },
+            alias="postgresql_compile_only",
+        )
+        with patch.object(
+            postgresql_connection,
+            "get_autocommit",
+            return_value=False,
+        ):
+            compiled_sql, _ = locked_queryset.query.get_compiler(
+                connection=postgresql_connection
+            ).as_sql()
+        compiled_sql = compiled_sql.upper()
+
+        self.assertTrue(locked_queryset.query.select_for_update)
+        self.assertFalse(locked_queryset.query.distinct)
+        self.assertIn("EXISTS", compiled_sql)
+        self.assertNotIn("DISTINCT", compiled_sql)
+        self.assertIn("FOR UPDATE", compiled_sql)
 
     def test_payment_state_lock_order_is_order_then_payment(self):
         payment = Payment.objects.create(
