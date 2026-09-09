@@ -3113,3 +3113,18 @@ msgstr "Overview"
 
 #~ msgid "Changer"
 #~ msgstr "Change"
+
+msgid "Saisissez un montant de don valide d’au moins 1 EUR, avec au maximum deux décimales."
+msgstr "Enter a valid donation amount of at least EUR 1, with no more than two decimal places."
+
+msgid "Choisissez un montant en euros."
+msgstr "Choose an amount in euros."
+
+msgid "Don en cours de confirmation"
+msgstr "Donation awaiting confirmation"
+
+msgid "Merci pour votre soutien."
+msgstr "Thank you for your support."
+
+msgid "La confirmation définitive de votre don est effectuée par Stripe, indépendamment de cette page."
+msgstr "Your donation is confirmed by Stripe independently of this page."

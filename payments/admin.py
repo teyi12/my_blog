@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Payment, Adresse
+from .models import Adresse, DonationPaymentAttempt, Payment
 from django.contrib.auth import get_user_model
 from django.contrib.auth.admin import UserAdmin as DefaultUserAdmin
 
@@ -33,6 +33,45 @@ class PaymentAdmin(admin.ModelAdmin):
             "fields": ("created_at", "updated_at")
         }),
     )
+
+
+@admin.register(DonationPaymentAttempt)
+class DonationPaymentAttemptAdmin(admin.ModelAdmin):
+    list_display = (
+        "id",
+        "utilisateur",
+        "montant",
+        "devise",
+        "status",
+        "stripe_session_id",
+        "created_at",
+        "updated_at",
+    )
+    list_filter = ("status", "created_at", "updated_at")
+    search_fields = ("utilisateur__email", "stripe_session_id")
+    ordering = ("-created_at",)
+    actions = None
+    fields = (
+        "id",
+        "utilisateur",
+        "montant",
+        "devise",
+        "status",
+        "stripe_session_id",
+        "idempotency_key",
+        "checkout_url",
+        "don",
+        "raw_response",
+        "created_at",
+        "updated_at",
+    )
+    readonly_fields = fields
+
+    def has_add_permission(self, request):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
 
 User = get_user_model()
 
@@ -85,4 +124,3 @@ class AdresseAdmin(admin.ModelAdmin):
     )
     autocomplete_fields = ("utilisateur",)
     ordering = ("-cree_le",)
-

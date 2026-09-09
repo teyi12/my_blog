@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 from django import forms
 from .models import Adresse
 
@@ -20,3 +22,11 @@ class AdresseForm(forms.ModelForm):
     class Meta:
         model = Adresse
         fields = ["rue", "ville", "code_postal", "pays", "telephone"]
+
+
+class DonationCheckoutForm(forms.Form):
+    amount = forms.DecimalField(
+        min_value=Decimal("1.00"),
+        max_digits=10,
+        decimal_places=2,
+    )

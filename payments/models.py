@@ -57,6 +57,65 @@ class Payment(models.Model):
             )
         ]
 
+
+class DonationPaymentAttempt(models.Model):
+    STATUS_CHOICES = [
+        ("PROCESSING", _("En cours")),
+        ("SUCCESS", _("Réussi")),
+        ("FAILED", _("Échoué")),
+        ("CANCELED", _("Annulé")),
+    ]
+
+    utilisateur = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="donation_payment_attempts",
+    )
+    montant = models.DecimalField(max_digits=10, decimal_places=2)
+    devise = models.CharField(max_length=3, choices=[("EUR", "EUR")], default="EUR")
+    status = models.CharField(
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default="PROCESSING",
+    )
+    stripe_session_id = models.CharField(
+        max_length=255,
+        unique=True,
+        null=True,
+        blank=True,
+    )
+    idempotency_key = models.UUIDField(
+        default=uuid.uuid4,
+        unique=True,
+        editable=False,
+    )
+    checkout_url = models.URLField(max_length=500, blank=True)
+    don = models.OneToOneField(
+        "monetization.Don",
+        on_delete=models.PROTECT,
+        related_name="payment_attempt",
+        null=True,
+        blank=True,
+    )
+    raw_response = models.JSONField(blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        constraints = [
+            models.CheckConstraint(
+                condition=Q(devise="EUR"),
+                name="donation_attempt_eur_only",
+            ),
+            models.CheckConstraint(
+                condition=Q(montant__gte=1),
+                name="donation_attempt_min_1_eur",
+            ),
+        ]
+
+    def __str__(self):
+        return f"Don Stripe {self.pk} - {self.montant} {self.devise} - {self.status}"
+
 from django.db import models
 from django.contrib.auth.models import User
 

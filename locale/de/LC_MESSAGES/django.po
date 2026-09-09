@@ -3170,3 +3170,18 @@ msgstr "Vorstellung"
 
 #~ msgid "Changer"
 #~ msgstr "Ändern"
+
+msgid "Saisissez un montant de don valide d’au moins 1 EUR, avec au maximum deux décimales."
+msgstr "Geben Sie einen gültigen Spendenbetrag von mindestens 1 EUR mit höchstens zwei Dezimalstellen ein."
+
+msgid "Choisissez un montant en euros."
+msgstr "Wählen Sie einen Betrag in Euro."
+
+msgid "Don en cours de confirmation"
+msgstr "Spende wird bestätigt"
+
+msgid "Merci pour votre soutien."
+msgstr "Vielen Dank für Ihre Unterstützung."
+
+msgid "La confirmation définitive de votre don est effectuée par Stripe, indépendamment de cette page."
+msgstr "Die endgültige Bestätigung Ihrer Spende erfolgt durch Stripe, unabhängig von dieser Seite."
