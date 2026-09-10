@@ -1,5 +1,6 @@
 import logging
 
+from cloudinary.exceptions import Error as CloudinaryError
 from django.shortcuts import render, redirect
 from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
@@ -7,11 +8,14 @@ from django.contrib import messages
 from django.contrib.auth.forms import AuthenticationForm
 from django.db import transaction
 from django.utils.translation import gettext_lazy as _
+from requests.exceptions import RequestException
 
 from .forms import CustomUserCreationForm, CustomUserUpdateForm
 
 
 logger = logging.getLogger(__name__)
+
+PHOTO_STORAGE_EXCEPTIONS = (CloudinaryError, RequestException, OSError)
 
 PHOTO_STORAGE_ERROR = _(
     "La photo n’a pas pu être enregistrée pour le moment. "
@@ -24,7 +28,7 @@ def _save_form_with_uploaded_photo(form, *, operation, old_photo_name="", user_i
     try:
         with transaction.atomic():
             return form.save()
-    except Exception as error:
+    except PHOTO_STORAGE_EXCEPTIONS as error:
         # A text-only save or an intentional clear doesn't call photo storage;
         # preserve its existing failure semantics instead of hiding unrelated
         # database/programming errors.

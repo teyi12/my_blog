@@ -3,8 +3,10 @@ from pathlib import Path
 from unittest import skipUnless
 from unittest.mock import patch
 
+from cloudinary.exceptions import Error as CloudinaryError
 from django.conf import settings
 from django.core.files.uploadedfile import SimpleUploadedFile
+from django.db import DatabaseError
 from django.test import SimpleTestCase, TestCase
 from django.urls import reverse
 from django.utils import translation
@@ -209,12 +211,15 @@ class ProfilePhotoUploadTests(TestCase):
         self.client.force_login(self.user)
         upload = make_image_upload("JPEG", "portrait.jpg", "image/jpeg")
         secret_marker = "CLOUDINARY_API_SECRET=must-not-appear"
+        provider_message = "Provider rejected the supplied credentials"
 
         with self.assertLogs("accounts.views", level="ERROR") as captured_logs:
             with patch.object(
                 self.photo_storage,
                 "save",
-                side_effect=RuntimeError(secret_marker),
+                side_effect=CloudinaryError(
+                    f"{provider_message}: {secret_marker}"
+                ),
             ):
                 response = self.client.post(
                     self.profile_url,
@@ -230,9 +235,34 @@ class ProfilePhotoUploadTests(TestCase):
         self.assertEqual(self.user.photo.name, "users/ancienne-photo.jpg")
         self.assertEqual(self.user.first_name, "Ancien")
         log_output = "\n".join(captured_logs.output)
-        self.assertIn("exception_type=RuntimeError", log_output)
+        self.assertIn("exception_type=Error", log_output)
         self.assertIn("operation=profile_update", log_output)
         self.assertNotIn(secret_marker, log_output)
+        self.assertNotIn(provider_message, log_output)
+
+    def test_programming_and_database_errors_are_not_masked(self):
+        self.client.force_login(self.user)
+
+        for exception in (
+            RuntimeError("programming error"),
+            DatabaseError("database error"),
+        ):
+            with self.subTest(exception_type=type(exception).__name__):
+                upload = make_image_upload("JPEG", "portrait.jpg", "image/jpeg")
+                with patch.object(
+                    self.photo_storage,
+                    "save",
+                    side_effect=exception,
+                ):
+                    with self.assertRaises(type(exception)):
+                        self.client.post(
+                            self.profile_url,
+                            self.profile_data(photo=upload),
+                        )
+
+        self.user.refresh_from_db()
+        self.assertEqual(self.user.photo.name, "users/ancienne-photo.jpg")
+        self.assertEqual(self.user.first_name, "Ancien")
 
     def test_storage_error_message_is_translated(self):
         self.client.force_login(self.user)
