@@ -10,6 +10,12 @@ from django.db import transaction
 from django.utils.translation import gettext_lazy as _
 from requests.exceptions import RequestException
 
+from payments.subscriptions import (
+    get_current_user_subscription,
+    subscription_has_premium_access,
+    subscription_portal_is_available,
+)
+
 from .forms import CustomUserCreationForm, CustomUserUpdateForm
 
 
@@ -75,7 +81,21 @@ def profile_view(request):
                 return redirect("accounts:profile")
     else:
         form = CustomUserUpdateForm(instance=request.user)
-    return render(request, "accounts/profile.html", {"form": form})
+    current_subscription = get_current_user_subscription(request.user)
+    return render(
+        request,
+        "accounts/profile.html",
+        {
+            "form": form,
+            "current_subscription": current_subscription,
+            "subscription_access_active": subscription_has_premium_access(
+                current_subscription
+            ),
+            "subscription_portal_available": subscription_portal_is_available(
+                current_subscription
+            ),
+        },
+    )
 
 
 def login_view(request):

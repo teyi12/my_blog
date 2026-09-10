@@ -1,9 +1,14 @@
 {% extends "monetization/base.html" %}
-{% load i18n %}
+{% load i18n static %}
 {% block title %}{% translate "Abonnements Premium — Teyilawson" %}{% endblock %}
+{% block monetization_styles %}<link rel="stylesheet" href="{% static 'css/subscriptions.css' %}">{% endblock %}
 
 {% block content %}
 <section class="monetization-section">
+  {% if user.is_authenticated %}
+    {% include "payments/_subscription_self_service.html" %}
+  {% endif %}
+
   <div class="monetization-section-heading">
     <div>
       <span class="monetization-eyebrow">{% translate "Premium" %}</span>
@@ -21,7 +26,9 @@
       <h3>{{ abo.nom }}</h3>
       <p>{{ abo.description }}</p>
       <div class="subscription-price"><strong>{{ abo.prix|floatformat:2 }} €</strong><span>{% blocktranslate count days=abo.duree_jours %}pour {{ days }} jour{% plural %}pour {{ days }} jours{% endblocktranslate %}</span></div>
-      {% if abo.stripe_subscription_available %}
+      {% if subscription_blocks_checkout %}
+      <p class="subscription-note" role="status"><i class="fa-solid fa-circle-info" aria-hidden="true"></i> {% translate "Une souscription est déjà en cours pour votre compte. Gérez-la depuis votre espace abonné." %}</p>
+      {% elif abo.stripe_subscription_available %}
       <form action="{% url 'monetization:souscrire_abonnement' abo.slug %}" method="post">
         {% csrf_token %}
         <button type="submit" class="btn btn-primary subscription-button">{% translate "Choisir cette formule" %}</button>

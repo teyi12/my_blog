@@ -3217,3 +3217,116 @@ msgstr "Accepted formats: JPEG, PNG, and WebP. Maximum size: %(max_size_mb)s MB.
 #: accounts/views.py
 msgid "La photo n’a pas pu être enregistrée pour le moment. Veuillez réessayer ultérieurement."
 msgstr "The photo could not be saved right now. Please try again later."
+
+#: payments/templates/payments/_subscription_self_service.html
+msgid "Espace abonné"
+msgstr "Subscriber area"
+
+#: payments/templates/payments/_subscription_self_service.html
+msgid "Mon abonnement"
+msgstr "My subscription"
+
+#: payments/templates/payments/_subscription_self_service.html
+msgid "Annulation programmée"
+msgstr "Cancellation scheduled"
+
+#: payments/templates/payments/_subscription_self_service.html
+msgid "Initialisation en cours"
+msgstr "Initialization in progress"
+
+#: payments/templates/payments/_subscription_self_service.html
+msgid "Confirmation en attente"
+msgstr "Awaiting confirmation"
+
+#: payments/templates/payments/_subscription_self_service.html
+msgid "Vous n’avez actuellement aucun abonnement Stripe."
+msgstr "You currently have no Stripe subscription."
+
+#: payments/templates/payments/_subscription_self_service.html
+msgid "Découvrir les offres Premium"
+msgstr "Explore Premium plans"
+
+#: payments/templates/payments/_subscription_self_service.html
+msgid "L’initialisation de votre souscription est en cours. Aucun accès Premium n’est activé avant la confirmation Stripe."
+msgstr "Your subscription is being initialized. Premium access will not be activated until Stripe confirms it."
+
+#: payments/templates/payments/_subscription_self_service.html
+msgid "Votre passage en caisse est terminé. La confirmation sécurisée du paiement est encore attendue."
+msgstr "Your checkout is complete. Secure payment confirmation is still pending."
+
+#: payments/templates/payments/_subscription_self_service.html
+#, python-format
+msgid "Votre annulation est programmée. Votre accès reste actif jusqu’au %(end)s."
+msgstr "Your cancellation is scheduled. Your access remains active until %(end)s."
+
+#: payments/templates/payments/_subscription_self_service.html
+msgid "Votre abonnement est actif et votre période actuelle est confirmée par Stripe."
+msgstr "Your subscription is active and Stripe has confirmed the current billing period."
+
+#: payments/templates/payments/_subscription_self_service.html
+msgid "Le dernier paiement n’a pas abouti. Mettez à jour votre moyen de paiement dans le portail Stripe."
+msgstr "The latest payment was unsuccessful. Update your payment method in the Stripe portal."
+
+#: payments/templates/payments/_subscription_self_service.html
+msgid "Cet abonnement est annulé. Vous pouvez choisir une nouvelle formule lorsque la souscription est disponible."
+msgstr "This subscription is canceled. You can choose a new plan when subscriptions are available."
+
+#: payments/templates/payments/_subscription_self_service.html
+msgid "Cette tentative de souscription a échoué. Aucun accès Premium n’a été activé."
+msgstr "This subscription attempt failed. No Premium access was activated."
+
+#: payments/templates/payments/_subscription_self_service.html
+msgid "Formule"
+msgstr "Plan"
+
+#: payments/templates/payments/_subscription_self_service.html
+msgid "Début de période"
+msgstr "Period start"
+
+#: payments/templates/payments/_subscription_self_service.html
+msgid "Fin de période"
+msgstr "Period end"
+
+#: payments/templates/payments/_subscription_self_service.html
+msgid "Accès Premium"
+msgstr "Premium access"
+
+#: payments/templates/payments/_subscription_self_service.html
+msgid "En attente de synchronisation"
+msgstr "Awaiting synchronization"
+
+#: payments/templates/payments/_subscription_self_service.html
+msgid "Inactif"
+msgstr "Inactive"
+
+#: payments/templates/payments/_subscription_self_service.html
+msgid "Gérer mon moyen de paiement"
+msgstr "Manage my payment method"
+
+#: payments/templates/payments/_subscription_self_service.html
+msgid "Gérer mon abonnement"
+msgstr "Manage my subscription"
+
+#: payments/templates/payments/_subscription_self_service.html
+msgid "La gestion en ligne de cet abonnement est momentanément indisponible."
+msgstr "Online management for this subscription is temporarily unavailable."
+
+#: payments/templates/payments/_subscription_self_service.html
+msgid "Voir les détails et les offres"
+msgstr "View details and plans"
+
+#: monetization/templates/monetization/abonnements.html
+msgid "Une souscription est déjà en cours pour votre compte. Gérez-la depuis votre espace abonné."
+msgstr "A subscription is already in progress for your account. Manage it from your subscriber area."
+
+#: payments/views.py
+msgid "La gestion en ligne de votre abonnement n’est pas disponible pour le moment."
+msgstr "Online subscription management is not available right now."
+
+#: payments/views.py
+msgid "Le portail de gestion Stripe est temporairement indisponible. Veuillez réessayer ultérieurement."
+msgstr "The Stripe management portal is temporarily unavailable. Please try again later."
+
+#: payments/templates/payments/_subscription_self_service.html
+msgid "Votre annulation est programmée. La date de fin sera affichée après synchronisation avec Stripe."
+msgstr "Your cancellation is scheduled. The end date will be shown after synchronization with Stripe."

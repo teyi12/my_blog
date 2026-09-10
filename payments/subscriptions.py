@@ -7,6 +7,7 @@ import stripe
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.db import IntegrityError, transaction
+from django.db.models import Case, IntegerField, Value, When
 from django.urls import reverse
 from django.utils import timezone
 
@@ -52,12 +53,111 @@ class SubscriptionProviderError(Exception):
     pass
 
 
+class SubscriptionPortalUnavailable(Exception):
+    pass
+
+
+class SubscriptionPortalProviderError(Exception):
+    pass
+
+
 class SubscriptionWebhookMismatch(Exception):
     pass
 
 
 class SubscriptionWebhookRetry(Exception):
     pass
+
+
+def get_current_user_subscription(user):
+    """Return only the most relevant Stripe subscription owned by ``user``."""
+    if not getattr(user, "is_authenticated", False):
+        return None
+
+    status_priority = Case(
+        When(status="ACTIVE", then=Value(0)),
+        When(status="PAST_DUE", then=Value(1)),
+        When(status="CHECKOUT_COMPLETE", then=Value(2)),
+        When(status="PROCESSING", then=Value(3)),
+        default=Value(4),
+        output_field=IntegerField(),
+    )
+    return (
+        StripeSubscription.objects.select_related(
+            "abonnement",
+            "abonnement_utilisateur",
+        )
+        .filter(utilisateur=user)
+        .annotate(_status_priority=status_priority)
+        .order_by("_status_priority", "-updated_at", "-pk")
+        .first()
+    )
+
+
+def subscription_has_premium_access(subscription, at=None):
+    """Read the access granted by signed webhooks for this subscription."""
+    if subscription is None or subscription.abonnement_utilisateur is None:
+        return False
+
+    current_time = at or timezone.now()
+    access = subscription.abonnement_utilisateur
+    return bool(
+        access.actif
+        and access.date_debut <= current_time
+        and access.date_fin > current_time
+    )
+
+
+def subscription_portal_is_available(subscription):
+    """Check Portal prerequisites without enabling new subscription checkout."""
+    if (
+        subscription is None
+        or subscription.status not in {"ACTIVE", "PAST_DUE"}
+        or not subscription.stripe_customer_id
+    ):
+        return False
+
+    secret_key = str(getattr(settings, "STRIPE_SECRET_KEY", "") or "").strip()
+    webhook_secret = str(
+        getattr(settings, "STRIPE_WEBHOOK_SECRET", "") or ""
+    ).strip()
+    if not secret_key or not webhook_secret:
+        return False
+    if getattr(settings, "IS_PRODUCTION", False) and not secret_key.startswith(
+        LIVE_SECRET_KEY_PREFIXES
+    ):
+        return False
+    return True
+
+
+def create_subscription_portal_session(request):
+    """Create a Portal session from server-owned subscription data only."""
+    subscription = get_current_user_subscription(request.user)
+    if not subscription_portal_is_available(subscription):
+        raise SubscriptionPortalUnavailable
+
+    try:
+        session = stripe.billing_portal.Session.create(
+            customer=subscription.stripe_customer_id,
+            return_url=request.build_absolute_uri(
+                reverse("monetization:abonnements")
+            ),
+        )
+    except (stripe.StripeError, OSError) as exc:
+        logger.warning(
+            "Stripe subscription portal creation failed (%s)",
+            type(exc).__name__,
+        )
+        raise SubscriptionPortalProviderError from None
+
+    portal_url = str(_value(session, "url") or "").strip()
+    if not portal_url:
+        logger.warning(
+            "Stripe subscription portal returned an incomplete response (%s)",
+            type(session).__name__,
+        )
+        raise SubscriptionPortalProviderError
+    return portal_url
 
 
 def subscriptions_are_available(plan=None):

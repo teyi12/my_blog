@@ -1,0 +1,94 @@
+{% load i18n %}
+<section class="subscriber-panel" aria-labelledby="subscriber-panel-title">
+  <div class="subscriber-panel-heading">
+    <div>
+      <span class="subscriber-eyebrow">{% translate "Espace abonné" %}</span>
+      <h2 id="subscriber-panel-title">{% translate "Mon abonnement" %}</h2>
+    </div>
+    {% if current_subscription %}
+      {% if current_subscription.status == "ACTIVE" and current_subscription.cancel_at_period_end %}
+        <span class="subscriber-status subscriber-status-warning">{% translate "Annulation programmée" %}</span>
+      {% elif current_subscription.status == "ACTIVE" %}
+        <span class="subscriber-status subscriber-status-success">{% translate "Actif" %}</span>
+      {% elif current_subscription.status == "PAST_DUE" %}
+        <span class="subscriber-status subscriber-status-danger">{% translate "Paiement en retard" %}</span>
+      {% elif current_subscription.status == "PROCESSING" %}
+        <span class="subscriber-status">{% translate "Initialisation en cours" %}</span>
+      {% elif current_subscription.status == "CHECKOUT_COMPLETE" %}
+        <span class="subscriber-status">{% translate "Confirmation en attente" %}</span>
+      {% elif current_subscription.status == "CANCELED" %}
+        <span class="subscriber-status subscriber-status-muted">{% translate "Annulé" %}</span>
+      {% elif current_subscription.status == "FAILED" %}
+        <span class="subscriber-status subscriber-status-danger">{% translate "Échoué" %}</span>
+      {% endif %}
+    {% endif %}
+  </div>
+
+  {% if not current_subscription %}
+    <p>{% translate "Vous n’avez actuellement aucun abonnement Stripe." %}</p>
+    <a class="btn btn-soft" href="{% url 'monetization:abonnements' %}">{% translate "Découvrir les offres Premium" %}</a>
+  {% else %}
+    <h3>{{ current_subscription.abonnement.nom }}</h3>
+
+    {% if current_subscription.status == "PROCESSING" %}
+      <p>{% translate "L’initialisation de votre souscription est en cours. Aucun accès Premium n’est activé avant la confirmation Stripe." %}</p>
+    {% elif current_subscription.status == "CHECKOUT_COMPLETE" %}
+      <p>{% translate "Votre passage en caisse est terminé. La confirmation sécurisée du paiement est encore attendue." %}</p>
+    {% elif current_subscription.status == "ACTIVE" and current_subscription.cancel_at_period_end %}
+      {% if current_subscription.current_period_end %}
+        <p>{% blocktranslate with end=current_subscription.current_period_end|date:"DATE_FORMAT" %}Votre annulation est programmée. Votre accès reste actif jusqu’au {{ end }}.{% endblocktranslate %}</p>
+      {% else %}
+        <p>{% translate "Votre annulation est programmée. La date de fin sera affichée après synchronisation avec Stripe." %}</p>
+      {% endif %}
+    {% elif current_subscription.status == "ACTIVE" %}
+      <p>{% translate "Votre abonnement est actif et votre période actuelle est confirmée par Stripe." %}</p>
+    {% elif current_subscription.status == "PAST_DUE" %}
+      <p>{% translate "Le dernier paiement n’a pas abouti. Mettez à jour votre moyen de paiement dans le portail Stripe." %}</p>
+    {% elif current_subscription.status == "CANCELED" %}
+      <p>{% translate "Cet abonnement est annulé. Vous pouvez choisir une nouvelle formule lorsque la souscription est disponible." %}</p>
+    {% elif current_subscription.status == "FAILED" %}
+      <p>{% translate "Cette tentative de souscription a échoué. Aucun accès Premium n’a été activé." %}</p>
+    {% endif %}
+
+    {% if current_subscription.status == "ACTIVE" or current_subscription.status == "PAST_DUE" %}
+      <dl class="subscriber-details">
+        <div>
+          <dt>{% translate "Formule" %}</dt>
+          <dd>{{ current_subscription.abonnement.nom }}</dd>
+        </div>
+        <div>
+          <dt>{% translate "Montant" %}</dt>
+          <dd>{{ current_subscription.montant|floatformat:2 }} {{ current_subscription.devise }}</dd>
+        </div>
+        <div>
+          <dt>{% translate "Début de période" %}</dt>
+          <dd>{% if current_subscription.current_period_start %}{{ current_subscription.current_period_start|date:"DATE_FORMAT" }}{% else %}{% translate "En attente de synchronisation" %}{% endif %}</dd>
+        </div>
+        <div>
+          <dt>{% translate "Fin de période" %}</dt>
+          <dd>{% if current_subscription.current_period_end %}{{ current_subscription.current_period_end|date:"DATE_FORMAT" }}{% else %}{% translate "En attente de synchronisation" %}{% endif %}</dd>
+        </div>
+        <div>
+          <dt>{% translate "Accès Premium" %}</dt>
+          <dd>{% if subscription_access_active %}{% translate "Actif" %}{% else %}{% translate "Inactif" %}{% endif %}</dd>
+        </div>
+      </dl>
+    {% endif %}
+
+    <div class="subscriber-actions">
+      {% if subscription_portal_available %}
+        <form action="{% url 'payments:subscription_portal' %}" method="post">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-brand">
+            {% if current_subscription.status == "PAST_DUE" %}{% translate "Gérer mon moyen de paiement" %}{% else %}{% translate "Gérer mon abonnement" %}{% endif %}
+          </button>
+        </form>
+      {% elif current_subscription.status == "ACTIVE" or current_subscription.status == "PAST_DUE" %}
+        <p class="subscriber-help" role="status">{% translate "La gestion en ligne de cet abonnement est momentanément indisponible." %}</p>
+      {% endif %}
+      {% if subscription_profile_summary %}
+        <a class="btn btn-soft" href="{% url 'monetization:abonnements' %}">{% translate "Voir les détails et les offres" %}</a>
+      {% endif %}
+    </div>
+  {% endif %}
+</section>

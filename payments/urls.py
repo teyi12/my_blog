@@ -12,6 +12,7 @@ urlpatterns = [
     # Déclenchements client Stripe, conservés non préfixés pour compatibilité.
     path("donate/", views.create_donation_checkout, name="create_donation_checkout"),
     path("subscribe/", views.create_subscription_checkout, name="create_subscription_checkout"),
+    path("subscription/portal/", views.subscription_portal, name="subscription_portal"),
     path("checkout/card/<int:order_id>/", views.stripe_checkout, name="stripe_checkout"),
     # Mobile Money (API custom)
     path("checkout/mobile/<int:order_id>/", views.mobile_money_checkout, name="mobile_checkout"),
