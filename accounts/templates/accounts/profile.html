@@ -1,10 +1,11 @@
 {% extends 'template_base.html' %}
-{% load static %}
+{% load i18n static %}
 
 {% block titre %}Mon profil — Teyilawson{% endblock %}
 
 {% block styles %}
 <link rel="stylesheet" href="{% static 'css/accounts.css' %}">
+<link rel="stylesheet" href="{% static 'css/subscriptions.css' %}">
 {% endblock %}
 
 {% block contenu %}
@@ -62,6 +63,10 @@
         </div>
       </form>
     </div>
+  </div>
+
+  <div class="profile-subscription">
+    {% include "payments/_subscription_self_service.html" with subscription_profile_summary=True %}
   </div>
 </section>
 {% endblock %}

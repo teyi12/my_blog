@@ -14,7 +14,10 @@ from payments.subscriptions import (
     SubscriptionInitializationInProgress,
     SubscriptionProviderError,
     SubscriptionUnavailable,
+    get_current_user_subscription,
     initialize_subscription_checkout,
+    subscription_has_premium_access,
+    subscription_portal_is_available,
     subscriptions_are_available,
 )
 
@@ -74,15 +77,31 @@ def affiliation_view(request):
 
 
 def abonnements_view(request):
+    current_subscription = get_current_user_subscription(request.user)
+    subscription_blocks_checkout = bool(
+        current_subscription
+        and current_subscription.status in current_subscription.OPEN_STATUSES
+    )
     abonnements = list(Abonnement.objects.all().order_by("prix", "nom"))
     for abonnement in abonnements:
-        abonnement.stripe_subscription_available = subscriptions_are_available(
-            abonnement
+        abonnement.stripe_subscription_available = (
+            not subscription_blocks_checkout
+            and subscriptions_are_available(abonnement)
         )
     return render(
         request,
         "monetization/abonnements.html",
-        {"abonnements": abonnements},
+        {
+            "abonnements": abonnements,
+            "current_subscription": current_subscription,
+            "subscription_access_active": subscription_has_premium_access(
+                current_subscription
+            ),
+            "subscription_blocks_checkout": subscription_blocks_checkout,
+            "subscription_portal_available": subscription_portal_is_available(
+                current_subscription
+            ),
+        },
     )
 
 

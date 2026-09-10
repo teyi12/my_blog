@@ -29,8 +29,11 @@ from .donations import donations_are_available
 from .forms import DonationCheckoutForm
 from .models import DonationPaymentAttempt, Payment
 from .subscriptions import (
+    SubscriptionPortalProviderError,
+    SubscriptionPortalUnavailable,
     SubscriptionWebhookMismatch,
     SubscriptionWebhookRetry,
+    create_subscription_portal_session,
     process_subscription_event,
 )
 
@@ -448,6 +451,33 @@ def create_subscription_checkout(request):
         )
         % {"subscription": "Premium"},
     )
+    return redirect("monetization:abonnements")
+
+
+@login_required
+@require_POST
+def subscription_portal(request):
+    """Open Stripe's hosted Portal without trusting browser identifiers."""
+    try:
+        portal_url = create_subscription_portal_session(request)
+    except SubscriptionPortalUnavailable:
+        messages.info(
+            request,
+            _(
+                "La gestion en ligne de votre abonnement n’est pas disponible "
+                "pour le moment."
+            ),
+        )
+    except SubscriptionPortalProviderError:
+        messages.error(
+            request,
+            _(
+                "Le portail de gestion Stripe est temporairement indisponible. "
+                "Veuillez réessayer ultérieurement."
+            ),
+        )
+    else:
+        return redirect(portal_url)
     return redirect("monetization:abonnements")
 
 
