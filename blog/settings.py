@@ -206,6 +206,19 @@ STATIC_ROOT = BASE_DIR / "staticfiles"
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
 
+# Limite commune aux formulaires qui acceptent une photo de profil. La
+# validation a lieu avant tout appel au backend de stockage.
+PROFILE_PHOTO_MAX_UPLOAD_SIZE = 5 * 1024 * 1024
+
+
+def get_media_storage_backend(is_production):
+    return (
+        "cloudinary_storage.storage.MediaCloudinaryStorage"
+        if is_production
+        else "django.core.files.storage.FileSystemStorage"
+    )
+
+
 if IS_PRODUCTION:
     CLOUDINARY_CLOUD_NAME = os.getenv("CLOUDINARY_CLOUD_NAME", "").strip()
     CLOUDINARY_API_KEY = os.getenv("CLOUDINARY_API_KEY", "").strip()
@@ -234,11 +247,7 @@ if IS_PRODUCTION:
 
 STORAGES = {
     "default": {
-        "BACKEND": (
-            "cloudinary_storage.storage.MediaCloudinaryStorage"
-            if IS_PRODUCTION
-            else "django.core.files.storage.FileSystemStorage"
-        ),
+        "BACKEND": get_media_storage_backend(IS_PRODUCTION),
     },
     "staticfiles": {
         "BACKEND": (

@@ -3191,3 +3191,29 @@ msgstr "Thank you for subscribing."
 #: payments/templates/payments/success.html
 msgid "Votre accès Premium sera activé uniquement après confirmation sécurisée du paiement récurrent par Stripe."
 msgstr "Your Premium access will be activated only after Stripe securely confirms the recurring payment."
+
+#: accounts/forms.py
+msgid "Le fichier sélectionné n’est pas une image valide."
+msgstr "The selected file is not a valid image."
+
+#: accounts/forms.py
+#, python-format
+msgid "La photo dépasse la taille maximale autorisée de %(max_size_mb)s Mo."
+msgstr "The photo exceeds the maximum allowed size of %(max_size_mb)s MB."
+
+#: accounts/forms.py
+msgid "Format non pris en charge. Utilisez une image JPEG, PNG ou WebP."
+msgstr "Unsupported format. Use a JPEG, PNG, or WebP image."
+
+#: accounts/forms.py
+msgid "Photo de profil"
+msgstr "Profile photo"
+
+#: accounts/forms.py
+#, python-format
+msgid "Formats acceptés : JPEG, PNG et WebP. Taille maximale : %(max_size_mb)s Mo."
+msgstr "Accepted formats: JPEG, PNG, and WebP. Maximum size: %(max_size_mb)s MB."
+
+#: accounts/views.py
+msgid "La photo n’a pas pu être enregistrée pour le moment. Veuillez réessayer ultérieurement."
+msgstr "The photo could not be saved right now. Please try again later."
