@@ -30,8 +30,8 @@
           {% for ligne in commande.lignes.all %}
           <div class="order-line">
             <div class="order-line-product">
-              {% if ligne.produit.image %}<img src="{{ ligne.produit.image.url }}" alt="">{% endif %}
-              <div><strong>{{ ligne.produit.nom }}</strong><small>{{ ligne.quantite }} × {{ ligne.prix_unitaire }} {{ commande.currency }}</small></div>
+              {% if ligne.produit and ligne.produit.image %}<img src="{{ ligne.produit.image.url }}" alt="">{% endif %}
+              <div><strong>{{ ligne.nom_produit_affiche }}</strong><small>{{ ligne.quantite }} × {{ ligne.prix_unitaire }} {{ commande.currency }}</small></div>
             </div>
             <strong>{{ ligne.sous_total }} {{ commande.currency }}</strong>
           </div>

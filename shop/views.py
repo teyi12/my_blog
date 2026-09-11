@@ -18,7 +18,15 @@ from django.utils import timezone
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.utils.translation import gettext as _, ngettext
 
-from .models import Produit, Categorie, Cart, CartItem, Commande, LigneCommande
+from .models import (
+    Cart,
+    CartItem,
+    Categorie,
+    Commande,
+    LigneCommande,
+    Produit,
+    safe_order_download_filename,
+)
 from payments.models import Adresse
 from blog.seo import PRODUCT_CATEGORY_DESCRIPTION, build_dynamic_seo
 from .forms import AdresseForm, CategorieForm, CommandeTraitementForm
@@ -425,18 +433,28 @@ class CheckoutView(LoginRequiredMixin, View):
                         payment_status="PENDING",
                         language_code=request.LANGUAGE_CODE,
                     )
-                    LigneCommande.objects.bulk_create(
-                        [
+                    order_lines = []
+                    for item in items:
+                        storage_name = (
+                            item.produit.fichier.name
+                            if item.produit.fichier
+                            else ""
+                        )
+                        order_lines.append(
                             LigneCommande(
                                 commande=commande,
                                 produit=item.produit,
                                 source_cart_item=item,
                                 quantite=item.quantite,
                                 prix_unitaire=item.produit.prix,
+                                nom_produit_snapshot=item.produit.nom,
+                                fichier_nom_stockage_snapshot=storage_name,
+                                fichier_nom_telechargement_snapshot=(
+                                    safe_order_download_filename(storage_name)
+                                ),
                             )
-                            for item in items
-                        ]
-                    )
+                        )
+                    LigneCommande.objects.bulk_create(order_lines)
                     return commande
 
             try:

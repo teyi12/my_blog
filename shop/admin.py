@@ -30,8 +30,14 @@ class ProduitAdmin(TranslationAdmin):
 class LigneCommandeInline(admin.TabularInline):
     model = LigneCommande
     extra = 1
-    fields = ("produit", "quantite", "prix_unitaire", "sous_total")
-    readonly_fields = ("sous_total",)
+    fields = (
+        "nom_produit_affiche",
+        "produit",
+        "quantite",
+        "prix_unitaire",
+        "sous_total",
+    )
+    readonly_fields = ("nom_produit_affiche", "sous_total")
 
 
 @admin.register(Commande)
@@ -68,5 +74,12 @@ class CommandeAdmin(admin.ModelAdmin):
 
 @admin.register(LigneCommande)
 class LigneCommandeAdmin(admin.ModelAdmin):
-    list_display = ("commande", "produit", "quantite", "prix_unitaire", "sous_total")
+    list_display = (
+        "commande",
+        "nom_produit_affiche",
+        "quantite",
+        "prix_unitaire",
+        "sous_total",
+    )
     autocomplete_fields = ("commande", "produit")
+    readonly_fields = ("nom_produit_affiche",)

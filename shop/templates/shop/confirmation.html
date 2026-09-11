@@ -35,7 +35,7 @@
             <div class="order-item-info">
               <span class="order-item-icon" aria-hidden="true"><i class="fa-solid fa-box"></i></span>
               <div>
-                <strong>{{ ligne.produit.nom }}</strong>
+                <strong>{{ ligne.nom_produit_affiche }}</strong>
                 <small>{{ ligne.quantite }} × {{ ligne.prix_unitaire|floatformat:2 }} {{ commande.currency }}</small>
               </div>
             </div>

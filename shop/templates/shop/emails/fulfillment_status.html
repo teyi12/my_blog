@@ -35,7 +35,7 @@
           {% if lignes %}
             <div style="font-size:15px;font-weight:700;margin:0 0 12px;">{% translate "Récapitulatif" %}</div>
             <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="margin-bottom:24px;border-top:1px solid #e4e9e4;">
-              {% for ligne in lignes %}<tr><td style="padding:13px 0;border-bottom:1px solid #e4e9e4;font-size:14px;line-height:1.5;">{{ ligne.produit.nom }} <span style="color:#75827b;">× {{ ligne.quantite }}</span></td><td align="right" style="padding:13px 0;border-bottom:1px solid #e4e9e4;font-size:14px;font-weight:700;">{{ ligne.sous_total }} {{ commande.currency }}</td></tr>{% endfor %}
+              {% for ligne in lignes %}<tr><td style="padding:13px 0;border-bottom:1px solid #e4e9e4;font-size:14px;line-height:1.5;">{{ ligne.nom_produit_affiche }} <span style="color:#75827b;">× {{ ligne.quantite }}</span></td><td align="right" style="padding:13px 0;border-bottom:1px solid #e4e9e4;font-size:14px;font-weight:700;">{{ ligne.sous_total }} {{ commande.currency }}</td></tr>{% endfor %}
               <tr><td style="padding:15px 0;font-size:15px;font-weight:700;">{% translate "Total" %}</td><td align="right" style="padding:15px 0;font-size:16px;font-weight:700;color:#173f33;">{{ commande.total }} {{ commande.currency }}</td></tr>
             </table>
           {% endif %}

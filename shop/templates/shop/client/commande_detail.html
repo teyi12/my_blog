@@ -30,11 +30,11 @@
         {% for ligne in commande.lignes.all %}
         <div class="customer-order-line">
           <div class="customer-order-line-product">
-            {% if ligne.produit.image %}<img src="{{ ligne.produit.image.url }}" alt="">{% endif %}
+            {% if ligne.produit and ligne.produit.image %}<img src="{{ ligne.produit.image.url }}" alt="">{% endif %}
             <div>
-              <strong>{{ ligne.produit.nom }}</strong>
+              <strong>{{ ligne.nom_produit_affiche }}</strong>
               <small>{{ ligne.quantite }} × {{ ligne.prix_unitaire }} {{ commande.currency }}</small>
-              {% if ligne.produit.fichier %}
+              {% if ligne.a_fichier_numerique %}
                 {% if commande.payment_status == 'SUCCESS' %}
                   <a class="customer-download-button" href="{% url 'shop:telecharger_fichier_commande' commande.pk ligne.pk %}">
                     <i class="fa-solid fa-download" aria-hidden="true"></i> {% translate "Télécharger le fichier" %}

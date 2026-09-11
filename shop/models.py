@@ -1,8 +1,11 @@
-from django.db import models
-from django.conf import settings
-from django.utils.text import slugify
-from django.utils.translation import gettext_lazy as _
 from decimal import Decimal
+from pathlib import PurePosixPath
+
+from django.conf import settings
+from django.core.exceptions import SuspiciousFileOperation
+from django.db import models
+from django.utils.text import get_valid_filename, slugify
+from django.utils.translation import gettext_lazy as _
 
 
 ORDER_CURRENCY_CHOICES = [
@@ -35,6 +38,26 @@ FULFILLMENT_TRANSITIONS = {
     "DELIVERED": set(),
     "CANCELED": set(),
 }
+
+
+def safe_order_download_filename(storage_name):
+    """Return a path-free attachment name derived from a storage key."""
+    normalized_name = str(storage_name or "").replace("\\", "/")
+    if not normalized_name:
+        return ""
+
+    basename = PurePosixPath(normalized_name).name
+    if not basename:
+        return "fichier-commande"
+    try:
+        return get_valid_filename(basename)
+    except SuspiciousFileOperation:
+        return "fichier-commande"
+
+
+def product_file_storage():
+    """Return the configured product-file storage without requiring a product."""
+    return Produit._meta.get_field("fichier").storage
 
 
 class Categorie(models.Model):
@@ -156,7 +179,12 @@ class LigneCommande(models.Model):
     commande = models.ForeignKey(
         Commande, related_name="lignes", on_delete=models.CASCADE
     )
-    produit = models.ForeignKey(Produit, on_delete=models.CASCADE)
+    produit = models.ForeignKey(
+        Produit,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+    )
     source_cart_item = models.ForeignKey(
         "CartItem",
         on_delete=models.SET_NULL,
@@ -166,17 +194,99 @@ class LigneCommande(models.Model):
     )
     quantite = models.PositiveIntegerField(default=1)
     prix_unitaire = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    nom_produit_snapshot = models.CharField(
+        max_length=255,
+        blank=True,
+        editable=False,
+    )
+    fichier_nom_stockage_snapshot = models.CharField(
+        max_length=500,
+        blank=True,
+        editable=False,
+    )
+    fichier_nom_telechargement_snapshot = models.CharField(
+        max_length=255,
+        blank=True,
+        editable=False,
+    )
+
+    SNAPSHOT_FIELDS = (
+        "nom_produit_snapshot",
+        "fichier_nom_stockage_snapshot",
+        "fichier_nom_telechargement_snapshot",
+    )
+
+    def _preserve_existing_snapshots(self):
+        if self._state.adding or not self.pk:
+            return
+
+        stored_snapshots = (
+            type(self).objects.filter(pk=self.pk).values(*self.SNAPSHOT_FIELDS).first()
+        )
+        if not stored_snapshots:
+            return
+        for field_name, stored_value in stored_snapshots.items():
+            if stored_value:
+                setattr(self, field_name, stored_value)
+
+    def _populate_missing_snapshots(self):
+        if not self.produit_id:
+            return set()
+        try:
+            produit = self.produit
+        except Produit.DoesNotExist:
+            return set()
+
+        changed_fields = set()
+        if not self.nom_produit_snapshot:
+            self.nom_produit_snapshot = produit.nom
+            changed_fields.add("nom_produit_snapshot")
+
+        current_storage_name = produit.fichier.name if produit.fichier else ""
+        if not self.fichier_nom_stockage_snapshot and current_storage_name:
+            self.fichier_nom_stockage_snapshot = current_storage_name
+            changed_fields.add("fichier_nom_stockage_snapshot")
+        if (
+            not self.fichier_nom_telechargement_snapshot
+            and self.fichier_nom_stockage_snapshot
+        ):
+            self.fichier_nom_telechargement_snapshot = safe_order_download_filename(
+                self.fichier_nom_stockage_snapshot
+            )
+            changed_fields.add("fichier_nom_telechargement_snapshot")
+        return changed_fields
 
     def save(self, *args, **kwargs):
+        self._preserve_existing_snapshots()
+        changed_snapshot_fields = self._populate_missing_snapshots()
         if not self.prix_unitaire and self.produit:
             self.prix_unitaire = self.produit.prix
+        if kwargs.get("update_fields") is not None and changed_snapshot_fields:
+            kwargs["update_fields"] = (
+                set(kwargs["update_fields"]) | changed_snapshot_fields
+            )
         super().save(*args, **kwargs)
+
+    @property
+    def nom_produit_affiche(self):
+        if self.nom_produit_snapshot:
+            return self.nom_produit_snapshot
+        if self.produit_id:
+            try:
+                return self.produit.nom
+            except Produit.DoesNotExist:
+                pass
+        return _("Produit indisponible")
+
+    @property
+    def a_fichier_numerique(self):
+        return bool(self.fichier_nom_stockage_snapshot)
 
     def sous_total(self):
         return Decimal(self.quantite) * self.prix_unitaire
 
     def __str__(self):
-        return f"{self.quantite} x {self.produit.nom}"
+        return f"{self.quantite} x {self.nom_produit_affiche}"
 
 
 class Cart(models.Model):

@@ -1,5 +1,4 @@
 import logging
-from pathlib import PurePosixPath
 
 from cloudinary.exceptions import Error as CloudinaryError
 from django.contrib.auth.decorators import login_required
@@ -10,7 +9,7 @@ from django.utils.translation import gettext as _
 from django.views.decorators.http import require_GET
 from requests.exceptions import RequestException
 
-from .models import Commande, LigneCommande
+from .models import Commande, LigneCommande, product_file_storage
 from .shipping import carrier_tracking_url
 
 
@@ -66,18 +65,21 @@ def ma_commande_detail(request, pk):
 def telecharger_fichier_commande(request, order_pk, line_pk):
     """Stream one paid digital purchase without exposing its storage URL."""
     ligne = get_object_or_404(
-        LigneCommande.objects.select_related("commande", "produit").filter(
+        LigneCommande.objects.select_related("commande").filter(
             commande_id=order_pk,
             commande__client=request.user,
         ),
         pk=line_pk,
     )
-    if ligne.commande.payment_status != "SUCCESS" or not ligne.produit.fichier:
+    if (
+        ligne.commande.payment_status != "SUCCESS"
+        or not ligne.fichier_nom_stockage_snapshot
+    ):
         raise Http404
 
-    stored_file = ligne.produit.fichier
+    storage_name = ligne.fichier_nom_stockage_snapshot
     try:
-        file_handle = stored_file.storage.open(stored_file.name, "rb")
+        file_handle = product_file_storage().open(storage_name, "rb")
     except FileNotFoundError as exc:
         logger.warning(
             "operation=customer_order_file_download exception_type=%s "
@@ -103,11 +105,12 @@ def telecharger_fichier_commande(request, order_pk, line_pk):
             status=503,
         )
 
-    filename = PurePosixPath(stored_file.name.replace("\\", "/")).name
     response = FileResponse(
         file_handle,
         as_attachment=True,
-        filename=filename or "fichier-commande",
+        filename=(
+            ligne.fichier_nom_telechargement_snapshot or "fichier-commande"
+        ),
     )
     response["Cache-Control"] = "private, no-store"
     response["X-Content-Type-Options"] = "nosniff"
