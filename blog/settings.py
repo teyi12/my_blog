@@ -80,6 +80,14 @@ EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER", "").strip()
 EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD", "")
 DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL", EMAIL_HOST_USER).strip()
 SITE_BASE_URL = os.getenv("SITE_BASE_URL", "http://127.0.0.1:8800").rstrip("/")
+ORDER_RECEIPT_ISSUER_NAME = os.getenv(
+    "ORDER_RECEIPT_ISSUER_NAME",
+    "Teyilawson",
+).strip() or "Teyilawson"
+ORDER_RECEIPT_ISSUER_CONTACT = os.getenv(
+    "ORDER_RECEIPT_ISSUER_CONTACT",
+    DEFAULT_FROM_EMAIL or SITE_BASE_URL,
+).strip() or DEFAULT_FROM_EMAIL or SITE_BASE_URL
 
 # -----------------------------------------------------------------------------
 # Applications

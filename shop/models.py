@@ -1,5 +1,6 @@
 from decimal import Decimal
 from pathlib import PurePosixPath
+import uuid
 
 from django.conf import settings
 from django.core.exceptions import SuspiciousFileOperation
@@ -309,6 +310,68 @@ class LigneCommande(models.Model):
 
     def __str__(self):
         return f"{self.quantite} x {self.nom_produit_affiche}"
+
+
+class OrderReceipt(models.Model):
+    """Immutable payment-receipt snapshot.
+
+    The save-level guard does not cover QuerySet.update() or bulk_update(),
+    which bypass model save methods in Django.
+    """
+
+    commande = models.OneToOneField(
+        Commande,
+        on_delete=models.CASCADE,
+        related_name="receipt",
+    )
+    public_id = models.UUIDField(default=uuid.uuid4, unique=True, editable=False)
+    issued_at = models.DateTimeField(editable=False)
+    language_code = models.CharField(max_length=10, editable=False)
+    currency = models.CharField(max_length=10, editable=False)
+    total = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        editable=False,
+    )
+    payment_channel = models.CharField(max_length=20, blank=True, editable=False)
+    issuer_name = models.CharField(max_length=255, editable=False)
+    issuer_contact = models.CharField(max_length=255, blank=True, editable=False)
+    customer_name = models.CharField(max_length=301, blank=True, editable=False)
+    customer_email = models.EmailField(editable=False)
+    address_snapshot = models.JSONField(default=dict, editable=False)
+    items_snapshot = models.JSONField(default=list, editable=False)
+
+    IMMUTABLE_FIELDS = (
+        "commande_id",
+        "public_id",
+        "issued_at",
+        "language_code",
+        "currency",
+        "total",
+        "payment_channel",
+        "issuer_name",
+        "issuer_contact",
+        "customer_name",
+        "customer_email",
+        "address_snapshot",
+        "items_snapshot",
+    )
+
+    def save(self, *args, **kwargs):
+        if not self._state.adding and self.pk:
+            stored_values = (
+                type(self)
+                .objects.filter(pk=self.pk)
+                .values(*self.IMMUTABLE_FIELDS)
+                .first()
+            )
+            if stored_values:
+                for field_name, stored_value in stored_values.items():
+                    setattr(self, field_name, stored_value)
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return f"Reçu commande #{self.commande_id}"
 
 
 class Cart(models.Model):

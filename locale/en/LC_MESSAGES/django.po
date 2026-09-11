@@ -3346,3 +3346,59 @@ msgstr "This file is temporarily unavailable. Please try again later."
 #: shop/models.py
 msgid "Produit indisponible"
 msgstr "Product unavailable"
+#: shop/customer_views.py
+msgid ""
+"Le reçu PDF est temporairement indisponible. Veuillez réessayer "
+"ultérieurement."
+msgstr "The PDF receipt is temporarily unavailable. Please try again later."
+
+#: shop/receipts.py
+msgid "Reçu de paiement"
+msgstr "Payment receipt"
+
+#: shop/receipts.py
+msgid "Référence du reçu"
+msgstr "Receipt reference"
+
+#: shop/receipts.py
+msgid "Date d’émission"
+msgstr "Issue date"
+
+#: shop/receipts.py
+msgid "Émetteur"
+msgstr "Issuer"
+
+#: shop/receipts.py
+msgid "Adresse"
+msgstr "Address"
+
+#: shop/receipts.py
+msgid "Canal de paiement"
+msgstr "Payment method"
+
+#: shop/receipts.py
+msgid "Article"
+msgstr "Item"
+
+#: shop/receipts.py
+msgid "Prix unitaire"
+msgstr "Unit price"
+
+#: shop/receipts.py
+msgid "Payé"
+msgstr "Paid"
+
+#: shop/receipts.py
+msgid "Page"
+msgstr "Page"
+
+#: shop/receipts.py
+msgid ""
+"Ce reçu confirme le paiement de la commande. Il ne constitue pas une facture "
+"fiscale."
+msgstr ""
+"This receipt confirms payment for the order. It is not a tax invoice."
+
+#: shop/templates/shop/client/commande_detail.html
+msgid "Télécharger le reçu PDF"
+msgstr "Download PDF receipt"

@@ -17,6 +17,11 @@ urlpatterns = [
         customer_views.telecharger_fichier_commande,
         name="telecharger_fichier_commande",
     ),
+    path(
+        "mes-commandes/<int:order_pk>/recu/<uuid:public_id>/",
+        customer_views.telecharger_recu_commande,
+        name="telecharger_recu_commande",
+    ),
 
     # Gestion des catégories (staff)
     path("categories/", views.categorie_gestion_liste, name="categorie_gestion_liste"),
