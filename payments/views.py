@@ -287,6 +287,7 @@ def _confirm_payment_once(payment_id, raw_response):
     with transaction.atomic():
         commande, payment = _lock_order_then_payment(payment_id)
         if payment.status == "SUCCESS":
+            finalize_paid_order(commande.id)
             return payment
         if payment.status != "PROCESSING":
             raise PaymentChannelConflict

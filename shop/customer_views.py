@@ -9,7 +9,8 @@ from django.utils.translation import gettext as _
 from django.views.decorators.http import require_GET
 from requests.exceptions import RequestException
 
-from .models import Commande, LigneCommande, product_file_storage
+from .models import Commande, LigneCommande, OrderReceipt, product_file_storage
+from .receipts import OrderReceiptPDFError, render_order_receipt_pdf
 from .shipping import carrier_tracking_url
 
 
@@ -45,16 +46,21 @@ def mes_commandes(request):
 def ma_commande_detail(request, pk):
     commande = get_object_or_404(
         _customer_orders(request.user)
-        .select_related("adresse")
+        .select_related("adresse", "receipt")
         .prefetch_related("lignes__produit", "payments"),
         pk=pk,
     )
+    try:
+        receipt = commande.receipt
+    except OrderReceipt.DoesNotExist:
+        receipt = None
     return render(
         request,
         "shop/client/commande_detail.html",
         {
             "commande": commande,
             "paiements": commande.payments.order_by("-created_at"),
+            "receipt": receipt,
             "tracking_url": carrier_tracking_url(commande.carrier, commande.tracking_number),
         },
     )
@@ -114,4 +120,41 @@ def telecharger_fichier_commande(request, order_pk, line_pk):
     )
     response["Cache-Control"] = "private, no-store"
     response["X-Content-Type-Options"] = "nosniff"
+    return response
+
+
+@login_required
+@require_GET
+def telecharger_recu_commande(request, order_pk, public_id):
+    receipt = get_object_or_404(
+        OrderReceipt.objects.select_related("commande").filter(
+            commande_id=order_pk,
+            commande__client=request.user,
+            commande__payment_status="SUCCESS",
+        ),
+        public_id=public_id,
+    )
+    try:
+        pdf_bytes = render_order_receipt_pdf(receipt)
+    except OrderReceiptPDFError as exc:
+        logger.error(
+            "operation=customer_order_receipt_pdf exception_type=%s order_id=%s",
+            type(exc).__name__,
+            receipt.commande_id,
+        )
+        return HttpResponse(
+            _(
+                "Le reçu PDF est temporairement indisponible. "
+                "Veuillez réessayer ultérieurement."
+            ),
+            status=503,
+        )
+
+    response = HttpResponse(pdf_bytes, content_type="application/pdf")
+    response["Content-Disposition"] = (
+        f'attachment; filename="recu-commande-{receipt.commande_id}.pdf"'
+    )
+    response["Cache-Control"] = "private, no-store"
+    response["X-Content-Type-Options"] = "nosniff"
+    response["Content-Security-Policy"] = "default-src 'none'; sandbox"
     return response

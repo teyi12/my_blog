@@ -6,6 +6,7 @@ from django.db.models import F
 from django.utils import timezone
 
 from .models import Cart, CartItem, Commande
+from .receipts import ensure_order_receipt
 
 
 class SQLiteLockRetryExhausted(Exception):
@@ -60,6 +61,10 @@ def _finalize_paid_order_once(order_id):
             if commande.payment_status == "SUCCESS" and commande.fulfillment_status == "WAITING_PAYMENT":
                 commande.fulfillment_status = "TO_PREPARE"
                 commande.save(update_fields=["fulfillment_status"])
+            ensure_order_receipt(
+                commande,
+                issued_at=commande.cart_finalized_at or commande.date_commande,
+            )
             return commande
 
         if commande.source_cart_id:
@@ -96,6 +101,7 @@ def _finalize_paid_order_once(order_id):
         commande.save(
             update_fields=["payment_status", "fulfillment_status", "cart_finalized_at"]
         )
+        ensure_order_receipt(commande, issued_at=commande.cart_finalized_at)
         return commande
 
 

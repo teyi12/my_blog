@@ -23,6 +23,12 @@
     </div>
   </header>
 
+  {% if receipt and commande.payment_status == 'SUCCESS' %}
+    <a class="customer-download-button" href="{% url 'shop:telecharger_recu_commande' commande.pk receipt.public_id %}">
+      <i class="fa-solid fa-file-pdf" aria-hidden="true"></i> {% translate "Télécharger le reçu PDF" %}
+    </a>
+  {% endif %}
+
   <div class="customer-order-detail-grid">
     <div class="customer-order-detail-main">
       <section class="customer-order-panel">

@@ -3403,3 +3403,62 @@ msgstr "Diese Datei ist vorübergehend nicht verfügbar. Bitte versuchen Sie es 
 #: shop/models.py
 msgid "Produit indisponible"
 msgstr "Produkt nicht verfügbar"
+#: shop/customer_views.py
+msgid ""
+"Le reçu PDF est temporairement indisponible. Veuillez réessayer "
+"ultérieurement."
+msgstr ""
+"Der PDF-Beleg ist vorübergehend nicht verfügbar. Bitte versuchen Sie es "
+"später erneut."
+
+#: shop/receipts.py
+msgid "Reçu de paiement"
+msgstr "Zahlungsbeleg"
+
+#: shop/receipts.py
+msgid "Référence du reçu"
+msgstr "Belegreferenz"
+
+#: shop/receipts.py
+msgid "Date d’émission"
+msgstr "Ausstellungsdatum"
+
+#: shop/receipts.py
+msgid "Émetteur"
+msgstr "Aussteller"
+
+#: shop/receipts.py
+msgid "Adresse"
+msgstr "Adresse"
+
+#: shop/receipts.py
+msgid "Canal de paiement"
+msgstr "Zahlungsart"
+
+#: shop/receipts.py
+msgid "Article"
+msgstr "Artikel"
+
+#: shop/receipts.py
+msgid "Prix unitaire"
+msgstr "Stückpreis"
+
+#: shop/receipts.py
+msgid "Payé"
+msgstr "Bezahlt"
+
+#: shop/receipts.py
+msgid "Page"
+msgstr "Seite"
+
+#: shop/receipts.py
+msgid ""
+"Ce reçu confirme le paiement de la commande. Il ne constitue pas une facture "
+"fiscale."
+msgstr ""
+"Dieser Beleg bestätigt die Zahlung der Bestellung. Er ist keine "
+"Steuerrechnung."
+
+#: shop/templates/shop/client/commande_detail.html
+msgid "Télécharger le reçu PDF"
+msgstr "PDF-Beleg herunterladen"

@@ -23,7 +23,14 @@ from payments.views import (
     _minor_amount,
     _reserve_payment,
 )
-from shop.models import Cart, CartItem, Commande, LigneCommande, Produit
+from shop.models import (
+    Cart,
+    CartItem,
+    Commande,
+    LigneCommande,
+    OrderReceipt,
+    Produit,
+)
 
 
 class OrderPaymentSecurityTests(TestCase):
@@ -472,6 +479,10 @@ class OrderPaymentSecurityTests(TestCase):
         self.order.refresh_from_db()
         self.assertEqual(payment.status, "SUCCESS")
         self.assertEqual(self.order.payment_status, "SUCCESS")
+        self.assertEqual(
+            OrderReceipt.objects.filter(commande=self.order).count(),
+            1,
+        )
         self.assertFalse(CartItem.objects.filter(pk=self.item.pk).exists())
 
     def test_stripe_webhook_rejects_wrong_amount_currency_status_or_session(self):
@@ -543,6 +554,10 @@ class OrderPaymentSecurityTests(TestCase):
         self.order.refresh_from_db()
         self.assertEqual(payment.status, "SUCCESS")
         self.assertEqual(self.order.payment_status, "SUCCESS")
+        self.assertEqual(
+            OrderReceipt.objects.filter(commande=self.order).count(),
+            1,
+        )
 
     def test_cinetpay_callback_rejects_old_reference_or_wrong_amount(self):
         Payment.objects.create(
