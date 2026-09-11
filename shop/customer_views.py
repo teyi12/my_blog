@@ -1,19 +1,22 @@
 import logging
 from pathlib import PurePosixPath
 
+from cloudinary.exceptions import Error as CloudinaryError
 from django.contrib.auth.decorators import login_required
-from django.contrib import messages
 from django.core.paginator import Paginator
-from django.http import FileResponse, Http404
-from django.shortcuts import get_object_or_404, redirect, render
+from django.http import FileResponse, Http404, HttpResponse
+from django.shortcuts import get_object_or_404, render
 from django.utils.translation import gettext as _
 from django.views.decorators.http import require_GET
+from requests.exceptions import RequestException
 
 from .models import Commande, LigneCommande
 from .shipping import carrier_tracking_url
 
 
 logger = logging.getLogger(__name__)
+
+DOWNLOAD_STORAGE_EXCEPTIONS = (CloudinaryError, RequestException, OSError)
 
 
 def _customer_orders(user):
@@ -75,22 +78,30 @@ def telecharger_fichier_commande(request, order_pk, line_pk):
     stored_file = ligne.produit.fichier
     try:
         file_handle = stored_file.storage.open(stored_file.name, "rb")
-    except OSError as exc:
+    except FileNotFoundError as exc:
         logger.warning(
-            "Customer digital download storage failure order_id=%s line_id=%s "
-            "exception_type=%s",
+            "operation=customer_order_file_download exception_type=%s "
+            "order_id=%s line_id=%s",
+            type(exc).__name__,
             ligne.commande_id,
             ligne.pk,
-            type(exc).__name__,
         )
-        messages.error(
-            request,
+        raise Http404 from None
+    except DOWNLOAD_STORAGE_EXCEPTIONS as exc:
+        logger.warning(
+            "operation=customer_order_file_download exception_type=%s "
+            "order_id=%s line_id=%s",
+            type(exc).__name__,
+            ligne.commande_id,
+            ligne.pk,
+        )
+        return HttpResponse(
             _(
                 "Ce fichier est temporairement indisponible. "
                 "Veuillez réessayer ultérieurement."
             ),
+            status=503,
         )
-        return redirect("shop:ma_commande_detail", pk=ligne.commande_id)
 
     filename = PurePosixPath(stored_file.name.replace("\\", "/")).name
     response = FileResponse(

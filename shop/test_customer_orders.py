@@ -2,11 +2,13 @@ from io import BytesIO
 from decimal import Decimal
 from unittest.mock import patch
 
+from cloudinary.exceptions import Error as CloudinaryError
 from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.urls import reverse
 from django.utils import translation
 from django.utils import timezone
+from requests.exceptions import RequestException
 
 from shop.models import Commande, LigneCommande, Produit
 
@@ -257,31 +259,82 @@ class CustomerOrderHistoryTests(TestCase):
 
         self.assertEqual(response.status_code, 404)
 
-    def test_storage_failure_is_controlled_and_logs_no_provider_message(self):
+    def test_missing_storage_file_returns_404(self):
         self.client.force_login(self.customer)
         download_url = reverse(
             "shop:telecharger_fichier_commande",
             args=[self.order.pk, self.digital_line.pk],
         )
-        provider_detail = "cloud provider private response and credentials"
+        missing_path = "/private/customer/files/missing-guide.pdf"
 
         with self.assertLogs("shop.customer_views", level="WARNING") as logs:
             with patch.object(
                 self.digital_product.fichier.storage,
                 "open",
-                side_effect=OSError(provider_detail),
+                side_effect=FileNotFoundError(missing_path),
             ):
-                response = self.client.get(download_url, follow=True)
+                response = self.client.get(download_url)
 
-        self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "temporairement indisponible")
-        log_output = "\n".join(logs.output)
-        self.assertIn("exception_type=OSError", log_output)
-        self.assertNotIn(provider_detail, log_output)
-        self.assertNotIn(self.digital_product.fichier.name, log_output)
-        self.assertNotIn(self.customer.email, log_output)
+        self.assertEqual(response.status_code, 404)
+        self.assertEqual(
+            logs.output,
+            [
+                "WARNING:shop.customer_views:"
+                "operation=customer_order_file_download "
+                "exception_type=FileNotFoundError "
+                f"order_id={self.order.pk} line_id={self.digital_line.pk}"
+            ],
+        )
+        self.assertNotContains(response, missing_path, status_code=404)
 
-    def test_non_storage_exception_is_not_hidden(self):
+    def test_storage_failures_return_translated_503_and_log_only_safe_fields(self):
+        self.client.force_login(self.customer)
+        sensitive_detail = (
+            "provider-secret=CLOUDINARY_API_SECRET "
+            "/private/customer/file customer@example.com 203.0.113.42"
+        )
+
+        for exception, exception_type in (
+            (CloudinaryError(sensitive_detail), "Error"),
+            (RequestException(sensitive_detail), "RequestException"),
+            (OSError(sensitive_detail), "OSError"),
+        ):
+            with self.subTest(exception_type=exception_type):
+                with translation.override("en"):
+                    download_url = reverse(
+                        "shop:telecharger_fichier_commande",
+                        args=[self.order.pk, self.digital_line.pk],
+                    )
+                    with self.assertLogs(
+                        "shop.customer_views", level="WARNING"
+                    ) as logs:
+                        with patch.object(
+                            self.digital_product.fichier.storage,
+                            "open",
+                            side_effect=exception,
+                        ):
+                            response = self.client.get(
+                                download_url,
+                                REMOTE_ADDR="203.0.113.42",
+                            )
+
+                self.assertEqual(response.status_code, 503)
+                self.assertContains(
+                    response,
+                    "This file is temporarily unavailable. Please try again later.",
+                    status_code=503,
+                )
+                self.assertEqual(
+                    logs.output,
+                    [
+                        "WARNING:shop.customer_views:"
+                        "operation=customer_order_file_download "
+                        f"exception_type={exception_type} "
+                        f"order_id={self.order.pk} line_id={self.digital_line.pk}"
+                    ],
+                )
+
+    def test_runtime_error_is_not_hidden(self):
         self.client.force_login(self.customer)
         download_url = reverse(
             "shop:telecharger_fichier_commande",
