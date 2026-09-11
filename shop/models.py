@@ -60,6 +60,24 @@ def product_file_storage():
     return Produit._meta.get_field("fichier").storage
 
 
+def order_product_snapshot_name(product, language_code):
+    """Choose a deterministic product name for an order language."""
+    language_fields = {
+        "fr": "nom_fr",
+        "de": "nom_de",
+        "en": "nom_en",
+    }
+    requested_language = (
+        language_code if language_code in language_fields else "fr"
+    )
+    fallback_languages = (requested_language, "fr", "de", "en")
+    for candidate_language in dict.fromkeys(fallback_languages):
+        value = getattr(product, language_fields[candidate_language], "") or ""
+        if value.strip():
+            return value
+    return "Produit indisponible"
+
+
 class Categorie(models.Model):
     nom = models.CharField(max_length=100)
     slug = models.SlugField(unique=True, blank=True)
@@ -216,7 +234,7 @@ class LigneCommande(models.Model):
         "fichier_nom_telechargement_snapshot",
     )
 
-    def _preserve_existing_snapshots(self):
+    def _restore_existing_snapshots(self):
         if self._state.adding or not self.pk:
             return
 
@@ -226,10 +244,11 @@ class LigneCommande(models.Model):
         if not stored_snapshots:
             return
         for field_name, stored_value in stored_snapshots.items():
-            if stored_value:
-                setattr(self, field_name, stored_value)
+            setattr(self, field_name, stored_value)
 
-    def _populate_missing_snapshots(self):
+    def _populate_initial_snapshots(self):
+        if not self._state.adding:
+            return set()
         if not self.produit_id:
             return set()
         try:
@@ -239,7 +258,10 @@ class LigneCommande(models.Model):
 
         changed_fields = set()
         if not self.nom_produit_snapshot:
-            self.nom_produit_snapshot = produit.nom
+            self.nom_produit_snapshot = order_product_snapshot_name(
+                produit,
+                self.commande.language_code,
+            )
             changed_fields.add("nom_produit_snapshot")
 
         current_storage_name = produit.fichier.name if produit.fichier else ""
@@ -257,8 +279,8 @@ class LigneCommande(models.Model):
         return changed_fields
 
     def save(self, *args, **kwargs):
-        self._preserve_existing_snapshots()
-        changed_snapshot_fields = self._populate_missing_snapshots()
+        self._restore_existing_snapshots()
+        changed_snapshot_fields = self._populate_initial_snapshots()
         if not self.prix_unitaire and self.produit:
             self.prix_unitaire = self.produit.prix
         if kwargs.get("update_fields") is not None and changed_snapshot_fields:

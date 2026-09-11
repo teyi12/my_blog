@@ -5,6 +5,7 @@ from unittest.mock import patch
 from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.urls import reverse
+from django.utils import translation
 
 from shop.models import (
     Commande,
@@ -76,6 +77,103 @@ class OrderLineSnapshotTests(TestCase):
             "guide-original.pdf",
         )
         self.assertEqual(self.line.quantite, 2)
+
+    def test_normal_creation_uses_order_language_not_active_language(self):
+        localized_product = Produit.objects.create(
+            nom_fr="Manuel français",
+            nom_de="Deutsches Handbuch",
+            nom_en="English handbook",
+            slug="manuel-multilingue-snapshot",
+            prix=Decimal("8.00"),
+        )
+        cases = (
+            ("de", "fr", "Deutsches Handbuch"),
+            ("en", "de", "English handbook"),
+        )
+
+        for order_language, active_language, expected_name in cases:
+            with self.subTest(order_language=order_language):
+                order = Commande.objects.create(
+                    client=self.customer,
+                    total=Decimal("8.00"),
+                    language_code=order_language,
+                )
+                with translation.override(active_language):
+                    line = LigneCommande.objects.create(
+                        commande=order,
+                        produit=localized_product,
+                        quantite=1,
+                        prix_unitaire=Decimal("8.00"),
+                    )
+
+                self.assertEqual(line.nom_produit_snapshot, expected_name)
+
+        fallback_product = Produit.objects.create(
+            nom_fr="Nom français de repli",
+            nom_de="",
+            nom_en="",
+            slug="nom-snapshot-repli",
+            prix=Decimal("4.00"),
+        )
+        fallback_order = Commande.objects.create(
+            client=self.customer,
+            total=Decimal("4.00"),
+            language_code="de",
+        )
+        with translation.override("en"):
+            fallback_line = LigneCommande.objects.create(
+                commande=fallback_order,
+                produit=fallback_product,
+                quantite=1,
+                prix_unitaire=Decimal("4.00"),
+            )
+        self.assertEqual(
+            fallback_line.nom_produit_snapshot,
+            "Nom français de repli",
+        )
+
+    def test_empty_file_snapshots_stay_empty_after_product_gains_file(self):
+        physical_product = Produit.objects.create(
+            nom="Livre physique",
+            slug="livre-physique-snapshot-vide",
+            prix=Decimal("12.00"),
+        )
+        physical_line = LigneCommande.objects.create(
+            commande=self.order,
+            produit=physical_product,
+            quantite=1,
+            prix_unitaire=Decimal("12.00"),
+        )
+        self.assertEqual(physical_line.fichier_nom_stockage_snapshot, "")
+        self.assertEqual(
+            physical_line.fichier_nom_telechargement_snapshot,
+            "",
+        )
+
+        physical_product.fichier = "produits/fichiers/ajoute-plus-tard.pdf"
+        physical_product.save(update_fields=["fichier"])
+        physical_line.fichier_nom_stockage_snapshot = physical_product.fichier.name
+        physical_line.fichier_nom_telechargement_snapshot = "ajoute-plus-tard.pdf"
+        physical_line.quantite = 2
+        physical_line.save()
+        physical_line.refresh_from_db()
+
+        self.assertEqual(physical_line.fichier_nom_stockage_snapshot, "")
+        self.assertEqual(
+            physical_line.fichier_nom_telechargement_snapshot,
+            "",
+        )
+        self.assertEqual(physical_line.quantite, 2)
+        self.client.force_login(self.customer)
+        with patch.object(product_file_storage(), "open") as storage_open:
+            response = self.client.get(
+                reverse(
+                    "shop:telecharger_fichier_commande",
+                    args=[self.order.pk, physical_line.pk],
+                )
+            )
+        self.assertEqual(response.status_code, 404)
+        storage_open.assert_not_called()
 
     def test_historical_pages_use_snapshot_and_survive_product_deletion(self):
         original_file_url = self.product.fichier.url

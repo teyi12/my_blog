@@ -25,6 +25,7 @@ from .models import (
     Commande,
     LigneCommande,
     Produit,
+    order_product_snapshot_name,
     safe_order_download_filename,
 )
 from payments.models import Adresse
@@ -447,7 +448,10 @@ class CheckoutView(LoginRequiredMixin, View):
                                 source_cart_item=item,
                                 quantite=item.quantite,
                                 prix_unitaire=item.produit.prix,
-                                nom_produit_snapshot=item.produit.nom,
+                                nom_produit_snapshot=order_product_snapshot_name(
+                                    item.produit,
+                                    commande.language_code,
+                                ),
                                 fichier_nom_stockage_snapshot=storage_name,
                                 fichier_nom_telechargement_snapshot=(
                                     safe_order_download_filename(storage_name)

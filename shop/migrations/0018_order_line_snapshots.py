@@ -29,21 +29,38 @@ def safe_download_filename(storage_name):
         return "fichier-commande"
 
 
+def order_product_snapshot_name(product, language_code):
+    language_fields = {
+        "fr": "nom_fr",
+        "de": "nom_de",
+        "en": "nom_en",
+    }
+    requested_language = (
+        language_code if language_code in language_fields else "fr"
+    )
+    fallback_languages = (requested_language, "fr", "de", "en")
+    for candidate_language in dict.fromkeys(fallback_languages):
+        value = getattr(product, language_fields[candidate_language], "") or ""
+        if value.strip():
+            return value
+    return "Produit indisponible"
+
+
 def backfill_order_line_snapshots(apps, schema_editor):
     database = schema_editor.connection.alias
     LigneCommande = apps.get_model("shop", "LigneCommande")
     lines = LigneCommande.objects.using(database).filter(produit__isnull=False)
 
     batch = []
-    for line in lines.select_related("produit").iterator(chunk_size=500):
+    historical_lines = lines.select_related("commande", "produit").iterator(
+        chunk_size=500
+    )
+    for line in historical_lines:
         product = line.produit
         storage_name = product.fichier.name if product.fichier else ""
-        line.nom_produit_snapshot = (
-            product.nom
-            or product.nom_fr
-            or product.nom_de
-            or product.nom_en
-            or ""
+        line.nom_produit_snapshot = order_product_snapshot_name(
+            product,
+            line.commande.language_code,
         )
         line.fichier_nom_stockage_snapshot = storage_name
         line.fichier_nom_telechargement_snapshot = safe_download_filename(

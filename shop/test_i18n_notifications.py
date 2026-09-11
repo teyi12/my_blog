@@ -48,13 +48,12 @@ class FulfillmentNotificationI18nTests(TestCase):
             tracking_number=f"TRACK-{language}",
             language_code=language,
         )
-        with translation.override(language):
-            LigneCommande.objects.create(
-                commande=order,
-                produit=self.product,
-                quantite=1,
-                prix_unitaire=self.product.prix,
-            )
+        LigneCommande.objects.create(
+            commande=order,
+            produit=self.product,
+            quantite=1,
+            prix_unitaire=self.product.prix,
+        )
         return order
 
     def setUp(self):
