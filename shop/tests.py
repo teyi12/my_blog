@@ -28,6 +28,7 @@ class CheckoutFlowTests(TestCase):
             nom="Produit initial",
             slug="produit-initial",
             prix=Decimal("12.50"),
+            fichier="produits/fichiers/produit-initial.pdf",
         )
         self.new_product = Produit.objects.create(
             nom="Nouveau produit",
@@ -78,6 +79,15 @@ class CheckoutFlowTests(TestCase):
         self.assertEqual(line.source_cart_item, self.cart_item)
         self.assertEqual(line.quantite, 2)
         self.assertEqual(line.prix_unitaire, Decimal("12.50"))
+        self.assertEqual(line.nom_produit_snapshot, "Produit initial")
+        self.assertEqual(
+            line.fichier_nom_stockage_snapshot,
+            "produits/fichiers/produit-initial.pdf",
+        )
+        self.assertEqual(
+            line.fichier_nom_telechargement_snapshot,
+            "produit-initial.pdf",
+        )
 
     @override_settings(DEFAULT_CURRENCY="XOF")
     def test_checkout_uses_order_model_currency_as_single_source_of_truth(self):

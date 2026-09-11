@@ -143,6 +143,14 @@ class CheckoutI18nPagesTests(TestCase):
                 )
                 order = Commande.objects.get(checkout_token=token)
                 self.assertEqual(order.language_code, language)
+                self.assertEqual(
+                    order.lignes.get(produit=self.product).nom_produit_snapshot,
+                    {
+                        "fr": "Produit français",
+                        "de": "Deutsches Produkt",
+                        "en": "English product",
+                    }[language],
+                )
                 expected_prefix = "" if language == "fr" else f"/{language}"
                 self.assertRedirects(
                     response,
@@ -173,8 +181,7 @@ class CheckoutI18nPagesTests(TestCase):
                 payment_status = {"fr": "Payée", "de": "Bezahlt", "en": "Paid"}[language]
                 self.assertContains(history, payment_status)
                 self.assertContains(detail, texts[2])
-                translated_name = {"fr": "Produit français", "de": "Deutsches Produkt", "en": "English product"}[language]
-                self.assertContains(detail, translated_name)
+                self.assertContains(detail, "Produit français")
 
     def test_status_choices_and_shipping_forms_follow_active_language(self):
         order = self._order()
@@ -257,5 +264,4 @@ class StaffOrderI18nPagesTests(TestCase):
                 self.assertContains(listing, expected[0])
                 self.assertContains(detail, expected[1])
                 self.assertContains(shipping, expected[2])
-                product_name = {"fr": "Produit staff", "de": "Staff-Produkt", "en": "Staff product"}[language]
-                self.assertContains(detail, product_name)
+                self.assertContains(detail, "Produit staff")

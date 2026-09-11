@@ -3399,3 +3399,7 @@ msgstr "Nach Bestätigung der Zahlung verfügbar."
 #: shop/customer_views.py
 msgid "Ce fichier est temporairement indisponible. Veuillez réessayer ultérieurement."
 msgstr "Diese Datei ist vorübergehend nicht verfügbar. Bitte versuchen Sie es später erneut."
+
+#: shop/models.py
+msgid "Produit indisponible"
+msgstr "Produkt nicht verfügbar"

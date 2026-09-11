@@ -38,8 +38,8 @@
         <div class="customer-order-products">
           {% for ligne in commande.lignes.all|slice:':3' %}
             <div class="customer-order-product">
-              {% if ligne.produit.image %}<img src="{{ ligne.produit.image.url }}" alt="">{% endif %}
-              <span>{{ ligne.quantite }} × {{ ligne.produit.nom }}</span>
+              {% if ligne.produit and ligne.produit.image %}<img src="{{ ligne.produit.image.url }}" alt="">{% endif %}
+              <span>{{ ligne.quantite }} × {{ ligne.nom_produit_affiche }}</span>
             </div>
           {% endfor %}
           {% if commande.lignes.count > 3 %}<small>{% blocktranslate count extra=commande.lignes.count|add:'-3' %}+ {{ extra }} autre article{% plural %}+ {{ extra }} autres articles{% endblocktranslate %}</small>{% endif %}
