@@ -3387,3 +3387,15 @@ msgstr "Das Stripe-Verwaltungsportal ist vorübergehend nicht verfügbar. Bitte 
 #: payments/templates/payments/_subscription_self_service.html
 msgid "Votre annulation est programmée. La date de fin sera affichée après synchronisation avec Stripe."
 msgstr "Ihre Kündigung ist vorgemerkt. Das Enddatum wird nach der Synchronisierung mit Stripe angezeigt."
+
+#: shop/templates/shop/client/commande_detail.html
+msgid "Télécharger le fichier"
+msgstr "Datei herunterladen"
+
+#: shop/templates/shop/client/commande_detail.html
+msgid "Disponible après confirmation du paiement."
+msgstr "Nach Bestätigung der Zahlung verfügbar."
+
+#: shop/customer_views.py
+msgid "Ce fichier est temporairement indisponible. Veuillez réessayer ultérieurement."
+msgstr "Diese Datei ist vorübergehend nicht verfügbar. Bitte versuchen Sie es später erneut."

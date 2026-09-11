@@ -1,17 +1,33 @@
-from django.contrib.auth.decorators import login_required
-from django.core.paginator import Paginator
-from django.shortcuts import get_object_or_404, render
+import logging
+from pathlib import PurePosixPath
 
-from .models import Commande
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+from django.core.paginator import Paginator
+from django.http import FileResponse, Http404
+from django.shortcuts import get_object_or_404, redirect, render
+from django.utils.translation import gettext as _
+from django.views.decorators.http import require_GET
+
+from .models import Commande, LigneCommande
 from .shipping import carrier_tracking_url
 
 
+logger = logging.getLogger(__name__)
+
+
+def _customer_orders(user):
+    """Return orders owned by the authenticated customer only."""
+    return Commande.objects.filter(client=user)
+
+
 @login_required
+@require_GET
 def mes_commandes(request):
     commandes = (
-        Commande.objects.filter(client=request.user)
+        _customer_orders(request.user)
         .prefetch_related("lignes__produit")
-        .order_by("-date_commande")
+        .order_by("-date_commande", "-pk")
     )
     paginator = Paginator(commandes, 10)
     page_obj = paginator.get_page(request.GET.get("page"))
@@ -23,9 +39,10 @@ def mes_commandes(request):
 
 
 @login_required
+@require_GET
 def ma_commande_detail(request, pk):
     commande = get_object_or_404(
-        Commande.objects.filter(client=request.user)
+        _customer_orders(request.user)
         .select_related("adresse")
         .prefetch_related("lignes__produit", "payments"),
         pk=pk,
@@ -39,3 +56,48 @@ def ma_commande_detail(request, pk):
             "tracking_url": carrier_tracking_url(commande.carrier, commande.tracking_number),
         },
     )
+
+
+@login_required
+@require_GET
+def telecharger_fichier_commande(request, order_pk, line_pk):
+    """Stream one paid digital purchase without exposing its storage URL."""
+    ligne = get_object_or_404(
+        LigneCommande.objects.select_related("commande", "produit").filter(
+            commande_id=order_pk,
+            commande__client=request.user,
+        ),
+        pk=line_pk,
+    )
+    if ligne.commande.payment_status != "SUCCESS" or not ligne.produit.fichier:
+        raise Http404
+
+    stored_file = ligne.produit.fichier
+    try:
+        file_handle = stored_file.storage.open(stored_file.name, "rb")
+    except OSError as exc:
+        logger.warning(
+            "Customer digital download storage failure order_id=%s line_id=%s "
+            "exception_type=%s",
+            ligne.commande_id,
+            ligne.pk,
+            type(exc).__name__,
+        )
+        messages.error(
+            request,
+            _(
+                "Ce fichier est temporairement indisponible. "
+                "Veuillez réessayer ultérieurement."
+            ),
+        )
+        return redirect("shop:ma_commande_detail", pk=ligne.commande_id)
+
+    filename = PurePosixPath(stored_file.name.replace("\\", "/")).name
+    response = FileResponse(
+        file_handle,
+        as_attachment=True,
+        filename=filename or "fichier-commande",
+    )
+    response["Cache-Control"] = "private, no-store"
+    response["X-Content-Type-Options"] = "nosniff"
+    return response

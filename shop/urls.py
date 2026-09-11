@@ -12,6 +12,11 @@ urlpatterns = [
     # Espace client
     path("mes-commandes/", customer_views.mes_commandes, name="mes_commandes"),
     path("mes-commandes/<int:pk>/", customer_views.ma_commande_detail, name="ma_commande_detail"),
+    path(
+        "mes-commandes/<int:order_pk>/lignes/<int:line_pk>/telecharger/",
+        customer_views.telecharger_fichier_commande,
+        name="telecharger_fichier_commande",
+    ),
 
     # Gestion des catégories (staff)
     path("categories/", views.categorie_gestion_liste, name="categorie_gestion_liste"),
