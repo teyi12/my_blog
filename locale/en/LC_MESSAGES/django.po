@@ -3330,3 +3330,15 @@ msgstr "The Stripe management portal is temporarily unavailable. Please try agai
 #: payments/templates/payments/_subscription_self_service.html
 msgid "Votre annulation est programmée. La date de fin sera affichée après synchronisation avec Stripe."
 msgstr "Your cancellation is scheduled. The end date will be shown after synchronization with Stripe."
+
+#: shop/templates/shop/client/commande_detail.html
+msgid "Télécharger le fichier"
+msgstr "Download file"
+
+#: shop/templates/shop/client/commande_detail.html
+msgid "Disponible après confirmation du paiement."
+msgstr "Available after payment confirmation."
+
+#: shop/customer_views.py
+msgid "Ce fichier est temporairement indisponible. Veuillez réessayer ultérieurement."
+msgstr "This file is temporarily unavailable. Please try again later."

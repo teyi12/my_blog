@@ -31,7 +31,19 @@
         <div class="customer-order-line">
           <div class="customer-order-line-product">
             {% if ligne.produit.image %}<img src="{{ ligne.produit.image.url }}" alt="">{% endif %}
-            <div><strong>{{ ligne.produit.nom }}</strong><small>{{ ligne.quantite }} × {{ ligne.prix_unitaire }} {{ commande.currency }}</small></div>
+            <div>
+              <strong>{{ ligne.produit.nom }}</strong>
+              <small>{{ ligne.quantite }} × {{ ligne.prix_unitaire }} {{ commande.currency }}</small>
+              {% if ligne.produit.fichier %}
+                {% if commande.payment_status == 'SUCCESS' %}
+                  <a class="customer-download-button" href="{% url 'shop:telecharger_fichier_commande' commande.pk ligne.pk %}">
+                    <i class="fa-solid fa-download" aria-hidden="true"></i> {% translate "Télécharger le fichier" %}
+                  </a>
+                {% else %}
+                  <small class="customer-download-pending"><i class="fa-solid fa-lock" aria-hidden="true"></i> {% translate "Disponible après confirmation du paiement." %}</small>
+                {% endif %}
+              {% endif %}
+            </div>
           </div>
           <strong>{{ ligne.sous_total }} {{ commande.currency }}</strong>
         </div>
