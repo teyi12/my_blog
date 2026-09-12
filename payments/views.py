@@ -20,6 +20,12 @@ from django.utils.translation import gettext as _
 from django.views.decorators.http import require_POST
 
 from shop.models import Commande, LigneCommande
+from shop.inventory import (
+    StockUnavailable,
+    release_order_stock,
+    reserve_order_stock,
+    stock_reservation_timeout_seconds,
+)
 from shop.services import (
     SQLiteLockRetryExhausted,
     execute_with_sqlite_lock_retry,
@@ -142,8 +148,7 @@ def _payment_amount_error_response(request, order_id, exc):
 
 
 def _payment_timeout_seconds():
-    configured = int(getattr(settings, "PAYMENT_PROCESSING_TIMEOUT_SECONDS", 3600))
-    return min(max(configured, 1800), 86400)
+    return stock_reservation_timeout_seconds()
 
 
 def _processing_expiration_cutoff():
@@ -197,12 +202,14 @@ def _reserve_payment(request, order_id, channel):
                 if active.updated_at > _processing_expiration_cutoff():
                     if active.channel != channel:
                         raise PaymentChannelConflict
+                    reserve_order_stock(commande.id)
                     return commande, active
 
                 raise PaymentResolutionRequired(active.id)
             if commande.payment_status == "PROCESSING":
                 raise PaymentChannelConflict
 
+            reserve_order_stock(commande.id)
             local_reference = f"pending_{uuid.uuid4().hex}"
             payment = Payment.objects.create(
                 commande=commande,
@@ -241,6 +248,7 @@ def _reserve_payment(request, order_id, channel):
                 raise
             if active.channel != channel:
                 raise PaymentChannelConflict
+            reserve_order_stock(active.commande_id)
             return active.commande, active
     raise PaymentChannelConflict
 
@@ -304,10 +312,12 @@ def _fail_payment_once(payment_id, raw_response):
         if payment.status == "SUCCESS":
             return payment
         if payment.status in ("FAILED", "CANCELED"):
+            release_order_stock(commande.id)
             return payment
         payment.status = "FAILED"
         payment.raw_response = raw_response
         payment.save(update_fields=["status", "raw_response", "updated_at"])
+        release_order_stock(commande.id)
         if (
             commande.payment_status == "PROCESSING"
             and commande.transaction_id == payment.transaction_id
@@ -330,6 +340,7 @@ def _cancel_payment_once(payment_id, raw_response):
         if payment.status == "SUCCESS":
             return "SUCCESS"
         if payment.status in ("FAILED", "CANCELED"):
+            release_order_stock(commande.id)
             return "TERMINAL"
         if payment.status != "PROCESSING":
             return "ACTIVE"
@@ -337,6 +348,7 @@ def _cancel_payment_once(payment_id, raw_response):
         payment.status = "CANCELED"
         payment.raw_response = raw_response
         payment.save(update_fields=["status", "raw_response", "updated_at"])
+        release_order_stock(commande.id)
         if (
             commande.payment_status == "PROCESSING"
             and commande.transaction_id == payment.transaction_id
@@ -520,6 +532,12 @@ def stripe_checkout(request, order_id):
         return redirect("payments:success")
     except PaymentAmountTooLow as exc:
         return _payment_amount_error_response(request, order_id, exc)
+    except StockUnavailable as exc:
+        return HttpResponse(
+            _("Stock insuffisant : %(available)s disponible(s).")
+            % {"available": exc.available},
+            status=409,
+        )
     except SQLiteLockRetryExhausted:
         return HttpResponse("RETRY", status=409)
     except Exception:
@@ -701,6 +719,12 @@ def cinetpay_create_payment(request, order_id):
         return redirect("payments:success")
     except PaymentAmountTooLow as exc:
         return _payment_amount_error_response(request, order_id, exc)
+    except StockUnavailable as exc:
+        return HttpResponse(
+            _("Stock insuffisant : %(available)s disponible(s).")
+            % {"available": exc.available},
+            status=409,
+        )
     except PaymentInitializationInProgress:
         return HttpResponse(_("Initialisation CinetPay déjà en cours."), status=409)
     except SQLiteLockRetryExhausted:
@@ -791,6 +815,8 @@ def cinetpay_ipn(request):
         return HttpResponse("RETRY", status=409)
     except PaymentChannelConflict:
         return HttpResponse("INVALID_STATE", status=409)
+    except StockUnavailable:
+        return HttpResponse("STOCK_UNAVAILABLE", status=409)
 
     return HttpResponse("OK", status=200)
 
@@ -1118,6 +1144,8 @@ def stripe_webhook(request):
             return HttpResponse("NO_PAYMENT", status=404)
         except PaymentChannelConflict:
             return HttpResponse("INVALID_STATE", status=409)
+        except StockUnavailable:
+            return HttpResponse("STOCK_UNAVAILABLE", status=409)
         except SQLiteLockRetryExhausted:
             return HttpResponse("RETRY", status=409)
 

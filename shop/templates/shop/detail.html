@@ -5,6 +5,7 @@
 
 {% block styles %}
 <link rel="stylesheet" href="{% static 'css/shop.css' %}">
+<link rel="stylesheet" href="{% static 'css/inventory.css' %}">
 {% endblock %}
 
 {% block contenu %}
@@ -28,6 +29,13 @@
       {% if produit.categorie %}<span class="shop-eyebrow">{{ produit.categorie.nom }}</span>{% endif %}
       <h1>{{ produit.nom }}</h1>
       <div class="product-detail-price" aria-label="{% blocktranslate with price=produit.prix %}Prix : {{ price }} euros{% endblocktranslate %}">{{ produit.prix }} €</div>
+      {% if produit.stock_est_gere %}
+        {% if produit.stock == 0 %}
+          <p class="shop-stock shop-stock-out">{% translate "Rupture de stock" %}</p>
+        {% else %}
+          <p class="shop-stock">{% blocktranslate with available=produit.stock %}Quantité disponible : {{ available }}{% endblocktranslate %}</p>
+        {% endif %}
+      {% endif %}
 
       {% if produit.description %}
       <div class="product-description">{{ produit.description|linebreaks }}</div>
@@ -42,7 +50,7 @@
       <div class="product-primary-actions">
         <form method="post" action="{% url 'shop:ajouter_panier' slug=produit.slug %}">
           {% csrf_token %}
-          <button type="submit" class="btn btn-brand btn-lg product-add-main">
+          <button type="submit" class="btn btn-brand btn-lg product-add-main" {% if not produit.est_disponible %}disabled aria-disabled="true"{% endif %}>
             <i class="fa-solid fa-bag-shopping" aria-hidden="true"></i>
             {% translate "Ajouter au panier" %}
           </button>

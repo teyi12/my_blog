@@ -10,7 +10,14 @@ from .models import Categorie, Commande, FULFILLMENT_STATUS_CHOICES, Produit
 class ProduitForm(forms.ModelForm):
     class Meta:
         model = Produit
-        fields = ["nom", "description", "prix", "image", "fichier"]
+        fields = [
+            "nom",
+            "description",
+            "prix",
+            "stock",
+            "image",
+            "fichier",
+        ]
 
 
 class CategorieForm(forms.ModelForm):

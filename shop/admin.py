@@ -13,7 +13,13 @@ class CategorieAdmin(TranslationAdmin):
 
 @admin.register(Produit)
 class ProduitAdmin(TranslationAdmin):
-    list_display = ("nom", "categorie", "prix", "en_vedette")
+    list_display = (
+        "nom",
+        "categorie",
+        "prix",
+        "stock",
+        "en_vedette",
+    )
     list_filter = ("categorie", "en_vedette")
     search_fields = (
         "nom_fr",
@@ -35,9 +41,14 @@ class LigneCommandeInline(admin.TabularInline):
         "produit",
         "quantite",
         "prix_unitaire",
+        "stock_reserved_quantity",
         "sous_total",
     )
-    readonly_fields = ("nom_produit_affiche", "sous_total")
+    readonly_fields = (
+        "nom_produit_affiche",
+        "stock_reserved_quantity",
+        "sous_total",
+    )
 
 
 @admin.register(Commande)
@@ -79,6 +90,8 @@ class CommandeAdmin(admin.ModelAdmin):
         "tracking_number",
         "shipped_at",
         "delivered_at",
+        "inventory_status",
+        "stock_reservation_expires_at",
     )
     inlines = [LigneCommandeInline]
 
@@ -90,7 +103,8 @@ class LigneCommandeAdmin(admin.ModelAdmin):
         "nom_produit_affiche",
         "quantite",
         "prix_unitaire",
+        "stock_reserved_quantity",
         "sous_total",
     )
     autocomplete_fields = ("commande", "produit")
-    readonly_fields = ("nom_produit_affiche",)
+    readonly_fields = ("nom_produit_affiche", "stock_reserved_quantity")

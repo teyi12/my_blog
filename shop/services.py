@@ -5,6 +5,7 @@ from django.db import transaction
 from django.db.models import F
 from django.utils import timezone
 
+from .inventory import commit_order_stock
 from .models import Cart, CartItem, Commande
 from .receipts import ensure_order_receipt
 
@@ -58,6 +59,7 @@ def _finalize_paid_order_once(order_id):
         )
 
         if commande.cart_finalized_at is not None:
+            commit_order_stock(commande.id)
             if commande.payment_status == "SUCCESS" and commande.fulfillment_status == "WAITING_PAYMENT":
                 commande.fulfillment_status = "TO_PREPARE"
                 commande.save(update_fields=["fulfillment_status"])
@@ -94,6 +96,7 @@ def _finalize_paid_order_once(order_id):
                         quantite__lte=ligne.quantite,
                     ).delete()
 
+        commit_order_stock(commande.id)
         commande.payment_status = "SUCCESS"
         if commande.fulfillment_status == "WAITING_PAYMENT":
             commande.fulfillment_status = "TO_PREPARE"

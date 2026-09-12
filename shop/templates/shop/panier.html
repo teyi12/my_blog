@@ -4,6 +4,7 @@
 
 {% block styles %}
 <link rel="stylesheet" href="{% static 'css/cart.css' %}">
+<link rel="stylesheet" href="{% static 'css/inventory.css' %}">
 {% endblock %}
 
 {% block contenu %}
@@ -39,6 +40,14 @@
           {% if item.produit.categorie %}<span class="cart-item-category">{{ item.produit.categorie.nom }}</span>{% endif %}
           <h2><a href="{% url 'shop:detail' slug=item.produit.slug %}">{{ item.produit.nom }}</a></h2>
           <span class="cart-unit-price">{{ item.prix_unitaire|floatformat:2 }} € / {% translate "unité" %}</span>
+          {% if item.produit.stock_est_gere %}
+            {% if item.produit.stock == 0 %}
+              <strong class="shop-stock shop-stock-out">{% translate "Rupture de stock" %}</strong>
+            {% else %}
+              <small class="shop-stock">{% blocktranslate with available=item.produit.stock %}Quantité disponible : {{ available }}{% endblocktranslate %}</small>
+            {% endif %}
+            {% if item.quantite > item.produit.stock %}<small class="shop-stock-out">{% translate "Réduisez la quantité avant de payer." %}</small>{% endif %}
+          {% endif %}
         </div>
 
         <div class="cart-item-quantity">
@@ -47,6 +56,7 @@
                  id="qty-{{ item.id }}"
                  value="{{ item.quantite }}"
                  min="1"
+                 {% if item.produit.stock_est_gere %}max="{{ item.produit.stock }}"{% endif %}
                  inputmode="numeric"
                  class="form-control cart-quantity-input"
                  data-prix="{{ item.prix_unitaire }}"
@@ -81,10 +91,16 @@
         <strong id="cart-total">{{ cart.total|floatformat:2 }} €</strong>
       </div>
 
-      <a href="{% url 'shop:checkout' %}" id="checkout-btn" class="btn btn-brand btn-lg cart-checkout-button">
-        {% translate "Passer à la caisse" %}
-        <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
-      </a>
+      {% if cart_has_stock_issue %}
+        <span id="checkout-btn" class="btn btn-brand btn-lg cart-checkout-button" aria-disabled="true">
+          {% translate "Panier indisponible" %}
+        </span>
+      {% else %}
+        <a href="{% url 'shop:checkout' %}" id="checkout-btn" class="btn btn-brand btn-lg cart-checkout-button">
+          {% translate "Passer à la caisse" %}
+          <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+        </a>
+      {% endif %}
 
       <div class="cart-trust">
         <span><i class="fa-solid fa-lock" aria-hidden="true"></i> {% translate "Paiement sécurisé" %}</span>
@@ -111,13 +127,15 @@
 {% translate "Votre panier est vide" as cart_empty_title %}
 {% translate "Découvrez la boutique et ajoutez les produits qui vous intéressent." as cart_empty_text %}
 {% translate "Découvrir la boutique" as cart_discover %}
+{% translate "Stock insuffisant. Quantité disponible :" as cart_stock_error %}
 <script>
 const cartMessages = {
   updated: "{{ cart_updated|escapejs }}",
   removed: "{{ cart_removed|escapejs }}",
   emptyTitle: "{{ cart_empty_title|escapejs }}",
   emptyText: "{{ cart_empty_text|escapejs }}",
-  discover: "{{ cart_discover|escapejs }}"
+  discover: "{{ cart_discover|escapejs }}",
+  stockError: "{{ cart_stock_error|escapejs }}"
 };
 
 function getCSRFToken() {
@@ -155,6 +173,9 @@ function updateCart(itemId) {
   .then(data => {
     updateUI(data);
     if (data.success) setCartStatus(cartMessages.updated);
+    if (!data.success && data.available !== undefined) {
+      setCartStatus(cartMessages.stockError + ' ' + data.available);
+    }
   });
 }
 

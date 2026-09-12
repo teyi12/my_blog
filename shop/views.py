@@ -5,7 +5,7 @@ from decimal import Decimal
 from django.conf import settings
 from django.core.paginator import Paginator
 from django.db import IntegrityError, transaction
-from django.db.models import Count, F, Q
+from django.db.models import Count, Q
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required, user_passes_test
@@ -36,6 +36,14 @@ from .fulfillment import (
     ShippingDetailsInvalid,
     transition_order_fulfillment,
 )
+from .inventory import (
+    StockUnavailable,
+    add_product_to_cart,
+    cart_stock_issues,
+    lock_and_validate_cart_items,
+    remove_cart_item,
+    set_cart_item_quantity,
+)
 from .services import (
     SQLiteLockRetryExhausted,
     execute_with_sqlite_lock_retry,
@@ -50,7 +58,16 @@ stripe.api_key = settings.STRIPE_SECRET_KEY
 @login_required
 def panier_view(request):
     cart = get_or_create_active_cart(request.user)
-    return render(request, "shop/panier.html", {"cart": cart})
+    stock_issues = cart_stock_issues(cart)
+    return render(
+        request,
+        "shop/panier.html",
+        {
+            "cart": cart,
+            "stock_issues": stock_issues,
+            "cart_has_stock_issue": bool(stock_issues),
+        },
+    )
 
 
 @login_required
@@ -60,33 +77,42 @@ def update_panier(request):
 
     try:
         data = json.loads(request.body.decode("utf-8"))
-        action = data.get("action")
-        item_id = data.get("item_id")
-        quantite = int(data.get("quantite", 1))
+    except (TypeError, ValueError, UnicodeDecodeError):
+        return JsonResponse({"success": False}, status=400)
 
-        cart = get_or_create_active_cart(request.user)
-
+    action = data.get("action")
+    item_id = data.get("item_id")
+    cart = get_or_create_active_cart(request.user)
+    try:
         if action == "modifier" and item_id:
-            item = get_object_or_404(CartItem, id=item_id, cart=cart)
-            item.quantite = max(1, quantite)
-            item.save()
+            set_cart_item_quantity(
+                cart.id,
+                item_id,
+                data.get("quantite"),
+            )
         elif action == "supprimer" and item_id:
-            item = get_object_or_404(CartItem, id=item_id, cart=cart)
-            item.delete()
+            remove_cart_item(cart.id, item_id)
         else:
             return JsonResponse({"success": False}, status=400)
-
-        sous_totaux = {i.id: float(i.sous_total()) for i in cart.items.all()}
-
-        return JsonResponse({
-            "success": True,
-            "total": float(cart.total()),
-            "total_articles": cart.total_articles(),
-            "sous_totaux": sous_totaux
-        })
-    except Exception as e:
-        print("Erreur update_panier:", e)
+    except StockUnavailable as exc:
+        return JsonResponse(
+            {
+                "success": False,
+                "error": _("Stock insuffisant."),
+                "available": exc.available,
+            },
+            status=409,
+        )
+    except (Cart.DoesNotExist, CartItem.DoesNotExist, Produit.DoesNotExist, ValueError):
         return JsonResponse({"success": False}, status=400)
+
+    sous_totaux = {i.id: float(i.sous_total()) for i in cart.items.all()}
+    return JsonResponse({
+        "success": True,
+        "total": float(cart.total()),
+        "total_articles": cart.total_articles(),
+        "sous_totaux": sous_totaux,
+    })
 
 
 @require_POST
@@ -95,9 +121,18 @@ def ajouter_panier(request, slug):
     produit = get_object_or_404(Produit, slug=slug)
     cart = get_or_create_active_cart(request.user)
 
-    item, created = CartItem.objects.get_or_create(cart=cart, produit=produit)
-    if not created:
-        CartItem.objects.filter(pk=item.pk).update(quantite=F("quantite") + 1)
+    try:
+        add_product_to_cart(cart.id, produit.id)
+    except StockUnavailable as exc:
+        if exc.available == 0:
+            messages.warning(request, _("Rupture de stock."))
+        else:
+            messages.warning(
+                request,
+                _("Quantité disponible : %(available)s.")
+                % {"available": exc.available},
+            )
+        return redirect("shop:panier")
 
     messages.success(
         request,
@@ -386,12 +421,14 @@ class CheckoutView(LoginRequiredMixin, View):
             messages.warning(request, _("Votre panier est vide."))
             return redirect("shop:panier")
 
+        stock_issues = cart_stock_issues(cart)
         form = AdresseForm()
         return render(request, "shop/checkout.html", {
             "cart": cart,
             "total": cart.total(),
             "form": form,
             "checkout_token": uuid.uuid4(),
+            "cart_has_stock_issue": bool(stock_issues),
         })
 
     def post(self, request, *args, **kwargs):
@@ -426,9 +463,7 @@ class CheckoutView(LoginRequiredMixin, View):
                     if not cart:
                         return None
 
-                    items = list(
-                        cart.items.select_for_update().select_related("produit")
-                    )
+                    items = lock_and_validate_cart_items(cart)
                     if not items:
                         return None
 
@@ -478,6 +513,23 @@ class CheckoutView(LoginRequiredMixin, View):
 
             try:
                 commande = execute_with_sqlite_lock_retry(create_order)
+            except StockUnavailable as exc:
+                cart = Cart.objects.filter(
+                    user=request.user,
+                    actif=True,
+                ).first()
+                messages.error(
+                    request,
+                    _("Le panier n’est plus disponible. Quantité disponible : %(available)s.")
+                    % {"available": exc.available},
+                )
+                return render(request, "shop/checkout.html", {
+                    "cart": cart,
+                    "total": cart.total() if cart else Decimal("0.00"),
+                    "form": form,
+                    "checkout_token": checkout_token,
+                    "cart_has_stock_issue": True,
+                }, status=409)
             except IntegrityError:
                 commande = Commande.objects.filter(
                     client=request.user,
@@ -526,6 +578,7 @@ class CheckoutView(LoginRequiredMixin, View):
             "total": cart.total(),
             "form": form,
             "checkout_token": checkout_token,
+            "cart_has_stock_issue": bool(cart_stock_issues(cart)),
         })
 
 

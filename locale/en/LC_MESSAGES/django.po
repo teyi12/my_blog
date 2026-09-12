@@ -3551,3 +3551,78 @@ msgstr "Refund confirmed on %(date)s."
 #: shop/templates/shop/client/commande_detail.html
 msgid "Votre paiement a été remboursé."
 msgstr "Your payment has been refunded."
+
+#: shop/models.py
+msgid "Sans réservation"
+msgstr "No reservation"
+
+#: shop/models.py
+msgid "Stock réservé"
+msgstr "Stock reserved"
+
+#: shop/models.py
+msgid "Stock consommé"
+msgstr "Stock committed"
+
+#: shop/models.py
+msgid "Stock libéré"
+msgstr "Stock released"
+
+#: shop/models.py
+msgid "Stock disponible"
+msgstr "Available stock"
+
+#: shop/models.py
+msgid "Laissez vide pour ne pas gérer le stock. Les produits numériques ne consomment pas de stock."
+msgstr "Leave blank when stock is not managed. Digital products do not consume stock."
+
+#: shop/views.py
+msgid "Stock insuffisant."
+msgstr "Insufficient stock."
+
+#: shop/views.py shop/templates/shop/detail.html
+#: shop/templates/shop/liste.html shop/templates/shop/panier.html
+#, python-format
+msgid "Quantité disponible : %(available)s"
+msgstr "Available quantity: %(available)s"
+
+#: shop/views.py
+#, python-format
+msgid "Quantité disponible : %(available)s."
+msgstr "Available quantity: %(available)s."
+
+#: shop/views.py
+#, python-format
+msgid "Le panier n’est plus disponible. Quantité disponible : %(available)s."
+msgstr "The cart is no longer available. Available quantity: %(available)s."
+
+#: payments/views.py
+#, python-format
+msgid "Stock insuffisant : %(available)s disponible(s)."
+msgstr "Insufficient stock: %(available)s available."
+
+#: shop/templates/shop/detail.html shop/templates/shop/liste.html
+#: shop/templates/shop/panier.html
+msgid "Rupture de stock"
+msgstr "Out of stock"
+
+#: shop/templates/shop/panier.html
+msgid "Réduisez la quantité avant de payer."
+msgstr "Reduce the quantity before paying."
+
+#: shop/templates/shop/panier.html
+msgid "Panier indisponible"
+msgstr "Cart unavailable"
+
+#: shop/templates/shop/panier.html
+msgid "Stock insuffisant. Quantité disponible :"
+msgstr "Insufficient stock. Available quantity:"
+
+#: shop/templates/shop/checkout.html
+msgid "Le panier contient une quantité indisponible. Revenez au panier pour la corriger."
+msgstr "The cart contains an unavailable quantity. Return to the cart to correct it."
+
+#: shop/templates/shop/checkout.html
+#, python-format
+msgid "Disponible : %(available)s"
+msgstr "Available: %(available)s"
