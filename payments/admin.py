@@ -3,6 +3,7 @@ from .models import (
     Adresse,
     DonationPaymentAttempt,
     Payment,
+    StripeOrderRefund,
     StripeSubscription,
     StripeSubscriptionInvoice,
     StripeWebhookEvent,
@@ -92,6 +93,24 @@ class ReadOnlyStripeRecordAdmin(admin.ModelAdmin):
 
     def has_delete_permission(self, request, obj=None):
         return False
+
+
+@admin.register(StripeOrderRefund)
+class StripeOrderRefundAdmin(ReadOnlyStripeRecordAdmin):
+    list_display = (
+        "id",
+        "commande",
+        "payment",
+        "status",
+        "montant",
+        "devise",
+        "requested_by",
+        "confirmed_at",
+        "created_at",
+    )
+    list_filter = ("status", "devise", "created_at", "confirmed_at")
+    search_fields = ("commande__id", "payment__id")
+    ordering = ("-created_at",)
 
 
 @admin.register(StripeSubscription)

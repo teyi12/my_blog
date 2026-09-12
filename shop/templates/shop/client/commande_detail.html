@@ -23,10 +23,20 @@
     </div>
   </header>
 
-  {% if receipt and commande.payment_status == 'SUCCESS' %}
-    <a class="customer-download-button" href="{% url 'shop:telecharger_recu_commande' commande.pk receipt.public_id %}">
-      <i class="fa-solid fa-file-pdf" aria-hidden="true"></i> {% translate "Télécharger le reçu PDF" %}
-    </a>
+  {% if receipt %}
+    {% if commande.payment_status == 'SUCCESS' or commande.payment_status == 'REFUNDED' %}
+      <a class="customer-download-button" href="{% url 'shop:telecharger_recu_commande' commande.pk receipt.public_id %}">
+        <i class="fa-solid fa-file-pdf" aria-hidden="true"></i> {% translate "Télécharger le reçu PDF" %}
+      </a>
+    {% endif %}
+  {% endif %}
+
+  {% if remboursement %}
+    <section class="customer-order-panel">
+      <div class="customer-order-panel-heading"><h2>{% translate "Remboursement" %}</h2><span>{{ remboursement.get_status_display }}</span></div>
+      <p>{% blocktranslate with amount=remboursement.montant currency=remboursement.devise %}Montant total : {{ amount }} {{ currency }}{% endblocktranslate %}</p>
+      {% if remboursement.confirmed_at %}<p>{% blocktranslate with date=remboursement.confirmed_at|date:'SHORT_DATETIME_FORMAT' %}Remboursement confirmé le {{ date }}.{% endblocktranslate %}</p>{% endif %}
+    </section>
   {% endif %}
 
   <div class="customer-order-detail-grid">
@@ -60,7 +70,7 @@
       <section class="customer-order-panel">
         <div class="customer-order-panel-heading"><h2>{% translate "Progression" %}</h2><span>{{ commande.get_fulfillment_status_display }}</span></div>
         <div class="customer-order-timeline">
-          <div class="timeline-step {% if commande.payment_status == 'SUCCESS' %}is-done{% endif %}"><span><i class="fa-solid fa-credit-card" aria-hidden="true"></i></span><div><strong>{% translate "Paiement confirmé" %}</strong><small>{% if commande.payment_status == 'SUCCESS' %}{% translate "Votre paiement a été validé." %}{% else %}{% translate "En attente de confirmation du paiement." %}{% endif %}</small></div></div>
+          <div class="timeline-step {% if commande.payment_status == 'SUCCESS' or commande.payment_status == 'REFUNDED' %}is-done{% endif %}"><span><i class="fa-solid fa-credit-card" aria-hidden="true"></i></span><div><strong>{% translate "Paiement confirmé" %}</strong><small>{% if commande.payment_status == 'REFUNDED' %}{% translate "Votre paiement a été remboursé." %}{% elif commande.payment_status == 'SUCCESS' %}{% translate "Votre paiement a été validé." %}{% else %}{% translate "En attente de confirmation du paiement." %}{% endif %}</small></div></div>
           <div class="timeline-step {% if commande.fulfillment_status == 'TO_PREPARE' or commande.fulfillment_status == 'PREPARING' or commande.fulfillment_status == 'SHIPPED' or commande.fulfillment_status == 'DELIVERED' %}is-done{% endif %}"><span><i class="fa-solid fa-box" aria-hidden="true"></i></span><div><strong>{% translate "Préparation" %}</strong><small>{% translate "Votre commande est prise en charge par la boutique." %}</small></div></div>
           <div class="timeline-step {% if commande.fulfillment_status == 'SHIPPED' or commande.fulfillment_status == 'DELIVERED' %}is-done{% endif %}">
             <span><i class="fa-solid fa-truck" aria-hidden="true"></i></span>

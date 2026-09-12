@@ -28,6 +28,7 @@ from shop.services import (
 from .donations import donations_are_available
 from .forms import DonationCheckoutForm
 from .models import DonationPaymentAttempt, Payment
+from .money import minor_amount as _minor_amount
 from .subscriptions import (
     SubscriptionPortalProviderError,
     SubscriptionPortalUnavailable,
@@ -35,6 +36,12 @@ from .subscriptions import (
     SubscriptionWebhookRetry,
     create_subscription_portal_session,
     process_subscription_event,
+)
+from .refunds import (
+    REFUND_EVENT_TYPES,
+    RefundMismatch,
+    RefundWebhookRetry,
+    process_refund_event,
 )
 
 # --- LOGGING ---
@@ -267,20 +274,6 @@ def _store_provider_checkout(payment_id, provider_reference, checkout_url):
             checkout_url,
         )
     )
-
-
-def _minor_amount(amount, currency):
-    zero_decimal = {"bif", "clp", "djf", "gnf", "jpy", "kmf", "krw", "mga", "pyg", "rwf", "ugx", "vnd", "vuv", "xaf", "xof", "xpf"}
-    decimal_amount = Decimal(str(amount))
-    exponent = Decimal("1") if currency.lower() in zero_decimal else Decimal("0.01")
-    normalized = decimal_amount.quantize(exponent)
-    if normalized != decimal_amount:
-        raise ValueError(
-            _("Le montant %(amount)s n'est pas valide pour %(currency)s.")
-            % {"amount": decimal_amount, "currency": currency.upper()}
-        )
-    multiplier = 1 if currency.lower() in zero_decimal else 100
-    return int(normalized * multiplier)
 
 
 def _confirm_payment_once(payment_id, raw_response):
@@ -1035,6 +1028,17 @@ def stripe_webhook(request):
         return HttpResponse(status=400)
     except stripe.error.SignatureVerificationError:
         return HttpResponse(status=400)
+
+    if event["type"] in REFUND_EVENT_TYPES:
+        try:
+            process_refund_event(event)
+        except RefundMismatch:
+            return HttpResponse("REFUND_MISMATCH", status=400)
+        except RefundWebhookRetry:
+            return HttpResponse("RETRY", status=409)
+        except IntegrityError:
+            return HttpResponse("RETRY", status=409)
+        return HttpResponse(status=200)
 
     donation_event_statuses = {
         "checkout.session.async_payment_failed": "FAILED",

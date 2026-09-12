@@ -1,4 +1,6 @@
 from django.urls import path
+from payments import refund_views
+
 from . import views, customer_views, order_views
 
 app_name = "shop"
@@ -41,6 +43,16 @@ urlpatterns = [
         "commandes/<int:pk>/expedition/",
         order_views.commande_expedition_modifier,
         name="commande_expedition_modifier",
+    ),
+    path(
+        "commandes/<int:pk>/remboursement/confirmer/",
+        refund_views.confirmer_remboursement_commande,
+        name="confirmer_remboursement_commande",
+    ),
+    path(
+        "commandes/<int:pk>/remboursement/",
+        refund_views.rembourser_commande,
+        name="rembourser_commande",
     ),
 
     # Panier

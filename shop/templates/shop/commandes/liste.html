@@ -23,6 +23,7 @@
     <a class="orders-stat {% if statut_actif == 'PENDING' %}is-active{% endif %}" href="?statut=PENDING"><span>{% translate "En attente" %}</span><strong>{{ compteurs.PENDING }}</strong></a>
     <a class="orders-stat {% if statut_actif == 'PROCESSING' %}is-active{% endif %}" href="?statut=PROCESSING"><span>{% translate "En cours" %}</span><strong>{{ compteurs.PROCESSING }}</strong></a>
     <a class="orders-stat {% if statut_actif == 'SUCCESS' %}is-active{% endif %}" href="?statut=SUCCESS"><span>{% translate "Payées" %}</span><strong>{{ compteurs.SUCCESS }}</strong></a>
+    <a class="orders-stat {% if statut_actif == 'REFUNDED' %}is-active{% endif %}" href="?statut=REFUNDED"><span>{% translate "Remboursées" %}</span><strong>{{ compteurs.REFUNDED }}</strong></a>
     <a class="orders-stat {% if statut_actif == 'FAILED' %}is-active{% endif %}" href="?statut=FAILED"><span>{% translate "Échouées" %}</span><strong>{{ compteurs.FAILED }}</strong></a>
     <a class="orders-stat {% if statut_actif == 'CANCELED' %}is-active{% endif %}" href="?statut=CANCELED"><span>{% translate "Annulées" %}</span><strong>{{ compteurs.CANCELED }}</strong></a>
   </div>

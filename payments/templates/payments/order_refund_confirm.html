@@ -1,0 +1,38 @@
+{% extends 'template_base.html' %}
+{% load i18n static %}
+
+{% block titre %}{% translate "Confirmer le remboursement" %} — Teyilawson{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{% static 'css/order-management.css' %}">
+{% endblock %}
+
+{% block contenu %}
+<section class="order-detail-page">
+  <header class="order-detail-hero">
+    <div>
+      <a class="orders-admin-back" href="{% url 'shop:commande_gestion_detail' commande.pk %}"><i class="fa-solid fa-arrow-left" aria-hidden="true"></i> {% translate "Retour à la commande" %}</a>
+      <span class="orders-admin-eyebrow">{% translate "Remboursement Stripe total" %}</span>
+      <h1>{% blocktranslate with order=commande.pk %}Rembourser la commande #{{ order }}{% endblocktranslate %}</h1>
+      <p>{% translate "Cette action demande à Stripe le remboursement de la totalité du paiement." %}</p>
+    </div>
+  </header>
+
+  <section class="order-panel">
+    <h2>{% translate "Vérification avant remboursement" %}</h2>
+    <dl class="order-meta">
+      <div><dt>{% translate "Commande" %}</dt><dd>#{{ commande.pk }}</dd></div>
+      <div><dt>{% translate "Client" %}</dt><dd>{{ commande.client.first_name }} {{ commande.client.last_name }} · {{ commande.client.email }}</dd></div>
+      <div><dt>{% translate "Montant total" %}</dt><dd><strong>{{ commande.total }} {{ commande.currency }}</strong></dd></div>
+    </dl>
+    <p class="fulfillment-note">{% translate "Le reçu, les lignes historiques et l’état logistique seront conservés. Aucun stock ne sera remis automatiquement." %}</p>
+    {% if refund and refund.status == 'RETRYABLE' %}
+      <p class="fulfillment-note">{% translate "La tentative précédente n’a pas pu joindre Stripe. La relance réutilisera la même clé d’idempotence." %}</p>
+    {% endif %}
+    <form method="post" action="{% url 'shop:rembourser_commande' commande.pk %}">
+      {% csrf_token %}
+      <button type="submit">{% translate "Confirmer le remboursement total" %}</button>
+    </form>
+  </section>
+</section>
+{% endblock %}

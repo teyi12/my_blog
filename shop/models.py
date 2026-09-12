@@ -145,6 +145,7 @@ class Commande(models.Model):
             ("PENDING", _("En attente")),
             ("PROCESSING", _("Paiement en cours")),
             ("SUCCESS", _("Payée")),
+            ("REFUNDED", _("Remboursée")),
             ("FAILED", _("Échouée")),
             ("CANCELED", _("Annulée")),
         ],
