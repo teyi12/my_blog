@@ -9,6 +9,8 @@ from django.utils.translation import gettext as _
 from django.views.decorators.http import require_GET
 from requests.exceptions import RequestException
 
+from payments.models import StripeOrderRefund
+
 from .models import Commande, LigneCommande, OrderReceipt, product_file_storage
 from .receipts import OrderReceiptPDFError, render_order_receipt_pdf
 from .shipping import carrier_tracking_url
@@ -54,6 +56,7 @@ def ma_commande_detail(request, pk):
         receipt = commande.receipt
     except OrderReceipt.DoesNotExist:
         receipt = None
+    remboursement = StripeOrderRefund.objects.filter(commande=commande).first()
     return render(
         request,
         "shop/client/commande_detail.html",
@@ -61,6 +64,7 @@ def ma_commande_detail(request, pk):
             "commande": commande,
             "paiements": commande.payments.order_by("-created_at"),
             "receipt": receipt,
+            "remboursement": remboursement,
             "tracking_url": carrier_tracking_url(commande.carrier, commande.tracking_number),
         },
     )
@@ -130,7 +134,7 @@ def telecharger_recu_commande(request, order_pk, public_id):
         OrderReceipt.objects.select_related("commande").filter(
             commande_id=order_pk,
             commande__client=request.user,
-            commande__payment_status="SUCCESS",
+            commande__payment_status__in=("SUCCESS", "REFUNDED"),
         ),
         public_id=public_id,
     )

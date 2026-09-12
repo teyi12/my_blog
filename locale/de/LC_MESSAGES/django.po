@@ -3462,3 +3462,152 @@ msgstr ""
 #: shop/templates/shop/client/commande_detail.html
 msgid "Télécharger le reçu PDF"
 msgstr "PDF-Beleg herunterladen"
+
+#: payments/models.py
+msgid "Traitement en cours"
+msgstr "In Bearbeitung"
+
+#: payments/models.py
+msgid "En attente de confirmation"
+msgstr "Bestätigung ausstehend"
+
+#: payments/models.py
+msgid "Remboursé"
+msgstr "Erstattet"
+
+#: payments/models.py
+msgid "Nouvel essai requis"
+msgstr "Erneuter Versuch erforderlich"
+
+#: shop/models.py
+msgid "Remboursée"
+msgstr "Erstattet"
+
+#: payments/refund_views.py
+msgid "Cette commande ne peut pas être remboursée."
+msgstr "Diese Bestellung kann nicht erstattet werden."
+
+#: payments/refund_views.py
+msgid "Cette commande est déjà remboursée."
+msgstr "Diese Bestellung wurde bereits erstattet."
+
+#: payments/refund_views.py
+msgid "Le remboursement de cette commande est déjà en cours."
+msgstr "Für diese Bestellung läuft bereits eine Erstattung."
+
+#: payments/refund_views.py
+msgid "Stripe est temporairement indisponible. Le remboursement peut être relancé sans risque."
+msgstr "Stripe ist vorübergehend nicht verfügbar. Die Erstattung kann sicher erneut versucht werden."
+
+#: payments/refund_views.py
+msgid "Le remboursement n’a pas été validé car les données Stripe ne correspondent pas à la commande."
+msgstr "Die Erstattung wurde nicht bestätigt, da die Stripe-Daten nicht mit der Bestellung übereinstimmen."
+
+#: payments/refund_views.py
+msgid "Le remboursement total a été confirmé par Stripe."
+msgstr "Die vollständige Erstattung wurde von Stripe bestätigt."
+
+#: payments/refund_views.py
+msgid "Le remboursement est en attente de confirmation par Stripe."
+msgstr "Die Erstattung wartet auf die Bestätigung durch Stripe."
+
+#: payments/refund_views.py
+msgid "Stripe n’a pas confirmé le remboursement."
+msgstr "Stripe hat die Erstattung nicht bestätigt."
+
+#: payments/refunds.py
+#, python-format
+msgid "Votre commande #%(order)s a été remboursée"
+msgstr "Ihre Bestellung #%(order)s wurde erstattet"
+
+#: payments/refunds.py
+#, python-format
+msgid "Le remboursement total de %(amount)s %(currency)s a été confirmé."
+msgstr "Die vollständige Erstattung von %(amount)s %(currency)s wurde bestätigt."
+
+#: payments/templates/payments/order_refund_confirm.html
+msgid "Confirmer le remboursement"
+msgstr "Erstattung bestätigen"
+
+#: payments/templates/payments/order_refund_confirm.html
+msgid "Remboursement Stripe total"
+msgstr "Vollständige Stripe-Erstattung"
+
+#: payments/templates/payments/order_refund_confirm.html
+#, python-format
+msgid "Rembourser la commande #%(order)s"
+msgstr "Bestellung #%(order)s erstatten"
+
+#: payments/templates/payments/order_refund_confirm.html
+msgid "Cette action demande à Stripe le remboursement de la totalité du paiement."
+msgstr "Diese Aktion fordert bei Stripe die vollständige Erstattung der Zahlung an."
+
+#: payments/templates/payments/order_refund_confirm.html
+msgid "Vérification avant remboursement"
+msgstr "Prüfung vor der Erstattung"
+
+#: payments/templates/payments/order_refund_confirm.html
+msgid "Le reçu, les lignes historiques et l’état logistique seront conservés. Aucun stock ne sera remis automatiquement."
+msgstr "Der Beleg, die historischen Positionen und der Versandstatus bleiben erhalten. Der Bestand wird nicht automatisch wieder aufgefüllt."
+
+#: payments/templates/payments/order_refund_confirm.html
+msgid "La tentative précédente n’a pas pu joindre Stripe. La relance réutilisera la même clé d’idempotence."
+msgstr "Beim vorherigen Versuch war Stripe nicht erreichbar. Der erneute Versuch verwendet denselben Idempotenzschlüssel."
+
+#: payments/templates/payments/order_refund_confirm.html
+msgid "Confirmer le remboursement total"
+msgstr "Vollständige Erstattung bestätigen"
+
+#: payments/templates/payments/emails/order_refunded.html
+msgid "Votre reçu et l’historique de la commande restent disponibles dans votre espace client."
+msgstr "Ihr Beleg und der Bestellverlauf bleiben in Ihrem Kundenbereich verfügbar."
+
+#: payments/templates/payments/emails/order_refunded.html
+msgid "Consulter ma commande"
+msgstr "Meine Bestellung ansehen"
+
+#: shop/templates/shop/commandes/liste.html
+msgid "Remboursées"
+msgstr "Erstattet"
+
+#: shop/templates/shop/commandes/detail.html
+msgid "Remboursement Stripe"
+msgstr "Stripe-Erstattung"
+
+#: shop/templates/shop/commandes/detail.html
+msgid "État du remboursement"
+msgstr "Erstattungsstatus"
+
+#: shop/templates/shop/commandes/detail.html
+msgid "Demandé le"
+msgstr "Angefordert am"
+
+#: shop/templates/shop/commandes/detail.html
+msgid "Confirmé le"
+msgstr "Bestätigt am"
+
+#: shop/templates/shop/commandes/detail.html
+msgid "Aucun remboursement demandé."
+msgstr "Keine Erstattung angefordert."
+
+#: shop/templates/shop/commandes/detail.html
+msgid "Rembourser intégralement"
+msgstr "Vollständig erstatten"
+
+#: shop/templates/shop/client/commande_detail.html
+msgid "Remboursement"
+msgstr "Erstattung"
+
+#: shop/templates/shop/client/commande_detail.html
+#, python-format
+msgid "Montant total : %(amount)s %(currency)s"
+msgstr "Gesamtbetrag: %(amount)s %(currency)s"
+
+#: shop/templates/shop/client/commande_detail.html
+#, python-format
+msgid "Remboursement confirmé le %(date)s."
+msgstr "Erstattung bestätigt am %(date)s."
+
+#: shop/templates/shop/client/commande_detail.html
+msgid "Votre paiement a été remboursé."
+msgstr "Ihre Zahlung wurde erstattet."

@@ -27,7 +27,7 @@ from .models import (
     order_product_snapshot_name,
     safe_order_download_filename,
 )
-from payments.models import Adresse
+from payments.models import Adresse, StripeOrderRefund
 from blog.seo import PRODUCT_CATEGORY_DESCRIPTION, build_dynamic_seo
 from .forms import AdresseForm, CategorieForm, CommandeTraitementForm
 from .fulfillment import (
@@ -281,6 +281,7 @@ def commande_gestion_liste(request):
         "SUCCESS": Commande.objects.filter(payment_status="SUCCESS").count(),
         "FAILED": Commande.objects.filter(payment_status="FAILED").count(),
         "CANCELED": Commande.objects.filter(payment_status="CANCELED").count(),
+        "REFUNDED": Commande.objects.filter(payment_status="REFUNDED").count(),
     }
 
     paginator = Paginator(commandes, 20)
@@ -307,6 +308,7 @@ def commande_gestion_detail(request, pk):
         pk=pk,
     )
     paiements = commande.payments.order_by("-created_at")
+    remboursement = StripeOrderRefund.objects.filter(commande=commande).first()
     traitement_form = CommandeTraitementForm(commande=commande)
     transitions_disponibles = bool(traitement_form.fields["statut"].choices)
     return render(
@@ -315,6 +317,7 @@ def commande_gestion_detail(request, pk):
         {
             "commande": commande,
             "paiements": paiements,
+            "remboursement": remboursement,
             "traitement_form": traitement_form,
             "transitions_disponibles": transitions_disponibles,
         },

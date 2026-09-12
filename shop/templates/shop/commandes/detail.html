@@ -54,6 +54,25 @@
           </div>
         {% else %}<p class="order-muted">{% translate "Aucune tentative de paiement enregistrée." %}</p>{% endif %}
       </section>
+
+      <section class="order-panel">
+        <div class="order-panel-heading"><h2>{% translate "Remboursement Stripe" %}</h2></div>
+        {% if remboursement %}
+          <dl class="order-meta">
+            <div><dt>{% translate "État du remboursement" %}</dt><dd>{{ remboursement.get_status_display }}</dd></div>
+            <div><dt>{% translate "Montant" %}</dt><dd>{{ remboursement.montant }} {{ remboursement.devise }}</dd></div>
+            <div><dt>{% translate "Demandé le" %}</dt><dd>{{ remboursement.created_at|date:'SHORT_DATETIME_FORMAT' }}</dd></div>
+            {% if remboursement.confirmed_at %}<div><dt>{% translate "Confirmé le" %}</dt><dd>{{ remboursement.confirmed_at|date:'SHORT_DATETIME_FORMAT' }}</dd></div>{% endif %}
+          </dl>
+        {% else %}
+          <p class="order-muted">{% translate "Aucun remboursement demandé." %}</p>
+        {% endif %}
+        {% if commande.payment_status == 'SUCCESS' and commande.payment_channel == 'STRIPE' %}
+          {% if not remboursement or remboursement.status == 'RETRYABLE' %}
+            <a class="orders-admin-back" href="{% url 'shop:confirmer_remboursement_commande' commande.pk %}">{% translate "Rembourser intégralement" %}</a>
+          {% endif %}
+        {% endif %}
+      </section>
     </div>
 
     <aside class="order-detail-side">

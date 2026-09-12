@@ -58,6 +58,75 @@ class Payment(models.Model):
         ]
 
 
+class StripeOrderRefund(models.Model):
+    STATUS_CHOICES = [
+        ("PROCESSING", _("Traitement en cours")),
+        ("PENDING", _("En attente de confirmation")),
+        ("SUCCESS", _("Remboursé")),
+        ("RETRYABLE", _("Nouvel essai requis")),
+        ("FAILED", _("Échoué")),
+        ("CANCELED", _("Annulé")),
+    ]
+
+    commande = models.OneToOneField(
+        Commande,
+        on_delete=models.PROTECT,
+        related_name="stripe_refund",
+    )
+    payment = models.OneToOneField(
+        Payment,
+        on_delete=models.PROTECT,
+        related_name="stripe_refund",
+    )
+    requested_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="requested_stripe_order_refunds",
+    )
+    montant = models.DecimalField(max_digits=10, decimal_places=2)
+    devise = models.CharField(max_length=10)
+    status = models.CharField(
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default="PROCESSING",
+    )
+    stripe_payment_intent_id = models.CharField(
+        max_length=255,
+        null=True,
+        blank=True,
+        unique=True,
+        editable=False,
+    )
+    stripe_refund_id = models.CharField(
+        max_length=255,
+        null=True,
+        blank=True,
+        unique=True,
+        editable=False,
+    )
+    idempotency_key = models.UUIDField(
+        default=uuid.uuid4,
+        unique=True,
+        editable=False,
+    )
+    confirmed_at = models.DateTimeField(null=True, blank=True, editable=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        constraints = [
+            models.CheckConstraint(
+                condition=Q(montant__gt=0),
+                name="stripe_order_refund_positive_amount",
+            ),
+        ]
+
+    def __str__(self):
+        return f"Remboursement commande #{self.commande_id} - {self.status}"
+
+
 class DonationPaymentAttempt(models.Model):
     STATUS_CHOICES = [
         ("PROCESSING", _("En cours")),

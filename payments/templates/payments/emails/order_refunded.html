@@ -1,0 +1,10 @@
+<!doctype html>
+{% load i18n %}
+<html lang="{{ commande.language_code|default:'fr' }}">
+<body>
+  <h1>{{ subject }}</h1>
+  <p>{% blocktranslate with amount=commande.total currency=commande.currency %}Le remboursement total de {{ amount }} {{ currency }} a été confirmé.{% endblocktranslate %}</p>
+  <p>{% translate "Votre reçu et l’historique de la commande restent disponibles dans votre espace client." %}</p>
+  {% if detail_url %}<p><a href="{{ detail_url }}">{% translate "Consulter ma commande" %}</a></p>{% endif %}
+</body>
+</html>
