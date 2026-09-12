@@ -4,6 +4,7 @@ import uuid
 
 from django.conf import settings
 from django.core.exceptions import SuspiciousFileOperation
+from django.core.validators import MinValueValidator
 from django.db import models
 from django.utils.text import get_valid_filename, slugify
 from django.utils.translation import gettext_lazy as _
@@ -39,6 +40,13 @@ FULFILLMENT_TRANSITIONS = {
     "DELIVERED": set(),
     "CANCELED": set(),
 }
+
+INVENTORY_STATUS_CHOICES = [
+    ("NONE", _("Sans réservation")),
+    ("RESERVED", _("Stock réservé")),
+    ("COMMITTED", _("Stock consommé")),
+    ("RELEASED", _("Stock libéré")),
+]
 
 
 def safe_order_download_filename(storage_name):
@@ -99,6 +107,16 @@ class Produit(models.Model):
     prix = models.DecimalField(max_digits=10, decimal_places=2)
     image = models.ImageField(upload_to="produits/", blank=True, null=True)
     fichier = models.FileField(upload_to="produits/fichiers/", blank=True, null=True)
+    stock = models.IntegerField(
+        null=True,
+        blank=True,
+        validators=[MinValueValidator(0)],
+        verbose_name=_("Stock disponible"),
+        help_text=_(
+            "Laissez vide pour ne pas gérer le stock. Les produits numériques "
+            "ne consomment pas de stock."
+        ),
+    )
 
     categorie = models.ForeignKey(
         Categorie, on_delete=models.SET_NULL, null=True, blank=True
@@ -112,6 +130,26 @@ class Produit(models.Model):
 
     def __str__(self):
         return self.nom
+
+    @property
+    def est_numerique(self):
+        return bool(self.fichier)
+
+    @property
+    def stock_est_gere(self):
+        return self.stock is not None and not self.est_numerique
+
+    @property
+    def est_disponible(self):
+        return not self.stock_est_gere or self.stock > 0
+
+    class Meta:
+        constraints = [
+            models.CheckConstraint(
+                condition=models.Q(stock__isnull=True) | models.Q(stock__gte=0),
+                name="product_stock_nonnegative",
+            ),
+        ]
 
 
 class Commande(models.Model):
@@ -181,6 +219,17 @@ class Commande(models.Model):
     tracking_number = models.CharField(max_length=150, blank=True)
     shipped_at = models.DateTimeField(null=True, blank=True, editable=False)
     delivered_at = models.DateTimeField(null=True, blank=True, editable=False)
+    inventory_status = models.CharField(
+        max_length=20,
+        choices=INVENTORY_STATUS_CHOICES,
+        default="NONE",
+        editable=False,
+    )
+    stock_reservation_expires_at = models.DateTimeField(
+        null=True,
+        blank=True,
+        editable=False,
+    )
 
     def __str__(self):
         return f"Commande #{self.id} - {self.client}"
@@ -227,6 +276,10 @@ class LigneCommande(models.Model):
     fichier_nom_telechargement_snapshot = models.CharField(
         max_length=255,
         blank=True,
+        editable=False,
+    )
+    stock_reserved_quantity = models.PositiveIntegerField(
+        default=0,
         editable=False,
     )
 

@@ -3611,3 +3611,78 @@ msgstr "Erstattung bestätigt am %(date)s."
 #: shop/templates/shop/client/commande_detail.html
 msgid "Votre paiement a été remboursé."
 msgstr "Ihre Zahlung wurde erstattet."
+
+#: shop/models.py
+msgid "Sans réservation"
+msgstr "Keine Reservierung"
+
+#: shop/models.py
+msgid "Stock réservé"
+msgstr "Bestand reserviert"
+
+#: shop/models.py
+msgid "Stock consommé"
+msgstr "Bestand verbucht"
+
+#: shop/models.py
+msgid "Stock libéré"
+msgstr "Bestand freigegeben"
+
+#: shop/models.py
+msgid "Stock disponible"
+msgstr "Verfügbarer Bestand"
+
+#: shop/models.py
+msgid "Laissez vide pour ne pas gérer le stock. Les produits numériques ne consomment pas de stock."
+msgstr "Leer lassen, wenn der Bestand nicht verwaltet wird. Digitale Produkte verbrauchen keinen Bestand."
+
+#: shop/views.py
+msgid "Stock insuffisant."
+msgstr "Unzureichender Bestand."
+
+#: shop/views.py shop/templates/shop/detail.html
+#: shop/templates/shop/liste.html shop/templates/shop/panier.html
+#, python-format
+msgid "Quantité disponible : %(available)s"
+msgstr "Verfügbare Menge: %(available)s"
+
+#: shop/views.py
+#, python-format
+msgid "Quantité disponible : %(available)s."
+msgstr "Verfügbare Menge: %(available)s."
+
+#: shop/views.py
+#, python-format
+msgid "Le panier n’est plus disponible. Quantité disponible : %(available)s."
+msgstr "Der Warenkorb ist nicht mehr verfügbar. Verfügbare Menge: %(available)s."
+
+#: payments/views.py
+#, python-format
+msgid "Stock insuffisant : %(available)s disponible(s)."
+msgstr "Unzureichender Bestand: %(available)s verfügbar."
+
+#: shop/templates/shop/detail.html shop/templates/shop/liste.html
+#: shop/templates/shop/panier.html
+msgid "Rupture de stock"
+msgstr "Nicht auf Lager"
+
+#: shop/templates/shop/panier.html
+msgid "Réduisez la quantité avant de payer."
+msgstr "Reduzieren Sie die Menge vor der Zahlung."
+
+#: shop/templates/shop/panier.html
+msgid "Panier indisponible"
+msgstr "Warenkorb nicht verfügbar"
+
+#: shop/templates/shop/panier.html
+msgid "Stock insuffisant. Quantité disponible :"
+msgstr "Unzureichender Bestand. Verfügbare Menge:"
+
+#: shop/templates/shop/checkout.html
+msgid "Le panier contient une quantité indisponible. Revenez au panier pour la corriger."
+msgstr "Der Warenkorb enthält eine nicht verfügbare Menge. Kehren Sie zum Warenkorb zurück, um sie zu korrigieren."
+
+#: shop/templates/shop/checkout.html
+#, python-format
+msgid "Disponible : %(available)s"
+msgstr "Verfügbar: %(available)s"

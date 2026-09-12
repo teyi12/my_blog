@@ -297,6 +297,12 @@ SUBSCRIPTIONS_ENABLED = env_bool("SUBSCRIPTIONS_ENABLED", False)
 PAYMENT_PROCESSING_TIMEOUT_SECONDS = int(
     os.getenv("PAYMENT_PROCESSING_TIMEOUT_SECONDS", "3600")
 )
+STOCK_RESERVATION_TIMEOUT_SECONDS = int(
+    os.getenv(
+        "STOCK_RESERVATION_TIMEOUT_SECONDS",
+        str(PAYMENT_PROCESSING_TIMEOUT_SECONDS),
+    )
+)
 
 # -----------------------------------------------------------------------------
 # Mobile Money

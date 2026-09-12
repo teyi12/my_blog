@@ -5,6 +5,7 @@
 
 {% block styles %}
 <link rel="stylesheet" href="{% static 'css/checkout.css' %}">
+<link rel="stylesheet" href="{% static 'css/inventory.css' %}">
 {% endblock %}
 
 {% block contenu %}
@@ -45,6 +46,9 @@
         {% if form.non_field_errors %}
         <div class="alert alert-danger" role="alert">{{ form.non_field_errors }}</div>
         {% endif %}
+        {% if cart_has_stock_issue %}
+          <div class="alert alert-danger" role="alert">{% translate "Le panier contient une quantité indisponible. Revenez au panier pour la corriger." %}</div>
+        {% endif %}
 
         <div class="checkout-field checkout-field-full">
           <label for="{{ form.rue.id_for_label }}">{{ form.rue.label }}</label>
@@ -77,7 +81,7 @@
         </div>
 
         <div class="checkout-submit">
-          <button type="submit" class="btn btn-brand btn-lg">
+          <button type="submit" class="btn btn-brand btn-lg" {% if cart_has_stock_issue %}disabled aria-disabled="true"{% endif %}>
             {% translate "Continuer vers le paiement" %} <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
           </button>
           <p><i class="fa-solid fa-lock" aria-hidden="true"></i> {% translate "Votre commande sera créée une seule fois, même en cas de double clic." %}</p>
@@ -102,6 +106,7 @@
           <div class="checkout-summary-copy">
             <strong>{{ item.produit.nom }}</strong>
             <span>{% blocktranslate with quantity=item.quantite %}Quantité : {{ quantity }}{% endblocktranslate %}</span>
+            {% if item.produit.stock_est_gere %}<span>{% blocktranslate with available=item.produit.stock %}Disponible : {{ available }}{% endblocktranslate %}</span>{% endif %}
           </div>
           <strong class="checkout-summary-price">{{ item.sous_total|floatformat:2 }} €</strong>
         </div>

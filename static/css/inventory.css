@@ -1,0 +1,18 @@
+.shop-stock {
+  display: block;
+  margin: .35rem 0;
+  color: var(--brand-700);
+  font-size: .82rem;
+  font-weight: 700;
+}
+
+.shop-stock-out {
+  color: var(--danger);
+}
+
+.shop-add-button:disabled,
+.product-add-main:disabled,
+[aria-disabled="true"].cart-checkout-button {
+  cursor: not-allowed;
+  opacity: .55;
+}

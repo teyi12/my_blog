@@ -14,6 +14,7 @@ from payments.views import (
     _stripe_value,
 )
 from shop.services import SQLiteLockRetryExhausted, execute_with_sqlite_lock_retry
+from shop.inventory import StockUnavailable
 
 
 DEFAULT_OLDER_THAN_MINUTES = 60
@@ -185,6 +186,7 @@ class Command(BaseCommand):
                 Payment.DoesNotExist,
                 PaymentChannelConflict,
                 ReconciliationMismatch,
+                StockUnavailable,
             ):
                 counters["incompatibles"] += 1
             except SQLiteLockRetryExhausted:

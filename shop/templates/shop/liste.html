@@ -5,6 +5,7 @@
 
 {% block styles %}
 <link rel="stylesheet" href="{% static 'css/shop.css' %}">
+<link rel="stylesheet" href="{% static 'css/inventory.css' %}">
 {% endblock %}
 
 {% block contenu %}
@@ -61,12 +62,19 @@
         {% if produit.categorie %}<span class="shop-category">{{ produit.categorie.nom }}</span>{% endif %}
         <h2><a href="{% url 'shop:detail' slug=produit.slug %}">{{ produit.nom }}</a></h2>
         {% if produit.description %}<p>{{ produit.description|truncatewords:15 }}</p>{% endif %}
+        {% if produit.stock_est_gere %}
+          {% if produit.stock == 0 %}
+            <p class="shop-stock shop-stock-out">{% translate "Rupture de stock" %}</p>
+          {% else %}
+            <p class="shop-stock">{% blocktranslate with available=produit.stock %}Quantité disponible : {{ available }}{% endblocktranslate %}</p>
+          {% endif %}
+        {% endif %}
 
         <div class="shop-card-footer">
           <span class="shop-price" aria-label="{% blocktranslate with price=produit.prix %}Prix : {{ price }} euros{% endblocktranslate %}">{{ produit.prix }} €</span>
           <form method="post" action="{% url 'shop:ajouter_panier' slug=produit.slug %}">
             {% csrf_token %}
-            <button class="shop-add-button" type="submit" aria-label="{% if produit.nom %}{% blocktranslate with product_name=produit.nom %}Ajouter {{ product_name }} au panier{% endblocktranslate %}{% else %}{% translate "Ajouter ce produit au panier" %}{% endif %}">
+            <button class="shop-add-button" type="submit" {% if not produit.est_disponible %}disabled aria-disabled="true"{% endif %} aria-label="{% if produit.nom %}{% blocktranslate with product_name=produit.nom %}Ajouter {{ product_name }} au panier{% endblocktranslate %}{% else %}{% translate "Ajouter ce produit au panier" %}{% endif %}">
               <i class="fa-solid fa-plus" aria-hidden="true"></i>
               <span>{% translate "Ajouter" %}</span>
             </button>
