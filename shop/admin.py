@@ -68,7 +68,18 @@ class CommandeAdmin(admin.ModelAdmin):
         "carrier",
         "tracking_number",
     )
-    readonly_fields = ("total", "date_commande", "shipped_at", "delivered_at")
+    readonly_fields = (
+        "total",
+        "date_commande",
+        "payment_status",
+        "payment_channel",
+        "transaction_id",
+        "fulfillment_status",
+        "carrier",
+        "tracking_number",
+        "shipped_at",
+        "delivered_at",
+    )
     inlines = [LigneCommandeInline]
 
 

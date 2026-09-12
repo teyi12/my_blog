@@ -14,7 +14,6 @@ from django.views.decorators.http import require_POST
 from django.views.generic import ListView, DetailView, View
 from django.urls import reverse, reverse_lazy
 from django.contrib import messages
-from django.utils import timezone
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.utils.translation import gettext as _, ngettext
 
@@ -31,6 +30,12 @@ from .models import (
 from payments.models import Adresse
 from blog.seo import PRODUCT_CATEGORY_DESCRIPTION, build_dynamic_seo
 from .forms import AdresseForm, CategorieForm, CommandeTraitementForm
+from .fulfillment import (
+    InvalidFulfillmentTransition,
+    PaymentNotConfirmed,
+    ShippingDetailsInvalid,
+    transition_order_fulfillment,
+)
 from .services import (
     SQLiteLockRetryExhausted,
     execute_with_sqlite_lock_retry,
@@ -319,39 +324,46 @@ def commande_gestion_detail(request, pk):
 @user_passes_test(_staff_required)
 @require_POST
 def commande_traitement_modifier(request, pk):
-    with transaction.atomic():
-        commande = get_object_or_404(Commande.objects.select_for_update(), pk=pk)
-        form = CommandeTraitementForm(request.POST, commande=commande)
+    commande = get_object_or_404(Commande, pk=pk)
+    form = CommandeTraitementForm(request.POST, commande=commande)
 
-        if commande.payment_status != "SUCCESS":
-            messages.warning(
-                request,
-                _("Le traitement logistique ne peut avancer qu’après confirmation du paiement."),
-            )
-            return redirect("shop:commande_gestion_detail", pk=commande.pk)
+    if commande.payment_status != "SUCCESS":
+        messages.warning(
+            request,
+            _("Le traitement logistique ne peut avancer qu’après confirmation du paiement."),
+        )
+        return redirect("shop:commande_gestion_detail", pk=commande.pk)
 
-        if not form.is_valid():
-            messages.error(request, _("Transition de traitement invalide. Vérifiez les informations d’expédition."))
-            return redirect("shop:commande_gestion_detail", pk=commande.pk)
+    if not form.is_valid():
+        messages.error(
+            request,
+            _(
+                "Transition de traitement invalide. "
+                "Vérifiez les informations d’expédition."
+            ),
+        )
+        return redirect("shop:commande_gestion_detail", pk=commande.pk)
 
-        nouveau_statut = form.cleaned_data["statut"]
-        if nouveau_statut not in commande.allowed_fulfillment_transitions():
-            messages.error(request, _("Cette transition de traitement n’est pas autorisée."))
-            return redirect("shop:commande_gestion_detail", pk=commande.pk)
-
-        update_fields = ["fulfillment_status"]
-        commande.fulfillment_status = nouveau_statut
-
-        if nouveau_statut == "SHIPPED":
-            commande.carrier = form.cleaned_data["carrier"].strip()
-            commande.tracking_number = form.cleaned_data["tracking_number"].strip()
-            commande.shipped_at = timezone.now()
-            update_fields.extend(["carrier", "tracking_number", "shipped_at"])
-        elif nouveau_statut == "DELIVERED":
-            commande.delivered_at = timezone.now()
-            update_fields.append("delivered_at")
-
-        commande.save(update_fields=update_fields)
+    nouveau_statut = form.cleaned_data["statut"]
+    try:
+        commande = transition_order_fulfillment(
+            commande.pk,
+            nouveau_statut,
+            carrier=form.cleaned_data["carrier"],
+            tracking_number=form.cleaned_data["tracking_number"],
+        )
+    except PaymentNotConfirmed:
+        messages.warning(
+            request,
+            _("Le traitement logistique ne peut avancer qu’après confirmation du paiement."),
+        )
+        return redirect("shop:commande_gestion_detail", pk=commande.pk)
+    except (InvalidFulfillmentTransition, ShippingDetailsInvalid):
+        messages.error(
+            request,
+            _("Cette transition de traitement n’est pas autorisée."),
+        )
+        return redirect("shop:commande_gestion_detail", pk=commande.pk)
 
     messages.success(
         request,
