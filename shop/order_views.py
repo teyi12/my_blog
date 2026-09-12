@@ -5,6 +5,12 @@ from django.views.decorators.http import require_http_methods
 from django.utils.translation import gettext as _
 
 from .forms import CommandeExpeditionForm
+from .fulfillment import (
+    PaymentNotConfirmed,
+    ShippingDetailsInvalid,
+    ShippingDetailsNotEditable,
+    update_order_shipping_details,
+)
 from .models import Commande
 
 
@@ -26,7 +32,30 @@ def commande_expedition_modifier(request, pk):
 
     form = CommandeExpeditionForm(request.POST or None, instance=commande)
     if request.method == "POST" and form.is_valid():
-        form.save()
+        try:
+            update_order_shipping_details(
+                commande.pk,
+                carrier=form.cleaned_data["carrier"],
+                tracking_number=form.cleaned_data["tracking_number"],
+            )
+        except (PaymentNotConfirmed, ShippingDetailsNotEditable):
+            messages.warning(
+                request,
+                _(
+                    "Les informations d’expédition peuvent être modifiées "
+                    "uniquement après l’expédition de la commande."
+                ),
+            )
+            return redirect("shop:commande_gestion_detail", pk=commande.pk)
+        except ShippingDetailsInvalid:
+            messages.error(
+                request,
+                _(
+                    "Les informations d’expédition peuvent être modifiées "
+                    "uniquement après l’expédition de la commande."
+                ),
+            )
+            return redirect("shop:commande_gestion_detail", pk=commande.pk)
         messages.success(
             request,
             _("Les informations d’expédition de la commande #%(order)s ont été mises à jour.")

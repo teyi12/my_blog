@@ -102,7 +102,11 @@ def send_fulfillment_notification(commande, new_status, request=None):
             )
             message.attach_alternative(html_body, "text/html")
             message.send(fail_silently=False)
-        except Exception:
-            logger.exception("Unable to send fulfillment email for order %s", commande.pk)
+        except Exception as exc:
+            logger.warning(
+                "operation=fulfillment_notification exception_type=%s order_id=%s",
+                type(exc).__name__,
+                commande.pk,
+            )
             return False
     return True
