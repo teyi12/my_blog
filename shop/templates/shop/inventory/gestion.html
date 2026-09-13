@@ -1,0 +1,65 @@
+{% extends 'template_base.html' %}
+{% load i18n static %}
+
+{% block titre %}{% translate "Gestion de l’inventaire" %} — Teyilawson{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{% static 'css/order-management.css' %}">
+{% endblock %}
+
+{% block contenu %}
+<section class="orders-admin-page">
+  <header class="orders-admin-hero">
+    <div>
+      <span class="orders-admin-eyebrow">{% translate "Espace staff" %}</span>
+      <h1>{% translate "Gestion de l’inventaire" %}</h1>
+      <p>{% translate "Chaque ajustement est enregistré définitivement dans le journal d’inventaire." %}</p>
+    </div>
+  </header>
+
+  <div class="order-detail-grid">
+    <section class="order-panel">
+      <h2>{% translate "Produits épuisés ou en stock faible" %}</h2>
+      {% if inventory_alerts %}
+        <div class="table-responsive">
+          <table class="table mt-3">
+            <thead><tr><th>{% translate "Produit" %}</th><th>{% translate "Stock" %}</th><th>{% translate "Seuil" %}</th></tr></thead>
+            <tbody>
+            {% for produit in inventory_alerts %}
+              <tr><td>{{ produit.nom }}</td><td>{{ produit.stock }}</td><td>{{ produit.low_stock_threshold|default_if_none:"—" }}</td></tr>
+            {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      {% else %}
+        <p class="order-muted">{% translate "Aucune alerte de stock." %}</p>
+      {% endif %}
+    </section>
+
+    <section class="order-panel">
+      <h2>{% translate "Ajustement manuel" %}</h2>
+      <form method="post" action="{% url 'shop:inventory_adjust' %}" class="fulfillment-form">
+        {% csrf_token %}
+        {{ adjustment_form.as_p }}
+        <button type="submit">{% translate "Enregistrer l’ajustement" %}</button>
+      </form>
+    </section>
+  </div>
+
+  <section class="order-panel mt-4">
+    <h2>{% translate "Derniers mouvements" %}</h2>
+    <div class="table-responsive">
+      <table class="table mt-3">
+        <thead><tr><th>{% translate "Date" %}</th><th>{% translate "Produit" %}</th><th>{% translate "Type" %}</th><th>{% translate "Variation" %}</th><th>{% translate "Stock avant/après" %}</th><th>{% translate "Motif" %}</th></tr></thead>
+        <tbody>
+        {% for movement in recent_movements %}
+          <tr><td>{{ movement.created_at|date:'SHORT_DATETIME_FORMAT' }}</td><td>{{ movement.produit }}</td><td>{{ movement.get_movement_type_display }}</td><td>{{ movement.quantity|stringformat:"+d" }}</td><td>{{ movement.stock_before }} → {{ movement.stock_after }}</td><td>{{ movement.reason }}</td></tr>
+        {% empty %}
+          <tr><td colspan="6">{% translate "Aucun mouvement enregistré." %}</td></tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+</section>
+{% endblock %}

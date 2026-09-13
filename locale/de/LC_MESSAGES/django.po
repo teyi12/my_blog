@@ -3686,3 +3686,172 @@ msgstr "Der Warenkorb enthält eine nicht verfügbare Menge. Kehren Sie zum Ware
 #, python-format
 msgid "Disponible : %(available)s"
 msgstr "Verfügbar: %(available)s"
+
+# Inventory audit trail
+msgid "Alerte de stock"
+msgstr "Bestandswarnung"
+
+msgid "Épuisé ou stock faible"
+msgstr "Ausverkauft oder niedriger Bestand"
+
+msgid "Stock faible"
+msgstr "Niedriger Bestand"
+
+msgid "Variation de stock"
+msgstr "Bestandsänderung"
+
+msgid "Motif"
+msgstr "Grund"
+
+msgid "La variation doit être différente de zéro."
+msgstr "Die Änderung darf nicht null sein."
+
+msgid "Le motif est obligatoire."
+msgstr "Ein Grund ist erforderlich."
+
+#, python-format
+msgid "Réservation pour la commande #%(order)s"
+msgstr "Reservierung für Bestellung Nr. %(order)s"
+
+#, python-format
+msgid "Vente confirmée pour la commande #%(order)s"
+msgstr "Bestätigter Verkauf für Bestellung Nr. %(order)s"
+
+#, python-format
+msgid "Libération pour la commande #%(order)s"
+msgstr "Freigabe für Bestellung Nr. %(order)s"
+
+#, python-format
+msgid "Remise en stock après remboursement de la commande #%(order)s"
+msgstr "Wiedereinlagerung nach Erstattung der Bestellung Nr. %(order)s"
+
+msgid "Stock remis en inventaire"
+msgstr "Bestand wiederhergestellt"
+
+msgid "Stock initial"
+msgstr "Anfangsbestand"
+
+msgid "Ajustement manuel"
+msgstr "Manuelle Anpassung"
+
+msgid "Réservation"
+msgstr "Reservierung"
+
+msgid "Libération"
+msgstr "Freigabe"
+
+msgid "Vente confirmée"
+msgstr "Bestätigter Verkauf"
+
+msgid "Remise en stock"
+msgstr "Wiedereinlagerung"
+
+msgid "Seuil de stock faible"
+msgstr "Schwellenwert für niedrigen Bestand"
+
+msgid "Laissez vide pour désactiver l’alerte de stock faible."
+msgstr "Leer lassen, um die Warnung bei niedrigem Bestand zu deaktivieren."
+
+msgid "Le journal d’inventaire est immuable."
+msgstr "Das Bestandsjournal ist unveränderlich."
+
+msgid "Produit"
+msgstr "Produkt"
+
+msgid "Identifiant produit"
+msgstr "Produktkennung"
+
+msgid "Nom du produit"
+msgstr "Produktname"
+
+msgid "Type de mouvement"
+msgstr "Bewegungsart"
+
+msgid "Variation"
+msgstr "Änderung"
+
+msgid "Stock avant"
+msgstr "Bestand vorher"
+
+msgid "Stock après"
+msgstr "Bestand nachher"
+
+msgid "Ligne de commande"
+msgstr "Bestellposition"
+
+msgid "Acteur staff"
+msgstr "Mitarbeiter"
+
+msgid "Clé d’idempotence"
+msgstr "Idempotenzschlüssel"
+
+msgid "Mouvement de stock"
+msgstr "Bestandsbewegung"
+
+msgid "Mouvements de stock"
+msgstr "Bestandsbewegungen"
+
+msgid "Remettre explicitement en stock"
+msgstr "Ausdrücklich wieder einlagern"
+
+msgid "Cette commande a déjà été remise en stock."
+msgstr "Diese Bestellung wurde bereits wieder eingelagert."
+
+msgid "Gestion de l’inventaire"
+msgstr "Bestandsverwaltung"
+
+msgid "Espace staff"
+msgstr "Mitarbeiterbereich"
+
+msgid "Chaque ajustement est enregistré définitivement dans le journal d’inventaire."
+msgstr "Jede Anpassung wird dauerhaft im Bestandsjournal erfasst."
+
+msgid "Produits épuisés ou en stock faible"
+msgstr "Ausverkaufte Produkte oder Produkte mit niedrigem Bestand"
+
+msgid "Stock"
+msgstr "Bestand"
+
+msgid "Seuil"
+msgstr "Schwellenwert"
+
+msgid "Aucune alerte de stock."
+msgstr "Keine Bestandswarnungen."
+
+msgid "Enregistrer l’ajustement"
+msgstr "Anpassung speichern"
+
+msgid "Derniers mouvements"
+msgstr "Neueste Bewegungen"
+
+msgid "Stock avant/après"
+msgstr "Bestand vorher/nachher"
+
+msgid "Aucun mouvement enregistré."
+msgstr "Keine Bewegungen erfasst."
+
+msgid "Gérer l’inventaire"
+msgstr "Bestand verwalten"
+
+msgid "Le stock ne peut pas devenir négatif."
+msgstr "Der Bestand darf nicht negativ werden."
+
+msgid "Cet ajustement de stock ne peut pas être appliqué."
+msgstr "Diese Bestandsanpassung kann nicht angewendet werden."
+
+#, python-format
+msgid "Stock de « %(product)s » ajusté de %(quantity)+d unité(s)."
+msgstr "Bestand von „%(product)s“ um %(quantity)+d Einheit(en) angepasst."
+
+msgid "Cette commande ne peut pas être remise en stock."
+msgstr "Diese Bestellung kann nicht wieder eingelagert werden."
+
+#, python-format
+msgid "Le stock de la commande #%(order)s a été restauré."
+msgstr "Der Bestand für Bestellung Nr. %(order)s wurde wiederhergestellt."
+
+msgid "Ajustement de stock"
+msgstr "Bestandsanpassung"
+
+msgid "Ajuster le stock"
+msgstr "Bestand anpassen"

@@ -22,7 +22,14 @@ from django.utils import timezone
 from payments.models import Adresse, Payment
 from payments.refunds import request_full_refund
 from shop.inventory import StockUnavailable, reserve_order_stock
-from shop.models import Cart, CartItem, Commande, LigneCommande, Produit
+from shop.models import (
+    Cart,
+    CartItem,
+    Commande,
+    LigneCommande,
+    Produit,
+    StockMovement,
+)
 from shop.services import execute_with_sqlite_lock_retry
 
 
@@ -298,6 +305,25 @@ class InventoryIntegrityTests(TestCase):
         self.assertEqual(line.stock_reserved_quantity, 2)
         self.assertEqual(payment.status, "SUCCESS")
         self.assertEqual(order.client, user)
+        self.assertEqual(
+            StockMovement.objects.filter(
+                commande=order,
+                movement_type="RESERVATION",
+            ).count(),
+            1,
+        )
+        self.assertEqual(
+            StockMovement.objects.filter(
+                commande=order,
+                movement_type="SALE",
+            ).count(),
+            1,
+        )
+        for movement in StockMovement.objects.filter(commande=order):
+            self.assertEqual(
+                movement.stock_before + movement.quantity,
+                movement.stock_after,
+            )
 
     def test_cinetpay_confirmation_commits_without_second_decrement(self):
         _user, product, _cart, _item, order, _line, payment = (

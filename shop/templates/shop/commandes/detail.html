@@ -72,6 +72,14 @@
             <a class="orders-admin-back" href="{% url 'shop:confirmer_remboursement_commande' commande.pk %}">{% translate "Rembourser intégralement" %}</a>
           {% endif %}
         {% endif %}
+        {% if can_restock %}
+          <form method="post" action="{% url 'shop:commande_remettre_en_stock' commande.pk %}">
+            {% csrf_token %}
+            <button class="orders-admin-back" type="submit">{% translate "Remettre explicitement en stock" %}</button>
+          </form>
+        {% elif commande.inventory_status == 'RESTOCKED' %}
+          <p class="fulfillment-note">{% translate "Cette commande a déjà été remise en stock." %}</p>
+        {% endif %}
       </section>
     </div>
 

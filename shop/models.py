@@ -3,7 +3,7 @@ from pathlib import PurePosixPath
 import uuid
 
 from django.conf import settings
-from django.core.exceptions import SuspiciousFileOperation
+from django.core.exceptions import SuspiciousFileOperation, ValidationError
 from django.core.validators import MinValueValidator
 from django.db import models
 from django.utils.text import get_valid_filename, slugify
@@ -46,6 +46,16 @@ INVENTORY_STATUS_CHOICES = [
     ("RESERVED", _("Stock réservé")),
     ("COMMITTED", _("Stock consommé")),
     ("RELEASED", _("Stock libéré")),
+    ("RESTOCKED", _("Stock remis en inventaire")),
+]
+
+STOCK_MOVEMENT_TYPE_CHOICES = [
+    ("INITIAL", _("Stock initial")),
+    ("MANUAL", _("Ajustement manuel")),
+    ("RESERVATION", _("Réservation")),
+    ("RELEASE", _("Libération")),
+    ("SALE", _("Vente confirmée")),
+    ("RESTOCK", _("Remise en stock")),
 ]
 
 
@@ -117,6 +127,13 @@ class Produit(models.Model):
             "ne consomment pas de stock."
         ),
     )
+    low_stock_threshold = models.PositiveIntegerField(
+        null=True,
+        blank=True,
+        validators=[MinValueValidator(0)],
+        verbose_name=_("Seuil de stock faible"),
+        help_text=_("Laissez vide pour désactiver l’alerte de stock faible."),
+    )
 
     categorie = models.ForeignKey(
         Categorie, on_delete=models.SET_NULL, null=True, blank=True
@@ -148,6 +165,13 @@ class Produit(models.Model):
             models.CheckConstraint(
                 condition=models.Q(stock__isnull=True) | models.Q(stock__gte=0),
                 name="product_stock_nonnegative",
+            ),
+            models.CheckConstraint(
+                condition=(
+                    models.Q(low_stock_threshold__isnull=True)
+                    | models.Q(low_stock_threshold__gte=0)
+                ),
+                name="product_low_stock_threshold_nonnegative",
             ),
         ]
 
@@ -225,6 +249,7 @@ class Commande(models.Model):
         default="NONE",
         editable=False,
     )
+    inventory_cycle = models.PositiveIntegerField(default=0, editable=False)
     stock_reservation_expires_at = models.DateTimeField(
         null=True,
         blank=True,
@@ -364,6 +389,108 @@ class LigneCommande(models.Model):
 
     def __str__(self):
         return f"{self.quantite} x {self.nom_produit_affiche}"
+
+
+class ImmutableStockMovementQuerySet(models.QuerySet):
+    def update(self, **kwargs):
+        raise ValidationError(_("Le journal d’inventaire est immuable."))
+
+    def delete(self):
+        raise ValidationError(_("Le journal d’inventaire est immuable."))
+
+    def bulk_update(self, objs, fields, batch_size=None):
+        raise ValidationError(_("Le journal d’inventaire est immuable."))
+
+
+class StockMovement(models.Model):
+    produit = models.ForeignKey(
+        Produit,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="stock_movements",
+        verbose_name=_("Produit"),
+    )
+    product_id_snapshot = models.PositiveBigIntegerField(
+        editable=False,
+        verbose_name=_("Identifiant produit"),
+    )
+    product_name_snapshot = models.CharField(
+        max_length=255,
+        editable=False,
+        verbose_name=_("Nom du produit"),
+    )
+    movement_type = models.CharField(
+        max_length=20,
+        choices=STOCK_MOVEMENT_TYPE_CHOICES,
+        verbose_name=_("Type de mouvement"),
+    )
+    quantity = models.IntegerField(verbose_name=_("Variation"))
+    stock_before = models.PositiveIntegerField(verbose_name=_("Stock avant"))
+    stock_after = models.PositiveIntegerField(verbose_name=_("Stock après"))
+    reason = models.TextField(verbose_name=_("Motif"))
+    commande = models.ForeignKey(
+        Commande,
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name="stock_movements",
+        verbose_name=_("Commande"),
+    )
+    ligne = models.ForeignKey(
+        LigneCommande,
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name="stock_movements",
+        verbose_name=_("Ligne de commande"),
+    )
+    actor = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="stock_movements",
+        verbose_name=_("Acteur staff"),
+    )
+    created_at = models.DateTimeField(auto_now_add=True, editable=False)
+    idempotency_key = models.CharField(
+        max_length=255,
+        unique=True,
+        editable=False,
+        verbose_name=_("Clé d’idempotence"),
+    )
+
+    objects = ImmutableStockMovementQuerySet.as_manager()
+
+    class Meta:
+        ordering = ("-created_at", "-pk")
+        verbose_name = _("Mouvement de stock")
+        verbose_name_plural = _("Mouvements de stock")
+        constraints = [
+            models.CheckConstraint(
+                condition=models.Q(stock_after=models.F("stock_before") + models.F("quantity")),
+                name="stock_movement_balanced",
+            ),
+            models.CheckConstraint(
+                condition=~models.Q(reason=""),
+                name="stock_movement_reason_not_empty",
+            ),
+        ]
+
+    def save(self, *args, **kwargs):
+        if not self._state.adding or self.pk:
+            raise ValidationError(_("Le journal d’inventaire est immuable."))
+        super().save(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        raise ValidationError(_("Le journal d’inventaire est immuable."))
+
+    def __str__(self):
+        return (
+            f"{self.get_movement_type_display()} · "
+            f"{self.product_name_snapshot} · {self.quantity:+d}"
+        )
 
 
 class OrderReceipt(models.Model):

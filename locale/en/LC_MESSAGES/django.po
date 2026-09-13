@@ -3626,3 +3626,172 @@ msgstr "The cart contains an unavailable quantity. Return to the cart to correct
 #, python-format
 msgid "Disponible : %(available)s"
 msgstr "Available: %(available)s"
+
+# Inventory audit trail
+msgid "Alerte de stock"
+msgstr "Stock alert"
+
+msgid "Épuisé ou stock faible"
+msgstr "Out of stock or low stock"
+
+msgid "Stock faible"
+msgstr "Low stock"
+
+msgid "Variation de stock"
+msgstr "Stock change"
+
+msgid "Motif"
+msgstr "Reason"
+
+msgid "La variation doit être différente de zéro."
+msgstr "The change must not be zero."
+
+msgid "Le motif est obligatoire."
+msgstr "A reason is required."
+
+#, python-format
+msgid "Réservation pour la commande #%(order)s"
+msgstr "Reservation for order #%(order)s"
+
+#, python-format
+msgid "Vente confirmée pour la commande #%(order)s"
+msgstr "Confirmed sale for order #%(order)s"
+
+#, python-format
+msgid "Libération pour la commande #%(order)s"
+msgstr "Release for order #%(order)s"
+
+#, python-format
+msgid "Remise en stock après remboursement de la commande #%(order)s"
+msgstr "Restock after refund of order #%(order)s"
+
+msgid "Stock remis en inventaire"
+msgstr "Stock restored"
+
+msgid "Stock initial"
+msgstr "Initial stock"
+
+msgid "Ajustement manuel"
+msgstr "Manual adjustment"
+
+msgid "Réservation"
+msgstr "Reservation"
+
+msgid "Libération"
+msgstr "Release"
+
+msgid "Vente confirmée"
+msgstr "Confirmed sale"
+
+msgid "Remise en stock"
+msgstr "Restock"
+
+msgid "Seuil de stock faible"
+msgstr "Low-stock threshold"
+
+msgid "Laissez vide pour désactiver l’alerte de stock faible."
+msgstr "Leave blank to disable the low-stock alert."
+
+msgid "Le journal d’inventaire est immuable."
+msgstr "The inventory journal is immutable."
+
+msgid "Produit"
+msgstr "Product"
+
+msgid "Identifiant produit"
+msgstr "Product identifier"
+
+msgid "Nom du produit"
+msgstr "Product name"
+
+msgid "Type de mouvement"
+msgstr "Movement type"
+
+msgid "Variation"
+msgstr "Change"
+
+msgid "Stock avant"
+msgstr "Stock before"
+
+msgid "Stock après"
+msgstr "Stock after"
+
+msgid "Ligne de commande"
+msgstr "Order line"
+
+msgid "Acteur staff"
+msgstr "Staff actor"
+
+msgid "Clé d’idempotence"
+msgstr "Idempotency key"
+
+msgid "Mouvement de stock"
+msgstr "Stock movement"
+
+msgid "Mouvements de stock"
+msgstr "Stock movements"
+
+msgid "Remettre explicitement en stock"
+msgstr "Explicitly restock"
+
+msgid "Cette commande a déjà été remise en stock."
+msgstr "This order has already been restocked."
+
+msgid "Gestion de l’inventaire"
+msgstr "Inventory management"
+
+msgid "Espace staff"
+msgstr "Staff area"
+
+msgid "Chaque ajustement est enregistré définitivement dans le journal d’inventaire."
+msgstr "Every adjustment is permanently recorded in the inventory journal."
+
+msgid "Produits épuisés ou en stock faible"
+msgstr "Out-of-stock or low-stock products"
+
+msgid "Stock"
+msgstr "Stock"
+
+msgid "Seuil"
+msgstr "Threshold"
+
+msgid "Aucune alerte de stock."
+msgstr "No stock alerts."
+
+msgid "Enregistrer l’ajustement"
+msgstr "Save adjustment"
+
+msgid "Derniers mouvements"
+msgstr "Latest movements"
+
+msgid "Stock avant/après"
+msgstr "Stock before/after"
+
+msgid "Aucun mouvement enregistré."
+msgstr "No movements recorded."
+
+msgid "Gérer l’inventaire"
+msgstr "Manage inventory"
+
+msgid "Le stock ne peut pas devenir négatif."
+msgstr "Stock cannot become negative."
+
+msgid "Cet ajustement de stock ne peut pas être appliqué."
+msgstr "This stock adjustment cannot be applied."
+
+#, python-format
+msgid "Stock de « %(product)s » ajusté de %(quantity)+d unité(s)."
+msgstr "Stock for “%(product)s” adjusted by %(quantity)+d unit(s)."
+
+msgid "Cette commande ne peut pas être remise en stock."
+msgstr "This order cannot be restocked."
+
+#, python-format
+msgid "Le stock de la commande #%(order)s a été restauré."
+msgstr "Stock for order #%(order)s has been restored."
+
+msgid "Ajustement de stock"
+msgstr "Stock adjustment"
+
+msgid "Ajuster le stock"
+msgstr "Adjust stock"
