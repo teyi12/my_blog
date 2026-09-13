@@ -23,6 +23,15 @@
     </div>
   </header>
 
+  {% if cancellation %}
+    <section class="customer-order-panel">
+      <div class="customer-order-panel-heading"><h2>{% translate "Commande annulée" %}</h2><span>{{ cancellation.created_at|date:'SHORT_DATETIME_FORMAT' }}</span></div>
+      <p>{% translate "Cette commande a été annulée et ne sera pas mise en paiement." %}</p>
+    </section>
+  {% elif can_cancel %}
+    <a class="customer-download-button" href="{% url 'shop:confirmer_annulation_client' commande.pk %}">{% translate "Annuler ma commande" %}</a>
+  {% endif %}
+
   {% if receipt %}
     {% if commande.payment_status == 'SUCCESS' or commande.payment_status == 'REFUNDED' %}
       <a class="customer-download-button" href="{% url 'shop:telecharger_recu_commande' commande.pk receipt.public_id %}">

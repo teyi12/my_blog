@@ -3855,3 +3855,106 @@ msgstr "Bestandsanpassung"
 
 msgid "Ajuster le stock"
 msgstr "Bestand anpassen"
+
+msgid "Équipe"
+msgstr "Team"
+
+msgid "Non requise"
+msgstr "Nicht erforderlich"
+
+msgid "À effectuer"
+msgstr "Ausstehend"
+
+msgid "Session expirée"
+msgstr "Sitzung abgelaufen"
+
+msgid "Échec contrôlé"
+msgstr "Kontrollierter Fehler"
+
+msgid "Annulée par"
+msgstr "Storniert von"
+
+msgid "Origine"
+msgstr "Quelle"
+
+msgid "Expiration Stripe"
+msgstr "Stripe-Ablauf"
+
+msgid "Annulation de commande"
+msgstr "Bestellstornierung"
+
+msgid "Annulations de commande"
+msgstr "Bestellstornierungen"
+
+msgid "Confirmer l’annulation"
+msgstr "Stornierung bestätigen"
+
+msgid "Cette commande est déjà annulée."
+msgstr "Diese Bestellung wurde bereits storniert."
+
+msgid "Une commande payée ne peut pas être annulée directement. Utilisez le remboursement sécurisé."
+msgstr "Eine bezahlte Bestellung kann nicht direkt storniert werden. Nutzen Sie die sichere Rückerstattung."
+
+msgid "Accéder au remboursement sécurisé"
+msgstr "Zur sicheren Rückerstattung"
+
+msgid "Cette commande ne peut plus être annulée."
+msgstr "Diese Bestellung kann nicht mehr storniert werden."
+
+msgid "L’annulation est définitive. Toute réservation de stock active sera libérée."
+msgstr "Die Stornierung ist endgültig. Jede aktive Bestandsreservierung wird freigegeben."
+
+msgid "Confirmer l’annulation de la commande"
+msgstr "Bestellstornierung bestätigen"
+
+msgid "L’annulation est momentanément indisponible. Veuillez réessayer."
+msgstr "Die Stornierung ist vorübergehend nicht verfügbar. Bitte versuchen Sie es erneut."
+
+msgid "La commande est annulée, mais la session Stripe n’a pas pu être expirée. Aucun nouveau paiement ne sera appliqué localement."
+msgstr "Die Bestellung ist storniert, aber die Stripe-Sitzung konnte nicht beendet werden. Lokal wird keine neue Zahlung übernommen."
+
+msgid "La commande a été annulée."
+msgstr "Die Bestellung wurde storniert."
+
+#, python-format
+msgid "Votre commande #%(order)s a été annulée"
+msgstr "Ihre Bestellung Nr. %(order)s wurde storniert"
+
+#, python-format
+msgid "Votre commande #%(order)s a bien été annulée."
+msgstr "Ihre Bestellung Nr. %(order)s wurde storniert."
+
+msgid "Aucun paiement ne sera initié pour cette commande."
+msgstr "Für diese Bestellung wird keine Zahlung eingeleitet."
+
+msgid "Consulter votre commande"
+msgstr "Bestellung ansehen"
+
+msgid "Commande annulée"
+msgstr "Bestellung storniert"
+
+#, python-format
+msgid "Annulation enregistrée par : %(source)s."
+msgstr "Stornierung erfasst durch: %(source)s."
+
+msgid "L’expiration de la session Stripe a échoué de manière contrôlée."
+msgstr "Das Beenden der Stripe-Sitzung ist kontrolliert fehlgeschlagen."
+
+msgid "Annuler la commande"
+msgstr "Bestellung stornieren"
+
+msgid "Une commande payée doit passer par le remboursement sécurisé."
+msgstr "Eine bezahlte Bestellung muss über die sichere Rückerstattung abgewickelt werden."
+
+msgid "Cette commande a été annulée et ne sera pas mise en paiement."
+msgstr "Diese Bestellung wurde storniert und wird nicht zur Zahlung eingereicht."
+
+msgid "Annuler ma commande"
+msgstr "Meine Bestellung stornieren"
+
+#, python-format
+msgid "Commande annulée le %(date)s."
+msgstr "Bestellung storniert am %(date)s."
+
+msgid "Alerte : un paiement a été confirmé après l’annulation. Vérifiez-le avant tout remboursement sécurisé."
+msgstr "Warnung: Nach der Stornierung wurde eine Zahlung bestätigt. Prüfen Sie sie vor einer sicheren Rückerstattung."

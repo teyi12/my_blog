@@ -5,7 +5,14 @@ from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
 from modeltranslation.admin import TranslationAdmin
 
-from .models import Categorie, Produit, Commande, LigneCommande, StockMovement
+from .models import (
+    Categorie,
+    Commande,
+    LigneCommande,
+    OrderCancellation,
+    Produit,
+    StockMovement,
+)
 
 
 class StockAlertFilter(admin.SimpleListFilter):
@@ -186,6 +193,33 @@ class StockMovementAdmin(admin.ModelAdmin):
     )
     readonly_fields = tuple(
         field.name for field in StockMovement._meta.concrete_fields
+    )
+
+    def has_add_permission(self, request):
+        return False
+
+    def has_change_permission(self, request, obj=None):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+
+@admin.register(OrderCancellation)
+class OrderCancellationAdmin(admin.ModelAdmin):
+    list_display = (
+        "commande",
+        "created_at",
+        "source",
+        "requested_by",
+        "stripe_expiration_status",
+        "late_payment_detected_at",
+        "notification_sent_at",
+    )
+    list_filter = ("source", "stripe_expiration_status", "created_at")
+    search_fields = ("commande__id", "commande__client__email", "idempotency_key")
+    readonly_fields = tuple(
+        field.name for field in OrderCancellation._meta.concrete_fields
     )
 
     def has_add_permission(self, request):

@@ -1,7 +1,7 @@
 from django.urls import path
 from payments import refund_views
 
-from . import views, customer_views, order_views
+from . import cancellation_views, customer_views, order_views, views
 
 app_name = "shop"
 
@@ -14,6 +14,16 @@ urlpatterns = [
     # Espace client
     path("mes-commandes/", customer_views.mes_commandes, name="mes_commandes"),
     path("mes-commandes/<int:pk>/", customer_views.ma_commande_detail, name="ma_commande_detail"),
+    path(
+        "mes-commandes/<int:pk>/annulation/confirmer/",
+        cancellation_views.confirmer_annulation_client,
+        name="confirmer_annulation_client",
+    ),
+    path(
+        "mes-commandes/<int:pk>/annulation/",
+        cancellation_views.annuler_commande_client,
+        name="annuler_commande_client",
+    ),
     path(
         "mes-commandes/<int:order_pk>/lignes/<int:line_pk>/telecharger/",
         customer_views.telecharger_fichier_commande,
@@ -38,6 +48,16 @@ urlpatterns = [
     # Gestion des commandes (staff)
     path("commandes/", views.commande_gestion_liste, name="commande_gestion_liste"),
     path("commandes/<int:pk>/", views.commande_gestion_detail, name="commande_gestion_detail"),
+    path(
+        "commandes/<int:pk>/annulation/confirmer/",
+        cancellation_views.confirmer_annulation_staff,
+        name="confirmer_annulation_staff",
+    ),
+    path(
+        "commandes/<int:pk>/annulation/",
+        cancellation_views.annuler_commande_staff,
+        name="annuler_commande_staff",
+    ),
     path(
         "commandes/<int:pk>/traitement/",
         views.commande_traitement_modifier,

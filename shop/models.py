@@ -58,6 +58,19 @@ STOCK_MOVEMENT_TYPE_CHOICES = [
     ("RESTOCK", _("Remise en stock")),
 ]
 
+ORDER_CANCELLATION_SOURCE_CHOICES = [
+    ("CUSTOMER", _("Client")),
+    ("STAFF", _("Équipe")),
+]
+
+STRIPE_EXPIRATION_STATUS_CHOICES = [
+    ("NOT_REQUIRED", _("Non requise")),
+    ("PENDING", _("À effectuer")),
+    ("PROCESSING", _("En cours")),
+    ("SUCCEEDED", _("Session expirée")),
+    ("FAILED", _("Échec contrôlé")),
+]
+
 
 def safe_order_download_filename(storage_name):
     """Return a path-free attachment name derived from a storage key."""
@@ -267,6 +280,65 @@ class Commande(models.Model):
 
     def allowed_fulfillment_transitions(self):
         return FULFILLMENT_TRANSITIONS.get(self.fulfillment_status, set())
+
+
+class OrderCancellation(models.Model):
+    commande = models.OneToOneField(
+        Commande,
+        on_delete=models.PROTECT,
+        related_name="cancellation",
+        verbose_name=_("Commande"),
+    )
+    requested_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="requested_order_cancellations",
+        verbose_name=_("Annulée par"),
+    )
+    source = models.CharField(
+        max_length=20,
+        choices=ORDER_CANCELLATION_SOURCE_CHOICES,
+        verbose_name=_("Origine"),
+    )
+    idempotency_key = models.UUIDField(
+        default=uuid.uuid4,
+        unique=True,
+        editable=False,
+        verbose_name=_("Clé d’idempotence"),
+    )
+    created_at = models.DateTimeField(auto_now_add=True, editable=False)
+    stripe_expiration_status = models.CharField(
+        max_length=20,
+        choices=STRIPE_EXPIRATION_STATUS_CHOICES,
+        default="NOT_REQUIRED",
+        editable=False,
+        verbose_name=_("Expiration Stripe"),
+    )
+    stripe_expiration_attempted_at = models.DateTimeField(
+        null=True,
+        blank=True,
+        editable=False,
+    )
+    notification_sent_at = models.DateTimeField(
+        null=True,
+        blank=True,
+        editable=False,
+    )
+    late_payment_detected_at = models.DateTimeField(
+        null=True,
+        blank=True,
+        editable=False,
+    )
+
+    class Meta:
+        ordering = ("-created_at", "-pk")
+        verbose_name = _("Annulation de commande")
+        verbose_name_plural = _("Annulations de commande")
+
+    def __str__(self):
+        return f"Annulation commande #{self.commande_id}"
 
 
 class LigneCommande(models.Model):

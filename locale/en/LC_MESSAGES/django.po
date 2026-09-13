@@ -3795,3 +3795,106 @@ msgstr "Stock adjustment"
 
 msgid "Ajuster le stock"
 msgstr "Adjust stock"
+
+msgid "Équipe"
+msgstr "Staff"
+
+msgid "Non requise"
+msgstr "Not required"
+
+msgid "À effectuer"
+msgstr "Pending"
+
+msgid "Session expirée"
+msgstr "Session expired"
+
+msgid "Échec contrôlé"
+msgstr "Controlled failure"
+
+msgid "Annulée par"
+msgstr "Canceled by"
+
+msgid "Origine"
+msgstr "Source"
+
+msgid "Expiration Stripe"
+msgstr "Stripe expiration"
+
+msgid "Annulation de commande"
+msgstr "Order cancellation"
+
+msgid "Annulations de commande"
+msgstr "Order cancellations"
+
+msgid "Confirmer l’annulation"
+msgstr "Confirm cancellation"
+
+msgid "Cette commande est déjà annulée."
+msgstr "This order has already been canceled."
+
+msgid "Une commande payée ne peut pas être annulée directement. Utilisez le remboursement sécurisé."
+msgstr "A paid order cannot be canceled directly. Use the secure refund process."
+
+msgid "Accéder au remboursement sécurisé"
+msgstr "Go to secure refund"
+
+msgid "Cette commande ne peut plus être annulée."
+msgstr "This order can no longer be canceled."
+
+msgid "L’annulation est définitive. Toute réservation de stock active sera libérée."
+msgstr "Cancellation is final. Any active stock reservation will be released."
+
+msgid "Confirmer l’annulation de la commande"
+msgstr "Confirm order cancellation"
+
+msgid "L’annulation est momentanément indisponible. Veuillez réessayer."
+msgstr "Cancellation is temporarily unavailable. Please try again."
+
+msgid "La commande est annulée, mais la session Stripe n’a pas pu être expirée. Aucun nouveau paiement ne sera appliqué localement."
+msgstr "The order is canceled, but the Stripe session could not be expired. No new payment will be applied locally."
+
+msgid "La commande a été annulée."
+msgstr "The order has been canceled."
+
+#, python-format
+msgid "Votre commande #%(order)s a été annulée"
+msgstr "Your order #%(order)s has been canceled"
+
+#, python-format
+msgid "Votre commande #%(order)s a bien été annulée."
+msgstr "Your order #%(order)s has been canceled."
+
+msgid "Aucun paiement ne sera initié pour cette commande."
+msgstr "No payment will be initiated for this order."
+
+msgid "Consulter votre commande"
+msgstr "View your order"
+
+msgid "Commande annulée"
+msgstr "Order canceled"
+
+#, python-format
+msgid "Annulation enregistrée par : %(source)s."
+msgstr "Cancellation recorded by: %(source)s."
+
+msgid "L’expiration de la session Stripe a échoué de manière contrôlée."
+msgstr "The Stripe session expiration failed in a controlled manner."
+
+msgid "Annuler la commande"
+msgstr "Cancel order"
+
+msgid "Une commande payée doit passer par le remboursement sécurisé."
+msgstr "A paid order must use the secure refund process."
+
+msgid "Cette commande a été annulée et ne sera pas mise en paiement."
+msgstr "This order has been canceled and will not be submitted for payment."
+
+msgid "Annuler ma commande"
+msgstr "Cancel my order"
+
+#, python-format
+msgid "Commande annulée le %(date)s."
+msgstr "Order canceled on %(date)s."
+
+msgid "Alerte : un paiement a été confirmé après l’annulation. Vérifiez-le avant tout remboursement sécurisé."
+msgstr "Alert: a payment was confirmed after cancellation. Review it before any secure refund."
