@@ -19,7 +19,7 @@ from django.utils import timezone
 from django.utils.translation import gettext as _
 from django.views.decorators.http import require_POST
 
-from shop.models import Commande, LigneCommande
+from shop.models import Commande, LigneCommande, OrderCancellation
 from shop.inventory import (
     StockUnavailable,
     release_order_stock,
@@ -71,6 +71,7 @@ def choice(request, order_id=None):
         id=order_id,
         client=request.user,
         payment_status__in=("PENDING", "PROCESSING", "FAILED", "CANCELED"),
+        cancellation__isnull=True,
         adresse__isnull=False,
         total__gt=0,
     )
@@ -87,6 +88,7 @@ def _get_payable_order(request, order_id):
         id=order_id,
         client=request.user,
         payment_status="PENDING",
+        cancellation__isnull=True,
         adresse__isnull=False,
         total__gt=0,
     )
@@ -190,6 +192,7 @@ def _reserve_payment(request, order_id, channel):
                 client=request.user,
                 has_order_lines=True,
                 payment_status__in=("PENDING", "PROCESSING", "FAILED", "CANCELED"),
+                cancellation__isnull=True,
                 adresse__isnull=False,
                 total__gt=0,
             )
@@ -287,6 +290,19 @@ def _store_provider_checkout(payment_id, provider_reference, checkout_url):
 def _confirm_payment_once(payment_id, raw_response):
     with transaction.atomic():
         commande, payment = _lock_order_then_payment(payment_id)
+        cancellation = (
+            OrderCancellation.objects.select_for_update()
+            .filter(commande=commande)
+            .first()
+        )
+        if cancellation is not None:
+            if cancellation.late_payment_detected_at is None:
+                cancellation.late_payment_detected_at = timezone.now()
+                cancellation.save(update_fields=["late_payment_detected_at"])
+            if payment.status != "SUCCESS" and payment.status != "CANCELED":
+                payment.status = "CANCELED"
+                payment.save(update_fields=["status", "updated_at"])
+            return payment
         if payment.status == "SUCCESS":
             finalize_paid_order(commande.id)
             return payment
@@ -780,7 +796,20 @@ def cinetpay_ipn(request):
     except Payment.DoesNotExist:
         return HttpResponse("NO_PAYMENT", status=404)
 
-    if payment.status in ("SUCCESS", "FAILED", "CANCELED"):
+    if payment.status in ("SUCCESS", "FAILED"):
+        return HttpResponse("OK", status=200)
+
+    if payment.status == "CANCELED":
+        if OrderCancellation.objects.filter(commande=payment.commande).exists():
+            provider_data = _cinetpay_check_status(tx_id)
+            if (
+                provider_data.get("status") == "ACCEPTED"
+                and _cinetpay_payment_matches(payment, provider_data)
+            ):
+                try:
+                    _confirm_payment(payment.id, {})
+                except SQLiteLockRetryExhausted:
+                    return HttpResponse("RETRY", status=409)
         return HttpResponse("OK", status=200)
 
     provider_data = _cinetpay_check_status(tx_id)
@@ -1124,7 +1153,14 @@ def stripe_webhook(request):
                 commande__client_id=user_id,
                 channel="STRIPE",
             )
-            if payment.status in ("SUCCESS", "FAILED", "CANCELED"):
+            if payment.status in ("SUCCESS", "FAILED"):
+                return HttpResponse(status=200)
+            if (
+                payment.status == "CANCELED"
+                and not OrderCancellation.objects.filter(
+                    commande=payment.commande
+                ).exists()
+            ):
                 return HttpResponse(status=200)
             expected_amount = _minor_amount(payment.montant, payment.devise)
             if (
@@ -1138,7 +1174,10 @@ def stripe_webhook(request):
             ):
                 return HttpResponse("PAYMENT_MISMATCH", status=400)
 
-            _confirm_payment(payment.id, dict(session))
+            _confirm_payment(
+                payment.id,
+                {} if payment.status == "CANCELED" else dict(session),
+            )
 
         except Payment.DoesNotExist:
             return HttpResponse("NO_PAYMENT", status=404)

@@ -22,6 +22,19 @@
     </div>
   </header>
 
+  {% if cancellation %}
+    <section class="order-panel mb-4">
+      <div class="order-panel-heading"><h2>{% translate "Commande annulée" %}</h2><span>{{ cancellation.created_at|date:'SHORT_DATETIME_FORMAT' }}</span></div>
+      <p class="fulfillment-note">{% blocktranslate with source=cancellation.get_source_display %}Annulation enregistrée par : {{ source }}.{% endblocktranslate %}</p>
+      {% if cancellation.stripe_expiration_status == 'FAILED' %}<p class="fulfillment-note">{% translate "L’expiration de la session Stripe a échoué de manière contrôlée." %}</p>{% endif %}
+      {% if cancellation.late_payment_detected_at %}<p class="fulfillment-note">{% translate "Alerte : un paiement a été confirmé après l’annulation. Vérifiez-le avant tout remboursement sécurisé." %}</p>{% endif %}
+    </section>
+  {% elif can_cancel %}
+    <p><a class="orders-admin-back" href="{% url 'shop:confirmer_annulation_staff' commande.pk %}">{% translate "Annuler la commande" %}</a></p>
+  {% elif commande.payment_status == 'SUCCESS' %}
+    <p class="fulfillment-note">{% translate "Une commande payée doit passer par le remboursement sécurisé." %}</p>
+  {% endif %}
+
   <div class="order-detail-grid">
     <div class="order-detail-main">
       <section class="order-panel">

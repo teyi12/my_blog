@@ -1,0 +1,12 @@
+{% load i18n %}
+<!doctype html>
+<html lang="{{ email_language }}">
+<body>
+  <h1>{{ subject }}</h1>
+  <p>{% blocktranslate with name=customer_name %}Bonjour {{ name }},{% endblocktranslate %}</p>
+  <p>{% blocktranslate with order=commande.pk %}Votre commande #{{ order }} a bien été annulée.{% endblocktranslate %}</p>
+  <p>{% translate "Aucun paiement ne sera initié pour cette commande." %}</p>
+  {% if detail_url %}<p><a href="{{ detail_url }}">{% translate "Consulter votre commande" %}</a></p>{% endif %}
+  <p>{% translate "L'équipe My Blog Shop" %}</p>
+</body>
+</html>

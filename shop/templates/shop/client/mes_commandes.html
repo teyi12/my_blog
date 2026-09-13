@@ -34,6 +34,7 @@
           <span class="customer-order-status payment-{{ commande.payment_status|lower }}">{% translate "Paiement" %} · {{ commande.get_payment_status_display }}</span>
           <span class="customer-order-status fulfillment-{{ commande.fulfillment_status|lower }}">{% translate "Traitement" %} · {{ commande.get_fulfillment_status_display }}</span>
         </div>
+        {% if commande.cancellation %}<p class="customer-order-muted">{% blocktranslate with date=commande.cancellation.created_at|date:'SHORT_DATETIME_FORMAT' %}Commande annulée le {{ date }}.{% endblocktranslate %}</p>{% endif %}
 
         <div class="customer-order-products">
           {% for ligne in commande.lignes.all|slice:':3' %}

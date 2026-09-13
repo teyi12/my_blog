@@ -1,0 +1,36 @@
+{% extends 'template_base.html' %}
+{% load i18n static %}
+
+{% block titre %}{% translate "Confirmer l’annulation" %} — Teyilawson{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{% static 'css/order-management.css' %}">
+{% endblock %}
+
+{% block contenu %}
+<section class="order-detail-page">
+  <div class="order-panel">
+    <span class="orders-admin-eyebrow">{% blocktranslate with order=commande.pk %}Commande #{{ order }}{% endblocktranslate %}</span>
+    <h1>{% translate "Confirmer l’annulation" %}</h1>
+
+    {% if cancellation %}
+      <p>{% translate "Cette commande est déjà annulée." %}</p>
+    {% elif requires_refund %}
+      <p>{% translate "Une commande payée ne peut pas être annulée directement. Utilisez le remboursement sécurisé." %}</p>
+      {% if staff_action and commande.payment_channel == 'STRIPE' %}
+        <a class="orders-admin-back" href="{% url 'shop:confirmer_remboursement_commande' commande.pk %}">{% translate "Accéder au remboursement sécurisé" %}</a>
+      {% endif %}
+    {% elif not can_cancel %}
+      <p>{% translate "Cette commande ne peut plus être annulée." %}</p>
+    {% else %}
+      <p>{% translate "L’annulation est définitive. Toute réservation de stock active sera libérée." %}</p>
+      <form method="post" action="{% if staff_action %}{% url 'shop:annuler_commande_staff' commande.pk %}{% else %}{% url 'shop:annuler_commande_client' commande.pk %}{% endif %}" class="fulfillment-form">
+        {% csrf_token %}
+        <button type="submit">{% translate "Confirmer l’annulation de la commande" %}</button>
+      </form>
+    {% endif %}
+
+    <a class="orders-admin-back" href="{% if staff_action %}{% url 'shop:commande_gestion_detail' commande.pk %}{% else %}{% url 'shop:ma_commande_detail' commande.pk %}{% endif %}">{% translate "Retour à la commande" %}</a>
+  </div>
+</section>
+{% endblock %}

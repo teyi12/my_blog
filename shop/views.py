@@ -29,6 +29,7 @@ from .models import (
     safe_order_download_filename,
 )
 from payments.models import Adresse, StripeOrderRefund
+from payments.cancellations import order_can_be_canceled
 from blog.seo import PRODUCT_CATEGORY_DESCRIPTION, build_dynamic_seo
 from .forms import (
     AdresseForm,
@@ -430,7 +431,7 @@ def commande_gestion_liste(request):
 @user_passes_test(_staff_required)
 def commande_gestion_detail(request, pk):
     commande = get_object_or_404(
-        Commande.objects.select_related("client", "adresse")
+        Commande.objects.select_related("client", "adresse", "cancellation")
         .prefetch_related("lignes__produit", "payments"),
         pk=pk,
     )
@@ -470,6 +471,8 @@ def commande_gestion_detail(request, pk):
             "traitement_form": traitement_form,
             "transitions_disponibles": transitions_disponibles,
             "can_restock": can_restock,
+            "cancellation": getattr(commande, "cancellation", None),
+            "can_cancel": order_can_be_canceled(commande),
         },
     )
 

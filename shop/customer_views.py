@@ -10,6 +10,7 @@ from django.views.decorators.http import require_GET
 from requests.exceptions import RequestException
 
 from payments.models import StripeOrderRefund
+from payments.cancellations import order_can_be_canceled
 
 from .models import Commande, LigneCommande, OrderReceipt, product_file_storage
 from .receipts import OrderReceiptPDFError, render_order_receipt_pdf
@@ -31,6 +32,7 @@ def _customer_orders(user):
 def mes_commandes(request):
     commandes = (
         _customer_orders(request.user)
+        .select_related("cancellation")
         .prefetch_related("lignes__produit")
         .order_by("-date_commande", "-pk")
     )
@@ -48,7 +50,7 @@ def mes_commandes(request):
 def ma_commande_detail(request, pk):
     commande = get_object_or_404(
         _customer_orders(request.user)
-        .select_related("adresse", "receipt")
+        .select_related("adresse", "receipt", "cancellation")
         .prefetch_related("lignes__produit", "payments"),
         pk=pk,
     )
@@ -66,6 +68,8 @@ def ma_commande_detail(request, pk):
             "receipt": receipt,
             "remboursement": remboursement,
             "tracking_url": carrier_tracking_url(commande.carrier, commande.tracking_number),
+            "cancellation": getattr(commande, "cancellation", None),
+            "can_cancel": order_can_be_canceled(commande),
         },
     )
 
