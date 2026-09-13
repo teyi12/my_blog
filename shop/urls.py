@@ -31,6 +31,10 @@ urlpatterns = [
     path("categories/<slug:slug>/modifier/", views.categorie_modifier, name="categorie_modifier"),
     path("categories/<slug:slug>/supprimer/", views.categorie_supprimer, name="categorie_supprimer"),
 
+    # Inventaire (staff)
+    path("inventaire/", views.inventory_gestion, name="inventory_gestion"),
+    path("inventaire/ajuster/", views.inventory_adjust, name="inventory_adjust"),
+
     # Gestion des commandes (staff)
     path("commandes/", views.commande_gestion_liste, name="commande_gestion_liste"),
     path("commandes/<int:pk>/", views.commande_gestion_detail, name="commande_gestion_detail"),
@@ -53,6 +57,11 @@ urlpatterns = [
         "commandes/<int:pk>/remboursement/",
         refund_views.rembourser_commande,
         name="rembourser_commande",
+    ),
+    path(
+        "commandes/<int:pk>/remise-en-stock/",
+        views.commande_remettre_en_stock,
+        name="commande_remettre_en_stock",
     ),
 
     # Panier

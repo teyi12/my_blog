@@ -5,7 +5,7 @@ from decimal import Decimal
 from django.conf import settings
 from django.core.paginator import Paginator
 from django.db import IntegrityError, transaction
-from django.db.models import Count, Q
+from django.db.models import Count, F, Q
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required, user_passes_test
@@ -24,12 +24,18 @@ from .models import (
     Commande,
     LigneCommande,
     Produit,
+    StockMovement,
     order_product_snapshot_name,
     safe_order_download_filename,
 )
 from payments.models import Adresse, StripeOrderRefund
 from blog.seo import PRODUCT_CATEGORY_DESCRIPTION, build_dynamic_seo
-from .forms import AdresseForm, CategorieForm, CommandeTraitementForm
+from .forms import (
+    AdresseForm,
+    CategorieForm,
+    CommandeTraitementForm,
+    StockAdjustmentForm,
+)
 from .fulfillment import (
     InvalidFulfillmentTransition,
     PaymentNotConfirmed,
@@ -37,11 +43,18 @@ from .fulfillment import (
     transition_order_fulfillment,
 )
 from .inventory import (
+    InventoryNotManaged,
+    InventoryStateConflict,
+    InvalidStockAdjustment,
+    OrderAlreadyRestocked,
+    OrderNotRestockable,
     StockUnavailable,
     add_product_to_cart,
+    adjust_product_stock,
     cart_stock_issues,
     lock_and_validate_cart_items,
     remove_cart_item,
+    restock_refunded_order,
     set_cart_item_quantity,
 )
 from .services import (
@@ -204,6 +217,85 @@ def _staff_required(user):
     return user.is_authenticated and user.is_staff
 
 
+def _inventory_staff_context(form=None, initial_product_id=None):
+    alerts = (
+        Produit.objects.filter(stock__isnull=False)
+        .filter(Q(fichier="") | Q(fichier__isnull=True))
+        .filter(
+            Q(stock=0)
+            | Q(
+                low_stock_threshold__isnull=False,
+                stock__lte=F("low_stock_threshold"),
+            )
+        )
+        .select_related("categorie")
+        .order_by("stock", "nom", "pk")
+    )
+    return {
+        "adjustment_form": form
+        or StockAdjustmentForm(initial={"produit": initial_product_id}),
+        "inventory_alerts": alerts,
+        "recent_movements": StockMovement.objects.select_related(
+            "produit", "commande", "actor"
+        )[:30],
+    }
+
+
+@user_passes_test(_staff_required)
+def inventory_gestion(request):
+    return render(
+        request,
+        "shop/inventory/gestion.html",
+        _inventory_staff_context(initial_product_id=request.GET.get("produit")),
+    )
+
+
+@user_passes_test(_staff_required)
+@require_POST
+def inventory_adjust(request):
+    form = StockAdjustmentForm(request.POST)
+    if not form.is_valid():
+        return render(
+            request,
+            "shop/inventory/gestion.html",
+            _inventory_staff_context(form),
+            status=400,
+        )
+
+    product = form.cleaned_data["produit"]
+    try:
+        movement = execute_with_sqlite_lock_retry(
+            lambda: adjust_product_stock(
+                product.pk,
+                form.cleaned_data["quantity"],
+                form.cleaned_data["reason"],
+                request.user,
+                f"manual:{form.cleaned_data['idempotency_key']}",
+            )
+        )
+    except StockUnavailable:
+        form.add_error("quantity", _("Le stock ne peut pas devenir négatif."))
+        return render(
+            request,
+            "shop/inventory/gestion.html",
+            _inventory_staff_context(form),
+            status=409,
+        )
+    except (InventoryNotManaged, InventoryStateConflict, InvalidStockAdjustment):
+        messages.error(request, _("Cet ajustement de stock ne peut pas être appliqué."))
+        return redirect("shop:inventory_gestion")
+
+    messages.success(
+        request,
+        _("Stock de « %(product)s » ajusté de %(quantity)+d unité(s).")
+        % {
+            "product": movement.product_name_snapshot,
+            "quantity": movement.quantity,
+        },
+    )
+    return redirect("shop:inventory_gestion")
+
+
 @user_passes_test(_staff_required)
 def categorie_gestion_liste(request):
     categories = Categorie.objects.annotate(nombre_produits=Count("produit")).order_by("nom")
@@ -346,6 +438,28 @@ def commande_gestion_detail(request, pk):
     remboursement = StripeOrderRefund.objects.filter(commande=commande).first()
     traitement_form = CommandeTraitementForm(commande=commande)
     transitions_disponibles = bool(traitement_form.fields["statut"].choices)
+    reserved_lines = [
+        line for line in commande.lignes.all() if line.stock_reserved_quantity > 0
+    ]
+    audited_line_ids = set(
+        StockMovement.objects.filter(
+            commande=commande,
+            movement_type="RESERVATION",
+            ligne__in=reserved_lines,
+        ).values_list("ligne_id", flat=True)
+    )
+    can_restock = (
+        commande.payment_status == "REFUNDED"
+        and commande.inventory_status == "COMMITTED"
+        and bool(reserved_lines)
+        and all(
+            line.pk in audited_line_ids
+            and line.produit is not None
+            and not line.a_fichier_numerique
+            and line.produit.stock_est_gere
+            for line in reserved_lines
+        )
+    )
     return render(
         request,
         "shop/commandes/detail.html",
@@ -355,8 +469,31 @@ def commande_gestion_detail(request, pk):
             "remboursement": remboursement,
             "traitement_form": traitement_form,
             "transitions_disponibles": transitions_disponibles,
+            "can_restock": can_restock,
         },
     )
+
+
+@user_passes_test(_staff_required)
+@require_POST
+def commande_remettre_en_stock(request, pk):
+    order = get_object_or_404(Commande, pk=pk)
+    try:
+        restock_refunded_order(order.pk, request.user)
+    except OrderAlreadyRestocked:
+        messages.info(request, _("Cette commande a déjà été remise en stock."))
+    except OrderNotRestockable:
+        messages.warning(
+            request,
+            _("Cette commande ne peut pas être remise en stock."),
+        )
+    else:
+        messages.success(
+            request,
+            _("Le stock de la commande #%(order)s a été restauré.")
+            % {"order": order.pk},
+        )
+    return redirect("shop:commande_gestion_detail", pk=order.pk)
 
 
 @user_passes_test(_staff_required)

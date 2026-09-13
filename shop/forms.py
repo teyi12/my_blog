@@ -1,4 +1,7 @@
+import uuid
+
 from django import forms
+from django.db.models import Q
 from django.utils.text import slugify
 from django.utils.translation import gettext_lazy as _
 
@@ -14,10 +17,49 @@ class ProduitForm(forms.ModelForm):
             "nom",
             "description",
             "prix",
-            "stock",
+            "low_stock_threshold",
             "image",
             "fichier",
         ]
+
+
+class StockAdjustmentForm(forms.Form):
+    produit = forms.ModelChoiceField(
+        queryset=Produit.objects.none(),
+        label=_("Produit"),
+    )
+    quantity = forms.IntegerField(label=_("Variation de stock"))
+    reason = forms.CharField(
+        label=_("Motif"),
+        max_length=500,
+        widget=forms.Textarea(attrs={"rows": 3}),
+    )
+    idempotency_key = forms.UUIDField(
+        initial=uuid.uuid4,
+        widget=forms.HiddenInput,
+    )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["produit"].queryset = (
+            Produit.objects.filter(stock__isnull=False)
+            .filter(Q(fichier="") | Q(fichier__isnull=True))
+            .order_by("nom", "pk")
+        )
+        for field_name in ("produit", "quantity", "reason"):
+            self.fields[field_name].widget.attrs.setdefault("class", "form-control")
+
+    def clean_quantity(self):
+        quantity = self.cleaned_data["quantity"]
+        if quantity == 0:
+            raise forms.ValidationError(_("La variation doit être différente de zéro."))
+        return quantity
+
+    def clean_reason(self):
+        reason = self.cleaned_data["reason"].strip()
+        if not reason:
+            raise forms.ValidationError(_("Le motif est obligatoire."))
+        return reason
 
 
 class CategorieForm(forms.ModelForm):
