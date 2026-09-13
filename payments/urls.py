@@ -28,5 +28,5 @@ urlpatterns = [
 
     # Résultats
     path("success/", TemplateView.as_view(template_name="payments/success.html"), name="success"),
-    path("cancel/", TemplateView.as_view(template_name="payments/cancel.html"), name="cancel"),
+    path("cancel/", views.paiement_annule, name="cancel"),
 ]
