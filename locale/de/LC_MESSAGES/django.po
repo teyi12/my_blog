@@ -3958,3 +3958,12 @@ msgstr "Bestellung storniert am %(date)s."
 
 msgid "Alerte : un paiement a été confirmé après l’annulation. Vérifiez-le avant tout remboursement sécurisé."
 msgstr "Warnung: Nach der Stornierung wurde eine Zahlung bestätigt. Prüfen Sie sie vor einer sicheren Rückerstattung."
+
+msgid "Cette commande a déjà été annulée"
+msgstr "Diese Bestellung wurde bereits storniert"
+
+msgid "Aucun nouveau paiement ne peut être commencé pour cette commande."
+msgstr "Für diese Bestellung kann keine neue Zahlung gestartet werden."
+
+msgid "Voir la commande"
+msgstr "Bestellung ansehen"

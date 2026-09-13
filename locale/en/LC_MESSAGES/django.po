@@ -3898,3 +3898,12 @@ msgstr "Order canceled on %(date)s."
 
 msgid "Alerte : un paiement a été confirmé après l’annulation. Vérifiez-le avant tout remboursement sécurisé."
 msgstr "Alert: a payment was confirmed after cancellation. Review it before any secure refund."
+
+msgid "Cette commande a déjà été annulée"
+msgstr "This order has already been canceled"
+
+msgid "Aucun nouveau paiement ne peut être commencé pour cette commande."
+msgstr "No new payment can be started for this order."
+
+msgid "Voir la commande"
+msgstr "View order"

@@ -5,15 +5,17 @@ import requests
 import logging
 from datetime import timedelta
 from decimal import Decimal
+from urllib.parse import urlencode
 
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.core import signing
 from django.db import IntegrityError, transaction
 from django.db.models import Exists, OuterRef, Q
 from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import redirect, render, get_object_or_404
-from django.http import HttpResponse
+from django.http import Http404, HttpResponse
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.translation import gettext as _
@@ -55,6 +57,7 @@ logger = logging.getLogger(__name__)
 
 # --- STRIPE ---
 stripe.api_key = settings.STRIPE_SECRET_KEY
+STRIPE_ORDER_CANCEL_TOKEN_SALT = "payments.stripe-order-cancel"
 
 
 # ================================================================
@@ -92,6 +95,47 @@ def _get_payable_order(request, order_id):
         adresse__isnull=False,
         total__gt=0,
     )
+
+
+def _stripe_order_cancel_url(request, commande, payment):
+    token = signing.dumps(
+        {
+            "order_id": commande.pk,
+            "payment_id": payment.pk,
+            "user_id": commande.client_id,
+        },
+        salt=STRIPE_ORDER_CANCEL_TOKEN_SALT,
+        compress=True,
+    )
+    path = reverse("payments:cancel")
+    return request.build_absolute_uri(f"{path}?{urlencode({'order_context': token})}")
+
+
+def _stripe_cancel_order_for_request(request):
+    token = request.GET.get("order_context", "")
+    if not token or not request.user.is_authenticated:
+        return None
+    try:
+        payload = signing.loads(token, salt=STRIPE_ORDER_CANCEL_TOKEN_SALT)
+        order_id = int(payload["order_id"])
+        payment_id = int(payload["payment_id"])
+        user_id = int(payload["user_id"])
+    except (signing.BadSignature, KeyError, TypeError, ValueError):
+        return None
+    if user_id != request.user.pk:
+        return None
+
+    payment = (
+        Payment.objects.select_related("commande", "commande__cancellation")
+        .filter(
+            pk=payment_id,
+            commande_id=order_id,
+            commande__client=request.user,
+            channel="STRIPE",
+        )
+        .first()
+    )
+    return payment.commande if payment is not None else None
 
 
 class PaymentChannelConflict(Exception):
@@ -530,7 +574,7 @@ def stripe_checkout(request, order_id):
                 "quantity": 1,
             }],
             success_url=request.build_absolute_uri(reverse("payments:success")),
-            cancel_url=request.build_absolute_uri(reverse("payments:cancel")),
+            cancel_url=_stripe_order_cancel_url(request, commande, payment),
             customer_email=request.user.email or None,
             metadata={
                 "commande_id": str(commande.id),
@@ -556,6 +600,8 @@ def stripe_checkout(request, order_id):
         )
     except SQLiteLockRetryExhausted:
         return HttpResponse("RETRY", status=409)
+    except Http404:
+        raise
     except Exception:
         logger.exception("Erreur Stripe commande")
         return redirect("payments:cancel")
@@ -745,6 +791,8 @@ def cinetpay_create_payment(request, order_id):
         return HttpResponse(_("Initialisation CinetPay déjà en cours."), status=409)
     except SQLiteLockRetryExhausted:
         return HttpResponse("RETRY", status=409)
+    except Http404:
+        raise
     except Exception:
         if payment is not None and claim_token is not None:
             try:
@@ -1226,4 +1274,22 @@ def paiement_reussi(request):
 
 
 def paiement_annule(request):
-    return render(request, "payments/cancel.html")
+    commande = _stripe_cancel_order_for_request(request)
+    cancellation = (
+        getattr(commande, "cancellation", None) if commande is not None else None
+    )
+    commande_payable = bool(
+        commande is not None
+        and cancellation is None
+        and commande.payment_status
+        in {"PENDING", "PROCESSING", "FAILED", "CANCELED"}
+    )
+    return render(
+        request,
+        "payments/cancel.html",
+        {
+            "commande": commande,
+            "commande_annulee": cancellation is not None,
+            "commande_payable": commande_payable,
+        },
+    )
