@@ -6,6 +6,7 @@ from django.db.models import F
 from django.utils import timezone
 
 from .inventory import commit_order_stock
+from .fulfillment import record_system_fulfillment_event
 from .models import Cart, CartItem, Commande
 from .receipts import ensure_order_receipt
 
@@ -61,8 +62,15 @@ def _finalize_paid_order_once(order_id):
         if commande.cart_finalized_at is not None:
             commit_order_stock(commande.id)
             if commande.payment_status == "SUCCESS" and commande.fulfillment_status == "WAITING_PAYMENT":
+                old_fulfillment_status = commande.fulfillment_status
                 commande.fulfillment_status = "TO_PREPARE"
                 commande.save(update_fields=["fulfillment_status"])
+                record_system_fulfillment_event(
+                    commande,
+                    old_fulfillment_status,
+                    "TO_PREPARE",
+                    action="payment-confirmed",
+                )
             ensure_order_receipt(
                 commande,
                 issued_at=commande.cart_finalized_at or commande.date_commande,
@@ -98,12 +106,20 @@ def _finalize_paid_order_once(order_id):
 
         commit_order_stock(commande.id)
         commande.payment_status = "SUCCESS"
+        old_fulfillment_status = commande.fulfillment_status
         if commande.fulfillment_status == "WAITING_PAYMENT":
             commande.fulfillment_status = "TO_PREPARE"
         commande.cart_finalized_at = timezone.now()
         commande.save(
             update_fields=["payment_status", "fulfillment_status", "cart_finalized_at"]
         )
+        if old_fulfillment_status != commande.fulfillment_status:
+            record_system_fulfillment_event(
+                commande,
+                old_fulfillment_status,
+                commande.fulfillment_status,
+                action="payment-confirmed",
+            )
         ensure_order_receipt(commande, issued_at=commande.cart_finalized_at)
         return commande
 

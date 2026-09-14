@@ -51,7 +51,7 @@ def ma_commande_detail(request, pk):
     commande = get_object_or_404(
         _customer_orders(request.user)
         .select_related("adresse", "receipt", "cancellation")
-        .prefetch_related("lignes__produit", "payments"),
+        .prefetch_related("lignes__produit", "payments", "fulfillment_events"),
         pk=pk,
     )
     try:
@@ -70,6 +70,8 @@ def ma_commande_detail(request, pk):
             "tracking_url": carrier_tracking_url(commande.carrier, commande.tracking_number),
             "cancellation": getattr(commande, "cancellation", None),
             "can_cancel": order_can_be_canceled(commande),
+            "fulfillment_events": commande.fulfillment_events.all(),
+            "is_digital_only": commande.is_digital_only,
         },
     )
 

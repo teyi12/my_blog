@@ -110,3 +110,16 @@ def send_fulfillment_notification(commande, new_status, request=None):
             )
             return False
     return True
+
+
+def send_fulfillment_event_notification(event_id):
+    """Load only durable local data before sending one transition email."""
+    from .models import OrderFulfillmentEvent
+
+    try:
+        event = OrderFulfillmentEvent.objects.select_related(
+            "commande__client"
+        ).get(pk=event_id)
+    except OrderFulfillmentEvent.DoesNotExist:
+        return False
+    return send_fulfillment_notification(event.commande, event.new_status)

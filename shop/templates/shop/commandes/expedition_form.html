@@ -28,6 +28,7 @@
 
         <form class="fulfillment-form" method="post">
           {% csrf_token %}
+          {{ form.idempotency_key }}
 
           <div>
             <label for="{{ form.carrier.id_for_label }}">{{ form.carrier.label }}</label>
@@ -39,6 +40,11 @@
             <label for="{{ form.tracking_number.id_for_label }}">{{ form.tracking_number.label }}</label>
             {{ form.tracking_number }}
             {% for error in form.tracking_number.errors %}<p class="fulfillment-note">{{ error }}</p>{% endfor %}
+          </div>
+          <div>
+            <label for="{{ form.note.id_for_label }}">{{ form.note.label }}</label>
+            {{ form.note }}
+            {% for error in form.note.errors %}<p class="fulfillment-note">{{ error }}</p>{% endfor %}
           </div>
 
           <button type="submit">{% translate "Enregistrer les informations d’expédition" %}</button>

@@ -38,6 +38,7 @@ from .forms import (
     StockAdjustmentForm,
 )
 from .fulfillment import (
+    FulfillmentIdempotencyConflict,
     InvalidFulfillmentTransition,
     PaymentNotConfirmed,
     ShippingDetailsInvalid,
@@ -432,7 +433,7 @@ def commande_gestion_liste(request):
 def commande_gestion_detail(request, pk):
     commande = get_object_or_404(
         Commande.objects.select_related("client", "adresse", "cancellation")
-        .prefetch_related("lignes__produit", "payments"),
+        .prefetch_related("lignes__produit", "payments", "fulfillment_events__actor"),
         pk=pk,
     )
     paiements = commande.payments.order_by("-created_at")
@@ -473,6 +474,8 @@ def commande_gestion_detail(request, pk):
             "can_restock": can_restock,
             "cancellation": getattr(commande, "cancellation", None),
             "can_cancel": order_can_be_canceled(commande),
+            "fulfillment_events": commande.fulfillment_events.all(),
+            "is_digital_only": commande.is_digital_only,
         },
     )
 
@@ -527,8 +530,11 @@ def commande_traitement_modifier(request, pk):
         commande = transition_order_fulfillment(
             commande.pk,
             nouveau_statut,
+            actor=request.user,
             carrier=form.cleaned_data["carrier"],
             tracking_number=form.cleaned_data["tracking_number"],
+            note=form.cleaned_data["note"],
+            idempotency_key=form.cleaned_data["idempotency_key"],
         )
     except PaymentNotConfirmed:
         messages.warning(
@@ -536,7 +542,11 @@ def commande_traitement_modifier(request, pk):
             _("Le traitement logistique ne peut avancer qu’après confirmation du paiement."),
         )
         return redirect("shop:commande_gestion_detail", pk=commande.pk)
-    except (InvalidFulfillmentTransition, ShippingDetailsInvalid):
+    except (
+        FulfillmentIdempotencyConflict,
+        InvalidFulfillmentTransition,
+        ShippingDetailsInvalid,
+    ):
         messages.error(
             request,
             _("Cette transition de traitement n’est pas autorisée."),

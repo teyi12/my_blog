@@ -10,6 +10,7 @@ from .models import (
     Commande,
     LigneCommande,
     OrderCancellation,
+    OrderFulfillmentEvent,
     Produit,
     StockMovement,
 )
@@ -220,6 +221,40 @@ class OrderCancellationAdmin(admin.ModelAdmin):
     search_fields = ("commande__id", "commande__client__email", "idempotency_key")
     readonly_fields = tuple(
         field.name for field in OrderCancellation._meta.concrete_fields
+    )
+
+    def has_add_permission(self, request):
+        return False
+
+    def has_change_permission(self, request, obj=None):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+
+@admin.register(OrderFulfillmentEvent)
+class OrderFulfillmentEventAdmin(admin.ModelAdmin):
+    list_display = (
+        "commande",
+        "created_at",
+        "old_status",
+        "new_status",
+        "actor",
+        "carrier",
+        "tracking_number",
+    )
+    list_filter = ("old_status", "new_status", "created_at")
+    search_fields = (
+        "commande__id",
+        "commande__client__email",
+        "carrier",
+        "tracking_number",
+        "note",
+        "idempotency_key",
+    )
+    readonly_fields = tuple(
+        field.name for field in OrderFulfillmentEvent._meta.concrete_fields
     )
 
     def has_add_permission(self, request):

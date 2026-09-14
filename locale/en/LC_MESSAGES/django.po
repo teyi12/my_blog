@@ -3907,3 +3907,45 @@ msgstr "No new payment can be started for this order."
 
 msgid "Voir la commande"
 msgstr "View order"
+
+msgid "Le journal logistique est immuable."
+msgstr "The fulfillment log is immutable."
+
+msgid "Ancien statut"
+msgstr "Previous status"
+
+msgid "Note opérationnelle"
+msgstr "Operational note"
+
+msgid "URL de suivi"
+msgstr "Tracking URL"
+
+msgid "Événement logistique"
+msgstr "Fulfillment event"
+
+msgid "Événements logistiques"
+msgstr "Fulfillment events"
+
+msgid "Information interne facultative"
+msgstr "Optional internal information"
+
+msgid "Motif de la mise à jour du suivi"
+msgstr "Reason for the tracking update"
+
+msgid "Cette commande est entièrement numérique et peut être marquée comme livrée sans expédition physique."
+msgstr "This order is entirely digital and can be marked as delivered without physical shipping."
+
+msgid "Chronologie logistique"
+msgstr "Fulfillment timeline"
+
+#, python-format
+msgid "%(count)s événement"
+msgid_plural "%(count)s événements"
+msgstr[0] "%(count)s event"
+msgstr[1] "%(count)s events"
+
+msgid "Système"
+msgstr "System"
+
+msgid "Aucun événement logistique enregistré."
+msgstr "No fulfillment event has been recorded."

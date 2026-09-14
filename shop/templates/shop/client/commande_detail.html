@@ -88,6 +88,20 @@
           <div class="timeline-step {% if commande.fulfillment_status == 'DELIVERED' %}is-done{% endif %}"><span><i class="fa-solid fa-house-circle-check" aria-hidden="true"></i></span><div><strong>{% translate "Livraison" %}</strong><small>{% if commande.delivered_at %}{% blocktranslate with date=commande.delivered_at|date:'SHORT_DATETIME_FORMAT' %}Livrée le {{ date }}.{% endblocktranslate %}{% else %}{% translate "En attente de livraison." %}{% endif %}</small></div></div>
         </div>
       </section>
+
+      <section class="customer-order-panel">
+        <div class="customer-order-panel-heading"><h2>{% translate "Chronologie logistique" %}</h2><span>{% blocktranslate count count=fulfillment_events|length %}{{ count }} événement{% plural %}{{ count }} événements{% endblocktranslate %}</span></div>
+        <ol class="customer-fulfillment-history" aria-label="{% translate 'Chronologie logistique' %}">
+          {% for event in fulfillment_events %}
+            <li>
+              <time datetime="{{ event.created_at|date:'c' }}">{{ event.created_at|date:'SHORT_DATETIME_FORMAT' }}</time>
+              <strong>{{ event.get_new_status_display }}</strong>
+            </li>
+          {% empty %}
+            <li class="customer-order-muted">{% translate "Aucun événement logistique enregistré." %}</li>
+          {% endfor %}
+        </ol>
+      </section>
     </div>
 
     <aside class="customer-order-detail-side">

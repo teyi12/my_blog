@@ -33,9 +33,9 @@ ORDER_LANGUAGE_CHOICES = [
 ]
 
 FULFILLMENT_TRANSITIONS = {
-    "WAITING_PAYMENT": {"TO_PREPARE"},
-    "TO_PREPARE": {"PREPARING", "CANCELED"},
-    "PREPARING": {"SHIPPED", "CANCELED"},
+    "WAITING_PAYMENT": set(),
+    "TO_PREPARE": {"PREPARING"},
+    "PREPARING": {"SHIPPED"},
     "SHIPPED": {"DELIVERED"},
     "DELIVERED": set(),
     "CANCELED": set(),
@@ -279,7 +279,15 @@ class Commande(models.Model):
         return self.total
 
     def allowed_fulfillment_transitions(self):
+        if self.fulfillment_status == "PREPARING" and self.is_digital_only:
+            return {"DELIVERED"}
         return FULFILLMENT_TRANSITIONS.get(self.fulfillment_status, set())
+
+    @property
+    def is_digital_only(self):
+        if not self.pk or not self.lignes.exists():
+            return False
+        return not self.lignes.filter(fichier_nom_stockage_snapshot="").exists()
 
 
 class OrderCancellation(models.Model):
@@ -339,6 +347,105 @@ class OrderCancellation(models.Model):
 
     def __str__(self):
         return f"Annulation commande #{self.commande_id}"
+
+
+class ImmutableFulfillmentEventQuerySet(models.QuerySet):
+    def update(self, **kwargs):
+        raise ValidationError(_("Le journal logistique est immuable."))
+
+    def delete(self):
+        raise ValidationError(_("Le journal logistique est immuable."))
+
+    def bulk_update(self, objs, fields, batch_size=None):
+        raise ValidationError(_("Le journal logistique est immuable."))
+
+
+class OrderFulfillmentEvent(models.Model):
+    commande = models.ForeignKey(
+        Commande,
+        on_delete=models.PROTECT,
+        related_name="fulfillment_events",
+        verbose_name=_("Commande"),
+    )
+    old_status = models.CharField(
+        max_length=20,
+        choices=FULFILLMENT_STATUS_CHOICES,
+        editable=False,
+        verbose_name=_("Ancien statut"),
+    )
+    new_status = models.CharField(
+        max_length=20,
+        choices=FULFILLMENT_STATUS_CHOICES,
+        editable=False,
+        verbose_name=_("Nouveau statut"),
+    )
+    actor = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="fulfillment_events",
+        editable=False,
+        verbose_name=_("Acteur staff"),
+    )
+    created_at = models.DateTimeField(auto_now_add=True, editable=False)
+    note = models.TextField(
+        max_length=1000,
+        blank=True,
+        editable=False,
+        verbose_name=_("Note opérationnelle"),
+    )
+    carrier = models.CharField(
+        max_length=100,
+        blank=True,
+        editable=False,
+        verbose_name=_("Transporteur"),
+    )
+    tracking_number = models.CharField(
+        max_length=150,
+        blank=True,
+        editable=False,
+        verbose_name=_("Numéro de suivi"),
+    )
+    tracking_url = models.URLField(
+        max_length=500,
+        blank=True,
+        editable=False,
+        verbose_name=_("URL de suivi"),
+    )
+    idempotency_key = models.UUIDField(
+        default=uuid.uuid4,
+        unique=True,
+        editable=False,
+        verbose_name=_("Clé d’idempotence"),
+    )
+
+    objects = ImmutableFulfillmentEventQuerySet.as_manager()
+
+    class Meta:
+        ordering = ("created_at", "pk")
+        verbose_name = _("Événement logistique")
+        verbose_name_plural = _("Événements logistiques")
+        indexes = [
+            models.Index(
+                fields=("commande", "created_at"),
+                name="shop_fulfi_command_1d5f54_idx",
+            )
+        ]
+
+    def save(self, *args, **kwargs):
+        if not self._state.adding or self.pk:
+            raise ValidationError(_("Le journal logistique est immuable."))
+        super().save(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        raise ValidationError(_("Le journal logistique est immuable."))
+
+    def __str__(self):
+        return (
+            f"Commande #{self.commande_id} · "
+            f"{self.old_status} → {self.new_status}"
+        )
 
 
 class LigneCommande(models.Model):

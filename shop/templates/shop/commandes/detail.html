@@ -104,9 +104,10 @@
         {% elif transitions_disponibles %}
           <form class="fulfillment-form" method="post" action="{% url 'shop:commande_traitement_modifier' commande.pk %}">
             {% csrf_token %}
+            {{ traitement_form.idempotency_key }}
             <label for="{{ traitement_form.statut.id_for_label }}">{{ traitement_form.statut.label }}</label>
             {{ traitement_form.statut }}
-            {% if commande.fulfillment_status == 'PREPARING' %}
+            {% if commande.fulfillment_status == 'PREPARING' and not is_digital_only %}
               <div class="shipping-fields">
                 <div>
                   <label for="{{ traitement_form.carrier.id_for_label }}">{{ traitement_form.carrier.label }}</label>
@@ -118,7 +119,11 @@
                 </div>
               </div>
               <p class="fulfillment-note"><i class="fa-solid fa-truck" aria-hidden="true"></i> {% translate "Le transporteur et le numéro de suivi sont requis pour passer la commande à « Expédiée »." %}</p>
+            {% elif commande.fulfillment_status == 'PREPARING' and is_digital_only %}
+              <p class="fulfillment-note"><i class="fa-solid fa-file-arrow-down" aria-hidden="true"></i> {% translate "Cette commande est entièrement numérique et peut être marquée comme livrée sans expédition physique." %}</p>
             {% endif %}
+            <label for="{{ traitement_form.note.id_for_label }}">{{ traitement_form.note.label }}</label>
+            {{ traitement_form.note }}
             <button type="submit">{% translate "Mettre à jour le traitement" %}</button>
           </form>
           <p class="fulfillment-note"><i class="fa-solid fa-circle-info" aria-hidden="true"></i> {% translate "Les étapes avancent dans l’ordre. Annuler le traitement n’effectue aucun remboursement." %}</p>
@@ -137,9 +142,26 @@
           <div><dt>{% translate "Expédiée le" %}</dt><dd>{% if commande.shipped_at %}{{ commande.shipped_at|date:'SHORT_DATETIME_FORMAT' }}{% else %}{% translate "Date non enregistrée" %}{% endif %}</dd></div>
           {% if commande.delivered_at %}<div><dt>{% translate "Livrée le" %}</dt><dd>{{ commande.delivered_at|date:'SHORT_DATETIME_FORMAT' }}</dd></div>{% endif %}
         </dl>
-        <a class="orders-admin-back" href="{% url 'shop:commande_expedition_modifier' commande.pk %}"><i class="fa-solid fa-pen" aria-hidden="true"></i> {% translate "Modifier les informations d’expédition" %}</a>
+        {% if not is_digital_only %}<a class="orders-admin-back" href="{% url 'shop:commande_expedition_modifier' commande.pk %}"><i class="fa-solid fa-pen" aria-hidden="true"></i> {% translate "Modifier les informations d’expédition" %}</a>{% endif %}
       </section>
       {% endif %}
+
+      <section class="order-panel fulfillment-history-panel">
+        <div class="order-panel-heading"><h2>{% translate "Chronologie logistique" %}</h2><span>{% blocktranslate count count=fulfillment_events|length %}{{ count }} événement{% plural %}{{ count }} événements{% endblocktranslate %}</span></div>
+        <ol class="fulfillment-history" aria-label="{% translate 'Chronologie logistique' %}">
+          {% for event in fulfillment_events %}
+            <li>
+              <time datetime="{{ event.created_at|date:'c' }}">{{ event.created_at|date:'SHORT_DATETIME_FORMAT' }}</time>
+              <strong>{{ event.get_old_status_display }} → {{ event.get_new_status_display }}</strong>
+              <small>{% if event.actor %}{{ event.actor.email }}{% else %}{% translate "Système" %}{% endif %}</small>
+              {% if event.note %}<p>{{ event.note }}</p>{% endif %}
+              {% if event.carrier or event.tracking_number %}<p>{{ event.carrier }}{% if event.tracking_number %} · <code>{{ event.tracking_number }}</code>{% endif %}</p>{% endif %}
+            </li>
+          {% empty %}
+            <li class="order-muted">{% translate "Aucun événement logistique enregistré." %}</li>
+          {% endfor %}
+        </ol>
+      </section>
 
       <section class="order-panel">
         <h2>{% translate "Résumé opérationnel" %}</h2>
