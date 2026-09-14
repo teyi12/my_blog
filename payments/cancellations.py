@@ -63,7 +63,7 @@ def _schedule_cancellation_notification(cancellation_id):
 def _cancel_order_locally(order_id, actor, source):
     with transaction.atomic():
         order = (
-            Commande.objects.select_for_update()
+            Commande.objects.select_for_update(of=("self",))
             .select_related("client")
             .get(pk=order_id)
         )

@@ -28,8 +28,10 @@ from shop.models import (
     CartItem,
     Commande,
     LigneCommande,
+    OrderCancellation,
     OrderReceipt,
     Produit,
+    StockMovement,
 )
 
 
@@ -196,7 +198,9 @@ class OrderPaymentSecurityTests(TestCase):
 
         self.assertFalse(Payment.objects.exists())
 
-    def test_reservation_lock_query_compiles_for_postgresql_without_distinct(self):
+    def test_reservation_lock_query_compiles_for_postgresql_without_nullable_join(
+        self,
+    ):
         with patch(
             "payments.views.get_object_or_404",
             wraps=get_object_or_404,
@@ -237,8 +241,57 @@ class OrderPaymentSecurityTests(TestCase):
         self.assertTrue(locked_queryset.query.select_for_update)
         self.assertFalse(locked_queryset.query.distinct)
         self.assertIn("EXISTS", compiled_sql)
+        self.assertIn("NOT EXISTS", compiled_sql)
         self.assertNotIn("DISTINCT", compiled_sql)
-        self.assertIn("FOR UPDATE", compiled_sql)
+        self.assertNotIn('LEFT OUTER JOIN "SHOP_ORDERCANCELLATION"', compiled_sql)
+        self.assertIn('FOR UPDATE OF "SHOP_COMMANDE"', compiled_sql)
+
+    def test_stripe_checkout_reserves_uncanceled_order_stock_on_sqlite(self):
+        self.product.stock = 5
+        self.product.save(update_fields=["stock"])
+
+        response, create = self.initiate_stripe()
+
+        self.assertEqual(response.status_code, 302)
+        create.assert_called_once()
+        self.product.refresh_from_db()
+        self.order.refresh_from_db()
+        self.item.refresh_from_db()
+        self.assertEqual(self.product.stock, 3)
+        self.assertEqual(self.order.inventory_status, "RESERVED")
+        self.assertEqual(self.item.quantite, 2)
+        movement = StockMovement.objects.get(
+            commande=self.order,
+            movement_type="RESERVATION",
+        )
+        self.assertEqual(
+            (movement.stock_before, movement.quantity, movement.stock_after),
+            (5, -2, 3),
+        )
+
+    def test_canceled_order_is_rejected_before_any_provider_call(self):
+        OrderCancellation.objects.create(
+            commande=self.order,
+            requested_by=self.user,
+            source="CUSTOMER",
+        )
+
+        with patch(
+            "payments.views.stripe.checkout.Session.create"
+        ) as stripe_create, patch("payments.views.requests.post") as cinetpay_post:
+            stripe_response = self.client.post(
+                reverse("payments:stripe_checkout", args=[self.order.id])
+            )
+            cinetpay_response = self.client.post(
+                reverse("payments:cinetpay_create", args=[self.order.id])
+            )
+
+        self.assertEqual(stripe_response.status_code, 404)
+        self.assertEqual(cinetpay_response.status_code, 404)
+        stripe_create.assert_not_called()
+        cinetpay_post.assert_not_called()
+        self.assertFalse(Payment.objects.exists())
+        self.assertFalse(StockMovement.objects.exists())
 
     def test_payment_state_lock_order_is_order_then_payment(self):
         payment = Payment.objects.create(
