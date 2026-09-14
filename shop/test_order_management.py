@@ -149,14 +149,14 @@ class OrderManagementTests(TestCase):
         unpaid.refresh_from_db()
         self.assertEqual(unpaid.fulfillment_status, "WAITING_PAYMENT")
 
-    def test_canceling_fulfillment_does_not_change_payment_status(self):
+    def test_fulfillment_form_cannot_bypass_secure_order_cancellation(self):
         self.client.force_login(self.staff)
         self.client.post(
             reverse("shop:commande_traitement_modifier", args=[self.order.pk]),
             {"statut": "CANCELED"},
         )
         self.order.refresh_from_db()
-        self.assertEqual(self.order.fulfillment_status, "CANCELED")
+        self.assertEqual(self.order.fulfillment_status, "TO_PREPARE")
         self.assertEqual(self.order.payment_status, "SUCCESS")
 
     def test_payment_finalization_queues_order_for_preparation(self):

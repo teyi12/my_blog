@@ -6,6 +6,7 @@ from django.utils.translation import gettext as _
 
 from .forms import CommandeExpeditionForm
 from .fulfillment import (
+    FulfillmentIdempotencyConflict,
     PaymentNotConfirmed,
     ShippingDetailsInvalid,
     ShippingDetailsNotEditable,
@@ -35,10 +36,17 @@ def commande_expedition_modifier(request, pk):
         try:
             update_order_shipping_details(
                 commande.pk,
+                actor=request.user,
                 carrier=form.cleaned_data["carrier"],
                 tracking_number=form.cleaned_data["tracking_number"],
+                note=form.cleaned_data["note"],
+                idempotency_key=form.cleaned_data["idempotency_key"],
             )
-        except (PaymentNotConfirmed, ShippingDetailsNotEditable):
+        except (
+            FulfillmentIdempotencyConflict,
+            PaymentNotConfirmed,
+            ShippingDetailsNotEditable,
+        ):
             messages.warning(
                 request,
                 _(

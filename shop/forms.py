@@ -7,6 +7,7 @@ from django.utils.translation import gettext_lazy as _
 
 from payments.models import Adresse
 
+from .fulfillment import allowed_order_fulfillment_transitions
 from .models import Categorie, Commande, FULFILLMENT_STATUS_CHOICES, Produit
 
 
@@ -128,12 +129,29 @@ class CommandeTraitementForm(forms.Form):
             }
         ),
     )
+    note = forms.CharField(
+        label=_("Note opérationnelle"),
+        max_length=1000,
+        required=False,
+        widget=forms.Textarea(
+            attrs={
+                "class": "form-control",
+                "rows": 3,
+                "placeholder": _("Information interne facultative"),
+            }
+        ),
+    )
+    idempotency_key = forms.UUIDField(
+        required=False,
+        initial=uuid.uuid4,
+        widget=forms.HiddenInput,
+    )
 
     def __init__(self, *args, commande, **kwargs):
         super().__init__(*args, **kwargs)
         self.commande = commande
         labels = dict(FULFILLMENT_STATUS_CHOICES)
-        allowed = commande.allowed_fulfillment_transitions()
+        allowed = allowed_order_fulfillment_transitions(commande)
         self.fields["statut"].choices = [
             (value, labels[value])
             for value, _label in FULFILLMENT_STATUS_CHOICES
@@ -153,6 +171,24 @@ class CommandeTraitementForm(forms.Form):
 
 
 class CommandeExpeditionForm(forms.ModelForm):
+    note = forms.CharField(
+        label=_("Note opérationnelle"),
+        max_length=1000,
+        required=False,
+        widget=forms.Textarea(
+            attrs={
+                "class": "form-control",
+                "rows": 3,
+                "placeholder": _("Motif de la mise à jour du suivi"),
+            }
+        ),
+    )
+    idempotency_key = forms.UUIDField(
+        required=False,
+        initial=uuid.uuid4,
+        widget=forms.HiddenInput,
+    )
+
     class Meta:
         model = Commande
         fields = ["carrier", "tracking_number"]

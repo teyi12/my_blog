@@ -12,6 +12,7 @@ from django.utils import timezone, translation
 from django.utils.translation import gettext as _
 
 from shop.inventory import release_order_stock
+from shop.fulfillment import record_system_fulfillment_event
 from shop.models import Commande, OrderCancellation
 
 from .models import Payment
@@ -113,6 +114,7 @@ def _cancel_order_locally(order_id, actor, source):
                 payment.save(update_fields=["status", "updated_at"])
 
         release_order_stock(order.pk)
+        old_fulfillment_status = order.fulfillment_status
         order.payment_status = "CANCELED"
         order.fulfillment_status = "CANCELED"
         order.save(update_fields=["payment_status", "fulfillment_status"])
@@ -121,6 +123,14 @@ def _cancel_order_locally(order_id, actor, source):
             requested_by=actor,
             source=source,
             stripe_expiration_status=expiration_status,
+        )
+        record_system_fulfillment_event(
+            order,
+            old_fulfillment_status,
+            "CANCELED",
+            action="order-canceled",
+            actor=actor,
+            note="Annulation de commande",
         )
         _schedule_cancellation_notification(cancellation.pk)
         return cancellation, True, stripe_payment.pk if stripe_payment else None

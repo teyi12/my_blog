@@ -27,6 +27,11 @@ class FulfillmentServiceSecurityTests(TestCase):
             email="fulfillment-customer@example.test",
             password="test-password",
         )
+        self.staff = user_model.objects.create_user(
+            email="fulfillment-service-staff@example.test",
+            password="test-password",
+            is_staff=True,
+        )
         self.address = Adresse.objects.create(
             utilisateur=self.customer,
             rue="1 rue du Colis",
@@ -56,14 +61,19 @@ class FulfillmentServiceSecurityTests(TestCase):
         )
 
     def test_transition_service_enforces_ordered_paid_workflow(self):
-        transition_order_fulfillment(self.order.pk, "PREPARING")
+        transition_order_fulfillment(self.order.pk, "PREPARING", actor=self.staff)
         shipped = transition_order_fulfillment(
             self.order.pk,
             "SHIPPED",
+            actor=self.staff,
             carrier="  DHL  ",
             tracking_number="  TRACK-123  ",
         )
-        delivered = transition_order_fulfillment(self.order.pk, "DELIVERED")
+        delivered = transition_order_fulfillment(
+            self.order.pk,
+            "DELIVERED",
+            actor=self.staff,
+        )
 
         self.assertEqual(shipped.carrier, "DHL")
         self.assertEqual(shipped.tracking_number, "TRACK-123")
@@ -74,11 +84,19 @@ class FulfillmentServiceSecurityTests(TestCase):
 
     def test_unpaid_or_skipped_transition_is_rejected_without_mutation(self):
         with self.assertRaises(InvalidFulfillmentTransition):
-            transition_order_fulfillment(self.order.pk, "SHIPPED")
+            transition_order_fulfillment(
+                self.order.pk,
+                "SHIPPED",
+                actor=self.staff,
+            )
 
         Commande.objects.filter(pk=self.order.pk).update(payment_status="FAILED")
         with self.assertRaises(PaymentNotConfirmed):
-            transition_order_fulfillment(self.order.pk, "PREPARING")
+            transition_order_fulfillment(
+                self.order.pk,
+                "PREPARING",
+                actor=self.staff,
+            )
 
         self.order.refresh_from_db()
         self.assertEqual(self.order.fulfillment_status, "TO_PREPARE")
@@ -86,7 +104,7 @@ class FulfillmentServiceSecurityTests(TestCase):
         self.assertIsNone(self.order.shipped_at)
 
     def test_shipping_requires_complete_bounded_details(self):
-        transition_order_fulfillment(self.order.pk, "PREPARING")
+        transition_order_fulfillment(self.order.pk, "PREPARING", actor=self.staff)
 
         for carrier, tracking_number in (
             ("", "TRACK-123"),
@@ -102,6 +120,7 @@ class FulfillmentServiceSecurityTests(TestCase):
                     transition_order_fulfillment(
                         self.order.pk,
                         "SHIPPED",
+                        actor=self.staff,
                         carrier=carrier,
                         tracking_number=tracking_number,
                     )
@@ -119,7 +138,11 @@ class FulfillmentServiceSecurityTests(TestCase):
         )
 
         with self.assertRaises(ShippingDetailsInvalid):
-            transition_order_fulfillment(self.order.pk, "DELIVERED")
+            transition_order_fulfillment(
+                self.order.pk,
+                "DELIVERED",
+                actor=self.staff,
+            )
 
         self.order.refresh_from_db()
         self.assertEqual(self.order.fulfillment_status, "SHIPPED")
@@ -132,8 +155,12 @@ class FulfillmentServiceSecurityTests(TestCase):
             "select_for_update",
             wraps=real_select_for_update,
         ) as lock:
-            transition_order_fulfillment(self.order.pk, "PREPARING")
-        lock.assert_called_once_with()
+            transition_order_fulfillment(
+                self.order.pk,
+                "PREPARING",
+                actor=self.staff,
+            )
+        lock.assert_called_once_with(of=("self",))
 
         Commande.objects.filter(pk=self.order.pk).update(
             fulfillment_status="SHIPPED",
@@ -147,10 +174,11 @@ class FulfillmentServiceSecurityTests(TestCase):
         ) as lock:
             update_order_shipping_details(
                 self.order.pk,
+                actor=self.staff,
                 carrier="UPS",
                 tracking_number="NEW",
             )
-        lock.assert_called_once_with()
+        lock.assert_called_once_with(of=("self",))
 
     def test_tracking_edit_rechecks_payment_and_fulfillment_state(self):
         for payment_status, fulfillment_status, expected_exception in (
@@ -170,6 +198,7 @@ class FulfillmentServiceSecurityTests(TestCase):
                 with self.assertRaises(expected_exception):
                     update_order_shipping_details(
                         self.order.pk,
+                        actor=self.staff,
                         carrier="UPS",
                         tracking_number="REPLACED",
                     )
@@ -178,22 +207,25 @@ class FulfillmentServiceSecurityTests(TestCase):
                 self.assertEqual(self.order.tracking_number, "ORIGINAL")
 
     def test_successful_transition_schedules_one_notification_after_commit(self):
-        transition_order_fulfillment(self.order.pk, "PREPARING")
+        transition_order_fulfillment(self.order.pk, "PREPARING", actor=self.staff)
 
         with patch(
-            "shop.signals.send_fulfillment_notification"
+            "shop.fulfillment.send_fulfillment_event_notification"
         ) as notify, self.captureOnCommitCallbacks(execute=True):
             transition_order_fulfillment(
                 self.order.pk,
                 "SHIPPED",
+                actor=self.staff,
                 carrier="DHL",
                 tracking_number="TRACK-123",
             )
 
         notify.assert_called_once()
-        notified_order, notified_status = notify.call_args.args
-        self.assertEqual(notified_order.pk, self.order.pk)
-        self.assertEqual(notified_status, "SHIPPED")
+        event_id = notify.call_args.args[0]
+        self.assertEqual(
+            self.order.fulfillment_events.get(pk=event_id).new_status,
+            "SHIPPED",
+        )
 
 
 class FulfillmentViewsAndNotificationSecurityTests(TestCase):

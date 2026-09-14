@@ -3967,3 +3967,45 @@ msgstr "Für diese Bestellung kann keine neue Zahlung gestartet werden."
 
 msgid "Voir la commande"
 msgstr "Bestellung ansehen"
+
+msgid "Le journal logistique est immuable."
+msgstr "Das Logistikprotokoll ist unveränderlich."
+
+msgid "Ancien statut"
+msgstr "Vorheriger Status"
+
+msgid "Note opérationnelle"
+msgstr "Betriebliche Notiz"
+
+msgid "URL de suivi"
+msgstr "Sendungsverfolgungs-URL"
+
+msgid "Événement logistique"
+msgstr "Logistikereignis"
+
+msgid "Événements logistiques"
+msgstr "Logistikereignisse"
+
+msgid "Information interne facultative"
+msgstr "Optionale interne Information"
+
+msgid "Motif de la mise à jour du suivi"
+msgstr "Grund für die Aktualisierung der Sendungsverfolgung"
+
+msgid "Cette commande est entièrement numérique et peut être marquée comme livrée sans expédition physique."
+msgstr "Diese Bestellung ist vollständig digital und kann ohne physischen Versand als geliefert markiert werden."
+
+msgid "Chronologie logistique"
+msgstr "Logistikverlauf"
+
+#, python-format
+msgid "%(count)s événement"
+msgid_plural "%(count)s événements"
+msgstr[0] "%(count)s Ereignis"
+msgstr[1] "%(count)s Ereignisse"
+
+msgid "Système"
+msgstr "System"
+
+msgid "Aucun événement logistique enregistré."
+msgstr "Es wurde kein Logistikereignis erfasst."
