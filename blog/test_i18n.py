@@ -1,3 +1,5 @@
+from urllib.parse import urlsplit
+
 from django.conf import settings
 from django.test import Client, TestCase
 from django.urls import reverse
@@ -75,6 +77,16 @@ class LanguageSelectorTests(TestCase):
         self.assertEqual(response.status_code, 200)
         return self.csrf_client.cookies["csrftoken"].value
 
+    def _switch_language(self, token, language, next_url):
+        return self.csrf_client.post(
+            self.set_language_url,
+            {
+                "language": language,
+                "next": next_url,
+            },
+            HTTP_X_CSRFTOKEN=token,
+        )
+
     def test_selector_is_a_csrf_protected_post_form(self):
         response = self.client.get("/articles/")
 
@@ -106,11 +118,7 @@ class LanguageSelectorTests(TestCase):
     def test_language_change_translates_internal_next_url(self):
         token = self._csrf_token("/articles/")
 
-        response = self.csrf_client.post(
-            self.set_language_url,
-            {"language": "de", "next": "/articles/"},
-            HTTP_X_CSRFTOKEN=token,
-        )
+        response = self._switch_language(token, "de", "/articles/")
 
         self.assertRedirects(response, "/de/articles/", fetch_redirect_response=False)
         self.assertEqual(response.cookies[settings.LANGUAGE_COOKIE_NAME].value, "de")
@@ -119,15 +127,106 @@ class LanguageSelectorTests(TestCase):
         self.assertContains(translated_page, 'value="de" class="language-button is-active" aria-label="Deutsch" aria-pressed="true"')
         self.assertContains(translated_page, 'name="next" value="/de/articles/"')
 
+    def test_successive_language_changes_keep_the_source_page(self):
+        pages = {
+            "home": ("/", "/de/", "/en/", "/"),
+            "shop": ("/shop/", "/de/shop/", "/en/shop/", "/shop/"),
+            "login": (
+                "/accounts/login/",
+                "/de/accounts/login/",
+                "/en/accounts/login/",
+                "/accounts/login/",
+            ),
+        }
+        language_cycle = ("de", "en", "fr")
+        token = self._csrf_token()
+
+        for page_name, paths in pages.items():
+            current_path = paths[0]
+            for language, expected_path in zip(language_cycle, paths[1:]):
+                with self.subTest(page=page_name, language=language):
+                    response = self._switch_language(
+                        token,
+                        language,
+                        current_path,
+                    )
+
+                    self.assertEqual(response.status_code, 302)
+                    self.assertEqual(response["Location"], expected_path)
+                    self.assertEqual(
+                        response.cookies[settings.LANGUAGE_COOKIE_NAME].value,
+                        language,
+                    )
+                    self.assertEqual(
+                        self.csrf_client.cookies[
+                            settings.LANGUAGE_COOKIE_NAME
+                        ].value,
+                        language,
+                    )
+
+                    translated_page = self.csrf_client.get(expected_path)
+                    self.assertEqual(translated_page.status_code, 200)
+                    self.assertEqual(
+                        translated_page.wsgi_request.LANGUAGE_CODE,
+                        language,
+                    )
+                    current_path = expected_path
+
+    def test_invalid_target_language_keeps_next_and_does_not_set_cookie(self):
+        token = self._csrf_token("/de/shop/")
+
+        response = self._switch_language(token, "invalid", "/de/shop/")
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response["Location"], "/de/shop/")
+        self.assertNotIn(settings.LANGUAGE_COOKIE_NAME, response.cookies)
+        self.assertNotIn(settings.LANGUAGE_COOKIE_NAME, self.csrf_client.cookies)
+
+    def test_empty_next_uses_the_safe_translated_home_fallback(self):
+        token = self._csrf_token()
+
+        response = self._switch_language(token, "de", "")
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response["Location"], "/de/")
+        self.assertEqual(
+            response.cookies[settings.LANGUAGE_COOKIE_NAME].value,
+            "de",
+        )
+
+    def test_safe_query_string_and_fragment_are_preserved(self):
+        token = self._csrf_token("/de/shop/")
+        next_url = "/de/shop/?source=selector&view=grid#catalog"
+
+        response = self._switch_language(token, "en", next_url)
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(
+            response["Location"],
+            "/en/shop/?source=selector&view=grid#catalog",
+        )
+        self.assertEqual(
+            response.cookies[settings.LANGUAGE_COOKIE_NAME].value,
+            "en",
+        )
+
     def test_external_next_is_rejected_with_a_safe_home_fallback(self):
         token = self._csrf_token()
 
-        response = self.csrf_client.post(
-            self.set_language_url,
-            {"language": "en", "next": "https://example.org/collect"},
-            HTTP_X_CSRFTOKEN=token,
+        unsafe_urls = (
+            "https://example.org/collect",
+            "//example.org/collect",
+            "javascript:alert(document.cookie)",
+            "http://[::1",
         )
+        for unsafe_url in unsafe_urls:
+            with self.subTest(next_url=unsafe_url):
+                response = self._switch_language(token, "en", unsafe_url)
 
-        self.assertEqual(response.status_code, 302)
-        self.assertFalse(response["Location"].startswith("https://example.org"))
-        self.assertEqual(response["Location"], "/en/")
+                self.assertEqual(response.status_code, 302)
+                self.assertEqual(response["Location"], "/en/")
+                self.assertEqual(urlsplit(response["Location"]).netloc, "")
+                self.assertEqual(
+                    response.cookies[settings.LANGUAGE_COOKIE_NAME].value,
+                    "en",
+                )
