@@ -1,3 +1,4 @@
+import logging
 from smtplib import SMTPException
 
 from django.conf import settings
@@ -10,6 +11,9 @@ from django.utils.translation import gettext as _
 from shop.models import Produit
 from .forms import ContactForm
 from .home_media import home_hero_image_url
+
+
+logger = logging.getLogger(__name__)
 
 
 def home_view(request):
@@ -33,10 +37,16 @@ def contact_view(request):
         email = form.cleaned_data["email"]
         message = form.cleaned_data["message"]
 
-        recipient = getattr(settings, "CONTACT_EMAIL", None) or settings.EMAIL_HOST_USER
-        from_email = getattr(settings, "DEFAULT_FROM_EMAIL", None) or settings.EMAIL_HOST_USER
+        recipient = (getattr(settings, "CONTACT_EMAIL", "") or "").strip()
+        from_email = (getattr(settings, "DEFAULT_FROM_EMAIL", "") or "").strip()
 
         if not recipient or not from_email:
+            logger.error(
+                "operation=contact_email_configuration_invalid "
+                "contact_email_configured=%s default_from_email_configured=%s",
+                bool(recipient),
+                bool(from_email),
+            )
             messages.error(
                 request,
                 _("Le service de contact est momentanément indisponible. Merci de réessayer plus tard."),
@@ -53,7 +63,11 @@ def contact_view(request):
 
         try:
             email_message.send(fail_silently=False)
-        except (SMTPException, OSError):
+        except (SMTPException, OSError) as exc:
+            logger.error(
+                "operation=contact_email_delivery_failed exception_type=%s",
+                type(exc).__name__,
+            )
             messages.error(
                 request,
                 _("L’envoi du message a momentanément échoué. Merci de réessayer dans quelques instants."),

@@ -18,6 +18,26 @@ def env_list(name, default=""):
     return [item.strip() for item in os.getenv(name, default).split(",") if item.strip()]
 
 
+def env_positive_int(name, default):
+    raw_value = os.getenv(name, str(default)).strip()
+    try:
+        value = int(raw_value)
+    except ValueError as exc:
+        raise ImproperlyConfigured(
+            f"{name} doit être un entier strictement positif."
+        ) from exc
+    if value <= 0:
+        raise ImproperlyConfigured(f"{name} doit être un entier strictement positif.")
+    return value
+
+
+def validate_email_transport_security(use_tls, use_ssl):
+    if use_tls and use_ssl:
+        raise ImproperlyConfigured(
+            "EMAIL_USE_TLS et EMAIL_USE_SSL ne peuvent pas être activés simultanément."
+        )
+
+
 ENVIRONMENT = os.getenv("ENVIRONMENT", "development").strip().lower()
 IS_PRODUCTION = ENVIRONMENT == "production" or bool(os.getenv("RENDER"))
 DEBUG = env_bool("DEBUG", default=not IS_PRODUCTION)
@@ -76,9 +96,12 @@ EMAIL_HOST = os.getenv("EMAIL_HOST", "smtp.gmail.com")
 EMAIL_PORT = int(os.getenv("EMAIL_PORT", "587"))
 EMAIL_USE_TLS = env_bool("EMAIL_USE_TLS", True)
 EMAIL_USE_SSL = env_bool("EMAIL_USE_SSL", False)
+validate_email_transport_security(EMAIL_USE_TLS, EMAIL_USE_SSL)
 EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER", "").strip()
 EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD", "")
+EMAIL_TIMEOUT = env_positive_int("EMAIL_TIMEOUT", 10)
 DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL", EMAIL_HOST_USER).strip()
+CONTACT_EMAIL = os.getenv("CONTACT_EMAIL", "").strip()
 SITE_BASE_URL = os.getenv("SITE_BASE_URL", "http://127.0.0.1:8800").rstrip("/")
 ORDER_RECEIPT_ISSUER_NAME = os.getenv(
     "ORDER_RECEIPT_ISSUER_NAME",
