@@ -223,22 +223,36 @@ def _reserve_payment(request, order_id, channel):
     """
     def reserve_once():
         with transaction.atomic():
-            # PostgreSQL rejects SELECT DISTINCT ... FOR UPDATE. EXISTS keeps
-            # the line-presence check out of the locked Commande relation.
-            locked_orders = Commande.objects.select_for_update().annotate(
-                has_order_lines=Exists(
-                    LigneCommande.objects.filter(commande_id=OuterRef("pk"))
+            # PostgreSQL rejects SELECT DISTINCT ... FOR UPDATE and cannot
+            # lock the nullable side of an outer join. EXISTS keeps both
+            # related-state checks out of the locked Commande relation.
+            locked_orders = (
+                Commande.objects.select_for_update(of=("self",))
+                .annotate(
+                    has_order_lines=Exists(
+                        LigneCommande.objects.filter(commande_id=OuterRef("pk"))
+                    ),
+                    has_cancellation=Exists(
+                        OrderCancellation.objects.filter(commande_id=OuterRef("pk"))
+                    ),
+                )
+                .filter(
+                    client=request.user,
+                    has_order_lines=True,
+                    has_cancellation=False,
+                    payment_status__in=(
+                        "PENDING",
+                        "PROCESSING",
+                        "FAILED",
+                        "CANCELED",
+                    ),
+                    adresse__isnull=False,
+                    total__gt=0,
                 )
             )
             commande = get_object_or_404(
                 locked_orders,
                 id=order_id,
-                client=request.user,
-                has_order_lines=True,
-                payment_status__in=("PENDING", "PROCESSING", "FAILED", "CANCELED"),
-                cancellation__isnull=True,
-                adresse__isnull=False,
-                total__gt=0,
             )
             _validate_order_payment_amount(commande)
             active = Payment.objects.select_for_update().filter(
