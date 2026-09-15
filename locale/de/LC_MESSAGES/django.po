@@ -3275,6 +3275,134 @@ msgstr "Akzeptierte Formate: JPEG, PNG und WebP. Maximale Größe: %(max_size_mb
 msgid "La photo n’a pas pu être enregistrée pour le moment. Veuillez réessayer ultérieurement."
 msgstr "Das Foto konnte derzeit nicht gespeichert werden. Bitte versuchen Sie es später erneut."
 
+#: accounts/forms.py
+msgctxt "account profile field"
+msgid "Présentation"
+msgstr "Kurzprofil"
+
+#: accounts/templates/accounts/login.html accounts/templates/accounts/profile.html
+msgid "Espace personnel"
+msgstr "Persönlicher Bereich"
+
+#: accounts/templates/accounts/login.html
+msgid "Heureux de vous revoir."
+msgstr "Schön, dass Sie wieder da sind."
+
+#: accounts/templates/accounts/login.html
+msgid "Connectez-vous pour retrouver votre profil, vos achats et vos contenus."
+msgstr "Melden Sie sich an, um auf Ihr Profil, Ihre Einkäufe und Ihre Inhalte zuzugreifen."
+
+#: accounts/templates/accounts/login.html
+msgid "Accès à votre profil"
+msgstr "Zugriff auf Ihr Profil"
+
+#: accounts/templates/accounts/login.html
+msgid "Commandes et paiements sécurisés"
+msgstr "Sichere Bestellungen und Zahlungen"
+
+#: accounts/templates/accounts/login.html
+msgid "Expérience personnalisée"
+msgstr "Personalisiertes Erlebnis"
+
+#: accounts/templates/accounts/login.html
+msgid "Accéder à mon compte"
+msgstr "Auf mein Konto zugreifen"
+
+#: accounts/templates/accounts/login.html
+msgid "Entrez vos identifiants pour continuer."
+msgstr "Geben Sie Ihre Anmeldedaten ein, um fortzufahren."
+
+#: accounts/templates/accounts/login.html
+msgid "Pas encore de compte ?"
+msgstr "Noch kein Konto?"
+
+#: accounts/templates/accounts/login.html accounts/templates/accounts/register.html
+msgid "Créer un compte"
+msgstr "Konto erstellen"
+
+#: accounts/templates/accounts/profile.html
+msgid "Mettez à jour les informations visibles dans votre espace personnel."
+msgstr "Aktualisieren Sie die Angaben, die in Ihrem persönlichen Bereich angezeigt werden."
+
+#: accounts/templates/accounts/profile.html
+#, python-format
+msgid "Photo de profil de %(identity)s"
+msgstr "Profilfoto von %(identity)s"
+
+#: accounts/templates/accounts/profile.html
+msgid "Mon compte"
+msgstr "Mein Konto"
+
+#: accounts/templates/accounts/profile.html
+msgid "Compte personnel"
+msgstr "Persönliches Konto"
+
+#: accounts/templates/accounts/profile.html accounts/templates/accounts/register.html
+msgid "Accès sécurisé"
+msgstr "Sicherer Zugang"
+
+#: accounts/templates/accounts/profile.html
+msgid "Informations"
+msgstr "Informationen"
+
+#: accounts/templates/accounts/profile.html
+msgid "Modifier mon profil"
+msgstr "Mein Profil bearbeiten"
+
+#: accounts/templates/accounts/profile.html
+msgid "Vous pouvez mettre à jour votre nom, votre photo, votre téléphone et votre présentation."
+msgstr "Sie können Ihren Namen, Ihr Profilfoto, Ihre Telefonnummer und Ihr Kurzprofil aktualisieren."
+
+#: accounts/templates/accounts/profile.html
+msgid "Retour au site"
+msgstr "Zurück zur Website"
+
+#: accounts/templates/accounts/register.html
+msgid "Inscription"
+msgstr "Registrierung"
+
+#: accounts/templates/accounts/register.html
+msgid "Rejoignez l’univers Teyilawson."
+msgstr "Werden Sie Teil der Teyilawson-Community."
+
+#: accounts/templates/accounts/register.html
+msgid "Créez votre espace personnel pour profiter d’une expérience plus fluide sur le site."
+msgstr "Erstellen Sie Ihren persönlichen Bereich, um die Website noch komfortabler zu nutzen."
+
+#: accounts/templates/accounts/register.html
+msgid "Profil personnalisable"
+msgstr "Anpassbares Profil"
+
+#: accounts/templates/accounts/register.html
+msgid "Commandes liées à votre compte"
+msgstr "Mit Ihrem Konto verknüpfte Bestellungen"
+
+#: accounts/templates/accounts/register.html
+msgid "Créer mon compte"
+msgstr "Mein Konto erstellen"
+
+#: accounts/templates/accounts/register.html
+msgid "Quelques informations suffisent pour commencer."
+msgstr "Wenige Angaben genügen, um zu beginnen."
+
+#: accounts/templates/accounts/register.html
+msgid "Déjà inscrit ?"
+msgstr "Bereits registriert?"
+
+#: accounts/views.py
+#, python-format
+msgid "Bienvenue %(name)s !"
+msgstr "Willkommen, %(name)s!"
+
+#: accounts/views.py
+msgid "Email ou mot de passe incorrect."
+msgstr "E-Mail-Adresse oder Passwort ist falsch."
+
+#. Native Django validation used by the account forms. Django 5.2's German
+#. catalog marks this entry as obsolete, which otherwise falls back to French.
+msgid "This field is required."
+msgstr "Dieses Feld ist erforderlich."
+
 #: payments/templates/payments/_subscription_self_service.html
 msgid "Espace abonné"
 msgstr "Abonnentenbereich"

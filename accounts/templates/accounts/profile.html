@@ -1,7 +1,7 @@
 {% extends 'template_base.html' %}
 {% load i18n static %}
 
-{% block titre %}Mon profil — Teyilawson{% endblock %}
+{% block titre %}{% translate "Mon profil" %} — Teyilawson{% endblock %}
 
 {% block styles %}
 <link rel="stylesheet" href="{% static 'css/accounts.css' %}">
@@ -12,9 +12,9 @@
 <section class="profile-page">
   <header class="profile-header">
     <div>
-      <span class="eyebrow">Espace personnel</span>
-      <h1>Mon profil</h1>
-      <p>Mettez à jour les informations visibles dans votre espace personnel.</p>
+      <span class="eyebrow">{% translate "Espace personnel" %}</span>
+      <h1>{% translate "Mon profil" %}</h1>
+      <p>{% translate "Mettez à jour les informations visibles dans votre espace personnel." %}</p>
     </div>
   </header>
 
@@ -22,26 +22,26 @@
     <aside class="profile-summary">
       <div class="profile-avatar">
         {% if user.photo %}
-          <img src="{{ user.photo.url }}" alt="Photo de profil de {{ user.get_full_name|default:user.email }}">
+          <img src="{{ user.photo.url }}" alt="{% blocktranslate with identity=user.get_full_name|default:user.email %}Photo de profil de {{ identity }}{% endblocktranslate %}">
         {% else %}
           <span>{% if user.first_name %}{{ user.first_name|first|upper }}{% else %}{{ user.email|first|upper }}{% endif %}</span>
         {% endif %}
       </div>
       <div class="profile-identity">
-        {% if user.get_full_name %}<strong>{{ user.get_full_name }}</strong>{% else %}<strong>Mon compte</strong>{% endif %}
+        {% if user.get_full_name %}<strong>{{ user.get_full_name }}</strong>{% else %}<strong>{% translate "Mon compte" %}</strong>{% endif %}
         <span>{{ user.email }}</span>
       </div>
       <div class="profile-summary-list">
-        <span><i class="fa-regular fa-user" aria-hidden="true"></i> Compte personnel</span>
-        <span><i class="fa-solid fa-shield-halved" aria-hidden="true"></i> Accès sécurisé</span>
+        <span><i class="fa-regular fa-user" aria-hidden="true"></i> {% translate "Compte personnel" %}</span>
+        <span><i class="fa-solid fa-shield-halved" aria-hidden="true"></i> {% translate "Accès sécurisé" %}</span>
       </div>
     </aside>
 
     <div class="profile-card">
       <div class="auth-card-heading">
-        <span class="eyebrow">Informations</span>
-        <h2>Modifier mon profil</h2>
-        <p>Vous pouvez mettre à jour votre nom, votre photo, votre téléphone et votre présentation.</p>
+        <span class="eyebrow">{% translate "Informations" %}</span>
+        <h2>{% translate "Modifier mon profil" %}</h2>
+        <p>{% translate "Vous pouvez mettre à jour votre nom, votre photo, votre téléphone et votre présentation." %}</p>
       </div>
 
       <form method="post" enctype="multipart/form-data" class="auth-form auth-form-grid">
@@ -49,17 +49,15 @@
         {% if form.non_field_errors %}<div class="alert alert-danger auth-grid-full" role="alert">{{ form.non_field_errors }}</div>{% endif %}
         {% for field in form %}
         <div class="auth-field {% if field.name == 'photo' or field.name == 'bio' %}auth-grid-full{% endif %}">
-          <label for="{{ field.id_for_label }}">
-            {% if field.name == 'first_name' %}Prénom{% elif field.name == 'last_name' %}Nom{% elif field.name == 'photo' %}Photo de profil{% elif field.name == 'telephone' %}Téléphone{% elif field.name == 'bio' %}Présentation{% else %}{{ field.label }}{% endif %}
-          </label>
+          <label for="{{ field.id_for_label }}">{{ field.label }}</label>
           {% if field.name == 'photo' %}<div class="profile-file-field">{{ field }}</div>{% else %}{{ field }}{% endif %}
           {% if field.help_text %}<small>{{ field.help_text|safe }}</small>{% endif %}
           {% if field.errors %}<div class="auth-field-error">{{ field.errors }}</div>{% endif %}
         </div>
         {% endfor %}
         <div class="auth-grid-full profile-actions">
-          <button type="submit" class="btn btn-brand">Enregistrer les modifications</button>
-          <a href="{% url 'home' %}" class="btn btn-soft">Retour au site</a>
+          <button type="submit" class="btn btn-brand">{% translate "Enregistrer les modifications" %}</button>
+          <a href="{% url 'home' %}" class="btn btn-soft">{% translate "Retour au site" %}</a>
         </div>
       </form>
     </div>
