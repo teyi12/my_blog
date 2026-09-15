@@ -7,7 +7,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.contrib.auth.forms import AuthenticationForm
 from django.db import transaction
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext, gettext_lazy
 from requests.exceptions import RequestException
 
 from payments.subscriptions import (
@@ -23,7 +23,7 @@ logger = logging.getLogger(__name__)
 
 PHOTO_STORAGE_EXCEPTIONS = (CloudinaryError, RequestException, OSError)
 
-PHOTO_STORAGE_ERROR = _(
+PHOTO_STORAGE_ERROR = gettext_lazy(
     "La photo n’a pas pu être enregistrée pour le moment. "
     "Veuillez réessayer ultérieurement."
 )
@@ -104,10 +104,14 @@ def login_view(request):
         if form.is_valid():
             user = form.get_user()
             login(request, user)
-            messages.success(request, f"Bienvenue {user.first_name or user.username} !")
+            messages.success(
+                request,
+                gettext("Bienvenue %(name)s !")
+                % {"name": user.first_name or user.username},
+            )
             return redirect("home")
         else:
-            messages.error(request, "Email ou mot de passe incorrect.")
+            messages.error(request, gettext("Email ou mot de passe incorrect."))
     else:
         form = AuthenticationForm()
 

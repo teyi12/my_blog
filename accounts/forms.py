@@ -4,7 +4,7 @@ from django import forms
 from django.conf import settings
 from django.contrib.auth.forms import UserCreationForm
 from django.core.exceptions import ValidationError
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext_lazy as _, pgettext_lazy
 from PIL import Image
 
 from .models import CustomUser
@@ -76,11 +76,19 @@ class ProfilePhotoField(forms.ImageField):
 
 
 class CustomUserCreationForm(UserCreationForm):
-    first_name = forms.CharField(max_length=150, required=False, label="Prénom")
-    last_name = forms.CharField(max_length=150, required=False, label="Nom")
+    first_name = forms.CharField(max_length=150, required=False, label=_("Prénom"))
+    last_name = forms.CharField(max_length=150, required=False, label=_("Nom"))
     photo = ProfilePhotoField()
-    telephone = forms.CharField(max_length=20, required=False, label="Téléphone")
-    bio = forms.CharField(widget=forms.Textarea, required=False, label="Bio")
+    telephone = forms.CharField(
+        max_length=20,
+        required=False,
+        label=_("Téléphone"),
+    )
+    bio = forms.CharField(
+        widget=forms.Textarea,
+        required=False,
+        label=pgettext_lazy("account profile field", "Présentation"),
+    )
 
     class Meta:
         model = CustomUser
@@ -94,6 +102,7 @@ class CustomUserCreationForm(UserCreationForm):
             "telephone",
             "bio",
         ]
+        labels = {"email": _("Adresse e-mail")}
 
 
 class CustomUserUpdateForm(forms.ModelForm):
@@ -102,6 +111,12 @@ class CustomUserUpdateForm(forms.ModelForm):
     class Meta:
         model = CustomUser
         fields = ["first_name", "last_name", "photo", "telephone", "bio"]
+        labels = {
+            "first_name": _("Prénom"),
+            "last_name": _("Nom"),
+            "telephone": _("Téléphone"),
+            "bio": pgettext_lazy("account profile field", "Présentation"),
+        }
 
 
 class ProfileForm(forms.ModelForm):
@@ -110,3 +125,8 @@ class ProfileForm(forms.ModelForm):
     class Meta:
         model = CustomUser
         fields = ("first_name", "last_name", "photo", "bio")
+        labels = {
+            "first_name": _("Prénom"),
+            "last_name": _("Nom"),
+            "bio": pgettext_lazy("account profile field", "Présentation"),
+        }

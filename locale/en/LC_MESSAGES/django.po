@@ -3218,6 +3218,129 @@ msgstr "Accepted formats: JPEG, PNG, and WebP. Maximum size: %(max_size_mb)s MB.
 msgid "La photo n’a pas pu être enregistrée pour le moment. Veuillez réessayer ultérieurement."
 msgstr "The photo could not be saved right now. Please try again later."
 
+#: accounts/forms.py
+msgctxt "account profile field"
+msgid "Présentation"
+msgstr "Bio"
+
+#: accounts/templates/accounts/login.html accounts/templates/accounts/profile.html
+msgid "Espace personnel"
+msgstr "Personal area"
+
+#: accounts/templates/accounts/login.html
+msgid "Heureux de vous revoir."
+msgstr "Welcome back."
+
+#: accounts/templates/accounts/login.html
+msgid "Connectez-vous pour retrouver votre profil, vos achats et vos contenus."
+msgstr "Sign in to access your profile, purchases, and content."
+
+#: accounts/templates/accounts/login.html
+msgid "Accès à votre profil"
+msgstr "Access to your profile"
+
+#: accounts/templates/accounts/login.html
+msgid "Commandes et paiements sécurisés"
+msgstr "Secure orders and payments"
+
+#: accounts/templates/accounts/login.html
+msgid "Expérience personnalisée"
+msgstr "Personalized experience"
+
+#: accounts/templates/accounts/login.html
+msgid "Accéder à mon compte"
+msgstr "Access my account"
+
+#: accounts/templates/accounts/login.html
+msgid "Entrez vos identifiants pour continuer."
+msgstr "Enter your sign-in details to continue."
+
+#: accounts/templates/accounts/login.html
+msgid "Pas encore de compte ?"
+msgstr "Don’t have an account yet?"
+
+#: accounts/templates/accounts/login.html accounts/templates/accounts/register.html
+msgid "Créer un compte"
+msgstr "Create an account"
+
+#: accounts/templates/accounts/profile.html
+msgid "Mettez à jour les informations visibles dans votre espace personnel."
+msgstr "Update the information shown in your personal area."
+
+#: accounts/templates/accounts/profile.html
+#, python-format
+msgid "Photo de profil de %(identity)s"
+msgstr "Profile photo of %(identity)s"
+
+#: accounts/templates/accounts/profile.html
+msgid "Mon compte"
+msgstr "My account"
+
+#: accounts/templates/accounts/profile.html
+msgid "Compte personnel"
+msgstr "Personal account"
+
+#: accounts/templates/accounts/profile.html accounts/templates/accounts/register.html
+msgid "Accès sécurisé"
+msgstr "Secure access"
+
+#: accounts/templates/accounts/profile.html
+msgid "Informations"
+msgstr "Information"
+
+#: accounts/templates/accounts/profile.html
+msgid "Modifier mon profil"
+msgstr "Edit my profile"
+
+#: accounts/templates/accounts/profile.html
+msgid "Vous pouvez mettre à jour votre nom, votre photo, votre téléphone et votre présentation."
+msgstr "You can update your name, profile photo, phone number, and bio."
+
+#: accounts/templates/accounts/profile.html
+msgid "Retour au site"
+msgstr "Back to the site"
+
+#: accounts/templates/accounts/register.html
+msgid "Inscription"
+msgstr "Sign up"
+
+#: accounts/templates/accounts/register.html
+msgid "Rejoignez l’univers Teyilawson."
+msgstr "Join the Teyilawson community."
+
+#: accounts/templates/accounts/register.html
+msgid "Créez votre espace personnel pour profiter d’une expérience plus fluide sur le site."
+msgstr "Create your personal space for a smoother experience across the site."
+
+#: accounts/templates/accounts/register.html
+msgid "Profil personnalisable"
+msgstr "Customizable profile"
+
+#: accounts/templates/accounts/register.html
+msgid "Commandes liées à votre compte"
+msgstr "Orders linked to your account"
+
+#: accounts/templates/accounts/register.html
+msgid "Créer mon compte"
+msgstr "Create my account"
+
+#: accounts/templates/accounts/register.html
+msgid "Quelques informations suffisent pour commencer."
+msgstr "A few details are all you need to get started."
+
+#: accounts/templates/accounts/register.html
+msgid "Déjà inscrit ?"
+msgstr "Already registered?"
+
+#: accounts/views.py
+#, python-format
+msgid "Bienvenue %(name)s !"
+msgstr "Welcome, %(name)s!"
+
+#: accounts/views.py
+msgid "Email ou mot de passe incorrect."
+msgstr "Incorrect email address or password."
+
 #: payments/templates/payments/_subscription_self_service.html
 msgid "Espace abonné"
 msgstr "Subscriber area"
