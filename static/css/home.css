@@ -305,12 +305,6 @@
   border-radius: var(--radius-lg);
   background: var(--surface);
   box-shadow: var(--shadow-sm);
-  transition: transform var(--transition), box-shadow var(--transition);
-}
-
-.home-product-card:hover {
-  transform: translateY(-4px);
-  box-shadow: var(--shadow-md);
 }
 
 .home-product-image {
@@ -328,7 +322,8 @@
   transition: transform 320ms ease;
 }
 
-.home-product-card:hover .home-product-image img {
+.home-product-image:hover img,
+.home-product-image:focus-visible img {
   transform: scale(1.035);
 }
 
