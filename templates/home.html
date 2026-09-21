@@ -5,14 +5,13 @@
 
 {% block styles %}
 <link rel="stylesheet" href="{% static 'css/home.css' %}">
-<link rel="stylesheet" href="{% static 'css/home-polish.css' %}">
 {% endblock %}
 
 {% block contenu %}
 <div class="home-page">
-  <section class="home-hero" aria-labelledby="home-hero-title">
+  <section class="home-hero" aria-labelledby="home-hero-title" data-home-section="hero">
     <div class="home-hero-copy">
-      <span class="eyebrow">{% translate "Explorer · Comprendre · Choisir" %}</span>
+      <span class="home-eyebrow">{% translate "Explorer · Comprendre · Choisir" %}</span>
       <h1 id="home-hero-title">{% translate "Des idées, des découvertes et une sélection pensée avec soin." %}</h1>
       <p class="home-hero-lead">
         {% translate "Retrouvez des articles inspirants, des expériences à découvrir et une boutique sélectionnée pour aller à l’essentiel." %}
@@ -22,135 +21,224 @@
           {% translate "Explorer les articles" %}
           <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
         </a>
-        <a class="btn btn-outline-primary btn-lg" href="{% url 'shop:liste' %}">
+        <a class="btn btn-soft btn-lg" href="{% url 'shop:liste' %}">
           {% translate "Découvrir la boutique" %}
         </a>
       </div>
-      <div class="home-trust-row" aria-label="{% translate "Points forts" %}">
-        <span><i class="fa-regular fa-circle-check" aria-hidden="true"></i> {% translate "Contenus choisis" %}</span>
-        <span><i class="fa-regular fa-circle-check" aria-hidden="true"></i> {% translate "Navigation simple" %}</span>
-        <span><i class="fa-regular fa-circle-check" aria-hidden="true"></i> {% translate "Paiement sécurisé" %}</span>
-      </div>
+      <ul class="home-trust-list" aria-label="{% translate 'Points forts' %}">
+        <li><i class="fa-regular fa-circle-check" aria-hidden="true"></i> {% translate "Contenus choisis" %}</li>
+        <li><i class="fa-regular fa-circle-check" aria-hidden="true"></i> {% translate "Navigation simple" %}</li>
+        <li><i class="fa-regular fa-circle-check" aria-hidden="true"></i> {% translate "Paiement sécurisé" %}</li>
+      </ul>
     </div>
 
     <div class="home-hero-visual">
-      <div class="hero-visual-card hero-visual-main">
-        <img src="{{ hero_image_url }}" alt="{% translate "Un carnet de voyage posé sur une carte, symbole de récits et de découvertes" %}">
-        <div class="hero-visual-overlay" aria-hidden="true">
+      <div class="home-hero-media">
+        <img src="{{ hero_image_url }}"
+             alt="{% translate 'Un carnet de voyage posé sur une carte, symbole de récits et de découvertes' %}"
+             width="640"
+             height="480"
+             fetchpriority="high">
+        <div class="home-hero-caption">
           <span>{% translate "Récits & découvertes" %}</span>
           <strong>{% translate "Voir le monde autrement" %}</strong>
         </div>
       </div>
-      <div class="hero-floating-card hero-floating-top" aria-hidden="true">
-        <span class="hero-floating-icon"><i class="fa-solid fa-compass"></i></span>
-        <span><small>{% translate "Inspiration" %}</small><strong>{% translate "Explorer" %}</strong></span>
-      </div>
-      <div class="hero-floating-card hero-floating-bottom" aria-hidden="true">
-        <span class="hero-floating-icon"><i class="fa-solid fa-bag-shopping"></i></span>
-        <span><small>{% translate "Sélection" %}</small><strong>{% translate "Boutique" %}</strong></span>
+      <div class="home-hero-note" aria-hidden="true">
+        <span><i class="fa-solid fa-compass"></i></span>
+        <strong>{% translate "Inspiration" %}</strong>
       </div>
     </div>
   </section>
 
-  <section class="home-section" aria-labelledby="discover-title">
-    <div class="home-section-heading">
+  <nav class="home-paths" aria-label="{% translate 'Explorer selon vos envies' %}" data-home-section="categories">
+    <a class="surface-card home-path" href="{% url 'articles:articles' %}">
+      <span class="home-path-icon"><i class="fa-regular fa-newspaper" aria-hidden="true"></i></span>
+      <span>
+        <small>{% translate "Lire" %}</small>
+        <strong>{% translate "Articles & récits" %}</strong>
+      </span>
+      <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+    </a>
+    <a class="surface-card home-path" href="{% url 'videos:list' %}">
+      <span class="home-path-icon"><i class="fa-solid fa-play" aria-hidden="true"></i></span>
+      <span>
+        <small>{% translate "Vidéos" %}</small>
+        <strong>{% translate "Des histoires à vivre en images." %}</strong>
+      </span>
+      <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+    </a>
+    <a class="surface-card home-path" href="{% url 'shop:liste' %}">
+      <span class="home-path-icon"><i class="fa-solid fa-bag-shopping" aria-hidden="true"></i></span>
+      <span>
+        <small>{% translate "Choisir" %}</small>
+        <strong>{% translate "Boutique sélectionnée" %}</strong>
+      </span>
+      <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+    </a>
+  </nav>
+
+  <section class="home-section" aria-labelledby="home-articles-title" data-home-section="articles">
+    <header class="home-section-heading">
       <div>
-        <span class="eyebrow">{% translate "L’univers Teyilawson" %}</span>
-        <h2 id="discover-title">{% translate "Explorer selon vos envies" %}</h2>
+        <span class="home-eyebrow">{% translate "Journal · idées · découvertes" %}</span>
+        <h2 id="home-articles-title">{% translate "Des lectures pour voir plus loin." %}</h2>
       </div>
-      <p>{% translate "Trois portes d’entrée pour découvrir le contenu, les idées et les sélections du site." %}</p>
-    </div>
-
-    <div class="home-feature-grid">
-      <a class="home-feature-card" href="{% url 'articles:articles' %}">
-        <span class="home-feature-icon"><i class="fa-regular fa-newspaper" aria-hidden="true"></i></span>
-        <div>
-          <span class="home-feature-kicker">{% translate "Lire" %}</span>
-          <h3>{% translate "Articles & récits" %}</h3>
-          <p>{% translate "Des contenus utiles, des expériences et des histoires qui donnent envie d’aller plus loin." %}</p>
-          <span class="home-feature-link">{% translate "Découvrir les articles" %} <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></span>
-        </div>
+      <a class="btn btn-link" href="{% url 'articles:articles' %}">
+        {% translate "Tous les articles" %}
+        <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
       </a>
+    </header>
 
-      <a class="home-feature-card" href="{% url 'shop:liste' %}">
-        <span class="home-feature-icon"><i class="fa-solid fa-bag-shopping" aria-hidden="true"></i></span>
-        <div>
-          <span class="home-feature-kicker">{% translate "Choisir" %}</span>
-          <h3>{% translate "Boutique sélectionnée" %}</h3>
-          <p>{% translate "Une sélection de produits présentés simplement, sans surcharge et avec une expérience d’achat claire." %}</p>
-          <span class="home-feature-link">{% translate "Voir la boutique" %} <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></span>
-        </div>
-      </a>
-
-      <a class="home-feature-card" href="{% url 'about' %}">
-        <span class="home-feature-icon"><i class="fa-regular fa-compass" aria-hidden="true"></i></span>
-        <div>
-          <span class="home-feature-kicker">{% translate "Comprendre" %}</span>
-          <h3>{% translate "Découvertes & inspiration" %}</h3>
-          <p>{% translate "Voyages, saveurs, idées et nouvelles perspectives réunies dans un même univers éditorial." %}</p>
-          <span class="home-feature-link">{% translate "En savoir plus" %} <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></span>
-        </div>
-      </a>
-    </div>
-  </section>
-
-  {% if produits_vedettes %}
-  <section class="home-section home-products-section" aria-labelledby="featured-products-title">
-    <div class="home-section-heading home-section-heading-inline">
-      <div>
-        <span class="eyebrow">{% translate "Sélection du moment" %}</span>
-        <h2 id="featured-products-title">{% translate "Produits en vedette" %}</h2>
-      </div>
-      <a class="home-text-link" href="{% url 'shop:liste' %}">{% translate "Voir toute la boutique" %} <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a>
-    </div>
-
-    <div class="home-product-grid">
-      {% for produit in produits_vedettes %}
-      <article class="home-product-card">
-        <a class="home-product-image" href="{% url 'shop:detail' slug=produit.slug %}">
-          {% if produit.image %}
-            <img src="{{ produit.image.url }}" alt="{{ produit.localized_name }}">
-          {% else %}
-            <img src="{% static 'images/default.jpg' %}" alt="{{ produit.localized_name }}">
-          {% endif %}
-          <span class="home-product-badge">{% translate "En vedette" %}</span>
-        </a>
-        <div class="home-product-body">
-          {% if produit.categorie %}<span class="home-product-category">{{ produit.categorie.nom }}</span>{% endif %}
-          <h3><a href="{% url 'shop:detail' slug=produit.slug %}">{{ produit.localized_name }}</a></h3>
-          {% if produit.localized_description %}<p>{{ produit.localized_description|truncatewords:16 }}</p>{% endif %}
-          <div class="home-product-footer">
-            <strong>{{ produit.prix }}</strong>
-            <a class="home-product-arrow" href="{% url 'shop:detail' slug=produit.slug %}" aria-label="{% blocktranslate with product_name=produit.localized_name %}Voir {{ product_name }}{% endblocktranslate %}">
-              <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+    {% if articles_recents %}
+      <div class="home-editorial-grid">
+        {% for article in articles_recents %}
+          <article class="surface-card home-editorial-card{% if forloop.first %} home-editorial-card-featured{% endif %}">
+            <a class="home-card-media" href="{% url 'articles:article_detail' slug=article.slug %}" aria-label="{% blocktranslate with article_title=article.titre %}Lire {{ article_title }}{% endblocktranslate %}">
+              {% if article.image %}
+                <img src="{{ article.image.url }}" alt="{{ article.resolved_image_alt }}" width="800" height="500" loading="lazy">
+              {% else %}
+                <span class="home-media-placeholder" aria-hidden="true"><i class="fa-regular fa-newspaper"></i></span>
+              {% endif %}
             </a>
-          </div>
-        </div>
-      </article>
-      {% endfor %}
-    </div>
+            <div class="home-card-body">
+              <div class="home-card-meta">
+                {% if article.categorie %}<span class="badge badge-neutral">{{ article.categorie.nom }}</span>{% endif %}
+                {% if article.is_premium %}<span class="badge badge-warning"><i class="fa-solid fa-star" aria-hidden="true"></i> {% translate "Premium" %}</span>{% endif %}
+                <time datetime="{{ article.date_publication|date:'Y-m-d' }}">{{ article.date_publication|date:"d F Y" }}</time>
+              </div>
+              <h3><a href="{% url 'articles:article_detail' slug=article.slug %}">{{ article.titre }}</a></h3>
+              <p>{{ article.contenu|striptags|truncatewords:24 }}</p>
+              <a class="home-card-link" href="{% url 'articles:article_detail' slug=article.slug %}">
+                {% translate "Lire l’article" %}<i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+              </a>
+            </div>
+          </article>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="empty-state home-empty-state">
+        <span class="empty-state-icon" aria-hidden="true"><i class="fa-regular fa-newspaper"></i></span>
+        <h3 class="empty-state-title">{% translate "Aucun article pour le moment" %}</h3>
+        <p class="empty-state-description">{% translate "Les prochains récits et découvertes apparaîtront ici." %}</p>
+        <a class="btn btn-soft empty-state-action" href="{% url 'articles:articles' %}">{% translate "Tous les articles" %}</a>
+      </div>
+    {% endif %}
   </section>
-  {% endif %}
 
-  <section class="home-story" aria-labelledby="home-story-title">
-    <div class="home-story-copy">
-      <span class="eyebrow eyebrow-light">{% translate "Une autre manière de découvrir" %}</span>
-      <h2 id="home-story-title">{% translate "Curiosité, simplicité et qualité." %}</h2>
-      <p>
-        {% translate "Teyilawson rassemble des contenus et des sélections qui donnent envie de découvrir, comprendre et choisir avec plus de confiance." %}
-      </p>
-      <a class="btn home-light-button" href="{% url 'about' %}">{% translate "Découvrir notre univers" %}</a>
-    </div>
-    <div class="home-story-values" aria-label="{% translate "Nos valeurs" %}">
-      <div><strong>01</strong><span>{% translate "Curiosité" %}</span></div>
-      <div><strong>02</strong><span>{% translate "Authenticité" %}</span></div>
-      <div><strong>03</strong><span>{% translate "Simplicité" %}</span></div>
-    </div>
+  <section class="home-section home-video-section" aria-labelledby="home-videos-title" data-home-section="videos">
+    <header class="home-section-heading">
+      <div>
+        <span class="home-eyebrow">{% translate "Vidéos · vlogs · découvertes" %}</span>
+        <h2 id="home-videos-title">{% translate "Des histoires à vivre en images." %}</h2>
+        <p>{% translate "Reportages, expériences et perspectives réunis dans un espace vidéo clair et immersif." %}</p>
+      </div>
+      <a class="btn btn-link" href="{% url 'videos:list' %}">
+        {% translate "Toutes les vidéos" %}
+        <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+      </a>
+    </header>
+
+    {% if videos_recentes %}
+      <div class="home-video-grid">
+        {% for video in videos_recentes %}
+          <article class="surface-card home-video-card">
+            <a class="home-card-media home-video-media" href="{% url 'videos:detail' slug=video.slug %}" aria-label="{% blocktranslate with video_title=video.titre %}Regarder {{ video_title }}{% endblocktranslate %}">
+              {% if video.miniature %}
+                <img src="{{ video.miniature.url }}" alt="{{ video.resolved_miniature_alt }}" width="1280" height="720" loading="lazy">
+              {% else %}
+                <img src="{% static 'images/video-placeholder.svg' %}" alt="{{ video.resolved_miniature_alt }}" width="1280" height="720" loading="lazy">
+              {% endif %}
+              <span class="home-play-icon" aria-hidden="true"><i class="fa-solid fa-play"></i></span>
+            </a>
+            <div class="home-card-body">
+              <div class="home-card-meta">
+                {% if video.categorie %}<span class="badge badge-neutral">{{ video.categorie.nom }}</span>{% endif %}
+                {% if video.is_premium %}<span class="badge badge-warning"><i class="fa-solid fa-star" aria-hidden="true"></i> {% translate "Premium" %}</span>{% endif %}
+                <time datetime="{{ video.date_publication|date:'Y-m-d' }}">{{ video.date_publication|date:"d F Y" }}</time>
+              </div>
+              <h3><a href="{% url 'videos:detail' slug=video.slug %}">{{ video.titre }}</a></h3>
+              <p>{{ video.description|striptags|truncatewords:22 }}</p>
+              <a class="home-card-link" href="{% url 'videos:detail' slug=video.slug %}">
+                {% translate "Regarder la vidéo" %}<i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+              </a>
+            </div>
+          </article>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="empty-state home-empty-state">
+        <span class="empty-state-icon" aria-hidden="true"><i class="fa-solid fa-video"></i></span>
+        <h3 class="empty-state-title">{% translate "Aucune vidéo pour le moment" %}</h3>
+        <p class="empty-state-description">{% translate "Les prochaines vidéos apparaîtront ici." %}</p>
+        <a class="btn btn-soft empty-state-action" href="{% url 'videos:list' %}">{% translate "Toutes les vidéos" %}</a>
+      </div>
+    {% endif %}
   </section>
 
-  <section class="home-cta" aria-labelledby="home-cta-title">
+  <section class="home-section" aria-labelledby="home-products-title" data-home-section="products">
+    <header class="home-section-heading">
+      <div>
+        <span class="home-eyebrow">{% translate "Sélection du moment" %}</span>
+        <h2 id="home-products-title">{% translate "Produits en vedette" %}</h2>
+      </div>
+      <a class="btn btn-link" href="{% url 'shop:liste' %}">
+        {% translate "Voir toute la boutique" %}
+        <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+      </a>
+    </header>
+
+    {% if produits_vedettes %}
+      <div class="home-product-grid">
+        {% for produit in produits_vedettes %}
+          <article class="surface-card home-product-card">
+            <a class="home-product-media" href="{% url 'shop:detail' slug=produit.slug %}" aria-label="{% blocktranslate with product_name=produit.localized_name %}Voir {{ product_name }}{% endblocktranslate %}">
+              {% if produit.image %}
+                <img src="{{ produit.image.url }}" alt="{{ produit.localized_name }}" width="640" height="480" loading="lazy">
+              {% else %}
+                <span class="home-media-placeholder" aria-hidden="true"><i class="fa-solid fa-bag-shopping"></i></span>
+              {% endif %}
+              <span class="badge badge-neutral home-product-badge">{% translate "En vedette" %}</span>
+            </a>
+            <div class="home-product-body">
+              {% if produit.categorie %}<span class="home-product-category">{{ produit.categorie.nom }}</span>{% endif %}
+              <h3><a href="{% url 'shop:detail' slug=produit.slug %}">{{ produit.localized_name }}</a></h3>
+              {% if produit.localized_description %}<p>{{ produit.localized_description|truncatewords:18 }}</p>{% endif %}
+              <div class="home-product-footer">
+                <strong>{{ produit.prix }} €</strong>
+                <a class="home-product-link" href="{% url 'shop:detail' slug=produit.slug %}">
+                  {% translate "Voir le produit" %}<i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+                </a>
+              </div>
+            </div>
+          </article>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="empty-state home-empty-state">
+        <span class="empty-state-icon" aria-hidden="true"><i class="fa-solid fa-bag-shopping"></i></span>
+        <h3 class="empty-state-title">{% translate "La sélection arrive bientôt." %}</h3>
+        <p class="empty-state-description">{% translate "Aucun produit n’est disponible pour le moment. Revenez prochainement pour découvrir la boutique." %}</p>
+        <a class="btn btn-soft empty-state-action" href="{% url 'shop:liste' %}">{% translate "Voir toute la boutique" %}</a>
+      </div>
+    {% endif %}
+  </section>
+
+  <section class="home-premium" aria-labelledby="home-premium-title" data-home-section="premium">
     <div>
-      <span class="eyebrow">{% translate "Restons connectés" %}</span>
+      <span class="home-eyebrow home-eyebrow-light">{% translate "Contenu premium" %}</span>
+      <h2 id="home-premium-title">{% translate "Choisissez la formule qui vous correspond." %}</h2>
+      <p>{% translate "Teyilawson rassemble des contenus et des sélections qui donnent envie de découvrir, comprendre et choisir avec plus de confiance." %}</p>
+    </div>
+    <a class="btn btn-soft" href="{% url 'monetization:abonnements' %}">
+      <i class="fa-solid fa-crown" aria-hidden="true"></i>
+      {% translate "Découvrir les offres Premium" %}
+    </a>
+  </section>
+
+  <section class="surface-card home-cta" aria-labelledby="home-cta-title" data-home-section="contact">
+    <div>
+      <span class="home-eyebrow">{% translate "Restons connectés" %}</span>
       <h2 id="home-cta-title">{% translate "Une question, une idée ou un projet ?" %}</h2>
       <p>{% translate "Échangeons autour d’un partenariat, d’une collaboration ou simplement d’une suggestion." %}</p>
     </div>
