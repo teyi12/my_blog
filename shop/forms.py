@@ -12,11 +12,19 @@ from .models import Categorie, Commande, FULFILLMENT_STATUS_CHOICES, Produit
 
 
 class ProduitForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["nom_fr"].required = True
+
     class Meta:
         model = Produit
         fields = [
-            "nom",
-            "description",
+            "nom_fr",
+            "nom_de",
+            "nom_en",
+            "description_fr",
+            "description_de",
+            "description_en",
             "prix",
             "low_stock_threshold",
             "image",

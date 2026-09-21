@@ -64,7 +64,7 @@ def get_cart_details(session):
         quantite = item["quantite"]
         sous_total = produit.prix * quantite
         panier_detail[produit_id] = {
-            "nom": produit.nom,
+            "nom": produit.localized_name,
             "prix": produit.prix,
             "quantite": quantite,
             "sous_total": sous_total,

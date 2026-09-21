@@ -151,7 +151,8 @@ def ajouter_panier(request, slug):
 
     messages.success(
         request,
-        _("« %(product)s » a été ajouté à votre panier.") % {"product": produit.nom},
+        _("« %(product)s » a été ajouté à votre panier.")
+        % {"product": produit.localized_name},
     )
 
     next_url = request.POST.get("next")

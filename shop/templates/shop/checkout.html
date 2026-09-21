@@ -96,15 +96,15 @@
       <div class="checkout-summary-items">
         {% for item in cart.items.all %}
         <div class="checkout-summary-item">
-          <a href="{% url 'shop:detail' slug=item.produit.slug %}" class="checkout-summary-media" aria-label="{% blocktranslate with product=item.produit.nom %}Voir {{ product }}{% endblocktranslate %}">
+          <a href="{% url 'shop:detail' slug=item.produit.slug %}" class="checkout-summary-media" aria-label="{% blocktranslate with product=item.produit.localized_name %}Voir {{ product }}{% endblocktranslate %}">
             {% if item.produit.image %}
-              <img src="{{ item.produit.image.url }}" alt="{{ item.produit.nom }}">
+              <img src="{{ item.produit.image.url }}" alt="{{ item.produit.localized_name }}">
             {% else %}
-              <img src="{% static 'images/default.jpg' %}" alt="{{ item.produit.nom }}">
+              <img src="{% static 'images/default.jpg' %}" alt="{{ item.produit.localized_name }}">
             {% endif %}
           </a>
           <div class="checkout-summary-copy">
-            <strong>{{ item.produit.nom }}</strong>
+            <strong>{{ item.produit.localized_name }}</strong>
             <span>{% blocktranslate with quantity=item.quantite %}Quantité : {{ quantity }}{% endblocktranslate %}</span>
             {% if item.produit.stock_est_gere %}<span>{% blocktranslate with available=item.produit.stock %}Disponible : {{ available }}{% endblocktranslate %}</span>{% endif %}
           </div>

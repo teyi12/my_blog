@@ -30,15 +30,15 @@
       <article class="cart-item" id="item-{{ item.id }}">
         <a class="cart-item-image" href="{% url 'shop:detail' slug=item.produit.slug %}">
           {% if item.produit.image %}
-            <img src="{{ item.produit.image.url }}" alt="{{ item.produit.nom }}">
+            <img src="{{ item.produit.image.url }}" alt="{{ item.produit.localized_name }}">
           {% else %}
-            <img src="{% static 'images/default.jpg' %}" alt="{{ item.produit.nom }}">
+            <img src="{% static 'images/default.jpg' %}" alt="{{ item.produit.localized_name }}">
           {% endif %}
         </a>
 
         <div class="cart-item-info">
           {% if item.produit.categorie %}<span class="cart-item-category">{{ item.produit.categorie.nom }}</span>{% endif %}
-          <h2><a href="{% url 'shop:detail' slug=item.produit.slug %}">{{ item.produit.nom }}</a></h2>
+          <h2><a href="{% url 'shop:detail' slug=item.produit.slug %}">{{ item.produit.localized_name }}</a></h2>
           <span class="cart-unit-price">{{ item.prix_unitaire|floatformat:2 }} € / {% translate "unité" %}</span>
           {% if item.produit.stock_est_gere %}
             {% if item.produit.stock == 0 %}
@@ -71,7 +71,7 @@
         <button class="cart-remove-button"
                 type="button"
                 onclick="removeFromCart({{ item.id }})"
-                aria-label="{% blocktranslate with product=item.produit.nom %}Supprimer {{ product }} du panier{% endblocktranslate %}">
+                aria-label="{% blocktranslate with product=item.produit.localized_name %}Supprimer {{ product }} du panier{% endblocktranslate %}">
           <i class="fa-regular fa-trash-can" aria-hidden="true"></i>
         </button>
       </article>

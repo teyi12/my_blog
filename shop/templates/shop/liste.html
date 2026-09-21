@@ -54,9 +54,9 @@
     <article class="shop-card">
       <a class="shop-card-media" href="{% url 'shop:detail' slug=produit.slug %}">
         {% if produit.image %}
-          <img src="{{ produit.image.url }}" alt="{% if produit.nom %}{{ produit.nom }}{% else %}{% translate "Image du produit" %}{% endif %}">
+          <img src="{{ produit.image.url }}" alt="{% if produit.localized_name %}{{ produit.localized_name }}{% else %}{% translate "Image du produit" %}{% endif %}">
         {% else %}
-          <img src="{% static 'images/default.jpg' %}" alt="{% if produit.nom %}{{ produit.nom }}{% else %}{% translate "Image du produit" %}{% endif %}">
+          <img src="{% static 'images/default.jpg' %}" alt="{% if produit.localized_name %}{{ produit.localized_name }}{% else %}{% translate "Image du produit" %}{% endif %}">
         {% endif %}
         {% if produit.en_vedette %}<span class="shop-featured-badge"><i class="fa-solid fa-star" aria-hidden="true"></i> {% translate "Sélection" %}</span>{% endif %}
         <span class="shop-view-product">{% translate "Voir le produit" %} <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></span>
@@ -64,8 +64,8 @@
 
       <div class="shop-card-body">
         {% if produit.categorie %}<span class="shop-category">{{ produit.categorie.nom }}</span>{% endif %}
-        <h2><a href="{% url 'shop:detail' slug=produit.slug %}">{{ produit.nom }}</a></h2>
-        {% if produit.description %}<p>{{ produit.description|truncatewords:15 }}</p>{% endif %}
+        <h2><a href="{% url 'shop:detail' slug=produit.slug %}">{{ produit.localized_name }}</a></h2>
+        {% if produit.localized_description %}<p>{{ produit.localized_description|truncatewords:15 }}</p>{% endif %}
         {% if produit.stock_est_gere %}
           {% if produit.stock == 0 %}
             <p class="shop-stock shop-stock-out">{% translate "Rupture de stock" %}</p>
@@ -78,7 +78,7 @@
           <span class="shop-price" aria-label="{% blocktranslate with price=produit.prix %}Prix : {{ price }} euros{% endblocktranslate %}">{{ produit.prix }} €</span>
           <form method="post" action="{% url 'shop:ajouter_panier' slug=produit.slug %}">
             {% csrf_token %}
-            <button class="shop-add-button" type="submit" {% if not produit.est_disponible %}disabled aria-disabled="true"{% endif %} aria-label="{% if produit.nom %}{% blocktranslate with product_name=produit.nom %}Ajouter {{ product_name }} au panier{% endblocktranslate %}{% else %}{% translate "Ajouter ce produit au panier" %}{% endif %}">
+            <button class="shop-add-button" type="submit" {% if not produit.est_disponible %}disabled aria-disabled="true"{% endif %} aria-label="{% if produit.localized_name %}{% blocktranslate with product_name=produit.localized_name %}Ajouter {{ product_name }} au panier{% endblocktranslate %}{% else %}{% translate "Ajouter ce produit au panier" %}{% endif %}">
               <i class="fa-solid fa-plus" aria-hidden="true"></i>
               <span>{% translate "Ajouter" %}</span>
             </button>
