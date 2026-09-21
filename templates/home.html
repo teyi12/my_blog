@@ -109,19 +109,19 @@
       <article class="home-product-card">
         <a class="home-product-image" href="{% url 'shop:detail' slug=produit.slug %}">
           {% if produit.image %}
-            <img src="{{ produit.image.url }}" alt="{{ produit.nom }}">
+            <img src="{{ produit.image.url }}" alt="{{ produit.localized_name }}">
           {% else %}
-            <img src="{% static 'images/default.jpg' %}" alt="{{ produit.nom }}">
+            <img src="{% static 'images/default.jpg' %}" alt="{{ produit.localized_name }}">
           {% endif %}
           <span class="home-product-badge">{% translate "En vedette" %}</span>
         </a>
         <div class="home-product-body">
           {% if produit.categorie %}<span class="home-product-category">{{ produit.categorie.nom }}</span>{% endif %}
-          <h3><a href="{% url 'shop:detail' slug=produit.slug %}">{{ produit.nom }}</a></h3>
-          {% if produit.description %}<p>{{ produit.description|truncatewords:16 }}</p>{% endif %}
+          <h3><a href="{% url 'shop:detail' slug=produit.slug %}">{{ produit.localized_name }}</a></h3>
+          {% if produit.localized_description %}<p>{{ produit.localized_description|truncatewords:16 }}</p>{% endif %}
           <div class="home-product-footer">
             <strong>{{ produit.prix }}</strong>
-            <a class="home-product-arrow" href="{% url 'shop:detail' slug=produit.slug %}" aria-label="{% blocktranslate with product_name=produit.nom %}Voir {{ product_name }}{% endblocktranslate %}">
+            <a class="home-product-arrow" href="{% url 'shop:detail' slug=produit.slug %}" aria-label="{% blocktranslate with product_name=produit.localized_name %}Voir {{ product_name }}{% endblocktranslate %}">
               <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
             </a>
           </div>

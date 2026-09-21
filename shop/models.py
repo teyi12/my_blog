@@ -6,6 +6,7 @@ from django.conf import settings
 from django.core.exceptions import SuspiciousFileOperation, ValidationError
 from django.core.validators import MinValueValidator
 from django.db import models
+from django.utils import translation
 from django.utils.text import get_valid_filename, slugify
 from django.utils.translation import gettext_lazy as _
 
@@ -160,6 +161,44 @@ class Produit(models.Model):
 
     def __str__(self):
         return self.nom
+
+    def _localized_content(self, field_name, language_code=None):
+        """Return an explicit product translation with French as fallback."""
+        active_language = language_code or translation.get_language() or "fr"
+        normalized_language = active_language.lower().split("-", 1)[0]
+        if normalized_language not in {"fr", "de", "en"}:
+            normalized_language = "fr"
+
+        translated_value = getattr(
+            self,
+            f"{field_name}_{normalized_language}",
+            None,
+        )
+        if str(translated_value or "").strip():
+            return translated_value
+
+        french_value = getattr(self, f"{field_name}_fr", None)
+        if str(french_value or "").strip():
+            return french_value
+
+        # Compatibility for rows created before the explicit translation columns
+        # were populated. Reading __dict__ avoids falling through to an unrelated
+        # active-language descriptor when an explicit language was requested.
+        return self.__dict__.get(field_name, "") or ""
+
+    def localized_name_for(self, language_code=None):
+        return self._localized_content("nom", language_code)
+
+    def localized_description_for(self, language_code=None):
+        return self._localized_content("description", language_code)
+
+    @property
+    def localized_name(self):
+        return self.localized_name_for()
+
+    @property
+    def localized_description(self):
+        return self.localized_description_for()
 
     @property
     def est_numerique(self):
@@ -794,4 +833,7 @@ class CartItem(models.Model):
         return Decimal(self.quantite) * self.prix_unitaire
 
     def __str__(self):
-        return f"{self.quantite} x {self.produit.nom} (Panier {self.cart.id})"
+        return (
+            f"{self.quantite} x {self.produit.localized_name} "
+            f"(Panier {self.cart.id})"
+        )

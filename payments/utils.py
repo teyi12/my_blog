@@ -36,7 +36,7 @@ def enrichir_panier(request):
     for item in cart.items.select_related("produit"):
         items.append({
             "id": item.id,
-            "produit": item.produit.nom,
+            "produit": item.produit.localized_name,
             "prix_unitaire": float(item.prix_unitaire),
             "quantite": item.quantite,
             "sous_total": float(item.sous_total()),

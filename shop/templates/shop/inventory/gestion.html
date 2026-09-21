@@ -26,7 +26,7 @@
             <thead><tr><th>{% translate "Produit" %}</th><th>{% translate "Stock" %}</th><th>{% translate "Seuil" %}</th></tr></thead>
             <tbody>
             {% for produit in inventory_alerts %}
-              <tr><td>{{ produit.nom }}</td><td>{{ produit.stock }}</td><td>{{ produit.low_stock_threshold|default_if_none:"—" }}</td></tr>
+              <tr><td>{{ produit.localized_name }}</td><td>{{ produit.stock }}</td><td>{{ produit.low_stock_threshold|default_if_none:"—" }}</td></tr>
             {% endfor %}
             </tbody>
           </table>

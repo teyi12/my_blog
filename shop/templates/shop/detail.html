@@ -1,7 +1,7 @@
 {% extends 'template_base.html' %}
 {% load i18n static %}
 
-{% block titre %}{% blocktranslate with product_name=produit.nom %}{{ product_name }} — Boutique Teyilawson{% endblocktranslate %}{% endblock %}
+{% block titre %}{% blocktranslate with product_name=produit.localized_name %}{{ product_name }} — Boutique Teyilawson{% endblocktranslate %}{% endblock %}
 
 {% block styles %}
 <link rel="stylesheet" href="{% static 'css/shop.css' %}">
@@ -18,16 +18,16 @@
   <div class="product-detail-grid">
     <div class="product-detail-media">
       {% if produit.image %}
-        <img src="{{ produit.image.url }}" alt="{% if produit.nom %}{{ produit.nom }}{% else %}{% translate "Image du produit" %}{% endif %}">
+        <img src="{{ produit.image.url }}" alt="{% if produit.localized_name %}{{ produit.localized_name }}{% else %}{% translate "Image du produit" %}{% endif %}">
       {% else %}
-        <img src="{% static 'images/default.jpg' %}" alt="{% if produit.nom %}{{ produit.nom }}{% else %}{% translate "Image du produit" %}{% endif %}">
+        <img src="{% static 'images/default.jpg' %}" alt="{% if produit.localized_name %}{{ produit.localized_name }}{% else %}{% translate "Image du produit" %}{% endif %}">
       {% endif %}
       {% if produit.en_vedette %}<span class="product-detail-badge"><i class="fa-solid fa-star" aria-hidden="true"></i> {% translate "Produit sélectionné" %}</span>{% endif %}
     </div>
 
     <div class="product-detail-copy">
       {% if produit.categorie %}<span class="shop-eyebrow">{{ produit.categorie.nom }}</span>{% endif %}
-      <h1>{{ produit.nom }}</h1>
+      <h1>{{ produit.localized_name }}</h1>
       <div class="product-detail-price" aria-label="{% blocktranslate with price=produit.prix %}Prix : {{ price }} euros{% endblocktranslate %}">{{ produit.prix }} €</div>
       {% if produit.stock_est_gere %}
         {% if produit.stock == 0 %}
@@ -37,8 +37,8 @@
         {% endif %}
       {% endif %}
 
-      {% if produit.description %}
-      <div class="product-description">{{ produit.description|linebreaks }}</div>
+      {% if produit.localized_description %}
+      <div class="product-description">{{ produit.localized_description|linebreaks }}</div>
       {% endif %}
 
       <div class="product-benefits" aria-label="{% translate "Informations d’achat" %}">
