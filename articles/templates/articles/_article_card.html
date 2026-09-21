@@ -1,27 +1,29 @@
-{% load i18n static %}
-<article class="article-card{% if featured %} article-card-featured{% endif %}" data-article-id="{{ article.pk }}">
+{% load i18n %}
+<article class="surface-card article-card{% if featured %} article-card-featured{% endif %}" data-article-id="{{ article.pk }}">
   <a class="article-card-media" href="{% url 'articles:article_detail' slug=article.slug %}" aria-label="{% blocktranslate with article_title=article.titre %}Lire {{ article_title }}{% endblocktranslate %}">
-    {% if article.image %}
-      <img class="img-fluid" src="{{ article.image.url }}" alt="{{ article.resolved_image_alt }}">
+    {% if article.is_premium and not premium_access %}
+      <span class="article-locked-media" aria-hidden="true"><i class="fa-solid fa-lock"></i></span>
+    {% elif article.image %}
+      <img class="img-fluid" src="{{ article.image.url }}" alt="{{ article.resolved_image_alt }}" width="800" height="500" loading="lazy">
     {% else %}
-      <img class="img-fluid" src="{% static 'images/default.jpg' %}" alt="{{ article.resolved_image_alt }}">
+      <span class="article-media-placeholder" aria-hidden="true"><i class="fa-regular fa-newspaper"></i></span>
     {% endif %}
 
-    <div class="article-badges" aria-label="{% translate 'Informations de l’article' %}">
+    <span class="article-badges" aria-label="{% translate 'Informations de l’article' %}">
       {% if featured %}
-        <span class="article-badge article-badge-featured">
+        <span class="badge badge-info article-badge article-badge-featured">
           <i class="fa-solid fa-thumbtack" aria-hidden="true"></i> {% translate "À la une" %}
         </span>
       {% endif %}
       {% if article.is_premium %}
-        <span class="article-badge article-badge-premium">
+        <span class="badge badge-warning article-badge article-badge-premium">
           <i class="fa-solid fa-star" aria-hidden="true"></i> {% translate "Premium" %}
         </span>
       {% endif %}
       {% if article.est_sponsorise %}
-        <span class="article-badge">{% translate "Sponsorisé" %}</span>
+        <span class="badge badge-neutral article-badge">{% translate "Sponsorisé" %}</span>
       {% endif %}
-    </div>
+    </span>
   </a>
 
   <div class="article-card-body">
@@ -35,7 +37,7 @@
       </time>
       {% if article.auteur %}
         <span aria-hidden="true">·</span>
-        <span>{{ article.auteur.username|default:article.auteur.email }}</span>
+        <span>{{ article.auteur.get_full_name|default:article.auteur.email }}</span>
       {% endif %}
     </div>
 
@@ -45,13 +47,27 @@
       </a>
     </h2>
 
-    <p class="article-excerpt">{{ article.contenu|striptags|truncatewords:30 }}</p>
+    {% if article.is_premium and not premium_access %}
+      <div class="article-premium-lock">
+        <i class="fa-solid fa-lock" aria-hidden="true"></i>
+        <p>{% translate "Cet article est réservé aux abonnés." %}</p>
+      </div>
+    {% else %}
+      <p class="article-excerpt">{{ article.contenu|striptags|truncatewords:30 }}</p>
+    {% endif %}
 
     <div class="article-card-footer">
-      <a class="article-read-link" href="{% url 'articles:article_detail' slug=article.slug %}">
-        {% translate "Lire l’article" %}
-        <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
-      </a>
+      {% if article.is_premium and not premium_access %}
+        <a class="btn btn-soft btn-sm article-premium-cta" href="{% url 'articles:article_detail' slug=article.slug %}">
+          <i class="fa-solid fa-crown" aria-hidden="true"></i>
+          {% translate "Accès Premium" %}
+        </a>
+      {% else %}
+        <a class="article-read-link" href="{% url 'articles:article_detail' slug=article.slug %}">
+          {% translate "Lire l’article" %}
+          <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+        </a>
+      {% endif %}
 
       {% if user.is_authenticated and user.is_staff or article.auteur == user %}
         <div class="article-admin-actions" aria-label="{% translate 'Actions de gestion' %}">
