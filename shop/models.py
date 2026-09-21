@@ -124,6 +124,18 @@ class Categorie(models.Model):
         return self.nom
 
 
+class ProduitQuerySet(models.QuerySet):
+    def with_secondary_images(self):
+        """Prefetch the ordered gallery for code that explicitly needs it."""
+        return self.prefetch_related(
+            models.Prefetch(
+                "images_secondaires",
+                queryset=ProduitImage.objects.order_by("ordre", "pk"),
+                to_attr="_prefetched_secondary_images",
+            )
+        )
+
+
 class Produit(models.Model):
     nom = models.CharField(max_length=255)
     slug = models.SlugField(unique=True, blank=True)
@@ -153,6 +165,8 @@ class Produit(models.Model):
         Categorie, on_delete=models.SET_NULL, null=True, blank=True
     )
     en_vedette = models.BooleanField(default=False)
+
+    objects = ProduitQuerySet.as_manager()
 
     def save(self, *args, **kwargs):
         if not self.slug:
@@ -200,6 +214,24 @@ class Produit(models.Model):
     def localized_description(self):
         return self.localized_description_for()
 
+    def get_public_secondary_images(self):
+        """Return gallery rows in stable order, using an explicit prefetch if present."""
+        prefetched = getattr(self, "_prefetched_secondary_images", None)
+        if prefetched is not None:
+            return prefetched
+        return self.images_secondaires.order_by("ordre", "pk")
+
+    def get_display_image(self):
+        """Resolve the historical main image, then the first gallery image."""
+        if self.image:
+            return self.image
+        secondary_images = self.get_public_secondary_images()
+        if isinstance(secondary_images, list):
+            first_secondary = secondary_images[0] if secondary_images else None
+        else:
+            first_secondary = secondary_images.first()
+        return first_secondary.image if first_secondary else None
+
     @property
     def est_numerique(self):
         return bool(self.fichier)
@@ -226,6 +258,70 @@ class Produit(models.Model):
                 name="product_low_stock_threshold_nonnegative",
             ),
         ]
+
+
+class ProduitImage(models.Model):
+    """Ordered secondary product image.
+
+    Deleting this row, or deleting its product through CASCADE, removes only the
+    database record. The storage object is deliberately retained because a
+    Cloudinary asset may be shared or managed outside Django.
+    """
+
+    produit = models.ForeignKey(
+        Produit,
+        on_delete=models.CASCADE,
+        related_name="images_secondaires",
+        db_index=False,
+    )
+    image = models.ImageField(upload_to="produits/galerie/")
+    ordre = models.PositiveIntegerField(
+        _("Ordre d’affichage"),
+        default=0,
+    )
+    texte_alternatif = models.CharField(
+        _("Texte alternatif de l’image"),
+        max_length=255,
+        blank=True,
+        default="",
+    )
+    date_creation = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ("ordre", "pk")
+        indexes = [
+            models.Index(
+                fields=("produit", "ordre"),
+                name="shop_prodimg_order_idx",
+            )
+        ]
+
+    def localized_alt_text_for(self, language_code=None):
+        active_language = language_code or translation.get_language() or "fr"
+        normalized_language = active_language.lower().split("-", 1)[0]
+        if normalized_language not in {"fr", "de", "en"}:
+            normalized_language = "fr"
+
+        translated_value = getattr(
+            self,
+            f"texte_alternatif_{normalized_language}",
+            "",
+        )
+        if str(translated_value or "").strip():
+            return str(translated_value).strip()
+
+        french_value = getattr(self, "texte_alternatif_fr", "")
+        if str(french_value or "").strip():
+            return str(french_value).strip()
+
+        return str(self.produit.localized_name_for(normalized_language) or "").strip()
+
+    @property
+    def localized_alt_text(self):
+        return self.localized_alt_text_for()
+
+    def __str__(self):
+        return f"{self.produit} · {self.ordre}"
 
 
 class Commande(models.Model):

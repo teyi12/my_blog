@@ -3,7 +3,7 @@ from django.db.models import F, Q
 from django.urls import reverse
 from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
-from modeltranslation.admin import TranslationAdmin
+from modeltranslation.admin import TranslationAdmin, TranslationTabularInline
 
 from .models import (
     Categorie,
@@ -12,6 +12,7 @@ from .models import (
     OrderCancellation,
     OrderFulfillmentEvent,
     Produit,
+    ProduitImage,
     StockMovement,
 )
 
@@ -37,6 +38,34 @@ class StockAlertFilter(admin.SimpleListFilter):
                 )
             )
         return queryset
+
+
+class ProduitImageInline(TranslationTabularInline):
+    model = ProduitImage
+    extra = 1
+    fields = (
+        "image",
+        "image_link",
+        "ordre",
+        "texte_alternatif_fr",
+        "texte_alternatif_de",
+        "texte_alternatif_en",
+    )
+    readonly_fields = ("image_link",)
+
+    @admin.display(description="")
+    def image_link(self, obj):
+        if not obj or not obj.image:
+            return "—"
+        try:
+            url = obj.image.url
+        except (AttributeError, ValueError):
+            return "—"
+        return format_html(
+            '<a href="{}" target="_blank" rel="noopener noreferrer">{}</a>',
+            url,
+            _("Voir"),
+        )
 
 
 @admin.register(Categorie)
@@ -69,6 +98,7 @@ class ProduitAdmin(TranslationAdmin):
     prepopulated_fields = {"slug": ("nom_fr",)}
     autocomplete_fields = ("categorie",)
     readonly_fields = ("stock", "stock_adjustment")
+    inlines = (ProduitImageInline,)
 
     @admin.display(boolean=True, description=_("Stock faible"))
     def stock_alert(self, obj):
