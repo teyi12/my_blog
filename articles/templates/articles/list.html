@@ -9,7 +9,7 @@
 
 {% block contenu %}
 <div class="articles-page">
-  <header class="articles-hero">
+  <header class="articles-hero" data-articles-section="header">
     <div class="articles-hero-copy">
       <span class="articles-eyebrow">{% translate "Journal · idées · découvertes" %}</span>
       <h1>{% translate "Des lectures pour voir plus loin." %}</h1>
@@ -27,19 +27,19 @@
   </header>
 
   {% if featured_article %}
-    <section class="articles-featured" aria-label="{% translate 'Article à la une' %}">
+    <section class="articles-featured" aria-label="{% translate 'Article à la une' %}" data-articles-section="featured">
       {% include "articles/_article_card.html" with article=featured_article featured=True %}
     </section>
   {% endif %}
 
   {% if page_obj %}
-    <section class="articles-grid" aria-label="{% translate 'Liste des articles' %}">
+    <section class="articles-grid" aria-label="{% translate 'Liste des articles' %}" data-articles-section="list">
       {% for article in page_obj %}
         {% include "articles/_article_card.html" with article=article featured=False %}
       {% endfor %}
     </section>
   {% elif not featured_article %}
-    <div class="articles-empty">
+    <div class="empty-state articles-empty" data-articles-section="empty">
       <span class="articles-empty-icon"><i class="fa-regular fa-newspaper" aria-hidden="true"></i></span>
       <h2>{% translate "Aucun article pour le moment" %}</h2>
       <p>{% translate "Les prochains récits et découvertes apparaîtront ici." %}</p>
@@ -54,7 +54,7 @@
           {% translate "Précédent" %}
         </a>
       {% else %}
-        <span class="articles-page-nav is-disabled">
+        <span class="articles-page-nav is-disabled" aria-disabled="true">
           <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
           {% translate "Précédent" %}
         </span>
@@ -76,7 +76,7 @@
           <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
         </a>
       {% else %}
-        <span class="articles-page-nav is-disabled">
+        <span class="articles-page-nav is-disabled" aria-disabled="true">
           {% translate "Suivant" %}
           <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
         </span>

@@ -9,15 +9,17 @@
 
 {% block contenu %}
 <article class="article-detail">
-  <header class="article-detail-header">
-    <a class="article-back-link" href="{% url 'articles:articles' %}">
-      <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
-      {% translate "Tous les articles" %}
-    </a>
+  <header class="article-detail-header" data-article-section="header">
+    <nav class="article-detail-navigation" aria-label="{% translate 'Tous les articles' %}">
+      <a class="article-back-link" href="{% url 'articles:articles' %}">
+        <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
+        {% translate "Tous les articles" %}
+      </a>
+    </nav>
 
-    <div class="article-detail-badges">
-      {% if article.is_premium %}<span class="article-badge article-badge-premium"><i class="fa-solid fa-star" aria-hidden="true"></i> {% translate "Premium" %}</span>{% endif %}
-      {% if article.est_sponsorise %}<span class="article-badge">{% translate "Sponsorisé" %}</span>{% endif %}
+    <div class="article-detail-badges" aria-label="{% translate 'Informations de l’article' %}">
+      {% if article.is_premium %}<span class="badge badge-warning article-badge article-badge-premium"><i class="fa-solid fa-star" aria-hidden="true"></i> {% translate "Premium" %}</span>{% endif %}
+      {% if article.est_sponsorise %}<span class="badge badge-neutral article-badge">{% translate "Sponsorisé" %}</span>{% endif %}
     </div>
 
     <h1>{{ article.titre }}</h1>
@@ -26,22 +28,22 @@
       {% if article.categorie %}
       <span><i class="fa-regular fa-folder" aria-hidden="true"></i> {{ article.categorie.nom }}</span>
       {% endif %}
-      <span><i class="fa-regular fa-calendar" aria-hidden="true"></i> {{ article.date_publication|date:"d F Y" }}</span>
+      <span><i class="fa-regular fa-calendar" aria-hidden="true"></i> <time datetime="{{ article.date_publication|date:'Y-m-d' }}">{{ article.date_publication|date:"d F Y" }}</time></span>
       {% if article.auteur %}
       <span><i class="fa-regular fa-user" aria-hidden="true"></i> {{ article.auteur.get_full_name|default:article.auteur.email }}</span>
       {% endif %}
     </div>
   </header>
 
-  <figure class="article-hero-media">
+  <figure class="article-hero-media" data-article-section="media">
     {% if article.image %}
-      <img src="{{ article.image.url }}" alt="{{ article.resolved_image_alt }}">
+      <img src="{{ article.image.url }}" alt="{{ article.resolved_image_alt }}" width="1280" height="672" fetchpriority="high">
     {% else %}
-      <img src="{% static 'images/default.jpg' %}" alt="{{ article.resolved_image_alt }}">
+      <span class="article-detail-placeholder" aria-hidden="true"><i class="fa-regular fa-newspaper"></i></span>
     {% endif %}
   </figure>
 
-  <div class="article-reading-layout">
+  <div class="article-reading-layout" data-article-section="content">
     <div class="article-reading-main">
       <div class="article-body">
         {{ article.contenu|linebreaks }}
@@ -62,8 +64,8 @@
       {% endif %}
     </div>
 
-    <aside class="article-side-note" aria-label="{% translate 'À propos de cette publication' %}">
-      <span class="article-side-kicker">{% translate "Publication" %}</span>
+    <aside class="surface-card article-side-note" aria-label="{% translate 'À propos de cette publication' %}">
+      <span class="article-side-kicker">{% if article.is_premium %}{% translate "Accès Premium" %}{% else %}{% translate "Publication" %}{% endif %}</span>
       <strong>Teyilawson</strong>
       <p>{% translate "Explorer, comprendre et découvrir à travers des contenus sélectionnés avec soin." %}</p>
       <a href="{% url 'articles:articles' %}">{% translate "Découvrir les autres articles" %} <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a>
@@ -71,34 +73,22 @@
   </div>
 
   {% if article.est_sponsorise %}
-  <section class="article-sponsor" aria-labelledby="sponsor-title">
+  <section class="surface-card article-sponsor" aria-labelledby="sponsor-title" data-article-section="sponsor">
     <div class="article-sponsor-heading">
-      <span class="eyebrow">{% translate "Partenariat" %}</span>
+      <span class="article-detail-eyebrow">{% translate "Partenariat" %}</span>
       <h2 id="sponsor-title">{% translate "Contenu sponsorisé" %}</h2>
       {% if article.sponsor %}<p>{% blocktranslate with sponsor=article.sponsor %}Cet article est sponsorisé par <strong>{{ sponsor }}</strong>.{% endblocktranslate %}</p>{% endif %}
     </div>
 
-    {% if article.pub_images.all or article.pub_videos.all or article.medias.all %}
+    {% if article.medias.all %}
     <div id="carouselSponsor" class="carousel slide article-sponsor-carousel d-none d-md-block">
       <div class="carousel-inner">
-        {% for pub in article.pub_images.all %}
-        <div class="carousel-item {% if forloop.first %}active{% endif %}">
-          <img src="{{ pub.image.url }}" class="d-block w-100" alt="{% translate 'Contenu sponsorisé' %}">
-        </div>
-        {% endfor %}
-        {% for pub in article.pub_videos.all %}
-        <div class="carousel-item {% if not article.pub_images.all and forloop.first %}active{% endif %}">
-          <video class="d-block w-100" controls preload="metadata">
-            <source src="{{ pub.video.url }}" type="video/mp4">
-          </video>
-        </div>
-        {% endfor %}
         {% for media in article.medias.all %}
-        <div class="carousel-item {% if not article.pub_images.all and not article.pub_videos.all and forloop.first %}active{% endif %}">
+        <div class="carousel-item {% if forloop.first %}active{% endif %}">
           {% if media.type == 'image' %}
-            <img src="{{ media.fichier.url }}" class="d-block w-100" alt="{% blocktranslate with article_title=article.titre %}Média associé à {{ article_title }}{% endblocktranslate %}">
+            <img src="{{ media.fichier.url }}" class="d-block w-100" alt="{% blocktranslate with article_title=article.titre %}Média associé à {{ article_title }}{% endblocktranslate %}" width="1200" height="675" loading="lazy">
           {% elif media.type == 'video' %}
-            <video class="d-block w-100" controls preload="metadata"><source src="{{ media.fichier.url }}" type="video/mp4"></video>
+            <video class="d-block w-100" controls preload="metadata" width="1200" height="675"><source src="{{ media.fichier.url }}" type="video/mp4"></video>
           {% endif %}
         </div>
         {% endfor %}
@@ -107,11 +97,9 @@
       <button class="carousel-control-next" type="button" data-bs-target="#carouselSponsor" data-bs-slide="next" aria-label="{% translate 'Média suivant' %}"><span class="carousel-control-next-icon"></span></button>
     </div>
 
-    <div class="article-mobile-media d-md-none">
-      {% for pub in article.pub_images.all %}<img src="{{ pub.image.url }}" alt="{% translate 'Contenu sponsorisé' %}">{% endfor %}
-      {% for pub in article.pub_videos.all %}<video controls preload="metadata"><source src="{{ pub.video.url }}" type="video/mp4"></video>{% endfor %}
+    <div class="article-mobile-media d-md-none" tabindex="0" aria-label="{% translate 'Contenu sponsorisé' %}">
       {% for media in article.medias.all %}
-        {% if media.type == 'image' %}<img src="{{ media.fichier.url }}" alt="{% blocktranslate with article_title=article.titre %}Média associé à {{ article_title }}{% endblocktranslate %}">{% elif media.type == 'video' %}<video controls preload="metadata"><source src="{{ media.fichier.url }}" type="video/mp4"></video>{% endif %}
+        {% if media.type == 'image' %}<img src="{{ media.fichier.url }}" alt="{% blocktranslate with article_title=article.titre %}Média associé à {{ article_title }}{% endblocktranslate %}" width="800" height="600" loading="lazy">{% elif media.type == 'video' %}<video controls preload="metadata" width="800" height="600"><source src="{{ media.fichier.url }}" type="video/mp4"></video>{% endif %}
       {% endfor %}
     </div>
     {% endif %}
@@ -119,7 +107,7 @@
   {% endif %}
 
   <footer class="article-detail-footer">
-    <a class="btn btn-outline-primary" href="{% url 'articles:articles' %}"><i class="fa-solid fa-arrow-left" aria-hidden="true"></i> {% translate "Retour aux articles" %}</a>
+    <a class="btn btn-soft" href="{% url 'articles:articles' %}"><i class="fa-solid fa-arrow-left" aria-hidden="true"></i> {% translate "Retour aux articles" %}</a>
   </footer>
 </article>
 {% endblock %}

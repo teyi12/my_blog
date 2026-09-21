@@ -32,7 +32,11 @@ def articles_view(request):
     return render(
         request,
         "articles/list.html",
-        {"featured_article": featured_article, "page_obj": page_obj},
+        {
+            "featured_article": featured_article,
+            "page_obj": page_obj,
+            "premium_access": utilisateur_a_acces_premium(request.user),
+        },
     )
 
 
