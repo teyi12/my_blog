@@ -4,11 +4,14 @@ from smtplib import SMTPException
 from django.conf import settings
 from django.contrib import messages
 from django.core.mail import EmailMessage
+from django.db.models import F
 from django.http import HttpResponse
 from django.shortcuts import redirect, render
 from django.utils.translation import gettext as _
 
+from articles.models import Article
 from shop.models import Produit
+from videos.models import Video
 from .forms import ContactForm
 from .home_media import home_hero_image_url
 
@@ -17,11 +20,35 @@ logger = logging.getLogger(__name__)
 
 
 def home_view(request):
-    produits_vedettes = Produit.objects.filter(en_vedette=True)[:6]
+    articles_recents = list(
+        Article.objects.select_related("auteur", "categorie").order_by(
+            "-en_vedette",
+            F("ordre_affichage").asc(nulls_last=True),
+            "-date_publication",
+            "-pk",
+        )[:3]
+    )
+    videos_recentes = list(
+        Video.objects.select_related("auteur", "categorie")
+        .filter(est_publie=True)
+        .order_by(
+            "-en_vedette",
+            F("ordre_affichage").asc(nulls_last=True),
+            "-date_publication",
+            "-pk",
+        )[:2]
+    )
+    produits_vedettes = list(
+        Produit.objects.select_related("categorie")
+        .filter(en_vedette=True)
+        .order_by("-pk")[:6]
+    )
     return render(
         request,
         "home.html",
         {
+            "articles_recents": articles_recents,
+            "videos_recentes": videos_recentes,
             "produits_vedettes": produits_vedettes,
             "hero_image_url": home_hero_image_url(),
         },
