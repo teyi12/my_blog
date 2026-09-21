@@ -52,12 +52,6 @@
   border-radius: var(--radius-xl);
   background: var(--surface);
   box-shadow: var(--shadow-sm);
-  transition: transform var(--transition), box-shadow var(--transition);
-}
-
-.video-card:hover {
-  transform: translateY(-4px);
-  box-shadow: var(--shadow-md);
 }
 
 .video-card-featured {
@@ -85,7 +79,8 @@
   min-height: 430px;
 }
 
-.video-card:hover .video-card-media img {
+.video-card-media:hover img,
+.video-card-media:focus-visible img {
   transform: scale(1.03);
 }
 
