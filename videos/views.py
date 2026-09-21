@@ -31,7 +31,11 @@ def video_list(request):
     return render(
         request,
         "videos/list.html",
-        {"featured_video": featured_video, "page_obj": page_obj},
+        {
+            "featured_video": featured_video,
+            "page_obj": page_obj,
+            "premium_access": utilisateur_a_acces_premium(request.user),
+        },
     )
 
 

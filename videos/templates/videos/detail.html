@@ -7,13 +7,16 @@
 
 {% block contenu %}
 <article class="video-detail">
-  <a class="video-back-link" href="{% url 'videos:list' %}"><i class="fa-solid fa-arrow-left" aria-hidden="true"></i> {% translate "Toutes les vidéos" %}</a>
+  <nav class="video-detail-navigation" aria-label="{% translate 'Toutes les vidéos' %}">
+    <a class="video-back-link" href="{% url 'videos:list' %}"><i class="fa-solid fa-arrow-left" aria-hidden="true"></i> {% translate "Toutes les vidéos" %}</a>
+  </nav>
 
-  <header class="video-detail-header">
+  <header class="video-detail-header" data-video-section="header">
     <div>
-      <div class="video-detail-badges">
-        {% if video.categorie %}<span class="video-badge">{{ video.categorie.nom }}</span>{% endif %}
-        {% if video.is_premium %}<span class="video-badge video-badge-premium"><i class="fa-solid fa-star" aria-hidden="true"></i> {% translate "Premium" %}</span>{% endif %}
+      <div class="video-detail-badges" aria-label="{% translate 'Informations de la vidéo' %}">
+        {% if video.categorie %}<span class="badge badge-neutral video-badge">{{ video.categorie.nom }}</span>{% endif %}
+        {% if video.is_premium %}<span class="badge badge-warning video-badge video-badge-premium"><i class="fa-solid fa-star" aria-hidden="true"></i> {% translate "Premium" %}</span>{% endif %}
+        <span class="badge badge-success video-badge"><i class="fa-solid fa-check" aria-hidden="true"></i> {% translate "Publiée" %}</span>
       </div>
       <h1>{{ video.titre }}</h1>
       <div class="video-meta">
@@ -23,26 +26,26 @@
     </div>
     <figure class="video-detail-thumbnail">
       {% if video.miniature %}
-        <img src="{{ video.miniature.url }}" alt="{{ video.resolved_miniature_alt }}">
+        <img src="{{ video.miniature.url }}" alt="{{ video.resolved_miniature_alt }}" width="1280" height="720" fetchpriority="high">
       {% else %}
-        <img src="{% static 'images/video-placeholder.svg' %}" alt="{{ video.resolved_miniature_alt }}">
+        <img src="{% static 'images/video-placeholder.svg' %}" alt="{{ video.resolved_miniature_alt }}" width="1280" height="720" fetchpriority="high">
       {% endif %}
     </figure>
   </header>
 
-  <section class="video-player-section" aria-label="{% translate 'Lecteur vidéo' %}">
+  <section class="video-player-section" aria-label="{% translate 'Lecteur vidéo' %}" data-video-section="player">
     <div class="video-player{% if video.is_youtube_short %} video-player-short{% endif %}">
       <iframe
         src="{{ video.embed_url }}"
         title="{% blocktranslate with video_title=video.titre %}Lecteur vidéo : {{ video_title }}{% endblocktranslate %}"
         loading="lazy"
         referrerpolicy="strict-origin-when-cross-origin"
-        allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+        allow="encrypted-media; picture-in-picture"
         allowfullscreen></iframe>
     </div>
   </section>
 
-  <section class="video-description" aria-labelledby="video-description-title">
+  <section class="surface-card video-description" aria-labelledby="video-description-title" data-video-section="description">
     <span class="videos-eyebrow">{% translate "À propos de cette vidéo" %}</span>
     <h2 id="video-description-title">{% translate "Présentation" %}</h2>
     <div>{{ video.description|linebreaks }}</div>
