@@ -7,27 +7,27 @@
 
 {% block contenu %}
 <div class="videos-page">
-  <header class="videos-hero">
+  <header class="videos-hero" data-videos-section="header">
     <span class="videos-eyebrow">{% translate "Vidéos · vlogs · découvertes" %}</span>
     <h1>{% translate "Des histoires à vivre en images." %}</h1>
     <p>{% translate "Reportages, expériences et perspectives réunis dans un espace vidéo clair et immersif." %}</p>
   </header>
 
   {% if featured_video %}
-    <section class="videos-featured" aria-label="{% translate 'Vidéo à la une' %}">
+    <section class="videos-featured" aria-label="{% translate 'Vidéo à la une' %}" data-videos-section="featured">
       {% include "videos/_video_card.html" with video=featured_video featured=True %}
     </section>
   {% endif %}
 
   {% if page_obj %}
-    <section class="videos-grid" aria-label="{% translate 'Liste des vidéos' %}">
+    <section class="videos-grid" aria-label="{% translate 'Liste des vidéos' %}" data-videos-section="list">
       {% for video in page_obj %}
         {% include "videos/_video_card.html" with video=video featured=False %}
       {% endfor %}
     </section>
   {% elif not featured_video %}
-    <div class="videos-empty">
-      <span aria-hidden="true"><i class="fa-solid fa-video"></i></span>
+    <div class="empty-state videos-empty" data-videos-section="empty">
+      <span class="empty-state-icon" aria-hidden="true"><i class="fa-solid fa-video"></i></span>
       <h2>{% translate "Aucune vidéo pour le moment" %}</h2>
       <p>{% translate "Les prochaines vidéos apparaîtront ici." %}</p>
     </div>
@@ -38,13 +38,13 @@
       {% if page_obj.has_previous %}
         <a href="?page={{ page_obj.previous_page_number }}"><i class="fa-solid fa-arrow-left" aria-hidden="true"></i> {% translate "Précédent" %}</a>
       {% else %}
-        <span class="is-disabled"><i class="fa-solid fa-arrow-left" aria-hidden="true"></i> {% translate "Précédent" %}</span>
+        <span class="is-disabled" aria-disabled="true"><i class="fa-solid fa-arrow-left" aria-hidden="true"></i> {% translate "Précédent" %}</span>
       {% endif %}
       <span>{% blocktranslate with current=page_obj.number total=page_obj.paginator.num_pages %}Page {{ current }} sur {{ total }}{% endblocktranslate %}</span>
       {% if page_obj.has_next %}
         <a href="?page={{ page_obj.next_page_number }}">{% translate "Suivant" %} <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a>
       {% else %}
-        <span class="is-disabled">{% translate "Suivant" %} <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></span>
+        <span class="is-disabled" aria-disabled="true">{% translate "Suivant" %} <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></span>
       {% endif %}
     </nav>
   {% endif %}

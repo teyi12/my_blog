@@ -1,16 +1,19 @@
 {% load i18n static %}
-<article class="video-card{% if featured %} video-card-featured{% endif %}" data-video-id="{{ video.pk }}">
+<article class="surface-card video-card{% if featured %} video-card-featured{% endif %}" data-video-id="{{ video.pk }}">
   <a class="video-card-media" href="{% url 'videos:detail' slug=video.slug %}" aria-label="{% blocktranslate with video_title=video.titre %}Regarder {{ video_title }}{% endblocktranslate %}">
-    {% if video.miniature %}
-      <img class="img-fluid" src="{{ video.miniature.url }}" alt="{{ video.resolved_miniature_alt }}" loading="lazy">
+    {% if video.is_premium and not premium_access %}
+      <span class="video-locked-media" aria-hidden="true"><i class="fa-solid fa-lock"></i></span>
+    {% elif video.miniature %}
+      <img class="img-fluid" src="{{ video.miniature.url }}" alt="{{ video.resolved_miniature_alt }}" width="1280" height="720"{% if featured %} fetchpriority="high"{% else %} loading="lazy"{% endif %}>
     {% else %}
-      <img class="img-fluid" src="{% static 'images/video-placeholder.svg' %}" alt="{{ video.resolved_miniature_alt }}" loading="lazy">
+      <img class="img-fluid" src="{% static 'images/video-placeholder.svg' %}" alt="{{ video.resolved_miniature_alt }}" width="1280" height="720"{% if featured %} fetchpriority="high"{% else %} loading="lazy"{% endif %}>
     {% endif %}
-    <span class="video-play-icon" aria-hidden="true"><i class="fa-solid fa-play"></i></span>
-    <div class="video-badges" aria-label="{% translate 'Informations de la vidéo' %}">
-      {% if featured %}<span class="video-badge video-badge-featured">{% translate "À la une" %}</span>{% endif %}
-      {% if video.is_premium %}<span class="video-badge video-badge-premium"><i class="fa-solid fa-star" aria-hidden="true"></i> {% translate "Premium" %}</span>{% endif %}
-    </div>
+    {% if not video.is_premium or premium_access %}<span class="video-play-icon" aria-hidden="true"><i class="fa-solid fa-play"></i></span>{% endif %}
+    <span class="video-badges" aria-label="{% translate 'Informations de la vidéo' %}">
+      {% if featured %}<span class="badge badge-info video-badge video-badge-featured">{% translate "À la une" %}</span>{% endif %}
+      {% if video.is_premium %}<span class="badge badge-warning video-badge video-badge-premium"><i class="fa-solid fa-star" aria-hidden="true"></i> {% translate "Premium" %}</span>{% endif %}
+      <span class="badge badge-success video-badge"><i class="fa-solid fa-check" aria-hidden="true"></i> {% translate "Publiée" %}</span>
+    </span>
   </a>
   <div class="video-card-body">
     <div class="video-meta">
@@ -18,9 +21,14 @@
       <time datetime="{{ video.date_publication|date:'Y-m-d' }}">{{ video.date_publication|date:"d F Y" }}</time>
     </div>
     <h2><a href="{% url 'videos:detail' slug=video.slug %}">{{ video.titre }}</a></h2>
-    <p>{{ video.description|striptags|truncatewords:28 }}</p>
-    <a class="video-watch-link" href="{% url 'videos:detail' slug=video.slug %}">
-      {% translate "Regarder la vidéo" %}<i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
-    </a>
+    {% if video.is_premium and not premium_access %}
+      <div class="video-premium-lock"><i class="fa-solid fa-lock" aria-hidden="true"></i><p>{% translate "Cette vidéo est réservée aux abonnés." %}</p></div>
+      <a class="btn btn-soft btn-sm video-premium-cta" href="{% url 'videos:detail' slug=video.slug %}"><i class="fa-solid fa-crown" aria-hidden="true"></i> {% translate "Accès Premium" %}</a>
+    {% else %}
+      <p class="video-card-description">{{ video.description|striptags|truncatewords:28 }}</p>
+      <a class="video-watch-link" href="{% url 'videos:detail' slug=video.slug %}">
+        {% translate "Regarder la vidéo" %}<i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+      </a>
+    {% endif %}
   </div>
 </article>
