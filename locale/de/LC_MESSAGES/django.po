@@ -4161,3 +4161,19 @@ msgstr "Bild 1 von %(total)s"
 #, python-format
 msgid "Image agrandie de %(product_name)s"
 msgstr "Vergrößertes Bild von %(product_name)s"
+
+#: shop/templates/shop/panier.html
+msgid "La mise à jour du panier a échoué. Veuillez réessayer."
+msgstr "Die Aktualisierung des Warenkorbs ist fehlgeschlagen. Bitte versuchen Sie es erneut."
+
+#: shop/templates/shop/checkout.html
+msgid "Corrigez les erreurs suivantes :"
+msgstr "Korrigieren Sie die folgenden Fehler:"
+
+#: payments/templates/payments/choice.html
+msgid "Paiement indisponible"
+msgstr "Zahlung nicht verfügbar"
+
+#: payments/templates/payments/choice.html
+msgid "Aucun moyen de paiement n’est disponible pour le moment."
+msgstr "Derzeit ist keine Zahlungsmethode verfügbar."

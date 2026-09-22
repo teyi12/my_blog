@@ -139,7 +139,7 @@ class CanceledOrderPaymentPageTests(TestCase):
             cinetpay_response = self.client.post(
                 reverse("payments:cinetpay_create", args=[self.order.pk])
             )
-            mobile_response = self.client.get(
+            mobile_response = self.client.post(
                 reverse("payments:mobile_checkout", args=[self.order.pk])
             )
 

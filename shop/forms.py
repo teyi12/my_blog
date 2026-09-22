@@ -239,6 +239,20 @@ class AjouterAuPanierForm(forms.Form):
 
 
 class AdresseForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if not self.is_bound:
+            return
+
+        for field_name in self.errors:
+            if field_name not in self.fields:
+                continue
+            bound_field = self[field_name]
+            self.fields[field_name].widget.attrs.update({
+                "aria-invalid": "true",
+                "aria-describedby": f"{bound_field.auto_id}_error",
+            })
+
     class Meta:
         model = Adresse
         fields = ["rue", "ville", "code_postal", "pays", "telephone"]

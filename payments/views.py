@@ -80,8 +80,9 @@ def choice(request, order_id=None):
     )
 
     return render(request, "payments/choice.html", {
-        "STRIPE_PUBLIC_KEY": getattr(settings, "STRIPE_PUBLIC_KEY", ""),
-        "commande": commande
+        "commande": commande,
+        "stripe_available": getattr(settings, "STRIPE_ENABLED", False) is True,
+        "cinetpay_available": getattr(settings, "CINETPAY_ENABLED", False) is True,
     })
 
 
@@ -625,6 +626,7 @@ def stripe_checkout(request, order_id):
 # MOBILE MONEY
 # ================================================================
 @login_required
+@require_POST
 def mobile_money_checkout(request, order_id):
     """Paiement via API Mobile Money"""
     commande = _get_payable_order(request, order_id)

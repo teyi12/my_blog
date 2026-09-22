@@ -315,6 +315,7 @@ STRIPE_PUBLIC_KEY = os.getenv("STRIPE_PUBLIC_KEY", "")
 STRIPE_SECRET_KEY = os.getenv("STRIPE_SECRET_KEY", "")
 STRIPE_WEBHOOK_SECRET = os.getenv("STRIPE_WEBHOOK_SECRET", "")
 STRIPE_PRICE_MONTHLY = os.getenv("STRIPE_PRICE_MONTHLY", "")
+STRIPE_ENABLED = env_bool("STRIPE_ENABLED", bool(STRIPE_SECRET_KEY))
 DONATIONS_ENABLED = env_bool("DONATIONS_ENABLED", False)
 SUBSCRIPTIONS_ENABLED = env_bool("SUBSCRIPTIONS_ENABLED", False)
 PAYMENT_PROCESSING_TIMEOUT_SECONDS = int(
@@ -342,6 +343,10 @@ MOBILE_MONEY_BASE_URL = os.getenv(
 # -----------------------------------------------------------------------------
 CINETPAY_API_KEY = os.getenv("CINETPAY_API_KEY", "")
 CINETPAY_SITE_ID = os.getenv("CINETPAY_SITE_ID", "")
+CINETPAY_ENABLED = env_bool(
+    "CINETPAY_ENABLED",
+    bool(CINETPAY_API_KEY and CINETPAY_SITE_ID),
+)
 CINETPAY_BASE_URL = os.getenv(
     "CINETPAY_BASE_URL",
     "https://api-checkout.cinetpay.com/v2",
