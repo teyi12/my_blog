@@ -2,73 +2,52 @@
 {% load i18n static %}
 
 {% block titre %}{% blocktranslate with category_name=categorie.nom %}{{ category_name }} — Boutique Teyilawson{% endblocktranslate %}{% endblock %}
-
-{% block styles %}
-<link rel="stylesheet" href="{% static 'css/shop.css' %}">
-{% endblock %}
+{% block styles %}<link rel="stylesheet" href="{% static 'css/shop.css' %}">{% endblock %}
 
 {% block contenu %}
-<div class="shop-page">
-  <header class="shop-header shop-category-header">
+<div class="shop-page shop-category-page">
+  <header class="shop-category-hero" data-shop-section="header">
     <div>
-      <a class="shop-back-link" href="{% url 'shop:liste' %}"><i class="fa-solid fa-arrow-left" aria-hidden="true"></i> {% translate "Toute la boutique" %}</a>
-      <span class="shop-eyebrow">{% translate "Catégorie" %}</span>
+      <nav class="product-breadcrumb" aria-label="{% translate 'Fil d’Ariane' %}">
+        <a href="{% url 'shop:liste' %}">{% translate "Boutique" %}</a>
+        <i class="fa-solid fa-chevron-right" aria-hidden="true"></i>
+        <span aria-current="page">{{ categorie.nom }}</span>
+      </nav>
+      <span class="shop-eyebrow">{% translate "Collection" %}</span>
       <h1>{{ categorie.nom }}</h1>
       <p>{% translate "Découvrez les produits disponibles dans cette sélection." %}</p>
     </div>
-
-    <a href="{% url 'shop:panier' %}" class="shop-cart-link" aria-label="{% translate "Voir le panier" %}">
-      <span class="shop-cart-icon"><i class="fa-solid fa-bag-shopping" aria-hidden="true"></i></span>
+    <a href="{% url 'shop:panier' %}" class="shop-category-cart">
+      <span><i class="fa-solid fa-bag-shopping" aria-hidden="true"></i></span>
       <span><small>{% translate "Votre panier" %}</small><strong>{% blocktranslate count counter=panier_items_count|default:0 %}{{ counter }} article{% plural %}{{ counter }} articles{% endblocktranslate %}</strong></span>
       <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
     </a>
   </header>
 
-  <div class="shop-toolbar">
-    <div>
-      <span class="shop-toolbar-label">{% translate "Sélection" %}</span>
-      <strong>{% blocktranslate count counter=produits|length %}{{ counter }} produit{% plural %}{{ counter }} produits{% endblocktranslate %}</strong>
-    </div>
-    <span class="shop-toolbar-note"><i class="fa-regular fa-circle-check" aria-hidden="true"></i> {% translate "Paiement sécurisé" %}</span>
+  {% if catalogue_categories %}
+  <nav class="shop-category-nav" aria-label="{% translate 'Catégories de la boutique' %}" data-shop-section="categories">
+    <a class="shop-category-pill" href="{% url 'shop:liste' %}">{% translate "Tous les produits" %}</a>
+    {% for category in catalogue_categories %}
+      <a class="shop-category-pill{% if category.pk == categorie.pk %} is-active{% endif %}" href="{% url 'shop:par_categorie' slug=category.slug %}"{% if category.pk == categorie.pk %} aria-current="page"{% endif %}>{{ category.nom }} <span>{{ category.product_count }}</span></a>
+    {% endfor %}
+  </nav>
+  {% endif %}
+
+  <div class="shop-toolbar" data-shop-section="toolbar">
+    <div><span class="shop-toolbar-label">{% translate "Sélection" %}</span><strong>{% blocktranslate count counter=produits|length %}{{ counter }} produit{% plural %}{{ counter }} produits{% endblocktranslate %}</strong></div>
+    <span class="shop-toolbar-note"><i class="fa-solid fa-lock" aria-hidden="true"></i> {% translate "Paiement sécurisé" %}</span>
   </div>
 
   {% if produits %}
-  <section class="shop-grid" aria-label="{% blocktranslate with category_name=categorie.nom %}Produits de la catégorie {{ category_name }}{% endblocktranslate %}">
-    {% for produit in produits %}
-    <article class="shop-card">
-      <a class="shop-card-media" href="{% url 'shop:detail' slug=produit.slug %}">
-        {% if produit.image %}
-          <img src="{{ produit.image.url }}" alt="{% if produit.localized_name %}{{ produit.localized_name }}{% else %}{% translate "Image du produit" %}{% endif %}">
-        {% else %}
-          <img src="{% static 'images/default.jpg' %}" alt="{% if produit.localized_name %}{{ produit.localized_name }}{% else %}{% translate "Image du produit" %}{% endif %}">
-        {% endif %}
-        {% if produit.en_vedette %}<span class="shop-featured-badge"><i class="fa-solid fa-star" aria-hidden="true"></i> {% translate "Sélection" %}</span>{% endif %}
-        <span class="shop-view-product">{% translate "Voir le produit" %} <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></span>
-      </a>
-
-      <div class="shop-card-body">
-        <span class="shop-category">{{ categorie.nom }}</span>
-        <h2><a href="{% url 'shop:detail' slug=produit.slug %}">{{ produit.localized_name }}</a></h2>
-        {% if produit.localized_description %}<p>{{ produit.localized_description|truncatewords:15 }}</p>{% endif %}
-        <div class="shop-card-footer">
-          <span class="shop-price" aria-label="{% blocktranslate with price=produit.prix %}Prix : {{ price }} euros{% endblocktranslate %}">{{ produit.prix }} €</span>
-          <form method="post" action="{% url 'shop:ajouter_panier' slug=produit.slug %}">
-            {% csrf_token %}
-            <button class="shop-add-button" type="submit" aria-label="{% if produit.localized_name %}{% blocktranslate with product_name=produit.localized_name %}Ajouter {{ product_name }} au panier{% endblocktranslate %}{% else %}{% translate "Ajouter ce produit au panier" %}{% endif %}">
-              <i class="fa-solid fa-plus" aria-hidden="true"></i><span>{% translate "Ajouter" %}</span>
-            </button>
-          </form>
-        </div>
-      </div>
-    </article>
-    {% endfor %}
+  <section class="shop-grid" aria-label="{% blocktranslate with category_name=categorie.nom %}Produits de la catégorie {{ category_name }}{% endblocktranslate %}" data-shop-section="products">
+    {% for produit in produits %}{% include "shop/_product_card.html" with produit=produit %}{% endfor %}
   </section>
   {% else %}
-  <div class="empty-state shop-empty-state">
-    <span class="shop-empty-icon"><i class="fa-solid fa-box-open" aria-hidden="true"></i></span>
+  <div class="empty-state shop-empty-state" data-shop-section="empty">
+    <span class="empty-state-icon" aria-hidden="true"><i class="fa-solid fa-box-open"></i></span>
     <h2>{% translate "Aucun produit dans cette catégorie." %}</h2>
     <p>{% translate "Explorez le reste de la boutique pour découvrir les produits actuellement disponibles." %}</p>
-    <a href="{% url 'shop:liste' %}" class="btn btn-primary">{% translate "Voir toute la boutique" %}</a>
+    <a href="{% url 'shop:liste' %}" class="btn btn-brand empty-state-action">{% translate "Voir toute la boutique" %}</a>
   </div>
   {% endif %}
 </div>

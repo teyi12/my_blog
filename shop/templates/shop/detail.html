@@ -2,78 +2,104 @@
 {% load i18n static %}
 
 {% block titre %}{% blocktranslate with product_name=produit.localized_name %}{{ product_name }} — Boutique Teyilawson{% endblocktranslate %}{% endblock %}
-
-{% block styles %}
-<link rel="stylesheet" href="{% static 'css/shop.css' %}">
-<link rel="stylesheet" href="{% static 'css/inventory.css' %}">
-{% endblock %}
+{% block styles %}<link rel="stylesheet" href="{% static 'css/shop.css' %}">{% endblock %}
 
 {% block contenu %}
 <article class="product-detail-page">
-  <a class="product-back-link" href="{% url 'shop:liste' %}">
-    <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
-    {% translate "Retour à la boutique" %}
-  </a>
+  <nav class="product-breadcrumb" aria-label="{% translate 'Fil d’Ariane' %}" data-product-section="navigation">
+    <a href="{% url 'shop:liste' %}">{% translate "Boutique" %}</a>
+    {% if produit.categorie %}
+      <i class="fa-solid fa-chevron-right" aria-hidden="true"></i>
+      <a href="{% url 'shop:par_categorie' slug=produit.categorie.slug %}">{{ produit.categorie.nom }}</a>
+    {% endif %}
+    <i class="fa-solid fa-chevron-right" aria-hidden="true"></i>
+    <span aria-current="page">{{ produit.localized_name }}</span>
+  </nav>
 
-  <div class="product-detail-grid">
-    <div class="product-detail-media">
-      {% if produit.image %}
-        <img src="{{ produit.image.url }}" alt="{% if produit.localized_name %}{{ produit.localized_name }}{% else %}{% translate "Image du produit" %}{% endif %}">
-      {% else %}
-        <img src="{% static 'images/default.jpg' %}" alt="{% if produit.localized_name %}{{ produit.localized_name }}{% else %}{% translate "Image du produit" %}{% endif %}">
+  <div class="product-detail-grid" data-product-section="overview">
+    <section class="product-gallery" aria-label="{% blocktranslate with product_name=produit.localized_name %}Images de {{ product_name }}{% endblocktranslate %}" data-product-gallery>
+      <figure class="product-gallery-stage">
+        {% if display_image %}
+          <img src="{{ display_image.url }}" alt="{% if produit.localized_name %}{{ produit.localized_name }}{% else %}{% translate 'Image du produit' %}{% endif %}" width="1000" height="1000" fetchpriority="high" data-product-gallery-main>
+        {% else %}
+          <span class="product-gallery-placeholder" aria-hidden="true"><i class="fa-solid fa-bag-shopping"></i></span>
+        {% endif %}
+        {% if produit.en_vedette %}<span class="badge badge-warning product-detail-badge"><i class="fa-solid fa-star" aria-hidden="true"></i> {% translate "Produit sélectionné" %}</span>{% endif %}
+      </figure>
+
+      {% if produit.image or secondary_images %}
+      <div class="product-gallery-thumbnails" aria-label="{% translate 'Choisir une image' %}">
+        {% if produit.image %}
+          <button class="product-gallery-thumbnail is-active" type="button" aria-pressed="true" aria-label="{% translate 'Afficher l’image principale' %}" data-gallery-src="{{ produit.image.url }}" data-gallery-alt="{% if produit.localized_name %}{{ produit.localized_name }}{% else %}{% translate 'Image du produit' %}{% endif %}">
+            <img src="{{ produit.image.url }}" alt="" width="160" height="160" loading="lazy">
+          </button>
+        {% endif %}
+        {% for gallery_image in secondary_images %}
+          <button class="product-gallery-thumbnail{% if not produit.image and forloop.first %} is-active{% endif %}" type="button" aria-pressed="{% if not produit.image and forloop.first %}true{% else %}false{% endif %}" aria-label="{% blocktranslate with number=forloop.counter %}Afficher l’image {{ number }}{% endblocktranslate %}" data-gallery-src="{{ gallery_image.image.url }}" data-gallery-alt="{{ gallery_image.localized_alt_text }}">
+            <img src="{{ gallery_image.image.url }}" alt="" width="160" height="160" loading="lazy">
+          </button>
+        {% endfor %}
+      </div>
       {% endif %}
-      {% if produit.en_vedette %}<span class="product-detail-badge"><i class="fa-solid fa-star" aria-hidden="true"></i> {% translate "Produit sélectionné" %}</span>{% endif %}
-    </div>
+    </section>
 
     <div class="product-detail-copy">
-      {% if produit.categorie %}<span class="shop-eyebrow">{{ produit.categorie.nom }}</span>{% endif %}
+      <div class="product-detail-kickers">
+        {% if produit.categorie %}<a class="shop-eyebrow" href="{% url 'shop:par_categorie' slug=produit.categorie.slug %}">{{ produit.categorie.nom }}</a>{% endif %}
+        {% if produit.fichier %}<span class="badge badge-info"><i class="fa-regular fa-file" aria-hidden="true"></i> {% translate "Produit numérique" %}</span>{% endif %}
+      </div>
       <h1>{{ produit.localized_name }}</h1>
       <div class="product-detail-price" aria-label="{% blocktranslate with price=produit.prix %}Prix : {{ price }} euros{% endblocktranslate %}">{{ produit.prix }} €</div>
+
       {% if produit.stock_est_gere %}
         {% if produit.stock == 0 %}
-          <p class="shop-stock shop-stock-out">{% translate "Rupture de stock" %}</p>
+          <p class="shop-stock shop-stock-out"><i class="fa-regular fa-circle-xmark" aria-hidden="true"></i> {% translate "Rupture de stock" %}</p>
         {% else %}
-          <p class="shop-stock">{% blocktranslate with available=produit.stock %}Quantité disponible : {{ available }}{% endblocktranslate %}</p>
+          <p class="shop-stock"><i class="fa-regular fa-circle-check" aria-hidden="true"></i> {% blocktranslate with available=produit.stock %}Quantité disponible : {{ available }}{% endblocktranslate %}</p>
         {% endif %}
+      {% else %}
+        <p class="shop-stock"><i class="fa-regular fa-circle-check" aria-hidden="true"></i> {% translate "Disponible immédiatement" %}</p>
       {% endif %}
 
-      {% if produit.localized_description %}
-      <div class="product-description">{{ produit.localized_description|linebreaks }}</div>
-      {% endif %}
+      {% if produit.localized_description %}<div class="product-description">{{ produit.localized_description|linebreaks }}</div>{% endif %}
 
-      <div class="product-benefits" aria-label="{% translate "Informations d’achat" %}">
-        <span><i class="fa-regular fa-circle-check" aria-hidden="true"></i> {% translate "Paiement sécurisé" %}</span>
-        <span><i class="fa-solid fa-bag-shopping" aria-hidden="true"></i> {% translate "Ajout simple au panier" %}</span>
-        {% if produit.fichier %}<span><i class="fa-regular fa-file" aria-hidden="true"></i> {% translate "Aperçu disponible" %}</span>{% endif %}
-      </div>
-
-      <div class="product-primary-actions">
+      <div class="product-purchase">
         <form method="post" action="{% url 'shop:ajouter_panier' slug=produit.slug %}">
           {% csrf_token %}
           <button type="submit" class="btn btn-brand btn-lg product-add-main" {% if not produit.est_disponible %}disabled aria-disabled="true"{% endif %}>
-            <i class="fa-solid fa-bag-shopping" aria-hidden="true"></i>
-            {% translate "Ajouter au panier" %}
+            <i class="fa-solid fa-bag-shopping" aria-hidden="true"></i> {% translate "Ajouter au panier" %}
           </button>
         </form>
-        <a href="{% url 'shop:panier' %}" class="btn btn-outline-primary btn-lg">{% translate "Voir le panier" %}</a>
+        <span><i class="fa-solid fa-lock" aria-hidden="true"></i> {% translate "Paiement sécurisé lors de la commande" %}</span>
       </div>
 
       {% if produit.fichier %}
       <div class="product-download">
-        <div>
-          <span class="product-download-icon"><i class="fa-regular fa-file-lines" aria-hidden="true"></i></span>
-          <span><small>{% translate "Ressource associée" %}</small><strong>{% translate "Aperçu du produit" %}</strong></span>
-        </div>
+        <span class="product-download-icon"><i class="fa-regular fa-file-lines" aria-hidden="true"></i></span>
+        <span><small>{% translate "Ressource associée" %}</small><strong>{% translate "Aperçu du produit" %}</strong></span>
         <a href="{{ produit.fichier.url }}" class="btn btn-soft btn-sm">{% translate "Télécharger" %}</a>
       </div>
       {% endif %}
     </div>
   </div>
 
-  <section class="product-confidence" aria-label="{% translate "Pourquoi acheter ici" %}">
-    <div><i class="fa-solid fa-shield-halved" aria-hidden="true"></i><span><strong>{% translate "Paiement protégé" %}</strong><small>{% translate "Parcours de commande sécurisé." %}</small></span></div>
-    <div><i class="fa-solid fa-check" aria-hidden="true"></i><span><strong>{% translate "Sélection claire" %}</strong><small>{% translate "Des produits présentés sans surcharge." %}</small></span></div>
-    <div><i class="fa-regular fa-compass" aria-hidden="true"></i><span><strong>{% translate "Univers Teyilawson" %}</strong><small>{% translate "Une sélection cohérente avec nos contenus." %}</small></span></div>
+  <section class="product-confidence" aria-labelledby="product-confidence-title" data-product-section="confidence">
+    <div class="product-confidence-heading">
+      <span class="shop-eyebrow">{% translate "Acheter en confiance" %}</span>
+      <h2 id="product-confidence-title">{% translate "Une expérience simple, du choix à la commande." %}</h2>
+    </div>
+    <div class="product-confidence-grid">
+      <div><i class="fa-solid fa-shield-halved" aria-hidden="true"></i><span><strong>{% translate "Paiement protégé" %}</strong><small>{% translate "Parcours de commande sécurisé." %}</small></span></div>
+      <div><i class="fa-solid fa-check" aria-hidden="true"></i><span><strong>{% translate "Sélection claire" %}</strong><small>{% translate "Des produits présentés sans surcharge." %}</small></span></div>
+      <div><i class="fa-regular fa-compass" aria-hidden="true"></i><span><strong>{% translate "Univers Teyilawson" %}</strong><small>{% translate "Une sélection cohérente avec nos contenus." %}</small></span></div>
+    </div>
   </section>
+
+  <footer class="product-detail-footer">
+    <a class="btn btn-soft" href="{% url 'shop:liste' %}"><i class="fa-solid fa-arrow-left" aria-hidden="true"></i> {% translate "Retour à la boutique" %}</a>
+    <a class="btn btn-link" href="{% url 'shop:panier' %}">{% translate "Voir le panier" %} <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a>
+  </footer>
 </article>
 {% endblock %}
+
+{% block extra_js %}<script src="{% static 'js/product-gallery.js' %}" defer></script>{% endblock %}

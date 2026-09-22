@@ -173,9 +173,19 @@ class ProduitListView(ListView):
     context_object_name = "produits"
     paginate_by = 12
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["catalogue_categories"] = (
+            Categorie.objects.annotate(product_count=Count("produit"))
+            .filter(product_count__gt=0)
+            .order_by("nom", "pk")
+        )
+        return context
+
 
 class ProduitDetailView(DetailView):
     model = Produit
+    queryset = Produit.objects.select_related("categorie").with_secondary_images()
     template_name = "shop/detail.html"
     context_object_name = "produit"
     slug_field = "slug"
@@ -183,6 +193,8 @@ class ProduitDetailView(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        context["display_image"] = self.object.get_display_image()
+        context["secondary_images"] = self.object.get_public_secondary_images()
         context["seo"] = build_dynamic_seo(
             self.request,
             instance=self.object,
@@ -198,7 +210,16 @@ class ProduitDetailView(DetailView):
 
 def produits_par_categorie(request, slug):
     categorie = get_object_or_404(Categorie, slug=slug)
-    produits = Produit.objects.filter(categorie=categorie).select_related("categorie")
+    produits = (
+        Produit.objects.filter(categorie=categorie)
+        .select_related("categorie")
+        .order_by("pk")
+    )
+    catalogue_categories = (
+        Categorie.objects.annotate(product_count=Count("produit"))
+        .filter(product_count__gt=0)
+        .order_by("nom", "pk")
+    )
     seo = build_dynamic_seo(
         request,
         instance=categorie,
@@ -211,7 +232,12 @@ def produits_par_categorie(request, slug):
     return render(
         request,
         "shop/produits_par_categorie.html",
-        {"produits": produits, "categorie": categorie, "seo": seo},
+        {
+            "produits": produits,
+            "categorie": categorie,
+            "catalogue_categories": catalogue_categories,
+            "seo": seo,
+        },
     )
 
 
