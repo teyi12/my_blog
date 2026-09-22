@@ -11,4 +11,4 @@ class AbonnementTranslationOptions(TranslationOptions):
 
 @register(Publicite)
 class PubliciteTranslationOptions(TranslationOptions):
-    fields = ("titre",)
+    fields = ("titre", "description", "texte_cta", "texte_alternatif")

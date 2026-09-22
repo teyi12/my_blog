@@ -1,4 +1,4 @@
-from datetime import date, timedelta
+from datetime import datetime, timedelta
 from decimal import Decimal
 
 from django.contrib import admin
@@ -63,8 +63,8 @@ class MonetizationI18nTests(TestCase):
             partenaire=cls.partner,
             image="publicites/campagne.jpg",
             lien="https://example.test/campaign",
-            date_debut=date(2026, 9, 1),
-            date_fin=date(2026, 9, 30),
+            date_debut=timezone.make_aware(datetime(2026, 9, 1)),
+            date_fin=timezone.make_aware(datetime(2026, 9, 30, 23, 59, 59)),
             actif=True,
         )
 

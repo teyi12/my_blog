@@ -2,6 +2,7 @@ import io
 import base64
 import matplotlib.pyplot as plt
 from django.utils.html import format_html
+from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from django.contrib import admin
 from django.db.models import Sum
@@ -20,9 +21,49 @@ class PartenaireAdmin(admin.ModelAdmin):
 
 @admin.register(Publicite)
 class PubliciteAdmin(TranslationAdmin):
-    list_display = ("titre", "partenaire", "date_debut", "date_fin", "actif")
-    list_filter = ("actif", "date_debut", "date_fin")
-    search_fields = ("titre_fr", "titre_de", "titre_en", "partenaire__nom")
+    list_display = (
+        "image_preview",
+        "titre",
+        "partenaire",
+        "ordre",
+        "date_debut",
+        "date_fin",
+        "diffusion_status",
+    )
+    list_filter = ("actif",)
+    search_fields = (
+        "titre_fr",
+        "titre_de",
+        "titre_en",
+        "partenaire__nom",
+    )
+    ordering = ("ordre", "date_debut", "pk")
+    readonly_fields = ("image_preview",)
+
+    def get_queryset(self, request):
+        return super().get_queryset(request).select_related("partenaire")
+
+    @admin.display(description=_("Aperçu"))
+    def image_preview(self, obj):
+        if not obj or not obj.image:
+            return _("Aucune image")
+        return format_html(
+            '<img src="{}" alt="{}" width="160" height="90" '
+            'style="object-fit: cover; border-radius: .35rem;">',
+            obj.image.url,
+            obj.image_alt,
+        )
+
+    @admin.display(description=_("État"), ordering="actif")
+    def diffusion_status(self, obj):
+        moment = timezone.now()
+        if not obj.actif:
+            return _("Inactive")
+        if obj.date_debut and obj.date_debut > moment:
+            return _("Future")
+        if obj.date_fin and obj.date_fin < moment:
+            return _("Expirée")
+        return _("Active")
 
 
 @admin.register(Abonnement)
