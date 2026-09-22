@@ -29,12 +29,12 @@
 
   {% if cart and cart.items.exists %}
   <div class="checkout-layout">
-    <div class="checkout-form-card">
+    <section class="surface-card checkout-form-card" aria-labelledby="checkout-address-title">
       <div class="checkout-section-heading">
         <span class="checkout-section-icon"><i class="fa-regular fa-address-card" aria-hidden="true"></i></span>
         <div>
           <span class="eyebrow">{% translate "Vos coordonnées" %}</span>
-          <h2>{% translate "Adresse de livraison" %}</h2>
+          <h2 id="checkout-address-title">{% translate "Adresse de livraison" %}</h2>
           <p>{% translate "Ces informations seront associées à cette commande." %}</p>
         </div>
       </div>
@@ -43,8 +43,18 @@
         {% csrf_token %}
         <input type="hidden" name="checkout_token" value="{{ checkout_token }}">
 
-        {% if form.non_field_errors %}
-        <div class="alert alert-danger" role="alert">{{ form.non_field_errors }}</div>
+        {% if form.errors %}
+        <div class="alert alert-danger checkout-error-summary" role="alert" aria-labelledby="checkout-errors-title">
+          <h3 id="checkout-errors-title">{% translate "Corrigez les erreurs suivantes :" %}</h3>
+          <ul>
+            {% for field in form %}
+              {% if field.errors %}<li><a href="#{{ field.id_for_label }}">{{ field.label }}</a></li>{% endif %}
+            {% endfor %}
+            {% for error in form.non_field_errors %}
+              <li>{{ error }}</li>
+            {% endfor %}
+          </ul>
+        </div>
         {% endif %}
         {% if cart_has_stock_issue %}
           <div class="alert alert-danger" role="alert">{% translate "Le panier contient une quantité indisponible. Revenez au panier pour la corriger." %}</div>
@@ -53,31 +63,31 @@
         <div class="checkout-field checkout-field-full">
           <label for="{{ form.rue.id_for_label }}">{{ form.rue.label }}</label>
           {{ form.rue }}
-          {% if form.rue.errors %}<div class="checkout-field-error">{{ form.rue.errors }}</div>{% endif %}
+          {% if form.rue.errors %}<ul class="checkout-field-error" id="{{ form.rue.auto_id }}_error">{% for error in form.rue.errors %}<li>{{ error }}</li>{% endfor %}</ul>{% endif %}
         </div>
 
         <div class="checkout-field">
           <label for="{{ form.ville.id_for_label }}">{{ form.ville.label }}</label>
           {{ form.ville }}
-          {% if form.ville.errors %}<div class="checkout-field-error">{{ form.ville.errors }}</div>{% endif %}
+          {% if form.ville.errors %}<ul class="checkout-field-error" id="{{ form.ville.auto_id }}_error">{% for error in form.ville.errors %}<li>{{ error }}</li>{% endfor %}</ul>{% endif %}
         </div>
 
         <div class="checkout-field">
           <label for="{{ form.code_postal.id_for_label }}">{{ form.code_postal.label }}</label>
           {{ form.code_postal }}
-          {% if form.code_postal.errors %}<div class="checkout-field-error">{{ form.code_postal.errors }}</div>{% endif %}
+          {% if form.code_postal.errors %}<ul class="checkout-field-error" id="{{ form.code_postal.auto_id }}_error">{% for error in form.code_postal.errors %}<li>{{ error }}</li>{% endfor %}</ul>{% endif %}
         </div>
 
         <div class="checkout-field">
           <label for="{{ form.pays.id_for_label }}">{{ form.pays.label }}</label>
           {{ form.pays }}
-          {% if form.pays.errors %}<div class="checkout-field-error">{{ form.pays.errors }}</div>{% endif %}
+          {% if form.pays.errors %}<ul class="checkout-field-error" id="{{ form.pays.auto_id }}_error">{% for error in form.pays.errors %}<li>{{ error }}</li>{% endfor %}</ul>{% endif %}
         </div>
 
         <div class="checkout-field">
           <label for="{{ form.telephone.id_for_label }}">{{ form.telephone.label }}</label>
           {{ form.telephone }}
-          {% if form.telephone.errors %}<div class="checkout-field-error">{{ form.telephone.errors }}</div>{% endif %}
+          {% if form.telephone.errors %}<ul class="checkout-field-error" id="{{ form.telephone.auto_id }}_error">{% for error in form.telephone.errors %}<li>{{ error }}</li>{% endfor %}</ul>{% endif %}
         </div>
 
         <div class="checkout-submit">
@@ -87,9 +97,9 @@
           <p><i class="fa-solid fa-lock" aria-hidden="true"></i> {% translate "Votre commande sera créée une seule fois, même en cas de double clic." %}</p>
         </div>
       </form>
-    </div>
+    </section>
 
-    <aside class="checkout-summary" aria-labelledby="checkout-summary-title">
+    <aside class="surface-card checkout-summary" aria-labelledby="checkout-summary-title">
       <span class="eyebrow">{% translate "Récapitulatif" %}</span>
       <h2 id="checkout-summary-title">{% translate "Votre commande" %}</h2>
 
@@ -98,9 +108,9 @@
         <div class="checkout-summary-item">
           <a href="{% url 'shop:detail' slug=item.produit.slug %}" class="checkout-summary-media" aria-label="{% blocktranslate with product=item.produit.localized_name %}Voir {{ product }}{% endblocktranslate %}">
             {% if item.produit.image %}
-              <img src="{{ item.produit.image.url }}" alt="{{ item.produit.localized_name }}">
+              <img src="{{ item.produit.image.url }}" alt="{{ item.produit.localized_name }}" width="160" height="160" loading="lazy">
             {% else %}
-              <img src="{% static 'images/default.jpg' %}" alt="{{ item.produit.localized_name }}">
+              <img src="{% static 'images/default.jpg' %}" alt="{{ item.produit.localized_name }}" width="160" height="160" loading="lazy">
             {% endif %}
           </a>
           <div class="checkout-summary-copy">
@@ -115,7 +125,6 @@
 
       <div class="checkout-totals">
         <div><span>{% translate "Sous-total" %}</span><strong>{{ total|floatformat:2 }} €</strong></div>
-        <div><span>{% translate "Livraison" %}</span><strong>{% translate "Gratuite" %}</strong></div>
         <div class="checkout-total"><span>{% translate "Total" %}</span><strong>{{ total|floatformat:2 }} €</strong></div>
       </div>
 

@@ -8,8 +8,21 @@
 {% endblock %}
 
 {% block contenu %}
-<section class="cart-page" aria-labelledby="cart-title">
-  <div class="cart-header">
+{% translate "Quantité mise à jour." as cart_updated %}
+{% translate "Article supprimé du panier." as cart_removed %}
+{% translate "Stock insuffisant. Quantité disponible :" as cart_stock_error %}
+{% translate "La mise à jour du panier a échoué. Veuillez réessayer." as cart_request_error %}
+{% translate "Passer à la caisse" as cart_checkout %}
+<section class="cart-page"
+         aria-labelledby="cart-title"
+         data-cart-root
+         data-update-url="{% url 'shop:update_panier' %}"
+         data-updated-message="{{ cart_updated }}"
+         data-removed-message="{{ cart_removed }}"
+         data-stock-message="{{ cart_stock_error }}"
+         data-error-message="{{ cart_request_error }}"
+         data-checkout-message="{{ cart_checkout }}">
+  <header class="cart-header">
     <div>
       <span class="eyebrow">{% translate "Votre sélection" %}</span>
       <h1 id="cart-title">{% translate "Votre panier" %}</h1>
@@ -19,66 +32,91 @@
       <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
       {% translate "Continuer mes achats" %}
     </a>
-  </div>
-
-  <form class="d-none" aria-hidden="true">{% csrf_token %}</form>
+  </header>
 
   {% if cart.items.exists %}
   <div class="cart-layout" id="cart-layout">
-    <div class="cart-items" id="cart-items">
+    <section class="cart-items" id="cart-items" aria-label="{% translate 'Articles' %}">
       {% for item in cart.items.all %}
-      <article class="cart-item" id="item-{{ item.id }}">
+      <article class="surface-card cart-item" id="item-{{ item.id }}" aria-labelledby="item-title-{{ item.id }}">
         <a class="cart-item-image" href="{% url 'shop:detail' slug=item.produit.slug %}">
           {% if item.produit.image %}
-            <img src="{{ item.produit.image.url }}" alt="{{ item.produit.localized_name }}">
+            <img src="{{ item.produit.image.url }}" alt="{{ item.produit.localized_name }}" width="320" height="320" loading="lazy">
           {% else %}
-            <img src="{% static 'images/default.jpg' %}" alt="{{ item.produit.localized_name }}">
+            <img src="{% static 'images/default.jpg' %}" alt="{{ item.produit.localized_name }}" width="320" height="320" loading="lazy">
           {% endif %}
         </a>
 
         <div class="cart-item-info">
           {% if item.produit.categorie %}<span class="cart-item-category">{{ item.produit.categorie.nom }}</span>{% endif %}
-          <h2><a href="{% url 'shop:detail' slug=item.produit.slug %}">{{ item.produit.localized_name }}</a></h2>
+          <h2 id="item-title-{{ item.id }}"><a href="{% url 'shop:detail' slug=item.produit.slug %}">{{ item.produit.localized_name }}</a></h2>
           <span class="cart-unit-price">{{ item.prix_unitaire|floatformat:2 }} € / {% translate "unité" %}</span>
           {% if item.produit.stock_est_gere %}
-            {% if item.produit.stock == 0 %}
-              <strong class="shop-stock shop-stock-out">{% translate "Rupture de stock" %}</strong>
-            {% else %}
-              <small class="shop-stock">{% blocktranslate with available=item.produit.stock %}Quantité disponible : {{ available }}{% endblocktranslate %}</small>
-            {% endif %}
-            {% if item.quantite > item.produit.stock %}<small class="shop-stock-out">{% translate "Réduisez la quantité avant de payer." %}</small>{% endif %}
+            <div class="cart-stock-state">
+              {% if item.produit.stock == 0 %}
+                <strong class="shop-stock shop-stock-out">{% translate "Rupture de stock" %}</strong>
+              {% else %}
+                <span class="shop-stock">{% blocktranslate with available=item.produit.stock %}Quantité disponible : {{ available }}{% endblocktranslate %}</span>
+              {% endif %}
+              {% if item.quantite > item.produit.stock %}<strong class="shop-stock-out">{% translate "Réduisez la quantité avant de payer." %}</strong>{% endif %}
+            </div>
           {% endif %}
         </div>
 
-        <div class="cart-item-quantity">
+        <form action="{% url 'shop:update_panier' %}"
+              method="post"
+              class="cart-quantity-form cart-action-form"
+              data-cart-action="modifier"
+              data-item-id="{{ item.id }}">
+          {% csrf_token %}
+          <input type="hidden" name="action" value="modifier">
+          <input type="hidden" name="item_id" value="{{ item.id }}">
           <label for="qty-{{ item.id }}">{% translate "Quantité" %}</label>
-          <input type="number"
-                 id="qty-{{ item.id }}"
-                 value="{{ item.quantite }}"
-                 min="1"
-                 {% if item.produit.stock_est_gere %}max="{{ item.produit.stock }}"{% endif %}
-                 inputmode="numeric"
-                 class="form-control cart-quantity-input"
-                 data-prix="{{ item.prix_unitaire }}"
-                 onchange="updateCart({{ item.id }})">
-        </div>
+          <div class="cart-quantity-controls">
+            <input type="number"
+                   id="qty-{{ item.id }}"
+                   name="quantite"
+                   value="{{ item.quantite }}"
+                   min="1"
+                   {% if item.produit.stock_est_gere %}max="{{ item.produit.stock }}"{% endif %}
+                   inputmode="numeric"
+                   required
+                   class="form-control cart-quantity-input"
+                   {% if item.produit.stock_est_gere and item.produit.stock == 0 %}disabled{% endif %}>
+            <button type="submit"
+                    class="btn btn-soft btn-sm cart-update-button"
+                    aria-describedby="item-title-{{ item.id }}"
+                    {% if item.produit.stock_est_gere and item.produit.stock == 0 %}disabled{% endif %}>
+              {% translate "Modifier" %}
+            </button>
+          </div>
+        </form>
 
         <div class="cart-item-total">
           <span>{% translate "Sous-total" %}</span>
           <strong id="subtotal-{{ item.id }}">{{ item.sous_total|floatformat:2 }} €</strong>
         </div>
 
-        <button class="cart-remove-button"
-                type="button"
-                onclick="removeFromCart({{ item.id }})"
-                aria-label="{% blocktranslate with product=item.produit.localized_name %}Supprimer {{ product }} du panier{% endblocktranslate %}">
-          <i class="fa-regular fa-trash-can" aria-hidden="true"></i>
-        </button>
+        <form action="{% url 'shop:update_panier' %}"
+              method="post"
+              class="cart-remove-form cart-action-form"
+              data-cart-action="supprimer"
+              data-item-id="{{ item.id }}">
+          {% csrf_token %}
+          <input type="hidden" name="action" value="supprimer">
+          <input type="hidden" name="item_id" value="{{ item.id }}">
+          <button class="cart-remove-button"
+                  type="submit"
+                  aria-label="{% blocktranslate with product=item.produit.localized_name %}Supprimer {{ product }} du panier{% endblocktranslate %}">
+            <i class="fa-regular fa-trash-can" aria-hidden="true"></i>
+            <span>{% translate "Supprimer" %}</span>
+          </button>
+        </form>
       </article>
       {% endfor %}
-    </div>
+    </section>
 
-    <aside class="cart-summary" id="cart-summary" aria-labelledby="cart-summary-title">
+    <aside class="surface-card cart-summary" id="cart-summary" aria-labelledby="cart-summary-title">
       <span class="cart-summary-kicker">{% translate "Récapitulatif" %}</span>
       <h2 id="cart-summary-title">{% translate "Votre commande" %}</h2>
 
@@ -92,11 +130,16 @@
       </div>
 
       {% if cart_has_stock_issue %}
-        <span id="checkout-btn" class="btn btn-brand btn-lg cart-checkout-button" aria-disabled="true">
+        <span id="checkout-blocked"
+              class="btn btn-brand btn-lg cart-checkout-button"
+              aria-disabled="true"
+              data-checkout-url="{% url 'shop:checkout' %}">
           {% translate "Panier indisponible" %}
         </span>
       {% else %}
-        <a href="{% url 'shop:checkout' %}" id="checkout-btn" class="btn btn-brand btn-lg cart-checkout-button">
+        <a href="{% url 'shop:checkout' %}"
+           id="checkout-link"
+           class="btn btn-brand btn-lg cart-checkout-button">
           {% translate "Passer à la caisse" %}
           <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
         </a>
@@ -109,122 +152,26 @@
     </aside>
   </div>
   {% else %}
-  <div class="cart-empty" id="cart-empty">
-    <span class="cart-empty-icon"><i class="fa-solid fa-bag-shopping" aria-hidden="true"></i></span>
+  <div class="empty-state cart-empty" id="cart-empty">
+    <span class="empty-state-icon"><i class="fa-solid fa-bag-shopping" aria-hidden="true"></i></span>
     <h2>{% translate "Votre panier est vide" %}</h2>
     <p>{% translate "Découvrez la boutique et ajoutez les produits qui vous intéressent." %}</p>
-    <a href="{% url 'shop:liste' %}" class="btn btn-brand">{% translate "Découvrir la boutique" %}</a>
+    <a href="{% url 'shop:liste' %}" class="btn btn-brand empty-state-action">{% translate "Découvrir la boutique" %}</a>
   </div>
   {% endif %}
 
   <p class="visually-hidden" id="cart-status" role="status" aria-live="polite"></p>
+  <template id="cart-empty-template">
+    <div class="empty-state cart-empty" id="cart-empty">
+      <span class="empty-state-icon"><i class="fa-solid fa-bag-shopping" aria-hidden="true"></i></span>
+      <h2>{% translate "Votre panier est vide" %}</h2>
+      <p>{% translate "Découvrez la boutique et ajoutez les produits qui vous intéressent." %}</p>
+      <a href="{% url 'shop:liste' %}" class="btn btn-brand empty-state-action">{% translate "Découvrir la boutique" %}</a>
+    </div>
+  </template>
 </section>
 {% endblock %}
 
 {% block extra_js %}
-{% translate "Quantité mise à jour." as cart_updated %}
-{% translate "Article supprimé du panier." as cart_removed %}
-{% translate "Votre panier est vide" as cart_empty_title %}
-{% translate "Découvrez la boutique et ajoutez les produits qui vous intéressent." as cart_empty_text %}
-{% translate "Découvrir la boutique" as cart_discover %}
-{% translate "Stock insuffisant. Quantité disponible :" as cart_stock_error %}
-<script>
-const cartMessages = {
-  updated: "{{ cart_updated|escapejs }}",
-  removed: "{{ cart_removed|escapejs }}",
-  emptyTitle: "{{ cart_empty_title|escapejs }}",
-  emptyText: "{{ cart_empty_text|escapejs }}",
-  discover: "{{ cart_discover|escapejs }}",
-  stockError: "{{ cart_stock_error|escapejs }}"
-};
-
-function getCSRFToken() {
-  return document.querySelector('[name=csrfmiddlewaretoken]')?.value || '';
-}
-
-function formatPrice(value) {
-  return Number(value).toFixed(2) + ' €';
-}
-
-function setCartStatus(message) {
-  const status = document.getElementById('cart-status');
-  if (status) status.textContent = message;
-}
-
-function updateCart(itemId) {
-  const input = document.getElementById('qty-' + itemId);
-  if (!input) return;
-
-  const quantity = parseInt(input.value, 10);
-  if (!Number.isInteger(quantity) || quantity < 1) {
-    input.value = 1;
-    return;
-  }
-
-  fetch("{% url 'shop:update_panier' %}", {
-    method: 'POST',
-    headers: {
-      'X-CSRFToken': getCSRFToken(),
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({action: 'modifier', item_id: itemId, quantite: quantity})
-  })
-  .then(response => response.json())
-  .then(data => {
-    updateUI(data);
-    if (data.success) setCartStatus(cartMessages.updated);
-    if (!data.success && data.available !== undefined) {
-      setCartStatus(cartMessages.stockError + ' ' + data.available);
-    }
-  });
-}
-
-function removeFromCart(itemId) {
-  fetch("{% url 'shop:update_panier' %}", {
-    method: 'POST',
-    headers: {
-      'X-CSRFToken': getCSRFToken(),
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({action: 'supprimer', item_id: itemId})
-  })
-  .then(response => response.json())
-  .then(data => {
-    if (data.success) {
-      document.getElementById('item-' + itemId)?.remove();
-      updateUI(data);
-      setCartStatus(cartMessages.removed);
-    }
-  });
-}
-
-function updateUI(data) {
-  if (!data.success) return;
-
-  const total = document.getElementById('cart-total');
-  const count = document.getElementById('cart-count');
-  if (total) total.textContent = formatPrice(data.total);
-  if (count) count.textContent = data.total_articles;
-
-  if (data.sous_totaux) {
-    for (const [id, sousTotal] of Object.entries(data.sous_totaux)) {
-      const element = document.getElementById('subtotal-' + id);
-      if (element) element.textContent = formatPrice(sousTotal);
-    }
-  }
-
-  if (data.total_articles === 0) {
-    const layout = document.getElementById('cart-layout');
-    if (layout) {
-      layout.outerHTML = `
-        <div class="cart-empty" id="cart-empty">
-          <span class="cart-empty-icon"><i class="fa-solid fa-bag-shopping" aria-hidden="true"></i></span>
-          <h2>${cartMessages.emptyTitle}</h2>
-          <p>${cartMessages.emptyText}</p>
-          <a href="{% url 'shop:liste' %}" class="btn btn-brand">${cartMessages.discover}</a>
-        </div>`;
-    }
-  }
-}
-</script>
+<script src="{% static 'js/cart.js' %}" defer></script>
 {% endblock %}

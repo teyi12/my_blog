@@ -29,55 +29,67 @@
   </header>
 
   <div class="payment-layout">
-    <div class="payment-methods" aria-label="{% translate 'Moyens de paiement disponibles' %}">
-      <article class="payment-method-card payment-method-featured">
-        <div class="payment-method-topline">
-          <span class="payment-icon"><i class="fa-regular fa-credit-card" aria-hidden="true"></i></span>
-          <span class="payment-recommended">{% translate "Recommandé" %}</span>
-        </div>
-        <div class="payment-method-copy">
-          <span class="eyebrow">{% translate "Carte bancaire" %}</span>
-          <h2>Stripe</h2>
-          <p>{% translate "Payez par carte via la page de paiement sécurisée de Stripe." %}</p>
-        </div>
-        <ul class="payment-benefits">
-          <li><i class="fa-regular fa-circle-check" aria-hidden="true"></i> {% translate "Paiement sécurisé" %}</li>
-          <li><i class="fa-regular fa-circle-check" aria-hidden="true"></i> {% translate "Confirmation rapide" %}</li>
-        </ul>
-        <form action="{% url 'payments:stripe_checkout' commande.id %}" method="post" class="payment-form">
-          {% csrf_token %}
-          <button type="submit" class="btn btn-brand btn-lg">
-            <i class="fa-regular fa-credit-card" aria-hidden="true"></i>
-            {% translate "Payer par carte" %}
-            <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
-          </button>
-        </form>
-      </article>
+    {% if stripe_available or cinetpay_available %}
+      <fieldset class="payment-methods">
+        <legend class="visually-hidden">{% translate "Moyens de paiement disponibles" %}</legend>
+        {% if stripe_available %}
+        <article class="surface-card payment-method-card">
+          <div class="payment-method-topline">
+            <span class="payment-icon"><i class="fa-regular fa-credit-card" aria-hidden="true"></i></span>
+            <span class="eyebrow">{% translate "Carte bancaire" %}</span>
+          </div>
+          <div class="payment-method-copy">
+            <h2>Stripe</h2>
+            <p>{% translate "Payez par carte via la page de paiement sécurisée de Stripe." %}</p>
+          </div>
+          <p class="payment-provider-note">
+            <i class="fa-regular fa-circle-check" aria-hidden="true"></i>
+            {% translate "Validation par le fournisseur" %}
+          </p>
+          <form action="{% url 'payments:stripe_checkout' commande.id %}" method="post" class="payment-form">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-brand btn-lg">
+              <i class="fa-regular fa-credit-card" aria-hidden="true"></i>
+              {% translate "Payer par carte" %}
+              <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+            </button>
+          </form>
+        </article>
+        {% endif %}
 
-      <article class="payment-method-card">
-        <div class="payment-method-topline">
-          <span class="payment-icon"><i class="fa-solid fa-mobile-screen-button" aria-hidden="true"></i></span>
-        </div>
-        <div class="payment-method-copy">
-          <span class="eyebrow">Mobile Money</span>
-          <h2>CinetPay</h2>
-          <p>{% translate "Utilisez les moyens Mobile Money disponibles via CinetPay." %}</p>
-        </div>
-        <ul class="payment-benefits">
-          <li><i class="fa-regular fa-circle-check" aria-hidden="true"></i> Orange Money, MTN, Moov, Wave…</li>
-          <li><i class="fa-regular fa-circle-check" aria-hidden="true"></i> {% translate "Validation par le fournisseur" %}</li>
-        </ul>
-        <form action="{% url 'payments:cinetpay_create' commande.id %}" method="post" class="payment-form">
-          {% csrf_token %}
-          <input type="hidden" name="channel" value="MOBILE_MONEY">
-          <button type="submit" class="btn btn-soft btn-lg">
-            <i class="fa-solid fa-mobile-screen-button" aria-hidden="true"></i>
-            {% translate "Payer avec Mobile Money" %}
-            <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
-          </button>
-        </form>
-      </article>
-    </div>
+        {% if cinetpay_available %}
+        <article class="surface-card payment-method-card">
+          <div class="payment-method-topline">
+            <span class="payment-icon"><i class="fa-solid fa-mobile-screen-button" aria-hidden="true"></i></span>
+            <span class="eyebrow">Mobile Money</span>
+          </div>
+          <div class="payment-method-copy">
+            <h2>CinetPay</h2>
+            <p>{% translate "Utilisez les moyens Mobile Money disponibles via CinetPay." %}</p>
+          </div>
+          <p class="payment-provider-note">
+            <i class="fa-regular fa-circle-check" aria-hidden="true"></i>
+            {% translate "Validation par le fournisseur" %}
+          </p>
+          <form action="{% url 'payments:cinetpay_create' commande.id %}" method="post" class="payment-form">
+            {% csrf_token %}
+            <input type="hidden" name="channel" value="MOBILE_MONEY">
+            <button type="submit" class="btn btn-soft btn-lg">
+              <i class="fa-solid fa-mobile-screen-button" aria-hidden="true"></i>
+              {% translate "Payer avec Mobile Money" %}
+              <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+            </button>
+          </form>
+        </article>
+        {% endif %}
+      </fieldset>
+    {% else %}
+      <div class="empty-state payment-methods-empty" role="status">
+        <span class="empty-state-icon"><i class="fa-regular fa-credit-card" aria-hidden="true"></i></span>
+        <h2>{% translate "Paiement indisponible" %}</h2>
+        <p>{% translate "Aucun moyen de paiement n’est disponible pour le moment." %}</p>
+      </div>
+    {% endif %}
 
     <aside class="payment-summary" aria-labelledby="payment-summary-title">
       <span class="eyebrow">{% translate "Récapitulatif" %}</span>
@@ -89,7 +101,7 @@
       </div>
       <div class="payment-summary-line">
         <span>{% translate "Statut" %}</span>
-        <strong>{% translate "En attente de paiement" %}</strong>
+        <strong>{{ commande.get_payment_status_display }}</strong>
       </div>
       <div class="payment-summary-total">
         <span>{% translate "Total à payer" %}</span>

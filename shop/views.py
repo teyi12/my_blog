@@ -5,7 +5,7 @@ from decimal import Decimal
 from django.conf import settings
 from django.core.paginator import Paginator
 from django.db import IntegrityError, transaction
-from django.db.models import Count, F, Q
+from django.db.models import Count, F, Prefetch, Q, prefetch_related_objects
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required, user_passes_test
@@ -70,10 +70,23 @@ stripe.api_key = settings.STRIPE_SECRET_KEY
 
 
 # ================= PANIER =================
+def _prepare_cart_for_display(cart):
+    if cart is not None:
+        prefetch_related_objects(
+            [cart],
+            Prefetch(
+                "items",
+                queryset=CartItem.objects.select_related("produit__categorie"),
+            ),
+        )
+    return cart
+
+
 @login_required
 def panier_view(request):
     cart = get_or_create_active_cart(request.user)
     stock_issues = cart_stock_issues(cart)
+    _prepare_cart_for_display(cart)
     return render(
         request,
         "shop/panier.html",
@@ -90,26 +103,43 @@ def update_panier(request):
     if request.method != "POST":
         return JsonResponse({"success": False}, status=405)
 
-    try:
-        data = json.loads(request.body.decode("utf-8"))
-    except (TypeError, ValueError, UnicodeDecodeError):
-        return JsonResponse({"success": False}, status=400)
+    expects_json = request.content_type == "application/json"
+    if expects_json:
+        try:
+            data = json.loads(request.body.decode("utf-8"))
+        except (TypeError, ValueError, UnicodeDecodeError):
+            return JsonResponse({"success": False}, status=400)
+    else:
+        data = request.POST
 
     action = data.get("action")
     item_id = data.get("item_id")
     cart = get_or_create_active_cart(request.user)
     try:
         if action == "modifier" and item_id:
+            quantity = data.get("quantite")
+            if not expects_json:
+                try:
+                    quantity = int(quantity)
+                except (TypeError, ValueError):
+                    raise ValueError("invalid cart quantity")
             set_cart_item_quantity(
                 cart.id,
                 item_id,
-                data.get("quantite"),
+                quantity,
             )
         elif action == "supprimer" and item_id:
             remove_cart_item(cart.id, item_id)
         else:
             return JsonResponse({"success": False}, status=400)
     except StockUnavailable as exc:
+        if not expects_json:
+            messages.error(
+                request,
+                _("Stock insuffisant : %(available)s disponible(s).")
+                % {"available": exc.available},
+            )
+            return redirect("shop:panier")
         return JsonResponse(
             {
                 "success": False,
@@ -121,12 +151,16 @@ def update_panier(request):
     except (Cart.DoesNotExist, CartItem.DoesNotExist, Produit.DoesNotExist, ValueError):
         return JsonResponse({"success": False}, status=400)
 
+    if not expects_json:
+        return redirect("shop:panier")
+
     sous_totaux = {i.id: float(i.sous_total()) for i in cart.items.all()}
     return JsonResponse({
         "success": True,
         "total": float(cart.total()),
         "total_articles": cart.total_articles(),
         "sous_totaux": sous_totaux,
+        "cart_has_stock_issue": bool(cart_stock_issues(cart)),
     })
 
 
@@ -618,6 +652,7 @@ class CheckoutView(LoginRequiredMixin, View):
             return redirect("shop:panier")
 
         stock_issues = cart_stock_issues(cart)
+        _prepare_cart_for_display(cart)
         form = AdresseForm()
         return render(request, "shop/checkout.html", {
             "cart": cart,
@@ -714,6 +749,7 @@ class CheckoutView(LoginRequiredMixin, View):
                     user=request.user,
                     actif=True,
                 ).first()
+                _prepare_cart_for_display(cart)
                 messages.error(
                     request,
                     _("Le panier n’est plus disponible. Quantité disponible : %(available)s.")
@@ -746,6 +782,7 @@ class CheckoutView(LoginRequiredMixin, View):
 
                 if not commande:
                     cart = Cart.objects.filter(user=request.user, actif=True).first()
+                    _prepare_cart_for_display(cart)
                     messages.warning(
                         request,
                         _("Le checkout est momentanément occupé. Veuillez réessayer."),
@@ -769,6 +806,7 @@ class CheckoutView(LoginRequiredMixin, View):
             messages.warning(request, _("Votre panier est vide."))
             return redirect("shop:panier")
 
+        _prepare_cart_for_display(cart)
         return render(request, "shop/checkout.html", {
             "cart": cart,
             "total": cart.total(),
