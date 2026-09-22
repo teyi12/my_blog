@@ -10,6 +10,7 @@ from django.shortcuts import redirect, render
 from django.utils.translation import gettext as _
 
 from articles.models import Article
+from monetization.models import Publicite
 from shop.models import Produit
 from videos.models import Video
 from .forms import ContactForm
@@ -20,6 +21,9 @@ logger = logging.getLogger(__name__)
 
 
 def home_view(request):
+    publicites = list(
+        Publicite.objects.diffusables().select_related("partenaire")[:5]
+    )
     articles_recents = list(
         Article.objects.select_related("auteur", "categorie").order_by(
             "-en_vedette",
@@ -50,6 +54,7 @@ def home_view(request):
             "articles_recents": articles_recents,
             "videos_recentes": videos_recentes,
             "produits_vedettes": produits_vedettes,
+            "publicites": publicites,
             "hero_image_url": home_hero_image_url(),
         },
     )

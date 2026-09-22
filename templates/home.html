@@ -78,6 +78,86 @@
     </a>
   </nav>
 
+  {% if publicites %}
+  <section class="home-advertising" aria-labelledby="home-advertising-title" data-home-section="advertising">
+    <header class="home-advertising-heading">
+      <div>
+        <span class="home-eyebrow">{% translate "Publicité" %}</span>
+        <h2 id="home-advertising-title">{% translate "Nos partenaires à découvrir" %}</h2>
+      </div>
+    </header>
+
+    <div class="home-advertising-carousel"
+         data-advertising-carousel
+         data-position-label="{% translate 'Publicité {current} sur {total}' %}">
+      <div class="home-advertising-track">
+        {% for pub in publicites %}
+        <article class="surface-card home-advertising-slide"
+                 id="advertising-slide-{{ forloop.counter }}"
+                 role="group"
+                 aria-roledescription="{% translate 'diapositive' %}"
+                 aria-label="{% blocktranslate with current=forloop.counter total=publicites|length title=pub.titre %}Publicité {{ current }} sur {{ total }} : {{ title }}{% endblocktranslate %}"
+                 data-advertising-slide>
+          <div class="home-advertising-media">
+            <img src="{{ pub.image.url }}"
+                 alt="{{ pub.image_alt }}"
+                 width="1200"
+                 height="675"
+                 loading="lazy">
+            <span class="badge badge-neutral home-advertising-badge">{% translate "Sponsorisé" %}</span>
+          </div>
+          <div class="home-advertising-copy">
+            <span class="home-advertising-partner">{{ pub.partenaire.nom }}</span>
+            <h3>{{ pub.titre }}</h3>
+            {% if pub.description %}<p>{{ pub.description }}</p>{% endif %}
+            {% if pub.lien %}
+            <a class="btn btn-brand home-advertising-link"
+               href="{{ pub.lien }}"
+               target="_blank"
+               rel="sponsored noopener noreferrer">
+              {% if pub.texte_cta %}{{ pub.texte_cta }}{% else %}{% translate "Découvrir l’offre" %}{% endif %}
+              <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i>
+            </a>
+            {% endif %}
+          </div>
+        </article>
+        {% endfor %}
+      </div>
+
+      {% if publicites|length > 1 %}
+      <div class="home-advertising-controls" data-advertising-controls hidden>
+        <button class="home-advertising-control" type="button" data-advertising-previous aria-label="{% translate 'Publicité précédente' %}">
+          <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
+        </button>
+        <div class="home-advertising-indicators" aria-label="{% translate 'Choisir une publicité' %}">
+          {% for pub in publicites %}
+          <button class="home-advertising-indicator"
+                  type="button"
+                  data-advertising-indicator
+                  aria-controls="advertising-slide-{{ forloop.counter }}"
+                  aria-label="{% blocktranslate with position=forloop.counter %}Afficher la publicité {{ position }}{% endblocktranslate %}">
+            <span aria-hidden="true"></span>
+          </button>
+          {% endfor %}
+        </div>
+        <button class="home-advertising-control" type="button" data-advertising-next aria-label="{% translate 'Publicité suivante' %}">
+          <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+        </button>
+        <button class="home-advertising-pause"
+                type="button"
+                data-advertising-pause
+                data-pause-label="{% translate 'Mettre le carrousel en pause' %}"
+                data-resume-label="{% translate 'Reprendre le carrousel' %}">
+          <i class="fa-solid fa-pause" aria-hidden="true" data-advertising-pause-icon></i>
+          <span data-advertising-pause-text>{% translate "Pause" %}</span>
+        </button>
+      </div>
+      {% endif %}
+      <p class="visually-hidden" role="status" aria-live="polite" aria-atomic="true" data-advertising-status></p>
+    </div>
+  </section>
+  {% endif %}
+
   <section class="home-section" aria-labelledby="home-articles-title" data-home-section="articles">
     <header class="home-section-heading">
       <div>
@@ -248,4 +328,8 @@
     </div>
   </section>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+{% if publicites %}<script src="{% static 'js/advertising-carousel.js' %}" defer></script>{% endif %}
 {% endblock %}

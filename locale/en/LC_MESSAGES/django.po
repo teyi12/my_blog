@@ -4112,3 +4112,90 @@ msgstr "Payment unavailable"
 #: payments/templates/payments/choice.html
 msgid "Aucun moyen de paiement n’est disponible pour le moment."
 msgstr "No payment method is currently available."
+
+#: monetization/admin.py
+msgid "Aperçu"
+msgstr "Preview"
+
+#: monetization/admin.py
+msgid "Aucune image"
+msgstr "No image"
+
+#: monetization/admin.py
+msgid "État"
+msgstr "Status"
+
+#: monetization/admin.py
+msgid "Inactive"
+msgstr "Inactive"
+
+#: monetization/admin.py
+msgid "Future"
+msgstr "Upcoming"
+
+#: monetization/admin.py
+msgid "Expirée"
+msgstr "Expired"
+
+#: monetization/admin.py
+msgid "Active"
+msgstr "Active"
+
+#: monetization/models.py
+msgid "La date de fin doit être postérieure ou égale à la date de début."
+msgstr "The end date must be later than or equal to the start date."
+
+#: monetization/models.py
+msgid "L’URL de destination doit utiliser HTTP ou HTTPS."
+msgstr "The destination URL must use HTTP or HTTPS."
+
+#: templates/home.html
+msgid "Nos partenaires à découvrir"
+msgstr "Partners worth discovering"
+
+#: templates/home.html
+#, python-brace-format
+msgid "Publicité {current} sur {total}"
+msgstr "Advertisement {current} of {total}"
+
+#: templates/home.html
+msgid "diapositive"
+msgstr "slide"
+
+#: templates/home.html
+#, python-format
+msgid "Publicité %(current)s sur %(total)s : %(title)s"
+msgstr "Advertisement %(current)s of %(total)s: %(title)s"
+
+#: templates/home.html
+msgid "Découvrir l’offre"
+msgstr "View offer"
+
+#: templates/home.html
+msgid "Publicité précédente"
+msgstr "Previous advertisement"
+
+#: templates/home.html
+msgid "Choisir une publicité"
+msgstr "Choose an advertisement"
+
+#: templates/home.html
+#, python-format
+msgid "Afficher la publicité %(position)s"
+msgstr "Show advertisement %(position)s"
+
+#: templates/home.html
+msgid "Publicité suivante"
+msgstr "Next advertisement"
+
+#: templates/home.html
+msgid "Mettre le carrousel en pause"
+msgstr "Pause carousel"
+
+#: templates/home.html
+msgid "Reprendre le carrousel"
+msgstr "Resume carousel"
+
+#: templates/home.html
+msgid "Pause"
+msgstr "Pause"

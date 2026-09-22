@@ -1,8 +1,17 @@
-from django.db import models
+from urllib.parse import urlsplit
+
 from django.conf import settings
-from django.core.validators import RegexValidator
+from django.core.exceptions import ValidationError
+from django.core.validators import RegexValidator, URLValidator
+from django.db import models
+from django.db.models import Q
+from django.utils import timezone
 from django.utils.text import slugify
+from django.utils.translation import get_language
 from django.utils.translation import gettext_lazy as _
+
+
+http_url_validator = URLValidator(schemes=("http", "https"))
 
 
 class Partenaire(models.Model):
@@ -15,15 +24,87 @@ class Partenaire(models.Model):
         return self.nom
 
 
+class PubliciteQuerySet(models.QuerySet):
+    def diffusables(self, moment=None):
+        """Return campaigns that can be shown publicly at ``moment``."""
+        moment = moment or timezone.now()
+        return (
+            self.filter(actif=True)
+            .filter(Q(date_debut__isnull=True) | Q(date_debut__lte=moment))
+            .filter(Q(date_fin__isnull=True) | Q(date_fin__gte=moment))
+            .order_by("ordre", "pk")
+        )
+
+
 class Publicite(models.Model):
     """Encarts publicitaires liés à un article ou globalement au blog"""
     titre = models.CharField(max_length=150)
+    description = models.TextField(max_length=500, blank=True)
+    texte_cta = models.CharField(max_length=80, blank=True)
+    texte_alternatif = models.CharField(max_length=255, blank=True)
     partenaire = models.ForeignKey(Partenaire, on_delete=models.CASCADE)
     image = models.ImageField(upload_to="publicites/")
-    lien = models.URLField()
-    date_debut = models.DateField()
-    date_fin = models.DateField()
+    lien = models.URLField(max_length=500, validators=[http_url_validator])
+    date_debut = models.DateTimeField(blank=True, null=True)
+    date_fin = models.DateTimeField(blank=True, null=True)
     actif = models.BooleanField(default=True)
+    ordre = models.PositiveIntegerField(default=0, db_index=True)
+
+    objects = PubliciteQuerySet.as_manager()
+
+    class Meta:
+        ordering = ("ordre", "pk")
+        constraints = [
+            models.CheckConstraint(
+                condition=(
+                    Q(date_debut__isnull=True)
+                    | Q(date_fin__isnull=True)
+                    | Q(date_debut__lte=models.F("date_fin"))
+                ),
+                name="publicite_period_is_chronological",
+            )
+        ]
+
+    def clean(self):
+        super().clean()
+        errors = {}
+        if self.date_debut and self.date_fin and self.date_debut > self.date_fin:
+            errors["date_fin"] = _(
+                "La date de fin doit être postérieure ou égale à la date de début."
+            )
+
+        if self.lien:
+            value = self.lien.strip()
+            parsed = urlsplit(value)
+            if (
+                value.startswith("//")
+                or parsed.scheme.lower() not in {"http", "https"}
+                or not parsed.netloc
+            ):
+                errors["lien"] = _(
+                    "L’URL de destination doit utiliser HTTP ou HTTPS."
+                )
+            else:
+                try:
+                    http_url_validator(value)
+                except ValidationError as exc:
+                    errors["lien"] = exc.messages
+                else:
+                    self.lien = value
+
+        if errors:
+            raise ValidationError(errors)
+
+    @property
+    def image_alt(self):
+        language = (get_language() or "fr").split("-", 1)[0]
+        candidate_languages = tuple(dict.fromkeys((language, "fr")))
+        for field_name in ("texte_alternatif", "titre"):
+            for language_code in candidate_languages:
+                value = getattr(self, f"{field_name}_{language_code}", "") or ""
+                if value.strip():
+                    return value.strip()
+        return (self.partenaire.nom or "").strip()
 
     def __str__(self):
         return f"{self.titre} ({self.partenaire.nom})"

@@ -163,9 +163,5 @@ def paiement_view(request):
 
 
 def publicite_view(request):
-    publicites = (
-        Publicite.objects.select_related("partenaire")
-        .filter(actif=True)
-        .order_by("-date_debut")
-    )
+    publicites = Publicite.objects.diffusables().select_related("partenaire")
     return render(request, "monetization/publicites.html", {"publicites": publicites})

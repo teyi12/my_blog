@@ -17,15 +17,16 @@
   <div class="advertising-grid">
     {% for pub in publicites %}
     <article class="advertising-card">
-      <a href="{{ pub.lien }}" target="_blank" rel="noopener sponsored" class="advertising-media">
-        {% if pub.image %}<img src="{{ pub.image.url }}" alt="{{ pub.titre }}">{% endif %}
+      <a href="{{ pub.lien }}" target="_blank" rel="sponsored noopener noreferrer" class="advertising-media">
+        {% if pub.image %}<img src="{{ pub.image.url }}" alt="{{ pub.image_alt }}" width="1200" height="675" loading="lazy">{% endif %}
         <span class="advertising-badge">{% translate "Sponsorisé" %}</span>
       </a>
       <div class="advertising-body">
         <span class="monetization-eyebrow">{{ pub.partenaire.nom }}</span>
         <h3>{{ pub.titre }}</h3>
-        <p>{% blocktranslate with start=pub.date_debut|date:"SHORT_DATE_FORMAT" end=pub.date_fin|date:"SHORT_DATE_FORMAT" %}Campagne active du {{ start }} au {{ end }}.{% endblocktranslate %}</p>
-        <a href="{{ pub.lien }}" target="_blank" rel="noopener sponsored" class="advertising-link">{% translate "Découvrir" %} <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></a>
+        {% if pub.description %}<p>{{ pub.description }}</p>{% endif %}
+        {% if pub.date_debut and pub.date_fin %}<p>{% blocktranslate with start=pub.date_debut|date:"SHORT_DATETIME_FORMAT" end=pub.date_fin|date:"SHORT_DATETIME_FORMAT" %}Campagne active du {{ start }} au {{ end }}.{% endblocktranslate %}</p>{% endif %}
+        <a href="{{ pub.lien }}" target="_blank" rel="sponsored noopener noreferrer" class="advertising-link">{% if pub.texte_cta %}{{ pub.texte_cta }}{% else %}{% translate "Découvrir" %}{% endif %} <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></a>
       </div>
     </article>
     {% endfor %}

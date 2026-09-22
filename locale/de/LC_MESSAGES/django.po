@@ -4177,3 +4177,90 @@ msgstr "Zahlung nicht verfügbar"
 #: payments/templates/payments/choice.html
 msgid "Aucun moyen de paiement n’est disponible pour le moment."
 msgstr "Derzeit ist keine Zahlungsmethode verfügbar."
+
+#: monetization/admin.py
+msgid "Aperçu"
+msgstr "Vorschau"
+
+#: monetization/admin.py
+msgid "Aucune image"
+msgstr "Kein Bild"
+
+#: monetization/admin.py
+msgid "État"
+msgstr "Status"
+
+#: monetization/admin.py
+msgid "Inactive"
+msgstr "Inaktiv"
+
+#: monetization/admin.py
+msgid "Future"
+msgstr "Zukünftig"
+
+#: monetization/admin.py
+msgid "Expirée"
+msgstr "Abgelaufen"
+
+#: monetization/admin.py
+msgid "Active"
+msgstr "Aktiv"
+
+#: monetization/models.py
+msgid "La date de fin doit être postérieure ou égale à la date de début."
+msgstr "Das Enddatum muss nach dem Startdatum liegen oder mit ihm übereinstimmen."
+
+#: monetization/models.py
+msgid "L’URL de destination doit utiliser HTTP ou HTTPS."
+msgstr "Die Ziel-URL muss HTTP oder HTTPS verwenden."
+
+#: templates/home.html
+msgid "Nos partenaires à découvrir"
+msgstr "Unsere Partner zum Entdecken"
+
+#: templates/home.html
+#, python-brace-format
+msgid "Publicité {current} sur {total}"
+msgstr "Werbung {current} von {total}"
+
+#: templates/home.html
+msgid "diapositive"
+msgstr "Folie"
+
+#: templates/home.html
+#, python-format
+msgid "Publicité %(current)s sur %(total)s : %(title)s"
+msgstr "Werbung %(current)s von %(total)s: %(title)s"
+
+#: templates/home.html
+msgid "Découvrir l’offre"
+msgstr "Angebot ansehen"
+
+#: templates/home.html
+msgid "Publicité précédente"
+msgstr "Vorherige Werbung"
+
+#: templates/home.html
+msgid "Choisir une publicité"
+msgstr "Werbung auswählen"
+
+#: templates/home.html
+#, python-format
+msgid "Afficher la publicité %(position)s"
+msgstr "Werbung %(position)s anzeigen"
+
+#: templates/home.html
+msgid "Publicité suivante"
+msgstr "Nächste Werbung"
+
+#: templates/home.html
+msgid "Mettre le carrousel en pause"
+msgstr "Karussell anhalten"
+
+#: templates/home.html
+msgid "Reprendre le carrousel"
+msgstr "Karussell fortsetzen"
+
+#: templates/home.html
+msgid "Pause"
+msgstr "Pause"

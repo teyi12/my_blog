@@ -12,6 +12,12 @@ class MonetizationTranslationMigrationTests(TransactionTestCase):
     migrate_from = [("monetization", "0002_demandeaffiliation_demandepartenariat")]
     schema_target = [("monetization", "0003_abonnement_publicite_translations")]
     migrate_to = [("monetization", "0004_populate_french_monetization_translations")]
+    restore_to = [
+        (
+            "monetization",
+            "0006_alter_publicite_options_publicite_description_and_more",
+        )
+    ]
 
     def setUp(self):
         super().setUp()
@@ -87,7 +93,7 @@ class MonetizationTranslationMigrationTests(TransactionTestCase):
         ).update(titre_fr="Campagne française déjà renseignée")
 
     def tearDown(self):
-        MigrationExecutor(connection).migrate(self.migrate_to)
+        MigrationExecutor(connection).migrate(self.restore_to)
         super().tearDown()
 
     def _migrate_and_get_apps(self):
