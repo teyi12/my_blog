@@ -193,8 +193,27 @@ class ProduitDetailView(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["display_image"] = self.object.get_display_image()
-        context["secondary_images"] = self.object.get_public_secondary_images()
+        secondary_images = list(self.object.get_public_secondary_images())
+        gallery_images = []
+        if self.object.image:
+            gallery_images.append(
+                {
+                    "image": self.object.image,
+                    "alt": self.object.localized_name or _("Image du produit"),
+                }
+            )
+        gallery_images.extend(
+            {
+                "image": gallery_image.image,
+                "alt": gallery_image.localized_alt_text,
+            }
+            for gallery_image in secondary_images
+        )
+        context["gallery_images"] = gallery_images
+        context["display_image"] = (
+            gallery_images[0]["image"] if gallery_images else None
+        )
+        context["secondary_images"] = secondary_images
         context["seo"] = build_dynamic_seo(
             self.request,
             instance=self.object,

@@ -19,27 +19,50 @@
   <div class="product-detail-grid" data-product-section="overview">
     <section class="product-gallery" aria-label="{% blocktranslate with product_name=produit.localized_name %}Images de {{ product_name }}{% endblocktranslate %}" data-product-gallery>
       <figure class="product-gallery-stage">
-        {% if display_image %}
-          <img src="{{ display_image.url }}" alt="{% if produit.localized_name %}{{ produit.localized_name }}{% else %}{% translate 'Image du produit' %}{% endif %}" width="1000" height="1000" fetchpriority="high" data-product-gallery-main>
+        {% if gallery_images %}
+          {% with active_image=gallery_images.0 %}
+          <a class="product-gallery-enlarge" href="{{ active_image.image.url }}" aria-label="{% translate 'Agrandir l’image' %}" data-gallery-enlarge>
+            <img src="{{ active_image.image.url }}" alt="{{ active_image.alt }}" width="1000" height="1000" fetchpriority="high" data-product-gallery-main>
+            <span class="product-gallery-enlarge-label">
+              <i class="fa-solid fa-magnifying-glass-plus" aria-hidden="true"></i>
+              <span>{% translate "Agrandir l’image" %}</span>
+            </span>
+          </a>
+          {% endwith %}
         {% else %}
           <span class="product-gallery-placeholder" aria-hidden="true"><i class="fa-solid fa-bag-shopping"></i></span>
         {% endif %}
         {% if produit.en_vedette %}<span class="badge badge-warning product-detail-badge"><i class="fa-solid fa-star" aria-hidden="true"></i> {% translate "Produit sélectionné" %}</span>{% endif %}
       </figure>
 
-      {% if produit.image or secondary_images %}
-      <div class="product-gallery-thumbnails" aria-label="{% translate 'Choisir une image' %}">
-        {% if produit.image %}
-          <button class="product-gallery-thumbnail is-active" type="button" aria-pressed="true" aria-label="{% translate 'Afficher l’image principale' %}" data-gallery-src="{{ produit.image.url }}" data-gallery-alt="{% if produit.localized_name %}{{ produit.localized_name }}{% else %}{% translate 'Image du produit' %}{% endif %}">
-            <img src="{{ produit.image.url }}" alt="" width="160" height="160" loading="lazy">
-          </button>
-        {% endif %}
-        {% for gallery_image in secondary_images %}
-          <button class="product-gallery-thumbnail{% if not produit.image and forloop.first %} is-active{% endif %}" type="button" aria-pressed="{% if not produit.image and forloop.first %}true{% else %}false{% endif %}" aria-label="{% blocktranslate with number=forloop.counter %}Afficher l’image {{ number }}{% endblocktranslate %}" data-gallery-src="{{ gallery_image.image.url }}" data-gallery-alt="{{ gallery_image.localized_alt_text }}">
+      {% if gallery_images %}
+      <div class="product-gallery-thumbnails" role="group" aria-label="{% translate 'Choisir une image' %}">
+        {% for gallery_image in gallery_images %}
+          <a class="product-gallery-thumbnail{% if forloop.first %} is-active{% endif %}" href="{{ gallery_image.image.url }}"{% if forloop.first %} aria-current="true"{% endif %} aria-label="{% blocktranslate with position=forloop.counter total=gallery_images|length product_name=produit.localized_name %}Afficher l’image {{ position }} sur {{ total }} de {{ product_name }}{% endblocktranslate %}" data-gallery-thumbnail data-gallery-src="{{ gallery_image.image.url }}" data-gallery-alt="{{ gallery_image.alt }}" data-gallery-status="{% blocktranslate with position=forloop.counter total=gallery_images|length %}Image {{ position }} sur {{ total }}{% endblocktranslate %}">
             <img src="{{ gallery_image.image.url }}" alt="" width="160" height="160" loading="lazy">
-          </button>
+            <span class="product-gallery-selected" aria-hidden="true"><i class="fa-solid fa-check"></i></span>
+          </a>
         {% endfor %}
       </div>
+      <p class="visually-hidden" aria-live="polite" aria-atomic="true" data-gallery-status>{% blocktranslate with total=gallery_images|length %}Image 1 sur {{ total }}{% endblocktranslate %}</p>
+
+      <dialog class="product-gallery-dialog" aria-labelledby="product-gallery-dialog-title-{{ produit.pk }}" data-gallery-dialog>
+        <div class="product-gallery-dialog-content" data-gallery-dialog-content>
+          <header class="product-gallery-dialog-header">
+            <p class="product-gallery-dialog-title" id="product-gallery-dialog-title-{{ produit.pk }}">{% blocktranslate with product_name=produit.localized_name %}Image agrandie de {{ product_name }}{% endblocktranslate %}</p>
+            <div class="product-gallery-dialog-actions">
+              <span data-gallery-dialog-counter aria-live="off" aria-atomic="true">{% blocktranslate with total=gallery_images|length %}Image 1 sur {{ total }}{% endblocktranslate %}</span>
+              <button class="product-gallery-dialog-close" type="button" data-gallery-dialog-close>
+                <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+                <span>{% translate "Fermer" %}</span>
+              </button>
+            </div>
+          </header>
+          <figure class="product-gallery-dialog-media">
+            <img alt="" width="1600" height="1600" data-gallery-dialog-image>
+          </figure>
+        </div>
+      </dialog>
       {% endif %}
     </section>
 

@@ -4072,3 +4072,27 @@ msgstr "System"
 
 msgid "Aucun événement logistique enregistré."
 msgstr "No fulfillment event has been recorded."
+
+#: shop/templates/shop/detail.html
+msgid "Agrandir l’image"
+msgstr "Enlarge image"
+
+#: shop/templates/shop/detail.html
+#, python-format
+msgid "Afficher l’image %(position)s sur %(total)s de %(product_name)s"
+msgstr "Display image %(position)s of %(total)s of %(product_name)s"
+
+#: shop/templates/shop/detail.html
+#, python-format
+msgid "Image %(position)s sur %(total)s"
+msgstr "Image %(position)s of %(total)s"
+
+#: shop/templates/shop/detail.html
+#, python-format
+msgid "Image 1 sur %(total)s"
+msgstr "Image 1 of %(total)s"
+
+#: shop/templates/shop/detail.html
+#, python-format
+msgid "Image agrandie de %(product_name)s"
+msgstr "Enlarged image of %(product_name)s"
