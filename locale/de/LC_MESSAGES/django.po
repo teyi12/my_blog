@@ -4137,3 +4137,27 @@ msgstr "System"
 
 msgid "Aucun événement logistique enregistré."
 msgstr "Es wurde kein Logistikereignis erfasst."
+
+#: shop/templates/shop/detail.html
+msgid "Agrandir l’image"
+msgstr "Bild vergrößern"
+
+#: shop/templates/shop/detail.html
+#, python-format
+msgid "Afficher l’image %(position)s sur %(total)s de %(product_name)s"
+msgstr "Bild %(position)s von %(total)s für %(product_name)s anzeigen"
+
+#: shop/templates/shop/detail.html
+#, python-format
+msgid "Image %(position)s sur %(total)s"
+msgstr "Bild %(position)s von %(total)s"
+
+#: shop/templates/shop/detail.html
+#, python-format
+msgid "Image 1 sur %(total)s"
+msgstr "Bild 1 von %(total)s"
+
+#: shop/templates/shop/detail.html
+#, python-format
+msgid "Image agrandie de %(product_name)s"
+msgstr "Vergrößertes Bild von %(product_name)s"

@@ -66,6 +66,26 @@ class ShopPremiumUIPublicTests(TestCase):
             stock=0,
             categorie=cls.category,
         )
+        cls.main_image_only = Produit.objects.create(
+            nom="Produit image principale",
+            slug="produit-image-principale-ui",
+            prix=Decimal("18.00"),
+            image="produits/image-principale-seule.jpg",
+        )
+        cls.secondary_only = Produit.objects.create(
+            nom_fr="Produit galerie seule",
+            nom_de="Produkt nur mit Galerie",
+            nom_en="Gallery-only product",
+            slug="produit-galerie-seule-ui",
+            prix=Decimal("21.00"),
+        )
+        cls.secondary_only_image = ProduitImage.objects.create(
+            produit=cls.secondary_only,
+            image="produits/galerie/image-secondaire-seule.jpg",
+            texte_alternatif_fr="Vue secondaire française",
+            texte_alternatif_de="Deutsche Sekundäransicht",
+            texte_alternatif_en="English secondary view",
+        )
 
     def setUp(self):
         translation.activate("fr")
@@ -138,6 +158,155 @@ class ShopPremiumUIPublicTests(TestCase):
         self.assertContains(response, 'data-gallery-alt="Inside the notebook"')
         self.assertContains(response, "data-product-gallery-main")
         self.assertContains(response, "product-gallery-thumbnail")
+
+    def test_gallery_controls_are_localized_in_french_german_and_english(self):
+        expectations = (
+            (
+                f"/shop/produit/{self.product.slug}/",
+                "Agrandir l’image",
+                "Fermer",
+                "Afficher l’image 1 sur 2 de Carnet de voyage premium",
+            ),
+            (
+                f"/de/shop/produit/{self.product.slug}/",
+                "Bild vergrößern",
+                "Schließen",
+                "Bild 1 von 2 für Premium-Reisetagebuch anzeigen",
+            ),
+            (
+                f"/en/shop/produit/{self.product.slug}/",
+                "Enlarge image",
+                "Close",
+                "Display image 1 of 2 of Premium travel notebook",
+            ),
+        )
+
+        for path, enlarge, close, thumbnail_label in expectations:
+            with self.subTest(path=path):
+                response = self.client.get(path)
+                self.assertContains(response, f'aria-label="{enlarge}"')
+                self.assertContains(response, f"<span>{enlarge}</span>")
+                self.assertContains(response, f"<span>{close}</span>")
+                self.assertContains(response, f'aria-label="{thumbnail_label}"')
+
+    def test_gallery_alt_text_is_localized_and_falls_back_to_product_name(self):
+        expectations = (
+            ("fr", "Carnet de voyage premium", "Intérieur du carnet"),
+            ("de", "Premium-Reisetagebuch", "Innenseite des Notizbuchs"),
+            ("en", "Premium travel notebook", "Inside the notebook"),
+        )
+        for language, primary_alt, secondary_alt in expectations:
+            prefix = "" if language == "fr" else f"/{language}"
+            with self.subTest(language=language):
+                response = self.client.get(
+                    f"{prefix}/shop/produit/{self.product.slug}/"
+                )
+                self.assertContains(response, f'alt="{primary_alt}"')
+                self.assertContains(
+                    response,
+                    f'data-gallery-alt="{secondary_alt}"',
+                )
+
+        fallback_product = Produit.objects.create(
+            nom_fr="Nom français de secours",
+            nom_de="Deutscher Ersatzname",
+            nom_en="English fallback name",
+            slug="produit-alt-secours-ui",
+            prix=Decimal("14.00"),
+        )
+        fallback_image = ProduitImage.objects.create(
+            produit=fallback_product,
+            image="produits/galerie/alt-vide.jpg",
+            texte_alternatif_fr="",
+            texte_alternatif_de="",
+            texte_alternatif_en="",
+        )
+        response = self.client.get(
+            f"/en/shop/produit/{fallback_product.slug}/"
+        )
+        self.assertContains(response, fallback_image.image.url)
+        self.assertContains(response, 'alt="English fallback name"')
+        self.assertContains(
+            response,
+            'data-gallery-alt="English fallback name"',
+        )
+
+    def test_gallery_has_real_fallback_links_and_no_positive_tabindex(self):
+        response = self.client.get(reverse("shop:detail", args=[self.product.slug]))
+        markup = response.content.decode()
+
+        self.assertContains(
+            response,
+            f'class="product-gallery-enlarge" href="{self.product.image.url}"',
+        )
+        self.assertContains(
+            response,
+            f'href="{self.secondary.image.url}" aria-label="Afficher l’image 2 sur 2 de Carnet de voyage premium"',
+        )
+        self.assertNotIn('href="#"', markup)
+        self.assertNotIn("javascript:", markup.lower())
+        self.assertNotRegex(markup, r'tabindex="[1-9][0-9]*"')
+        self.assertNotRegex(markup, r"<div[^>]+data-gallery-thumbnail")
+        self.assertRegex(markup, r'<a[^>]+data-gallery-thumbnail')
+        self.assertContains(response, 'aria-current="true"')
+        self.assertContains(response, "Image 1 sur 2")
+        self.assertRegex(
+            markup,
+            r'<img alt="" width="1600" height="1600" data-gallery-dialog-image>',
+        )
+
+    def test_gallery_handles_main_only_secondary_only_and_no_image(self):
+        main_only = self.client.get(
+            reverse("shop:detail", args=[self.main_image_only.slug])
+        )
+        self.assertContains(main_only, "data-gallery-enlarge")
+        self.assertContains(main_only, "Image 1 sur 1")
+        self.assertContains(main_only, 'aria-current="true"')
+
+        secondary_only = self.client.get(
+            f"/en/shop/produit/{self.secondary_only.slug}/"
+        )
+        self.assertContains(
+            secondary_only,
+            f'src="{self.secondary_only_image.image.url}" alt="English secondary view" width="1000" height="1000" fetchpriority="high"',
+        )
+        self.assertContains(
+            secondary_only,
+            f'href="{self.secondary_only_image.image.url}"',
+        )
+        self.assertContains(secondary_only, "Image 1 of 1")
+
+        no_image = self.client.get(
+            reverse("shop:detail", args=[self.unavailable.slug])
+        )
+        self.assertContains(no_image, "product-gallery-placeholder")
+        self.assertNotContains(no_image, "data-gallery-enlarge")
+        self.assertNotContains(no_image, "data-gallery-dialog")
+
+    def test_gallery_keeps_primary_then_secondary_order_by_position_and_pk(self):
+        later = ProduitImage.objects.create(
+            produit=self.product,
+            image="produits/galerie/vue-plus-tard.jpg",
+            ordre=5,
+        )
+        same_position = ProduitImage.objects.create(
+            produit=self.product,
+            image="produits/galerie/vue-meme-position.jpg",
+            ordre=5,
+        )
+
+        markup = self.client.get(
+            reverse("shop:detail", args=[self.product.slug])
+        ).content.decode()
+        positions = [
+            markup.index(self.product.image.url),
+            markup.index(self.secondary.image.url),
+            markup.index(later.image.url),
+            markup.index(same_position.image.url),
+        ]
+
+        self.assertEqual(positions, sorted(positions))
+        self.assertIn("Afficher l’image 4 sur 4", markup)
 
     def test_detail_prefetches_gallery_once(self):
         with CaptureQueriesContext(connection) as captured:
@@ -257,12 +426,37 @@ class ShopPremiumUIStaticTests(SimpleTestCase):
         self.assertNotRegex(self.detail_template, r"\|safe\b")
         self.assertEqual(self.detail_template.count("<h1"), 1)
 
-    def test_gallery_script_updates_image_alt_and_pressed_state(self):
+    def test_gallery_script_covers_selection_keyboard_dialog_and_focus_return(self):
         for marker in (
             "thumbnail.dataset.gallerySrc",
             "thumbnail.dataset.galleryAlt",
-            'setAttribute("aria-pressed"',
+            'setAttribute("aria-current", "true")',
+            'event.key === "Escape"',
+            'key === "ArrowLeft"',
+            'key === "ArrowRight"',
+            'key === "Home"',
+            'key === "End"',
+            'key === "Enter"',
+            'key === " "',
+            "dialog.showModal()",
+            "dialogOpener.focus",
             'addEventListener("click"',
         ):
             with self.subTest(marker=marker):
                 self.assertIn(marker, self.gallery_script)
+
+    def test_gallery_styles_keep_controls_large_visible_and_token_based(self):
+        for selector in (
+            ".product-gallery-enlarge-label",
+            ".product-gallery-dialog-close",
+        ):
+            rule = re.search(
+                rf"{re.escape(selector)}\s*\{{([^}}]*)\}}",
+                self.shop_css,
+            ).group(1)
+            self.assertIn("min-width: 2.75rem", rule)
+            self.assertIn("min-height: 2.75rem", rule)
+
+        self.assertIn(".product-gallery-selected", self.shop_css)
+        self.assertIn(".product-gallery-dialog::backdrop", self.shop_css)
+        self.assertIn(".product-gallery-enlarge:focus-visible", self.shop_css)
