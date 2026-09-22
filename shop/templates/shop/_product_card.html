@@ -1,0 +1,52 @@
+{% load i18n static %}
+<article class="surface-card shop-card" data-product-id="{{ produit.pk }}">
+  <a class="shop-card-media" href="{% url 'shop:detail' slug=produit.slug %}" aria-label="{% blocktranslate with product_name=produit.localized_name %}Voir {{ product_name }}{% endblocktranslate %}">
+    {% if produit.image %}
+      <img src="{{ produit.image.url }}" alt="{% if produit.localized_name %}{{ produit.localized_name }}{% else %}{% translate 'Image du produit' %}{% endif %}" width="800" height="600" loading="lazy">
+    {% else %}
+      <img src="{% static 'images/default.jpg' %}" alt="{% if produit.localized_name %}{{ produit.localized_name }}{% else %}{% translate 'Image du produit' %}{% endif %}" width="800" height="600" loading="lazy">
+    {% endif %}
+
+    <span class="shop-card-badges" aria-label="{% translate 'Informations du produit' %}">
+      {% if produit.en_vedette %}<span class="badge badge-warning shop-featured-badge"><i class="fa-solid fa-star" aria-hidden="true"></i> {% translate "Sélection" %}</span>{% endif %}
+      {% if produit.fichier %}<span class="badge badge-info shop-type-badge"><i class="fa-regular fa-file" aria-hidden="true"></i> {% translate "Numérique" %}</span>{% endif %}
+      {% if produit.stock_est_gere and produit.stock == 0 %}<span class="badge badge-danger shop-type-badge">{% translate "Indisponible" %}</span>{% endif %}
+    </span>
+
+    <span class="shop-view-product">{% translate "Voir le produit" %} <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></span>
+  </a>
+
+  <div class="shop-card-body">
+    {% if produit.categorie %}
+      <a class="shop-category" href="{% url 'shop:par_categorie' slug=produit.categorie.slug %}">{{ produit.categorie.nom }}</a>
+    {% else %}
+      <span class="shop-category">{% translate "Collection Teyilawson" %}</span>
+    {% endif %}
+
+    <h2><a href="{% url 'shop:detail' slug=produit.slug %}">{{ produit.localized_name }}</a></h2>
+    {% if produit.localized_description %}<p class="shop-card-description">{{ produit.localized_description|striptags|truncatewords:18 }}</p>{% endif %}
+
+    {% if produit.stock_est_gere %}
+      {% if produit.stock == 0 %}
+        <p class="shop-stock shop-stock-out"><i class="fa-regular fa-circle-xmark" aria-hidden="true"></i> {% translate "Rupture de stock" %}</p>
+      {% elif produit.stock <= 5 %}
+        <p class="shop-stock shop-stock-low"><i class="fa-solid fa-bolt" aria-hidden="true"></i> {% blocktranslate with available=produit.stock %}Plus que {{ available }} disponible(s){% endblocktranslate %}</p>
+      {% else %}
+        <p class="shop-stock"><i class="fa-regular fa-circle-check" aria-hidden="true"></i> {% translate "Disponible" %}</p>
+      {% endif %}
+    {% else %}
+      <p class="shop-stock"><i class="fa-regular fa-circle-check" aria-hidden="true"></i> {% translate "Disponible" %}</p>
+    {% endif %}
+
+    <div class="shop-card-footer">
+      <span class="shop-price" aria-label="{% blocktranslate with price=produit.prix %}Prix : {{ price }} euros{% endblocktranslate %}">{{ produit.prix }} €</span>
+      <form method="post" action="{% url 'shop:ajouter_panier' slug=produit.slug %}">
+        {% csrf_token %}
+        <button class="shop-add-button" type="submit" {% if not produit.est_disponible %}disabled aria-disabled="true"{% endif %} aria-label="{% if produit.localized_name %}{% blocktranslate with product_name=produit.localized_name %}Ajouter {{ product_name }} au panier{% endblocktranslate %}{% else %}{% translate 'Ajouter ce produit au panier' %}{% endif %}">
+          <i class="fa-solid fa-plus" aria-hidden="true"></i>
+          <span>{% translate "Ajouter" %}</span>
+        </button>
+      </form>
+    </div>
+  </div>
+</article>
