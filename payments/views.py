@@ -127,7 +127,11 @@ def _stripe_cancel_order_for_request(request):
         return None
 
     payment = (
-        Payment.objects.select_related("commande", "commande__cancellation")
+        Payment.objects.select_related(
+            "commande",
+            "commande__cancellation",
+            "commande__receipt",
+        )
         .filter(
             pk=payment_id,
             commande_id=order_id,
@@ -657,13 +661,21 @@ def mobile_money_checkout(request, order_id):
         data = r.json()
     except Exception:
         logger.exception("Erreur Mobile Money")
-        return render(request, "payments/error.html", {"error": "Impossible de contacter Mobile Money."})
+        return render(
+            request,
+            "payments/error.html",
+            {"language_switch_next": reverse("payments:failure")},
+        )
 
     payment_url = data.get("invoice_url") or data.get("payment_url")
     if payment_url:
         return redirect(payment_url)
 
-    return render(request, "payments/error.html", {"error": data})
+    return render(
+        request,
+        "payments/error.html",
+        {"language_switch_next": reverse("payments:failure")},
+    )
 
 
 # ================================================================
@@ -816,7 +828,11 @@ def cinetpay_create_payment(request, order_id):
             except SQLiteLockRetryExhausted:
                 return HttpResponse("RETRY", status=409)
         logger.exception("Erreur CinetPay")
-        return render(request, "payments/cancel.html", {"message": _("Erreur de connexion à CinetPay.")})
+        return render(
+            request,
+            "payments/error.html",
+            {"language_switch_next": reverse("payments:failure")},
+        )
 
     payment_url = (data.get("data") or {}).get("payment_url")
     if str(data.get("code")) in ("201", "200") and payment_url:
@@ -836,7 +852,11 @@ def cinetpay_create_payment(request, order_id):
         _release_cinetpay_initialization(payment.id, claim_token)
     except SQLiteLockRetryExhausted:
         return HttpResponse("RETRY", status=409)
-    return render(request, "payments/cancel.html", {"message": data})
+    return render(
+        request,
+        "payments/error.html",
+        {"language_switch_next": reverse("payments:failure")},
+    )
 
 
 @csrf_exempt
@@ -1037,11 +1057,22 @@ def cinetpay_return(request):
     tx_id = request.GET.get("transaction_id")
     provider_data = _cinetpay_check_status(tx_id) if tx_id else {}
     status = provider_data.get("status", "PENDING")
-    ctx = {"status": status}
+    if status == "REFUSED":
+        return render(
+            request,
+            "payments/error.html",
+            {"language_switch_next": reverse("payments:failure")},
+        )
+    if status == "CANCELED":
+        return render(
+            request,
+            "payments/cancel.html",
+            {"language_switch_next": reverse("payments:cancel")},
+        )
     return render(
         request,
-        "payments/success.html" if status == "ACCEPTED" else "payments/cancel.html",
-        ctx
+        "payments/success.html",
+        {"language_switch_next": reverse("payments:success")},
     )
 
 
@@ -1300,6 +1331,16 @@ def paiement_annule(request):
         and commande.payment_status
         in {"PENDING", "PROCESSING", "FAILED", "CANCELED"}
     )
+    commande_deja_payee = bool(
+        commande is not None
+        and cancellation is None
+        and commande.payment_status == "SUCCESS"
+    )
+    commande_remboursee = bool(
+        commande is not None
+        and cancellation is None
+        and commande.payment_status == "REFUNDED"
+    )
     return render(
         request,
         "payments/cancel.html",
@@ -1307,5 +1348,7 @@ def paiement_annule(request):
             "commande": commande,
             "commande_annulee": cancellation is not None,
             "commande_payable": commande_payable,
+            "commande_deja_payee": commande_deja_payee,
+            "commande_remboursee": commande_remboursee,
         },
     )

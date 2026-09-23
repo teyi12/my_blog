@@ -8,54 +8,89 @@
 {% endblock %}
 
 {% block contenu %}
-<section class="payment-result-page payment-result-cancel">
-  <div class="payment-result-card">
-    <div class="payment-result-icon" aria-hidden="true">
-      <i class="fa-solid fa-arrow-rotate-left"></i>
-    </div>
+<section class="payment-result-page{% if commande_annulee %} payment-result-canceled-order{% elif commande_remboursee %} payment-result-refunded{% elif commande_deja_payee %} payment-result-paid{% else %} payment-result-interrupted{% endif %}">
+  <section class="payment-result-card" aria-labelledby="payment-result-title">
+    <span class="payment-result-icon" aria-hidden="true">
+      {% if commande_annulee %}
+        <i class="fa-solid fa-ban"></i>
+      {% elif commande_remboursee %}
+        <i class="fa-solid fa-arrow-rotate-left"></i>
+      {% elif commande_deja_payee %}
+        <i class="fa-solid fa-check"></i>
+      {% else %}
+        <i class="fa-solid fa-arrow-rotate-left"></i>
+      {% endif %}
+    </span>
 
     {% if commande_annulee %}
       <span class="payment-result-eyebrow">{% translate "Commande annulée" %}</span>
-      <h1>{% translate "Cette commande a déjà été annulée" %}</h1>
+      <h1 id="payment-result-title">{% translate "Cette commande a déjà été annulée" %}</h1>
       <p class="payment-result-lead">{% translate "Aucun nouveau paiement ne peut être commencé pour cette commande." %}</p>
+    {% elif commande_remboursee %}
+      <span class="payment-result-eyebrow">{% translate "Paiement remboursé" %}</span>
+      <h1 id="payment-result-title">{% translate "Le paiement de cette commande a été remboursé." %}</h1>
+      <p class="payment-result-lead">{% translate "Aucun nouveau paiement n’est proposé. Le suivi et le reçu historique restent disponibles." %}</p>
+    {% elif commande_deja_payee %}
+      <span class="payment-result-eyebrow">{% translate "Paiement déjà confirmé" %}</span>
+      <h1 id="payment-result-title">{% translate "Cette commande est déjà payée." %}</h1>
+      <p class="payment-result-lead">{% translate "Aucun nouveau paiement n’est nécessaire. Vous pouvez consulter le suivi et le reçu disponibles pour cette commande." %}</p>
     {% else %}
       <span class="payment-result-eyebrow">{% translate "Paiement interrompu" %}</span>
-      <h1>{% translate "Aucun paiement n’a été finalisé." %}</h1>
-      <p class="payment-result-lead">{% translate "L’opération a été annulée ou interrompue. Vous pouvez reprendre le parcours de paiement lorsque vous le souhaitez." %}</p>
-      {% if message %}<p class="payment-result-lead">{{ message }}</p>{% endif %}
+      <h1 id="payment-result-title">{% translate "Aucun paiement n’a été finalisé." %}</h1>
+      <p class="payment-result-lead">{% translate "L’opération a été annulée ou interrompue. La commande reste inchangée tant que le serveur n’a pas confirmé le paiement." %}</p>
+      {% if message %}<p class="payment-result-message">{{ message }}</p>{% endif %}
     {% endif %}
 
-    {% if not commande_annulee %}
-      <div class="payment-result-note">
+    {% if commande %}
+      <section class="payment-result-summary" aria-labelledby="payment-result-summary-title">
+        <h2 id="payment-result-summary-title">{% translate "Récapitulatif autorisé" %}</h2>
+        <dl>
+          <div><dt>{% translate "Commande" %}</dt><dd>#{{ commande.pk }}</dd></div>
+          <div><dt>{% translate "Statut du paiement" %}</dt><dd>{{ commande.get_payment_status_display }}</dd></div>
+          <div><dt>{% translate "Montant" %}</dt><dd>{{ commande.total|floatformat:2 }} {{ commande.currency }}</dd></div>
+        </dl>
+      </section>
+    {% endif %}
+
+    {% if not commande_annulee and not commande_deja_payee and not commande_remboursee %}
+      <div class="payment-result-notice" role="status">
         <i class="fa-regular fa-circle-info" aria-hidden="true"></i>
         <div>
           <strong>{% translate "Votre commande n’est pas considérée comme payée" %}</strong>
-          <span>{% translate "Retournez au parcours de commande pour sélectionner à nouveau un moyen de paiement." %}</span>
+          {% if commande_payable %}
+            <span>{% translate "Le serveur autorise encore l’accès au choix du moyen de paiement pour cette commande." %}</span>
+          {% else %}
+            <span>{% translate "Aucune commande identifiable n’est affichée sur cette page." %}</span>
+          {% endif %}
         </div>
       </div>
     {% endif %}
 
     <div class="payment-result-actions">
-      {% if commande_annulee %}
-        <a href="{% url 'shop:ma_commande_detail' commande.pk %}" class="btn btn-primary btn-lg">{% translate "Voir la commande" %}</a>
-        <a href="{% url 'shop:mes_commandes' %}" class="btn btn-soft btn-lg">{% translate "Mes commandes" %}</a>
+      {% if commande_annulee or commande_deja_payee or commande_remboursee %}
+        <a href="{% url 'shop:ma_commande_detail' commande.pk %}" class="btn btn-brand btn-lg">{% translate "Voir le suivi de la commande" %}</a>
+        {% if not commande_annulee and commande.receipt %}
+          <a href="{% url 'shop:telecharger_recu_commande' commande.pk commande.receipt.public_id %}" class="btn btn-soft btn-lg">{% translate "Télécharger le reçu PDF" %}</a>
+        {% else %}
+          <a href="{% url 'shop:mes_commandes' %}" class="btn btn-soft btn-lg">{% translate "Mes commandes" %}</a>
+        {% endif %}
       {% else %}
         {% if commande_payable %}
-          <a href="{% url 'payments:choice' commande.pk %}" class="btn btn-primary btn-lg">
-            {% translate "Reprendre le paiement" %} <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+          <a href="{% url 'payments:choice' commande.pk %}" class="btn btn-brand btn-lg">
+            {% translate "Reprendre le paiement de cette commande" %} <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
           </a>
         {% elif not commande %}
-          <a href="{% url 'payments:choice' %}" class="btn btn-primary btn-lg">
-            {% translate "Reprendre le paiement" %} <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+          <a href="{% url 'payments:choice' %}" class="btn btn-brand btn-lg">
+            {% translate "Retourner au parcours de paiement" %} <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
           </a>
         {% endif %}
         {% if commande %}
-          <a href="{% url 'shop:ma_commande_detail' commande.pk %}" class="btn btn-soft btn-lg">{% translate "Voir la commande" %}</a>
+          <a href="{% url 'shop:ma_commande_detail' commande.pk %}" class="btn btn-soft btn-lg">{% translate "Voir le suivi de la commande" %}</a>
         {% else %}
           <a href="{% url 'shop:panier' %}" class="btn btn-soft btn-lg">{% translate "Retour au panier" %}</a>
         {% endif %}
       {% endif %}
     </div>
-  </div>
+  </section>
 </section>
 {% endblock %}

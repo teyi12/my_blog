@@ -1,47 +1,55 @@
 {% extends 'template_base.html' %}
 {% load i18n static %}
 
-{% block titre %}{% translate "Paiement réussi" %} — Teyilawson{% endblock %}
+{% block titre %}{% translate "Vérification du paiement" %} — Teyilawson{% endblock %}
 
 {% block styles %}
 <link rel="stylesheet" href="{% static 'css/payment-result.css' %}">
 {% endblock %}
 
 {% block contenu %}
-<section class="payment-result-page payment-result-success">
-  <div class="payment-result-card">
-    <div class="payment-result-icon" aria-hidden="true">
-      <i class="fa-solid fa-check"></i>
-    </div>
+<section class="payment-result-page payment-result-pending">
+  <section class="payment-result-card" aria-labelledby="payment-result-title">
+    <span class="payment-result-icon" aria-hidden="true">
+      <i class="fa-regular fa-clock"></i>
+    </span>
 
+    <span class="payment-result-eyebrow">{% translate "Confirmation en attente" %}</span>
     {% if request.GET.payment_kind == "donation" %}
-      <span class="payment-result-eyebrow">{% translate "Don en cours de confirmation" %}</span>
-      <h1>{% translate "Merci pour votre soutien." %}</h1>
-      <p class="payment-result-lead">{% translate "La confirmation définitive de votre don est effectuée par Stripe, indépendamment de cette page." %}</p>
+      <h1 id="payment-result-title">{% translate "Votre don est en cours de vérification." %}</h1>
+      <p class="payment-result-lead">{% translate "Merci pour votre soutien. Le don sera confirmé uniquement après validation sécurisée par Stripe." %}</p>
     {% elif request.GET.payment_kind == "subscription" %}
-      <span class="payment-result-eyebrow">{% translate "Souscription en cours de confirmation" %}</span>
-      <h1>{% translate "Merci pour votre souscription." %}</h1>
+      <h1 id="payment-result-title">{% translate "Votre souscription est en cours de vérification." %}</h1>
       <p class="payment-result-lead">{% translate "Votre accès Premium sera activé uniquement après confirmation sécurisée du paiement récurrent par Stripe." %}</p>
     {% else %}
-      <span class="payment-result-eyebrow">{% translate "Paiement terminé" %}</span>
-      <h1>{% translate "Merci, votre paiement a bien été enregistré." %}</h1>
-      <p class="payment-result-lead">{% translate "Votre opération est terminée. La confirmation définitive de la commande est traitée de manière sécurisée par le système de paiement." %}</p>
+      <h1 id="payment-result-title">{% translate "Votre paiement est en cours de vérification." %}</h1>
+      <p class="payment-result-lead">{% translate "Cette page ne confirme pas encore le paiement. Le statut définitif apparaîtra dans le suivi de votre commande après validation par le serveur." %}</p>
     {% endif %}
 
-    <div class="payment-result-note">
+    <div class="payment-result-notice" role="status">
       <i class="fa-solid fa-shield-halved" aria-hidden="true"></i>
       <div>
-        <strong>{% translate "Confirmation sécurisée" %}</strong>
-        <span>{% translate "Vous pouvez maintenant poursuivre votre navigation sur le site." %}</span>
+        <strong>{% translate "Vérification sécurisée" %}</strong>
+        <span>{% translate "Vous n’avez pas besoin de relancer immédiatement le paiement." %}</span>
       </div>
     </div>
 
     <div class="payment-result-actions">
-      <a href="{% url 'home' %}" class="btn btn-primary btn-lg">
-        {% translate "Retour à l’accueil" %} <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
-      </a>
-      <a href="{% url 'shop:liste' %}" class="btn btn-soft btn-lg">{% translate "Continuer mes achats" %}</a>
+      {% if request.GET.payment_kind == "donation" %}
+        <a href="{% url 'home' %}" class="btn btn-brand btn-lg">{% translate "Retour à l’accueil" %}</a>
+        <a href="{% url 'monetization:don' %}" class="btn btn-soft btn-lg">{% translate "Voir la page des dons" %}</a>
+      {% elif request.GET.payment_kind == "subscription" %}
+        <a href="{% url 'monetization:abonnements' %}" class="btn btn-brand btn-lg">{% translate "Suivre mon abonnement" %}</a>
+        <a href="{% url 'home' %}" class="btn btn-soft btn-lg">{% translate "Retour à l’accueil" %}</a>
+      {% else %}
+        {% if user.is_authenticated %}
+          <a href="{% url 'shop:mes_commandes' %}" class="btn btn-brand btn-lg">{% translate "Suivre mes commandes" %}</a>
+        {% else %}
+          <a href="{% url 'shop:liste' %}" class="btn btn-brand btn-lg">{% translate "Retour à la boutique" %}</a>
+        {% endif %}
+        <a href="{% url 'shop:liste' %}" class="btn btn-soft btn-lg">{% translate "Continuer mes achats" %}</a>
+      {% endif %}
     </div>
-  </div>
+  </section>
 </section>
 {% endblock %}

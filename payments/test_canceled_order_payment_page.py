@@ -160,7 +160,7 @@ class CanceledOrderPaymentPageTests(TestCase):
         for response in (generic, cinetpay):
             self.assertEqual(response.status_code, 200)
             self.assertContains(response, "Aucun paiement n’a été finalisé.")
-            self.assertContains(response, "Reprendre le paiement")
+            self.assertContains(response, "Retourner au parcours de paiement")
             self.assertNotContains(response, "Cette commande a déjà été annulée")
 
     def test_donation_checkout_keeps_generic_cancel_url(self):

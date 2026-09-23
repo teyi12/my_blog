@@ -63,7 +63,7 @@
           <div class="header-actions">
             <form method="post" action="{% url 'set_language' %}" class="language-switcher" aria-label="{% translate "Choisir la langue" %}">
               {% csrf_token %}
-              <input type="hidden" name="next" value="{{ request.get_full_path }}">
+              <input type="hidden" name="next" value="{% if language_switch_next %}{{ language_switch_next }}{% elif request %}{{ request.get_full_path }}{% else %}/{% endif %}">
               <span class="visually-hidden">{% translate "Langue" %}</span>
               <button type="submit" name="language" value="fr" class="language-button{% if CURRENT_LANGUAGE == 'fr' %} is-active{% endif %}" aria-label="{% translate 'Français' %}" aria-pressed="{% if CURRENT_LANGUAGE == 'fr' %}true{% else %}false{% endif %}">FR<span class="visually-hidden">{% if CURRENT_LANGUAGE == 'fr' %} — {% translate "langue active" %}{% endif %}</span></button>
               <span aria-hidden="true">|</span>

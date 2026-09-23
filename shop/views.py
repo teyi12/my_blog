@@ -840,4 +840,8 @@ class ConfirmationView(LoginRequiredMixin, DetailView):
     context_object_name = "commande"
 
     def get_queryset(self):
-        return Commande.objects.filter(client=self.request.user)
+        return (
+            Commande.objects.filter(client=self.request.user)
+            .select_related("adresse", "cancellation", "receipt")
+            .prefetch_related("lignes__produit")
+        )

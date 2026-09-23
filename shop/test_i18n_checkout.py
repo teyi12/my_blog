@@ -161,9 +161,9 @@ class CheckoutI18nPagesTests(TestCase):
     def test_address_saved_confirmation_and_customer_order_pages_are_translated(self):
         order = self._order()
         cases = {
-            "fr": ("Adresse enregistrée avec succès", "Votre commande est prête", "Suivi de votre commande"),
-            "de": ("Adresse erfolgreich gespeichert", "Ihre Bestellung ist zur Zahlung bereit", "Ihre Bestellung verfolgen"),
-            "en": ("Address saved successfully", "Your order is ready for payment", "Track your order"),
+            "fr": ("Adresse enregistrée avec succès", "Votre commande est confirmée", "Suivi de votre commande"),
+            "de": ("Adresse erfolgreich gespeichert", "Ihre Bestellung ist bestätigt", "Ihre Bestellung verfolgen"),
+            "en": ("Address saved successfully", "Your order is confirmed", "Track your order"),
         }
         for language, texts in cases.items():
             with self.subTest(language=language):

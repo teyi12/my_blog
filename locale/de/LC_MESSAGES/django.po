@@ -3971,6 +3971,222 @@ msgstr "Diese Bestandsanpassung kann nicht angewendet werden."
 msgid "Stock de « %(product)s » ajusté de %(quantity)+d unité(s)."
 msgstr "Bestand von „%(product)s“ um %(quantity)+d Einheit(en) angepasst."
 
+
+#: payments/templates/payments/cancel.html
+msgid "Paiement remboursé"
+msgstr "Zahlung zurückerstattet"
+
+#: payments/templates/payments/cancel.html shop/templates/shop/confirmation.html
+msgid "Le paiement de cette commande a été remboursé."
+msgstr "Die Zahlung für diese Bestellung wurde zurückerstattet."
+
+#: payments/templates/payments/cancel.html
+msgid "Aucun nouveau paiement n’est proposé. Le suivi et le reçu historique restent disponibles."
+msgstr "Es wird keine neue Zahlung angeboten. Die Bestellverfolgung und der bisherige Beleg bleiben verfügbar."
+
+#: payments/templates/payments/cancel.html
+msgid "Paiement déjà confirmé"
+msgstr "Zahlung bereits bestätigt"
+
+#: payments/templates/payments/cancel.html
+msgid "Cette commande est déjà payée."
+msgstr "Diese Bestellung ist bereits bezahlt."
+
+#: payments/templates/payments/cancel.html
+msgid "Aucun nouveau paiement n’est nécessaire. Vous pouvez consulter le suivi et le reçu disponibles pour cette commande."
+msgstr "Keine neue Zahlung ist erforderlich. Sie können die Bestellverfolgung und den verfügbaren Beleg einsehen."
+
+#: payments/templates/payments/cancel.html
+msgid "L’opération a été annulée ou interrompue. La commande reste inchangée tant que le serveur n’a pas confirmé le paiement."
+msgstr "Der Vorgang wurde abgebrochen oder unterbrochen. Die Bestellung bleibt unverändert, solange der Server die Zahlung nicht bestätigt hat."
+
+#: payments/templates/payments/cancel.html
+msgid "Récapitulatif autorisé"
+msgstr "Freigegebene Zusammenfassung"
+
+#: payments/templates/payments/cancel.html shop/templates/shop/confirmation.html
+msgid "Statut du paiement"
+msgstr "Zahlungsstatus"
+
+#: payments/templates/payments/cancel.html
+msgid "Le serveur autorise encore l’accès au choix du moyen de paiement pour cette commande."
+msgstr "Der Server erlaubt für diese Bestellung weiterhin die Auswahl einer Zahlungsmethode."
+
+#: payments/templates/payments/cancel.html
+msgid "Aucune commande identifiable n’est affichée sur cette page."
+msgstr "Auf dieser Seite werden keine Daten zu einer identifizierbaren Bestellung angezeigt."
+
+#: payments/templates/payments/cancel.html shop/templates/shop/confirmation.html
+msgid "Voir le suivi de la commande"
+msgstr "Bestellstatus ansehen"
+
+#: payments/templates/payments/cancel.html
+msgid "Reprendre le paiement de cette commande"
+msgstr "Zahlung für diese Bestellung fortsetzen"
+
+#: payments/templates/payments/cancel.html
+msgid "Retourner au parcours de paiement"
+msgstr "Zum Zahlungsvorgang zurückkehren"
+
+#: payments/templates/payments/error.html shop/templates/shop/confirmation.html
+msgid "Paiement échoué"
+msgstr "Zahlung fehlgeschlagen"
+
+#: payments/templates/payments/error.html
+msgid "Paiement non abouti"
+msgstr "Zahlung nicht abgeschlossen"
+
+#: payments/templates/payments/error.html
+msgid "Le paiement n’a pas pu être confirmé."
+msgstr "Die Zahlung konnte nicht bestätigt werden."
+
+#: payments/templates/payments/error.html
+msgid "Aucun détail technique n’est affiché ici. Consultez vos commandes avant de lancer une nouvelle tentative."
+msgstr "Hier werden keine technischen Details angezeigt. Prüfen Sie Ihre Bestellungen, bevor Sie einen neuen Versuch starten."
+
+#: payments/templates/payments/error.html
+msgid "Paiement non confirmé"
+msgstr "Zahlung nicht bestätigt"
+
+#: payments/templates/payments/error.html
+msgid "Une commande est considérée comme payée uniquement après validation par le serveur."
+msgstr "Eine Bestellung gilt erst nach der Bestätigung durch den Server als bezahlt."
+
+#: payments/templates/payments/error.html
+msgid "Vérifier mes commandes"
+msgstr "Meine Bestellungen prüfen"
+
+#: payments/templates/payments/success.html
+msgid "Vérification du paiement"
+msgstr "Zahlungsprüfung"
+
+#: payments/templates/payments/success.html
+msgid "Votre don est en cours de vérification."
+msgstr "Ihre Spende wird überprüft."
+
+#: payments/templates/payments/success.html
+msgid "Merci pour votre soutien. Le don sera confirmé uniquement après validation sécurisée par Stripe."
+msgstr "Vielen Dank für Ihre Unterstützung. Die Spende wird erst nach der sicheren Bestätigung durch Stripe bestätigt."
+
+#: payments/templates/payments/success.html
+msgid "Votre souscription est en cours de vérification."
+msgstr "Ihr Abonnement wird überprüft."
+
+#: payments/templates/payments/success.html shop/templates/shop/confirmation.html
+msgid "Votre paiement est en cours de vérification."
+msgstr "Ihre Zahlung wird überprüft."
+
+#: payments/templates/payments/success.html
+msgid "Cette page ne confirme pas encore le paiement. Le statut définitif apparaîtra dans le suivi de votre commande après validation par le serveur."
+msgstr "Diese Seite bestätigt die Zahlung noch nicht. Der endgültige Status wird nach der Bestätigung durch den Server in Ihrer Bestellverfolgung angezeigt."
+
+#: payments/templates/payments/success.html
+msgid "Vérification sécurisée"
+msgstr "Sichere Prüfung"
+
+#: payments/templates/payments/success.html
+msgid "Vous n’avez pas besoin de relancer immédiatement le paiement."
+msgstr "Sie müssen die Zahlung nicht sofort erneut starten."
+
+#: payments/templates/payments/success.html
+msgid "Voir la page des dons"
+msgstr "Spendenseite ansehen"
+
+#: payments/templates/payments/success.html
+msgid "Suivre mon abonnement"
+msgstr "Mein Abonnement ansehen"
+
+#: payments/templates/payments/success.html
+msgid "Suivre mes commandes"
+msgstr "Meine Bestellungen verfolgen"
+
+#: shop/templates/shop/confirmation.html
+msgid "Cette commande a été annulée."
+msgstr "Diese Bestellung wurde storniert."
+
+#: shop/templates/shop/confirmation.html
+msgid "Elle reste disponible dans votre historique, mais aucun nouveau paiement ne peut être lancé."
+msgstr "Sie bleibt in Ihrem Verlauf verfügbar, aber es kann keine neue Zahlung gestartet werden."
+
+#: shop/templates/shop/confirmation.html
+msgid "Votre commande est confirmée."
+msgstr "Ihre Bestellung ist bestätigt."
+
+#: shop/templates/shop/confirmation.html
+msgid "Le serveur a validé le paiement. Le traitement logistique est présenté séparément ci-dessous."
+msgstr "Der Server hat die Zahlung bestätigt. Die Bestellabwicklung wird unten separat dargestellt."
+
+#: shop/templates/shop/confirmation.html
+msgid "Le reçu et l’historique restent accessibles. Aucun nouveau paiement n’est proposé depuis cette page."
+msgstr "Beleg und Verlauf bleiben verfügbar. Auf dieser Seite wird keine neue Zahlung angeboten."
+
+#: shop/templates/shop/confirmation.html
+msgid "La commande n’est pas encore présentée comme payée. Consultez son suivi pour connaître le statut confirmé par le serveur."
+msgstr "Die Bestellung wird noch nicht als bezahlt angezeigt. In der Bestellverfolgung finden Sie den vom Server bestätigten Status."
+
+#: shop/templates/shop/confirmation.html
+msgid "Le paiement de cette commande n’a pas abouti."
+msgstr "Die Zahlung für diese Bestellung war nicht erfolgreich."
+
+#: shop/templates/shop/confirmation.html
+msgid "Vous pouvez vérifier le récapitulatif avant de revenir au choix du moyen de paiement."
+msgstr "Sie können die Übersicht prüfen, bevor Sie erneut eine Zahlungsmethode auswählen."
+
+#: shop/templates/shop/confirmation.html
+msgid "La tentative de paiement a été interrompue."
+msgstr "Der Zahlungsversuch wurde unterbrochen."
+
+#: shop/templates/shop/confirmation.html
+msgid "La commande n’est pas annulée et reste payable. Vous pouvez choisir à nouveau un moyen de paiement."
+msgstr "Die Bestellung wurde nicht storniert und kann weiterhin bezahlt werden. Sie können erneut eine Zahlungsmethode auswählen."
+
+#: shop/templates/shop/confirmation.html
+msgid "États de la commande"
+msgstr "Bestellstatus"
+
+#: shop/templates/shop/confirmation.html
+msgid "Paiement et traitement"
+msgstr "Zahlung und Abwicklung"
+
+#: shop/templates/shop/confirmation.html
+msgid "État logistique"
+msgstr "Bearbeitungsstatus"
+
+#: shop/templates/shop/confirmation.html
+msgid "Montant de la commande"
+msgstr "Bestellbetrag"
+
+#: shop/templates/shop/confirmation.html
+msgid "Paiement confirmé par le serveur"
+msgstr "Vom Server bestätigte Zahlung"
+
+#: shop/templates/shop/confirmation.html
+msgid "Le paiement et le traitement logistique conservent chacun leur propre état."
+msgstr "Zahlung und Bestellabwicklung behalten jeweils ihren eigenen Status."
+
+#: shop/templates/shop/confirmation.html
+msgid "Vérification en cours"
+msgstr "Prüfung läuft"
+
+#: shop/templates/shop/confirmation.html
+msgid "Aucune confirmation définitive n’est affichée avant la mise à jour du serveur."
+msgstr "Vor der Aktualisierung durch den Server wird keine endgültige Bestätigung angezeigt."
+
+#: shop/templates/shop/confirmation.html
+msgid "Données de commande protégées"
+msgstr "Geschützte Bestelldaten"
+
+#: shop/templates/shop/confirmation.html
+msgid "Seul le propriétaire connecté peut consulter cette page."
+msgstr "Nur der angemeldete Bestellinhaber kann diese Seite aufrufen."
+
+#: shop/templates/shop/confirmation.html
+msgid "Suivre la vérification du paiement"
+msgstr "Zahlungsprüfung verfolgen"
+
+#: shop/templates/shop/confirmation.html
+msgid "Choisir un moyen de paiement"
+msgstr "Zahlungsmethode auswählen"
 msgid "Cette commande ne peut pas être remise en stock."
 msgstr "Diese Bestellung kann nicht wieder eingelagert werden."
 
