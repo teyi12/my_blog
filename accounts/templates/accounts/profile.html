@@ -1,4 +1,4 @@
-{% extends 'template_base.html' %}
+{% extends "template_base.html" %}
 {% load i18n static %}
 
 {% block titre %}{% translate "Mon profil" %} — Teyilawson{% endblock %}
@@ -9,53 +9,72 @@
 {% endblock %}
 
 {% block contenu %}
-<section class="profile-page">
+<section class="profile-page" aria-labelledby="profile-title">
   <header class="profile-header">
-    <div>
-      <span class="eyebrow">{% translate "Espace personnel" %}</span>
-      <h1>{% translate "Mon profil" %}</h1>
-      <p>{% translate "Mettez à jour les informations visibles dans votre espace personnel." %}</p>
-    </div>
+    <span class="eyebrow">{% translate "Espace personnel" %}</span>
+    <h1 id="profile-title">{% translate "Mon profil" %}</h1>
+    <p>{% translate "Mettez à jour les informations visibles dans votre espace personnel." %}</p>
   </header>
 
   <div class="profile-layout">
-    <aside class="profile-summary">
+    <aside class="profile-summary" aria-labelledby="profile-identity-title">
       <div class="profile-avatar">
         {% if user.photo %}
-          <img src="{{ user.photo.url }}" alt="{% blocktranslate with identity=user.get_full_name|default:user.email %}Photo de profil de {{ identity }}{% endblocktranslate %}">
+          <img src="{{ user.photo.url }}" alt="{% blocktranslate with identity=user.get_full_name|default:user.email %}Photo de profil de {{ identity }}{% endblocktranslate %}" width="160" height="160">
         {% else %}
-          <span>{% if user.first_name %}{{ user.first_name|first|upper }}{% else %}{{ user.email|first|upper }}{% endif %}</span>
+          <span aria-hidden="true">{% if user.first_name %}{{ user.first_name|first|upper }}{% else %}{{ user.email|first|upper }}{% endif %}</span>
+          <span class="visually-hidden">{% translate "Aucune photo de profil" %}</span>
         {% endif %}
       </div>
       <div class="profile-identity">
-        {% if user.get_full_name %}<strong>{{ user.get_full_name }}</strong>{% else %}<strong>{% translate "Mon compte" %}</strong>{% endif %}
+        <h2 id="profile-identity-title">{% if user.get_full_name %}{{ user.get_full_name }}{% else %}{% translate "Mon compte" %}{% endif %}</h2>
         <span>{{ user.email }}</span>
       </div>
-      <div class="profile-summary-list">
-        <span><i class="fa-regular fa-user" aria-hidden="true"></i> {% translate "Compte personnel" %}</span>
-        <span><i class="fa-solid fa-shield-halved" aria-hidden="true"></i> {% translate "Accès sécurisé" %}</span>
-      </div>
+      <dl class="profile-details">
+        <div>
+          <dt>{% translate "Adresse e-mail" %}</dt>
+          <dd>{{ user.email }}</dd>
+        </div>
+        <div>
+          <dt>{% translate "Téléphone" %}</dt>
+          <dd>{{ user.telephone|default:"—" }}</dd>
+        </div>
+      </dl>
     </aside>
 
     <div class="profile-card">
-      <div class="auth-card-heading">
-        <span class="eyebrow">{% translate "Informations" %}</span>
+      <div class="account-card-heading">
+        <span class="account-step">{% translate "Informations" %}</span>
         <h2>{% translate "Modifier mon profil" %}</h2>
-        <p>{% translate "Vous pouvez mettre à jour votre nom, votre photo, votre téléphone et votre présentation." %}</p>
+        <p>{% translate "Votre adresse e-mail reste l’identifiant de ce compte." %}</p>
       </div>
 
-      <form method="post" enctype="multipart/form-data" class="auth-form auth-form-grid">
+      <form method="post" enctype="multipart/form-data" class="account-form" data-account-form>
         {% csrf_token %}
-        {% if form.non_field_errors %}<div class="alert alert-danger auth-grid-full" role="alert">{{ form.non_field_errors }}</div>{% endif %}
-        {% for field in form %}
-        <div class="auth-field {% if field.name == 'photo' or field.name == 'bio' %}auth-grid-full{% endif %}">
-          <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-          {% if field.name == 'photo' %}<div class="profile-file-field">{{ field }}</div>{% else %}{{ field }}{% endif %}
-          {% if field.help_text %}<small>{{ field.help_text|safe }}</small>{% endif %}
-          {% if field.errors %}<div class="auth-field-error">{{ field.errors }}</div>{% endif %}
-        </div>
-        {% endfor %}
-        <div class="auth-grid-full profile-actions">
+        {% include "accounts/_error_summary.html" with form=form %}
+
+        <fieldset class="account-fieldset">
+          <legend>{% translate "Identité" %}</legend>
+          <div class="account-form-grid">
+            {% include "accounts/_form_field.html" with field=form.first_name %}
+            {% include "accounts/_form_field.html" with field=form.last_name %}
+          </div>
+        </fieldset>
+
+        <fieldset class="account-fieldset">
+          <legend>{% translate "Coordonnées" %}</legend>
+          {% include "accounts/_form_field.html" with field=form.telephone wide=True %}
+        </fieldset>
+
+        <fieldset class="account-fieldset">
+          <legend>{% translate "Photo et présentation" %}</legend>
+          <div class="account-form-grid">
+            {% include "accounts/_form_field.html" with field=form.photo wide=True %}
+            {% include "accounts/_form_field.html" with field=form.bio wide=True %}
+          </div>
+        </fieldset>
+
+        <div class="profile-actions">
           <button type="submit" class="btn btn-brand">{% translate "Enregistrer les modifications" %}</button>
           <a href="{% url 'home' %}" class="btn btn-soft">{% translate "Retour au site" %}</a>
         </div>
@@ -67,4 +86,8 @@
     {% include "payments/_subscription_self_service.html" with subscription_profile_summary=True %}
   </div>
 </section>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/accounts.js' %}" defer></script>
 {% endblock %}

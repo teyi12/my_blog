@@ -8,47 +8,50 @@
 {% endblock %}
 
 {% block contenu %}
-<section class="auth-page">
-  <div class="auth-panel auth-panel-intro">
+<section class="account-page account-page-login" aria-labelledby="account-title">
+  <header class="account-intro">
     <span class="eyebrow">{% translate "Espace personnel" %}</span>
-    <h1>{% translate "Heureux de vous revoir." %}</h1>
+    <h1 id="account-title">{% translate "Heureux de vous revoir." %}</h1>
     <p>{% translate "Connectez-vous pour retrouver votre profil, vos achats et vos contenus." %}</p>
-    <div class="auth-benefits">
-      <span><i class="fa-regular fa-circle-check" aria-hidden="true"></i> {% translate "Accès à votre profil" %}</span>
-      <span><i class="fa-regular fa-circle-check" aria-hidden="true"></i> {% translate "Commandes et paiements sécurisés" %}</span>
-      <span><i class="fa-regular fa-circle-check" aria-hidden="true"></i> {% translate "Expérience personnalisée" %}</span>
+    <div class="account-context" aria-label="{% translate 'Votre espace personnel' %}">
+      <span>{% translate "Profil" %}</span>
+      <span aria-hidden="true">·</span>
+      <span>{% translate "Commandes" %}</span>
+      <span aria-hidden="true">·</span>
+      <span>{% translate "Abonnements" %}</span>
     </div>
-  </div>
+  </header>
 
-  <div class="auth-card">
-    <div class="auth-card-heading">
-      <span class="eyebrow">{% translate "Connexion" %}</span>
+  <div class="account-card">
+    <div class="account-card-heading">
+      <span class="account-step">{% translate "Connexion" %}</span>
       <h2>{% translate "Accéder à mon compte" %}</h2>
       <p>{% translate "Entrez vos identifiants pour continuer." %}</p>
     </div>
 
-    <form method="post" class="auth-form">
+    <form method="post" class="account-form" data-account-form>
       {% csrf_token %}
       {% firstof request.POST.next request.GET.next as login_next %}
       {% if login_next %}<input type="hidden" name="next" value="{{ login_next }}">{% endif %}
-      {% if form.non_field_errors %}<div class="alert alert-danger" role="alert">{{ form.non_field_errors }}</div>{% endif %}
+      {% include "accounts/_error_summary.html" with form=form %}
+      <p class="account-required-note"><span aria-hidden="true">*</span> {% translate "Champ obligatoire" %}</p>
       {% for field in form %}
-      <div class="auth-field">
-        <label for="{{ field.id_for_label }}">
-          {% if field.name == 'username' or field.name == 'email' %}{% translate "Adresse e-mail" %}{% else %}{{ field.label }}{% endif %}
-        </label>
-        {{ field }}
-        {% if field.help_text %}<small>{{ field.help_text|safe }}</small>{% endif %}
-        {% if field.errors %}<div class="auth-field-error">{{ field.errors }}</div>{% endif %}
-      </div>
+        {% include "accounts/_form_field.html" with field=field %}
       {% endfor %}
-      <button type="submit" class="btn btn-brand btn-lg auth-submit">{% translate "Se connecter" %} <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></button>
+      <button type="submit" class="btn btn-brand btn-lg account-submit">
+        {% translate "Se connecter" %}
+        <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+      </button>
     </form>
 
-    <div class="auth-switch">
+    <div class="account-switch">
       <span>{% translate "Pas encore de compte ?" %}</span>
       <a href="{% url 'accounts:register' %}">{% translate "Créer un compte" %}</a>
     </div>
   </div>
 </section>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/accounts.js' %}" defer></script>
 {% endblock %}

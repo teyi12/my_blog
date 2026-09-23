@@ -1,0 +1,49 @@
+{% load i18n %}
+<div class="account-field{% if wide %} account-field-wide{% endif %}{% if field.errors %} has-error{% endif %}">
+  <label for="{{ field.id_for_label }}">
+    {{ field.label }}
+    {% if field.field.required %}
+      <span class="account-required-mark" aria-hidden="true">*</span>
+      <span class="visually-hidden">{% translate "(obligatoire)" %}</span>
+    {% endif %}
+  </label>
+
+  {% if field.field.widget.input_type == "password" %}
+    <div class="account-password-control">
+      {{ field }}
+      <button
+        type="button"
+        class="account-password-toggle"
+        aria-controls="{{ field.id_for_label }}"
+        aria-pressed="false"
+        data-password-toggle
+        data-show-label="{% translate 'Afficher le mot de passe' %}"
+        data-hide-label="{% translate 'Masquer le mot de passe' %}"
+        hidden
+      >{% translate "Afficher le mot de passe" %}</button>
+    </div>
+  {% elif field.name == "photo" %}
+    <div class="account-file-control" data-photo-control>
+      {{ field }}
+      <figure class="account-photo-preview" data-photo-preview hidden>
+        <img
+          src=""
+          alt="{% translate 'Aperçu de la photo sélectionnée' %}"
+          width="160"
+          height="160"
+          data-photo-preview-image
+        >
+        <figcaption>
+          <span data-photo-preview-name></span>
+          <button type="button" class="btn btn-soft btn-sm" data-photo-preview-cancel>{% translate "Annuler l’aperçu" %}</button>
+        </figcaption>
+      </figure>
+      <span class="visually-hidden" aria-live="polite" data-photo-preview-status></span>
+    </div>
+  {% else %}
+    {{ field }}
+  {% endif %}
+
+  {% if field.help_text %}<div class="account-field-help" id="{{ field.id_for_label }}_help">{{ field.help_text }}</div>{% endif %}
+  {% if field.errors %}<div class="account-field-error">{{ field.errors }}</div>{% endif %}
+</div>

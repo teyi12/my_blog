@@ -1,0 +1,17 @@
+{% load i18n %}
+{% if form.errors %}
+<div class="account-error-summary" id="account-error-summary" tabindex="-1" aria-labelledby="account-error-title" data-account-error-summary>
+  <div class="account-error-summary-icon" aria-hidden="true"><i class="fa-solid fa-circle-exclamation"></i></div>
+  <div>
+    <h2 id="account-error-title">{% translate "Vérifiez les informations saisies" %}</h2>
+    <ul>
+      {% for error in form.non_field_errors %}<li>{{ error }}</li>{% endfor %}
+      {% for field in form %}
+        {% if field.errors %}
+          <li><a href="#{{ field.id_for_label }}">{% blocktranslate with label=field.label %}Vérifiez le champ « {{ label }} ».{% endblocktranslate %}</a></li>
+        {% endif %}
+      {% endfor %}
+    </ul>
+  </div>
+</div>
+{% endif %}
