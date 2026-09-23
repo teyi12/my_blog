@@ -12,7 +12,7 @@
 <section class="monetization-page">
   <div class="monetization-shell">
     <header class="monetization-header">
-      <div>
+      <div class="monetization-header-copy">
         <span class="monetization-eyebrow">{% translate "Teyilawson · Monétisation" %}</span>
         <h1>{% translate "Des collaborations claires, utiles et durables." %}</h1>
         <p>{% translate "Partenariats, affiliation, abonnements et soutien : chaque canal est présenté séparément pour garder une expérience simple et transparente." %}</p>
@@ -20,12 +20,12 @@
     </header>
 
     <nav class="monetization-nav" aria-label="{% translate 'Navigation monétisation' %}">
-      <a href="{% url 'monetization:partenariat' %}">{% translate "Partenariat" %}</a>
-      <a href="{% url 'monetization:affiliation' %}">{% translate "Affiliation" %}</a>
-      <a href="{% url 'monetization:abonnements' %}">{% translate "Abonnements" %}</a>
-      <a href="{% url 'monetization:don' %}">{% translate "Soutenir" %}</a>
-      <a href="{% url 'monetization:publicites' %}">{% translate "Publicités" %}</a>
-      {% if user.is_staff %}<a href="{% url 'monetization:dashboard' %}">{% translate "Dashboard" %}</a>{% endif %}
+      <a{% if request.resolver_match.url_name == 'partenariat' %} class="is-current" aria-current="page"{% endif %} href="{% url 'monetization:partenariat' %}">{% translate "Partenariat" %}</a>
+      <a{% if request.resolver_match.url_name == 'affiliation' %} class="is-current" aria-current="page"{% endif %} href="{% url 'monetization:affiliation' %}">{% translate "Affiliation" %}</a>
+      <a{% if request.resolver_match.url_name == 'abonnements' %} class="is-current" aria-current="page"{% endif %} href="{% url 'monetization:abonnements' %}">{% translate "Abonnements" %}</a>
+      <a{% if request.resolver_match.url_name == 'don' %} class="is-current" aria-current="page"{% endif %} href="{% url 'monetization:don' %}">{% translate "Soutenir" %}</a>
+      <a{% if request.resolver_match.url_name == 'publicites' %} class="is-current" aria-current="page"{% endif %} href="{% url 'monetization:publicites' %}">{% translate "Publicités" %}</a>
+      {% if user.is_staff %}<a{% if request.resolver_match.url_name == 'dashboard' or request.resolver_match.url_name == 'revenus' %} class="is-current" aria-current="page"{% endif %} href="{% url 'monetization:dashboard' %}">{% translate "Dashboard" %}</a>{% endif %}
     </nav>
 
     {% block content %}{% endblock %}

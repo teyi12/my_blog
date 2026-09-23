@@ -27,8 +27,9 @@
     </div>
 
     {% if revenus_recents %}
-    <div class="revenue-table-wrap">
+    <div class="revenue-table-wrap table-responsive" tabindex="0">
       <table class="revenue-table">
+        <caption class="visually-hidden">{% translate "Derniers revenus enregistrés" %}</caption>
         <thead><tr><th>{% translate "Source" %}</th><th>{% translate "Date" %}</th><th>{% translate "Montant" %}</th></tr></thead>
         <tbody>
           {% for revenu in revenus_recents %}

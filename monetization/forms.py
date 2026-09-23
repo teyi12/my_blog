@@ -7,7 +7,23 @@ from .models import DemandePartenariat, DemandeAffiliation
 REQUIRED_ERROR = _("Ce champ est obligatoire.")
 
 
-class PartenariatForm(forms.ModelForm):
+class AccessibleBoundFormMixin:
+    """Connect bound field errors to their controls without changing validation."""
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if not self.is_bound:
+            return
+
+        for field_name in self.errors:
+            if field_name not in self.fields:
+                continue
+            field = self.fields[field_name]
+            field.widget.attrs["aria-invalid"] = "true"
+            field.widget.attrs["aria-describedby"] = f"id_{field_name}_errors"
+
+
+class PartenariatForm(AccessibleBoundFormMixin, forms.ModelForm):
     class Meta:
         model = DemandePartenariat
         fields = ["nom", "email", "entreprise", "message"]
@@ -24,7 +40,7 @@ class PartenariatForm(forms.ModelForm):
         }
 
 
-class AffiliationForm(forms.ModelForm):
+class AffiliationForm(AccessibleBoundFormMixin, forms.ModelForm):
     class Meta:
         model = DemandeAffiliation
         fields = ["nom", "email", "plateforme", "produit", "message"]

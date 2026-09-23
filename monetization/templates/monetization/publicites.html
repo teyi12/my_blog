@@ -16,10 +16,10 @@
   {% if publicites %}
   <div class="advertising-grid">
     {% for pub in publicites %}
-    <article class="advertising-card">
+    <article class="advertising-card surface-card">
       <a href="{{ pub.lien }}" target="_blank" rel="sponsored noopener noreferrer" class="advertising-media">
         {% if pub.image %}<img src="{{ pub.image.url }}" alt="{{ pub.image_alt }}" width="1200" height="675" loading="lazy">{% endif %}
-        <span class="advertising-badge">{% translate "Sponsorisé" %}</span>
+        <span class="advertising-badge badge badge-neutral">{% translate "Sponsorisé" %}</span>
       </a>
       <div class="advertising-body">
         <span class="monetization-eyebrow">{{ pub.partenaire.nom }}</span>
@@ -32,7 +32,7 @@
     {% endfor %}
   </div>
   {% else %}
-  <div class="monetization-empty">
+  <div class="monetization-empty empty-state">
     <i class="fa-regular fa-rectangle-ad" aria-hidden="true"></i>
     <h3>{% translate "Aucune campagne active pour le moment." %}</h3>
     <p>{% translate "Les prochaines collaborations apparaîtront ici." %}</p>

@@ -1,5 +1,270 @@
-.monetization-page{padding:3.25rem 1.25rem 5rem;background:linear-gradient(180deg,rgba(244,239,225,.5),transparent 24%)}.monetization-shell{width:min(1180px,100%);margin:0 auto}.monetization-header{display:flex;justify-content:space-between;gap:2rem;align-items:flex-end;margin-bottom:1.35rem}.monetization-header h1{margin:.35rem 0 .7rem;font-size:clamp(2.2rem,4.5vw,4.1rem);line-height:1;letter-spacing:-.045em;max-width:860px}.monetization-header p{max-width:780px;margin:0;color:var(--color-text-muted,#66716e);font-size:1.03rem;line-height:1.7}.monetization-eyebrow{display:block;text-transform:uppercase;letter-spacing:.12em;font-size:.7rem;font-weight:800;color:var(--color-accent,#a67c2e)}.monetization-nav{display:flex;gap:.55rem;flex-wrap:wrap;padding:.65rem;margin-bottom:1.6rem;border:1px solid rgba(23,60,52,.1);border-radius:18px;background:rgba(255,255,255,.86);box-shadow:0 12px 34px rgba(20,42,36,.055)}.monetization-nav a{padding:.72rem .95rem;border-radius:12px;text-decoration:none;font-weight:700;font-size:.88rem;color:var(--color-primary,#173c34)}.monetization-nav a:hover{background:rgba(23,60,52,.07)}
-.monetization-grid,.support-grid{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:1.4rem;align-items:start}.monetization-copy-card,.monetization-form-card,.donation-card,.revenue-table-card{background:#fff;border:1px solid rgba(23,60,52,.1);border-radius:24px;box-shadow:0 18px 48px rgba(20,42,36,.07)}.monetization-copy-card{padding:2rem;background:linear-gradient(145deg,#173c34,#214d43);color:#fff;position:sticky;top:100px}.monetization-copy-card .monetization-eyebrow{color:#dec58b}.monetization-copy-card h2{margin:.45rem 0 .85rem;font-size:clamp(1.75rem,3vw,2.65rem);line-height:1.07;letter-spacing:-.035em}.monetization-copy-card>p{color:rgba(255,255,255,.76);line-height:1.7}.monetization-points{display:grid;gap:.8rem;margin-top:1.5rem}.monetization-points span{display:flex;gap:.65rem;align-items:flex-start;font-size:.92rem}.monetization-points i{margin-top:.12rem;color:#dec58b}.monetization-form-card,.donation-card{padding:1.7rem}.monetization-card-heading h2,.donation-card h2{margin:.35rem 0 0;font-size:1.55rem;letter-spacing:-.025em}.monetization-form{display:grid;gap:1rem;margin-top:1.35rem}.monetization-field{display:grid;gap:.42rem}.monetization-field label,.donation-form label{font-weight:750;font-size:.9rem;color:var(--color-primary,#173c34)}.monetization-field label span{font-weight:500;color:var(--color-text-muted,#66716e)}.monetization-field input,.monetization-field textarea,.monetization-field select,.donation-input-wrap input{width:100%;border:1px solid rgba(23,60,52,.16);border-radius:13px;background:#fbfcfb;padding:.85rem .95rem;color:inherit;outline:none;transition:.2s ease}.monetization-field textarea{min-height:150px;resize:vertical}.monetization-field input:focus,.monetization-field textarea:focus,.monetization-field select:focus,.donation-input-wrap input:focus{border-color:rgba(23,60,52,.5);box-shadow:0 0 0 4px rgba(23,60,52,.07);background:#fff}.monetization-field .errorlist,.monetization-error .errorlist{list-style:none;margin:.25rem 0 0;padding:0;color:#a12b2b;font-size:.84rem}.monetization-submit{display:flex;align-items:center;justify-content:center;gap:.6rem;margin-top:.2rem}.monetization-section{display:grid;gap:1.35rem}.monetization-section-heading{display:flex;justify-content:space-between;gap:1.5rem;align-items:end}.monetization-section-heading h2{margin:.35rem 0 .45rem;font-size:clamp(1.8rem,3.5vw,2.8rem);letter-spacing:-.035em}.monetization-section-heading p{margin:0;max-width:760px;color:var(--color-text-muted,#66716e);line-height:1.65}
-.subscription-grid,.advertising-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1.15rem}.subscription-card,.advertising-card{background:#fff;border:1px solid rgba(23,60,52,.1);border-radius:22px;box-shadow:0 16px 42px rgba(20,42,36,.06);overflow:hidden}.subscription-card{padding:1.55rem;display:flex;flex-direction:column}.subscription-icon,.donation-icon,.revenue-kpi-icon{width:46px;height:46px;border-radius:14px;display:grid;place-items:center;background:rgba(23,60,52,.07);color:var(--color-primary,#173c34);margin-bottom:1rem}.subscription-card h3{margin:.35rem 0 .55rem;font-size:1.35rem}.subscription-card>p{color:var(--color-text-muted,#66716e);line-height:1.6;flex:1}.subscription-price{display:grid;gap:.2rem;margin:1.2rem 0}.subscription-price strong{font-size:1.65rem;color:var(--color-primary,#173c34);letter-spacing:-.03em}.subscription-price span,.subscription-note{color:var(--color-text-muted,#66716e)}.subscription-button{text-align:center}.subscription-note{display:flex;gap:.4rem;align-items:flex-start;margin-top:.7rem;font-size:.76rem;line-height:1.4}.donation-card>p{color:var(--color-text-muted,#66716e)}.donation-form{display:grid;gap:.75rem;margin-top:1.2rem}.donation-input-wrap{display:flex;align-items:center;position:relative}.donation-input-wrap input{padding-right:3rem;font-size:1.15rem;font-weight:800}.donation-input-wrap span{position:absolute;right:1rem;font-weight:800;color:var(--color-primary,#173c34)}.monetization-auth-note{padding:1rem;border-radius:15px;background:rgba(23,60,52,.055);margin-top:1.2rem}.monetization-auth-note p{margin-top:0}.advertising-media{position:relative;display:block;aspect-ratio:16/10;background:#eef1ef;overflow:hidden}.advertising-media img{width:100%;height:100%;object-fit:cover;transition:transform .35s ease}.advertising-media:hover img,.advertising-media:focus-visible img{transform:scale(1.035)}.advertising-badge{position:absolute;top:.8rem;left:.8rem;padding:.42rem .65rem;border-radius:999px;background:rgba(255,255,255,.92);font-size:.72rem;font-weight:800;color:#173c34}.advertising-body{padding:1.25rem}.advertising-body h3{margin:.35rem 0 .55rem}.advertising-body p{color:var(--color-text-muted,#66716e);font-size:.9rem;line-height:1.55}.advertising-link{display:inline-flex;gap:.45rem;align-items:center;color:var(--color-primary,#173c34);font-weight:800;text-decoration:none}.advertising-link:hover{text-decoration:underline}.monetization-empty{padding:2.3rem;text-align:center;border:1px dashed rgba(23,60,52,.22);border-radius:22px;background:rgba(255,255,255,.72)}.monetization-empty>i{font-size:1.6rem;color:var(--color-primary,#173c34)}.monetization-empty h3{margin:.8rem 0 .4rem}.monetization-empty p{margin:0;color:var(--color-text-muted,#66716e)}.monetization-empty.compact{padding:1.3rem}
-.revenue-kpis{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:.9rem}.revenue-kpi{background:#fff;border:1px solid rgba(23,60,52,.1);border-radius:18px;padding:1.15rem;box-shadow:0 12px 32px rgba(20,42,36,.05)}.revenue-kpi small{display:block;color:var(--color-text-muted,#66716e);font-weight:700}.revenue-kpi strong{display:block;margin-top:.25rem;font-size:1.35rem;color:var(--color-primary,#173c34);letter-spacing:-.025em}.revenue-table-card{padding:1.45rem}.revenue-table-wrap{overflow:auto;margin-top:1rem}.revenue-table{width:100%;border-collapse:collapse}.revenue-table th,.revenue-table td{padding:.9rem .75rem;border-bottom:1px solid rgba(23,60,52,.08);text-align:left}.revenue-table th{font-size:.75rem;text-transform:uppercase;letter-spacing:.08em;color:var(--color-text-muted,#66716e)}.revenue-source{display:inline-flex;padding:.34rem .55rem;border-radius:999px;background:rgba(23,60,52,.07);font-size:.78rem;font-weight:800;color:var(--color-primary,#173c34)}
-@media(max-width:980px){.monetization-grid,.support-grid{grid-template-columns:1fr}.monetization-copy-card{position:static}.subscription-grid,.advertising-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.revenue-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.monetization-section-heading{align-items:flex-start;flex-direction:column}}@media(max-width:650px){.monetization-page{padding:2.3rem .9rem 4rem}.monetization-header h1{font-size:2.45rem}.monetization-nav{overflow-x:auto;flex-wrap:nowrap}.monetization-nav a{white-space:nowrap}.subscription-grid,.advertising-grid,.revenue-kpis{grid-template-columns:1fr}.monetization-copy-card,.monetization-form-card,.donation-card,.revenue-table-card{border-radius:19px;padding:1.2rem}.revenue-table th,.revenue-table td{white-space:nowrap}}
+.monetization-page {
+  padding: clamp(2rem,5vw,4.5rem) var(--space-4) var(--space-8);
+  background: linear-gradient(180deg,var(--gold-100),var(--surface-1) 18rem);
+}
+
+.monetization-shell {
+  width: min(100%,var(--content-wide));
+  margin-inline: auto;
+}
+
+.monetization-header {
+  display: grid;
+  grid-template-columns: minmax(0,1fr);
+  margin-bottom: var(--space-5);
+}
+
+.monetization-header-copy { max-width: 58rem; }
+.monetization-header h1 {
+  max-width: 55rem;
+  margin: var(--space-2) 0 var(--space-3);
+}
+.monetization-header p {
+  max-width: 48rem;
+  margin: 0;
+  color: var(--ink-600);
+  font-size: 1.03rem;
+}
+
+.monetization-eyebrow {
+  display: block;
+  color: var(--gold-700);
+  font-size: .72rem;
+  font-weight: 800;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+
+.monetization-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-bottom: var(--space-6);
+  padding: var(--space-2);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  background: var(--surface-0);
+  box-shadow: var(--shadow-sm);
+}
+.monetization-nav a {
+  display: inline-flex;
+  min-height: 2.75rem;
+  align-items: center;
+  padding: .65rem var(--space-4);
+  border-radius: var(--radius-sm);
+  color: var(--ink-700);
+  font-size: .88rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+.monetization-nav a:hover,
+.monetization-nav a:focus-visible { color: var(--brand-900); background: var(--brand-50); }
+.monetization-nav a.is-current {
+  color: var(--brand-900);
+  background: var(--brand-100);
+  box-shadow: inset 0 -3px 0 var(--gold-700);
+}
+
+.monetization-grid,
+.support-grid {
+  display: grid;
+  grid-template-columns: minmax(0,.9fr) minmax(0,1.1fr);
+  gap: var(--space-5);
+  align-items: start;
+}
+.monetization-copy-card,
+.monetization-form-card,
+.donation-card,
+.revenue-table-card { min-width: 0; }
+.monetization-copy-card.surface-card {
+  position: sticky;
+  top: var(--space-4);
+  border-color: var(--brand-800);
+  color: var(--surface-0);
+  background: linear-gradient(145deg,var(--brand-950),var(--brand-800));
+  box-shadow: var(--shadow-md);
+}
+.monetization-copy-card .monetization-eyebrow { color: var(--gold-500); }
+.monetization-copy-card h2 {
+  margin: var(--space-2) 0 var(--space-3);
+  color: var(--surface-0);
+  font-size: clamp(1.75rem,3vw,2.65rem);
+}
+.monetization-copy-card > p { margin-bottom: 0; color: var(--brand-100); }
+.monetization-points { display: grid; gap: var(--space-3); margin-top: var(--space-5); }
+.monetization-points span { display: flex; align-items: flex-start; gap: var(--space-3); }
+.monetization-points i { margin-top: .25rem; color: var(--gold-500); }
+.monetization-form-card.surface-card,
+.donation-card.surface-card,
+.revenue-table-card { padding: clamp(1.25rem,3vw,2rem); }
+.monetization-card-heading h2,
+.donation-card h2 { margin: var(--space-2) 0 0; font-size: clamp(1.45rem,2vw,1.75rem); }
+
+.monetization-form { display: grid; gap: var(--space-4); margin-top: var(--space-5); }
+.monetization-field { display: grid; gap: var(--space-2); }
+.monetization-field label,
+.donation-form label { color: var(--ink-900); font-size: .9rem; font-weight: 700; }
+.monetization-field label span { color: var(--ink-500); font-weight: 500; }
+.monetization-field input,
+.monetization-field textarea,
+.monetization-field select,
+.donation-input-wrap input {
+  width: 100%;
+  min-height: 2.75rem;
+  padding: .75rem var(--space-4);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  color: var(--ink-950);
+  background: var(--surface-0);
+  font: inherit;
+}
+.monetization-field textarea { min-height: 9rem; resize: vertical; }
+.monetization-field input:focus,
+.monetization-field textarea:focus,
+.monetization-field select:focus,
+.donation-input-wrap input:focus { border-color: var(--brand-700); box-shadow: var(--focus-ring); }
+.monetization-field.has-error input,
+.monetization-field.has-error textarea,
+.monetization-field.has-error select,
+.donation-input-wrap input[aria-invalid="true"] { border-color: var(--color-danger); }
+.monetization-field .errorlist,
+.donation-form .errorlist {
+  margin: 0;
+  padding: 0;
+  color: var(--color-danger);
+  font-size: .85rem;
+  font-weight: 600;
+  list-style: none;
+}
+.monetization-error-summary {
+  padding: var(--space-4);
+  border: 1px solid var(--color-danger);
+  border-inline-start-width: .3rem;
+  border-radius: var(--radius-sm);
+  background: var(--surface-0);
+}
+.monetization-error-summary h2 { margin: 0 0 var(--space-2); font-size: 1rem; }
+.monetization-error-summary ul { margin: 0; padding-inline-start: var(--space-5); }
+.monetization-error-summary a { color: var(--color-danger); font-weight: 700; }
+.monetization-submit { width: 100%; margin-top: var(--space-1); }
+
+.monetization-section { display: grid; gap: var(--space-5); }
+.monetization-section-heading {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: var(--space-5);
+}
+.monetization-section-heading h2 { margin: var(--space-2) 0; }
+.monetization-section-heading p { max-width: 48rem; margin: 0; color: var(--ink-600); }
+
+.subscription-grid,
+.advertising-grid {
+  display: grid;
+  grid-template-columns: repeat(3,minmax(0,1fr));
+  gap: var(--space-4);
+}
+.subscription-card.surface-card { padding: var(--space-5); }
+.advertising-card.surface-card { padding: 0; }
+.subscription-card {
+  position: relative;
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  padding: var(--space-5);
+  overflow: hidden;
+}
+.subscription-card.is-current {
+  border-width: 2px;
+  border-color: var(--color-success);
+  box-shadow: var(--shadow-md);
+}
+.subscription-icon,
+.donation-icon,
+.revenue-kpi-icon {
+  display: grid;
+  width: 2.875rem;
+  height: 2.875rem;
+  place-items: center;
+  margin-bottom: var(--space-4);
+  border-radius: var(--radius-md);
+  color: var(--brand-800);
+  background: var(--brand-50);
+}
+.subscription-card h3 { margin: var(--space-2) 0; font-size: 1.35rem; }
+.subscription-current-status { align-self: flex-start; gap: var(--space-1); margin-bottom: var(--space-2); }
+.subscription-card > p { flex: 1; color: var(--ink-600); }
+.subscription-price { display: grid; gap: var(--space-1); margin: var(--space-4) 0; }
+.subscription-price strong { color: var(--brand-900); font-size: 1.65rem; letter-spacing: -.03em; }
+.subscription-price span,
+.subscription-note { color: var(--ink-600); }
+.subscription-card form,
+.subscription-button { width: 100%; }
+.subscription-note { display: flex; align-items: flex-start; gap: var(--space-2); margin: var(--space-3) 0 0; font-size: .8rem; }
+
+.donation-card > p { color: var(--ink-600); }
+.donation-form { display: grid; gap: var(--space-3); margin-top: var(--space-5); }
+.donation-input-wrap { position: relative; display: flex; align-items: center; }
+.donation-input-wrap input { padding-inline-end: 3rem; font-size: 1.15rem; font-weight: 700; }
+.donation-input-wrap > span { position: absolute; right: var(--space-4); color: var(--brand-900); font-weight: 800; }
+.donation-form .form-text { margin: calc(var(--space-2) * -1) 0 0; }
+.monetization-auth-note { margin-top: var(--space-5); padding: var(--space-4); border-radius: var(--radius-md); background: var(--brand-50); }
+.monetization-auth-note p { margin-top: 0; }
+
+.advertising-card { min-width: 0; overflow: hidden; }
+.advertising-media { position: relative; display: block; aspect-ratio: 16 / 10; overflow: hidden; background: var(--surface-2); }
+.advertising-media img { width: 100%; height: 100%; object-fit: cover; }
+.advertising-badge { position: absolute; top: var(--space-3); left: var(--space-3); }
+.advertising-body { padding: var(--space-5); }
+.advertising-body h3 { margin: var(--space-2) 0; }
+.advertising-body p { color: var(--ink-600); font-size: .9rem; }
+.advertising-link {
+  display: inline-flex;
+  min-height: 2.75rem;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--brand-800);
+  font-weight: 800;
+}
+
+.monetization-empty { width: 100%; }
+.revenue-kpis { display: grid; grid-template-columns: repeat(5,minmax(0,1fr)); gap: var(--space-3); }
+.revenue-kpi { min-width: 0; padding: var(--space-4); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); background: var(--surface-0); box-shadow: var(--shadow-sm); }
+.revenue-kpi small { display: block; color: var(--ink-600); font-weight: 700; }
+.revenue-kpi strong { display: block; margin-top: var(--space-1); color: var(--brand-900); font-size: 1.25rem; overflow-wrap: anywhere; }
+.revenue-table-card { border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); background: var(--surface-0); box-shadow: var(--shadow-sm); }
+.revenue-table-wrap { margin-top: var(--space-4); }
+.revenue-table { width: 100%; border-collapse: collapse; }
+.revenue-table th,
+.revenue-table td { padding: .8rem var(--space-3); border-bottom: 1px solid var(--border-subtle); text-align: start; }
+.revenue-table th { color: var(--ink-600); font-size: .75rem; letter-spacing: .08em; text-transform: uppercase; }
+.revenue-source { display: inline-flex; padding: .35rem .6rem; border-radius: var(--radius-pill); color: var(--brand-800); background: var(--brand-50); font-size: .78rem; font-weight: 800; }
+
+@media (max-width: 63.99rem) {
+  .monetization-grid,
+  .support-grid { grid-template-columns: 1fr; }
+  .monetization-copy-card.surface-card { position: static; }
+  .subscription-grid,
+  .advertising-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .revenue-kpis { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .monetization-section-heading { align-items: flex-start; flex-direction: column; }
+}
+
+@media (max-width: 47.99rem) {
+  .monetization-page { padding-inline: var(--space-3); }
+  .monetization-nav { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .monetization-nav a { justify-content: center; text-align: center; overflow-wrap: anywhere; }
+  .subscription-grid,
+  .advertising-grid,
+  .revenue-kpis { grid-template-columns: 1fr; }
+  .monetization-form-card.surface-card,
+  .donation-card.surface-card,
+  .monetization-copy-card.surface-card,
+  .revenue-table-card { padding: var(--space-4); }
+}
+
+@media (max-width: 24.99rem) {
+  .monetization-page { padding-inline: var(--space-2); }
+  .monetization-nav { grid-template-columns: 1fr; }
+  .monetization-section-heading .btn { width: 100%; }
+}

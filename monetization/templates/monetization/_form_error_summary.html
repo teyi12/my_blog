@@ -1,0 +1,12 @@
+{% load i18n %}
+{% if form.errors %}
+<div class="monetization-error-summary" role="alert" aria-labelledby="{{ summary_id }}" tabindex="-1">
+  <h2 id="{{ summary_id }}">{% translate "Vérifiez les informations saisies" %}</h2>
+  <ul>
+    {% for field in form %}
+      {% if field.errors %}<li><a href="#{{ field.id_for_label }}">{% blocktranslate with label=field.label %}Vérifiez le champ « {{ label }} ».{% endblocktranslate %}</a></li>{% endif %}
+    {% endfor %}
+    {% for error in form.non_field_errors %}<li>{{ error }}</li>{% endfor %}
+  </ul>
+</div>
+{% endif %}
