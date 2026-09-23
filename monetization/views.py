@@ -20,6 +20,7 @@ from payments.subscriptions import (
     subscription_portal_is_available,
     subscriptions_are_available,
 )
+from payments.forms import DONATION_FORM_SESSION_KEY, DonationCheckoutForm
 
 from .forms import AffiliationForm, PartenariatForm
 from .models import Abonnement, Publicite, Revenu
@@ -155,7 +156,13 @@ def souscrire_abonnement(request, slug):
 
 def don_view(request):
     """La collecte du don est déléguée au checkout Stripe sécurisé de payments."""
-    return render(request, "monetization/don.html")
+    submitted_data = request.session.pop(DONATION_FORM_SESSION_KEY, None)
+    donation_form = DonationCheckoutForm(submitted_data)
+    return render(
+        request,
+        "monetization/don.html",
+        {"donation_form": donation_form},
+    )
 
 
 def paiement_view(request):

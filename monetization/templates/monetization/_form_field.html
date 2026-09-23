@@ -1,0 +1,5 @@
+<div class="monetization-field{% if field.errors %} has-error{% endif %}">
+  <label for="{{ field.id_for_label }}">{{ field.label }}{% if optional %} <span>({{ optional_label }})</span>{% endif %}</label>
+  {{ field }}
+  {% if field.errors %}<ul class="errorlist" id="{{ field.auto_id }}_errors">{% for error in field.errors %}<li>{{ error }}</li>{% endfor %}</ul>{% endif %}
+</div>

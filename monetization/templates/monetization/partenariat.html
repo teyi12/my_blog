@@ -4,7 +4,7 @@
 
 {% block content %}
 <div class="monetization-grid">
-  <div class="monetization-copy-card">
+  <div class="monetization-copy-card surface-card">
     <span class="monetization-eyebrow">{% translate "Partenariat" %}</span>
     <h2>{% translate "Construisons une collaboration cohérente avec votre marque." %}</h2>
     <p>{% translate "Présentez votre projet, votre entreprise et le type de collaboration envisagé. Chaque demande est examinée avant toute mise en avant." %}</p>
@@ -15,19 +15,19 @@
     </div>
   </div>
 
-  <div class="monetization-form-card">
+  <div class="monetization-form-card surface-card">
     <div class="monetization-card-heading">
       <span class="monetization-eyebrow">{% translate "Votre demande" %}</span>
       <h2>{% translate "Parlez-nous de votre projet" %}</h2>
     </div>
     <form method="post" class="monetization-form">
       {% csrf_token %}
-      {% if form.non_field_errors %}<div class="monetization-error">{{ form.non_field_errors }}</div>{% endif %}
-
-      <div class="monetization-field"><label for="{{ form.nom.id_for_label }}">{% translate "Nom" context "monetization form" %}</label>{{ form.nom }}{{ form.nom.errors }}</div>
-      <div class="monetization-field"><label for="{{ form.email.id_for_label }}">{% translate "Adresse e-mail" %}</label>{{ form.email }}{{ form.email.errors }}</div>
-      <div class="monetization-field"><label for="{{ form.entreprise.id_for_label }}">{% translate "Entreprise" %} <span>({% translate "facultatif" %})</span></label>{{ form.entreprise }}{{ form.entreprise.errors }}</div>
-      <div class="monetization-field"><label for="{{ form.message.id_for_label }}">{% translate "Votre proposition" %}</label>{{ form.message }}{{ form.message.errors }}</div>
+      {% include "monetization/_form_error_summary.html" with form=form summary_id="partnership-error-summary-title" %}
+      {% include "monetization/_form_field.html" with field=form.nom %}
+      {% include "monetization/_form_field.html" with field=form.email %}
+      {% translate "facultatif" as optional_label %}
+      {% include "monetization/_form_field.html" with field=form.entreprise optional=True optional_label=optional_label %}
+      {% include "monetization/_form_field.html" with field=form.message %}
 
       <button type="submit" class="btn btn-primary btn-lg monetization-submit">{% translate "Envoyer ma demande" %} <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></button>
     </form>

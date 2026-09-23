@@ -20,12 +20,13 @@
   {% if abonnements %}
   <div class="subscription-grid">
     {% for abo in abonnements %}
-    <article class="subscription-card">
+    <article class="subscription-card surface-card{% if subscription_access_active and current_subscription.abonnement_id == abo.id %} is-current{% endif %}" aria-labelledby="subscription-title-{{ abo.id }}">
       <span class="subscription-icon" aria-hidden="true"><i class="fa-solid fa-crown"></i></span>
       <span class="monetization-eyebrow">{% translate "Formule Premium" %}</span>
-      <h3>{{ abo.nom }}</h3>
+      <h3 id="subscription-title-{{ abo.id }}">{{ abo.nom }}</h3>
+      {% if subscription_access_active and current_subscription.abonnement_id == abo.id %}<span class="badge badge-success subscription-current-status"><i class="fa-solid fa-circle-check" aria-hidden="true"></i> {% translate "Actif" %}</span>{% endif %}
       <p>{{ abo.description }}</p>
-      <div class="subscription-price"><strong>{{ abo.prix|floatformat:2 }} €</strong><span>{% blocktranslate count days=abo.duree_jours %}pour {{ days }} jour{% plural %}pour {{ days }} jours{% endblocktranslate %}</span></div>
+      <div class="subscription-price"><strong>{{ abo.prix|floatformat:2 }} EUR</strong><span>{% blocktranslate count days=abo.duree_jours %}pour {{ days }} jour{% plural %}pour {{ days }} jours{% endblocktranslate %}</span></div>
       {% if subscription_blocks_checkout %}
       <p class="subscription-note" role="status"><i class="fa-solid fa-circle-info" aria-hidden="true"></i> {% translate "Une souscription est déjà en cours pour votre compte. Gérez-la depuis votre espace abonné." %}</p>
       {% elif abo.stripe_subscription_available %}
@@ -41,7 +42,7 @@
     {% endfor %}
   </div>
   {% else %}
-  <div class="monetization-empty">
+  <div class="monetization-empty empty-state">
     <i class="fa-solid fa-crown" aria-hidden="true"></i>
     <h3>{% translate "Les offres Premium arrivent bientôt." %}</h3>
     <p>{% translate "Aucune formule n’est actuellement publiée." %}</p>

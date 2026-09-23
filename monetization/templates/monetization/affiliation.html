@@ -4,7 +4,7 @@
 
 {% block content %}
 <div class="monetization-grid">
-  <div class="monetization-copy-card">
+  <div class="monetization-copy-card surface-card">
     <span class="monetization-eyebrow">{% translate "Affiliation" %}</span>
     <h2>{% translate "Proposer un produit ou service réellement pertinent." %}</h2>
     <p>{% translate "L’affiliation doit rester utile au lecteur. Présentez la plateforme, le produit concerné et le contexte dans lequel vous imaginez la collaboration." %}</p>
@@ -15,20 +15,19 @@
     </div>
   </div>
 
-  <div class="monetization-form-card">
+  <div class="monetization-form-card surface-card">
     <div class="monetization-card-heading">
       <span class="monetization-eyebrow">{% translate "Votre proposition" %}</span>
       <h2>{% translate "Soumettre une demande d’affiliation" %}</h2>
     </div>
     <form method="post" class="monetization-form">
       {% csrf_token %}
-      {% if form.non_field_errors %}<div class="monetization-error">{{ form.non_field_errors }}</div>{% endif %}
-
-      <div class="monetization-field"><label for="{{ form.nom.id_for_label }}">{% translate "Nom" context "monetization form" %}</label>{{ form.nom }}{{ form.nom.errors }}</div>
-      <div class="monetization-field"><label for="{{ form.email.id_for_label }}">{% translate "Adresse e-mail" %}</label>{{ form.email }}{{ form.email.errors }}</div>
-      <div class="monetization-field"><label for="{{ form.plateforme.id_for_label }}">{% translate "Plateforme" %}</label>{{ form.plateforme }}{{ form.plateforme.errors }}</div>
-      <div class="monetization-field"><label for="{{ form.produit.id_for_label }}">{% translate "Produit ou service" %}</label>{{ form.produit }}{{ form.produit.errors }}</div>
-      <div class="monetization-field"><label for="{{ form.message.id_for_label }}">{% translate "Votre proposition" %}</label>{{ form.message }}{{ form.message.errors }}</div>
+      {% include "monetization/_form_error_summary.html" with form=form summary_id="affiliate-error-summary-title" %}
+      {% include "monetization/_form_field.html" with field=form.nom %}
+      {% include "monetization/_form_field.html" with field=form.email %}
+      {% include "monetization/_form_field.html" with field=form.plateforme %}
+      {% include "monetization/_form_field.html" with field=form.produit %}
+      {% include "monetization/_form_field.html" with field=form.message %}
 
       <button type="submit" class="btn btn-primary btn-lg monetization-submit">{% translate "Envoyer ma proposition" %} <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></button>
     </form>

@@ -34,7 +34,7 @@ from shop.services import (
     finalize_paid_order,
 )
 from .donations import donations_are_available
-from .forms import DonationCheckoutForm
+from .forms import DONATION_FORM_SESSION_KEY, DonationCheckoutForm
 from .models import DonationPaymentAttempt, Payment
 from .money import minor_amount as _minor_amount
 from .subscriptions import (
@@ -462,6 +462,9 @@ def create_donation_checkout(request):
 
     form = DonationCheckoutForm(request.POST)
     if not form.is_valid():
+        request.session[DONATION_FORM_SESSION_KEY] = {
+            "amount": request.POST.get("amount", ""),
+        }
         messages.error(
             request,
             _(
