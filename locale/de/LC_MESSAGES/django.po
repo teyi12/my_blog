@@ -4335,6 +4335,14 @@ msgstr "Alle Rechte vorbehalten."
 msgid "Retour en haut"
 msgstr "Nach oben"
 
+#: templates/template_base.html
+msgid "Fermer le menu"
+msgstr "Menü schließen"
+
+#: templates/template_base.html
+msgid "Votre espace"
+msgstr "Ihr Bereich"
+
 #: venv/lib/python3.12/site-packages/cloudinary/forms.py:55
 #: venv/lib/python3.12/site-packages/cloudinary/forms.py:124
 msgid "No file selected!"
