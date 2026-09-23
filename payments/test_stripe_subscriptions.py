@@ -356,17 +356,17 @@ class SubscriptionCheckoutTests(TestCase):
             "fr": (
                 "/monetization/abonnements/",
                 "Souscription sécurisée momentanément indisponible.",
-                "Souscription en cours de confirmation",
+                "Votre souscription est en cours de vérification.",
             ),
             "de": (
                 "/de/monetization/abonnements/",
                 "Das sichere Abonnement ist vorübergehend nicht verfügbar.",
-                "Abonnement wird bestätigt",
+                "Ihr Abonnement wird überprüft.",
             ),
             "en": (
                 "/en/monetization/abonnements/",
                 "The secure subscription is temporarily unavailable.",
-                "Subscription awaiting confirmation",
+                "Your subscription is being verified.",
             ),
         }
         for language, (page_url, unavailable, success) in cases.items():

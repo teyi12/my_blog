@@ -62,9 +62,9 @@ class PaymentPagesI18nTests(TestCase):
         choice_url = reverse("payments:choice", args=[self.order.pk])
         self.assertEqual(choice_url, f"/payments/choice/{self.order.pk}/")
         cases = {
-            "fr": ("Choisissez votre moyen de paiement", "Paiement réussi", "Aucun paiement n’a été finalisé."),
-            "de": ("Wählen Sie Ihre Zahlungsmethode", "Zahlung erfolgreich", "Es wurde keine Zahlung abgeschlossen."),
-            "en": ("Choose your payment method", "Payment successful", "No payment was completed."),
+            "fr": ("Choisissez votre moyen de paiement", "Votre paiement est en cours de vérification.", "Aucun paiement n’a été finalisé.", "Le paiement n’a pas pu être confirmé."),
+            "de": ("Wählen Sie Ihre Zahlungsmethode", "Ihre Zahlung wird überprüft.", "Es wurde keine Zahlung abgeschlossen.", "Die Zahlung konnte nicht bestätigt werden."),
+            "en": ("Choose your payment method", "Your payment is being verified.", "No payment was completed.", "The payment could not be confirmed."),
         }
         for language, expected in cases.items():
             with self.subTest(language=language):
@@ -72,10 +72,12 @@ class PaymentPagesI18nTests(TestCase):
                 choice = self.client.get(choice_url)
                 success = self.client.get(reverse("payments:success"))
                 cancel = self.client.get(reverse("payments:cancel"))
+                failure = self.client.get(reverse("payments:failure"))
                 self.assertEqual(choice.wsgi_request.LANGUAGE_CODE, language)
                 self.assertContains(choice, expected[0])
                 self.assertContains(success, expected[1])
                 self.assertContains(cancel, expected[2])
+                self.assertContains(failure, expected[3])
                 self.assertContains(choice, f'action="/payments/checkout/card/{self.order.pk}/"')
                 self.assertContains(choice, f'action="/payments/cinetpay/{self.order.pk}/"')
 
@@ -87,6 +89,7 @@ class PaymentPagesI18nTests(TestCase):
                 self.assertEqual(reverse("payments:cinetpay_create", args=[self.order.pk]), f"/payments/cinetpay/{self.order.pk}/")
                 self.assertEqual(reverse("payments:stripe_webhook"), "/payments/webhook/")
                 self.assertEqual(reverse("payments:cinetpay_ipn"), "/payments/cinetpay/ipn/")
+                self.assertEqual(reverse("payments:failure"), "/payments/failure/")
 
     def test_payment_choice_labels_follow_the_active_language(self):
         for language, expected in {

@@ -3952,6 +3952,222 @@ msgstr "Order cancellations"
 msgid "Confirmer l’annulation"
 msgstr "Confirm cancellation"
 
+
+#: payments/templates/payments/cancel.html
+msgid "Paiement remboursé"
+msgstr "Payment refunded"
+
+#: payments/templates/payments/cancel.html shop/templates/shop/confirmation.html
+msgid "Le paiement de cette commande a été remboursé."
+msgstr "The payment for this order has been refunded."
+
+#: payments/templates/payments/cancel.html
+msgid "Aucun nouveau paiement n’est proposé. Le suivi et le reçu historique restent disponibles."
+msgstr "No new payment is offered. Order tracking and the historical receipt remain available."
+
+#: payments/templates/payments/cancel.html
+msgid "Paiement déjà confirmé"
+msgstr "Payment already confirmed"
+
+#: payments/templates/payments/cancel.html
+msgid "Cette commande est déjà payée."
+msgstr "This order has already been paid."
+
+#: payments/templates/payments/cancel.html
+msgid "Aucun nouveau paiement n’est nécessaire. Vous pouvez consulter le suivi et le reçu disponibles pour cette commande."
+msgstr "No new payment is needed. You can view the tracking information and available receipt for this order."
+
+#: payments/templates/payments/cancel.html
+msgid "L’opération a été annulée ou interrompue. La commande reste inchangée tant que le serveur n’a pas confirmé le paiement."
+msgstr "The operation was cancelled or interrupted. The order remains unchanged until the server confirms the payment."
+
+#: payments/templates/payments/cancel.html
+msgid "Récapitulatif autorisé"
+msgstr "Authorised summary"
+
+#: payments/templates/payments/cancel.html shop/templates/shop/confirmation.html
+msgid "Statut du paiement"
+msgstr "Payment status"
+
+#: payments/templates/payments/cancel.html
+msgid "Le serveur autorise encore l’accès au choix du moyen de paiement pour cette commande."
+msgstr "The server still allows a payment method to be selected for this order."
+
+#: payments/templates/payments/cancel.html
+msgid "Aucune commande identifiable n’est affichée sur cette page."
+msgstr "No identifiable order information is displayed on this page."
+
+#: payments/templates/payments/cancel.html shop/templates/shop/confirmation.html
+msgid "Voir le suivi de la commande"
+msgstr "View order tracking"
+
+#: payments/templates/payments/cancel.html
+msgid "Reprendre le paiement de cette commande"
+msgstr "Resume payment for this order"
+
+#: payments/templates/payments/cancel.html
+msgid "Retourner au parcours de paiement"
+msgstr "Return to the payment process"
+
+#: payments/templates/payments/error.html shop/templates/shop/confirmation.html
+msgid "Paiement échoué"
+msgstr "Payment failed"
+
+#: payments/templates/payments/error.html
+msgid "Paiement non abouti"
+msgstr "Payment unsuccessful"
+
+#: payments/templates/payments/error.html
+msgid "Le paiement n’a pas pu être confirmé."
+msgstr "The payment could not be confirmed."
+
+#: payments/templates/payments/error.html
+msgid "Aucun détail technique n’est affiché ici. Consultez vos commandes avant de lancer une nouvelle tentative."
+msgstr "No technical details are displayed here. Check your orders before starting another attempt."
+
+#: payments/templates/payments/error.html
+msgid "Paiement non confirmé"
+msgstr "Payment not confirmed"
+
+#: payments/templates/payments/error.html
+msgid "Une commande est considérée comme payée uniquement après validation par le serveur."
+msgstr "An order is considered paid only after confirmation by the server."
+
+#: payments/templates/payments/error.html
+msgid "Vérifier mes commandes"
+msgstr "Check my orders"
+
+#: payments/templates/payments/success.html
+msgid "Vérification du paiement"
+msgstr "Payment verification"
+
+#: payments/templates/payments/success.html
+msgid "Votre don est en cours de vérification."
+msgstr "Your donation is being verified."
+
+#: payments/templates/payments/success.html
+msgid "Merci pour votre soutien. Le don sera confirmé uniquement après validation sécurisée par Stripe."
+msgstr "Thank you for your support. The donation will be confirmed only after secure validation by Stripe."
+
+#: payments/templates/payments/success.html
+msgid "Votre souscription est en cours de vérification."
+msgstr "Your subscription is being verified."
+
+#: payments/templates/payments/success.html shop/templates/shop/confirmation.html
+msgid "Votre paiement est en cours de vérification."
+msgstr "Your payment is being verified."
+
+#: payments/templates/payments/success.html
+msgid "Cette page ne confirme pas encore le paiement. Le statut définitif apparaîtra dans le suivi de votre commande après validation par le serveur."
+msgstr "This page does not confirm the payment yet. The final status will appear in your order tracking after validation by the server."
+
+#: payments/templates/payments/success.html
+msgid "Vérification sécurisée"
+msgstr "Secure verification"
+
+#: payments/templates/payments/success.html
+msgid "Vous n’avez pas besoin de relancer immédiatement le paiement."
+msgstr "You do not need to restart the payment immediately."
+
+#: payments/templates/payments/success.html
+msgid "Voir la page des dons"
+msgstr "View the donations page"
+
+#: payments/templates/payments/success.html
+msgid "Suivre mon abonnement"
+msgstr "View my subscription"
+
+#: payments/templates/payments/success.html
+msgid "Suivre mes commandes"
+msgstr "Track my orders"
+
+#: shop/templates/shop/confirmation.html
+msgid "Cette commande a été annulée."
+msgstr "This order has been cancelled."
+
+#: shop/templates/shop/confirmation.html
+msgid "Elle reste disponible dans votre historique, mais aucun nouveau paiement ne peut être lancé."
+msgstr "It remains available in your history, but no new payment can be started."
+
+#: shop/templates/shop/confirmation.html
+msgid "Votre commande est confirmée."
+msgstr "Your order is confirmed."
+
+#: shop/templates/shop/confirmation.html
+msgid "Le serveur a validé le paiement. Le traitement logistique est présenté séparément ci-dessous."
+msgstr "The server has confirmed the payment. Order fulfilment is shown separately below."
+
+#: shop/templates/shop/confirmation.html
+msgid "Le reçu et l’historique restent accessibles. Aucun nouveau paiement n’est proposé depuis cette page."
+msgstr "The receipt and history remain available. No new payment is offered from this page."
+
+#: shop/templates/shop/confirmation.html
+msgid "La commande n’est pas encore présentée comme payée. Consultez son suivi pour connaître le statut confirmé par le serveur."
+msgstr "The order is not shown as paid yet. Check its tracking page for the status confirmed by the server."
+
+#: shop/templates/shop/confirmation.html
+msgid "Le paiement de cette commande n’a pas abouti."
+msgstr "The payment for this order was unsuccessful."
+
+#: shop/templates/shop/confirmation.html
+msgid "Vous pouvez vérifier le récapitulatif avant de revenir au choix du moyen de paiement."
+msgstr "You can review the summary before selecting a payment method again."
+
+#: shop/templates/shop/confirmation.html
+msgid "La tentative de paiement a été interrompue."
+msgstr "The payment attempt was interrupted."
+
+#: shop/templates/shop/confirmation.html
+msgid "La commande n’est pas annulée et reste payable. Vous pouvez choisir à nouveau un moyen de paiement."
+msgstr "The order has not been cancelled and can still be paid. You can select a payment method again."
+
+#: shop/templates/shop/confirmation.html
+msgid "États de la commande"
+msgstr "Order statuses"
+
+#: shop/templates/shop/confirmation.html
+msgid "Paiement et traitement"
+msgstr "Payment and fulfilment"
+
+#: shop/templates/shop/confirmation.html
+msgid "État logistique"
+msgstr "Fulfilment status"
+
+#: shop/templates/shop/confirmation.html
+msgid "Montant de la commande"
+msgstr "Order total"
+
+#: shop/templates/shop/confirmation.html
+msgid "Paiement confirmé par le serveur"
+msgstr "Payment confirmed by the server"
+
+#: shop/templates/shop/confirmation.html
+msgid "Le paiement et le traitement logistique conservent chacun leur propre état."
+msgstr "Payment and order fulfilment each retain their own status."
+
+#: shop/templates/shop/confirmation.html
+msgid "Vérification en cours"
+msgstr "Verification in progress"
+
+#: shop/templates/shop/confirmation.html
+msgid "Aucune confirmation définitive n’est affichée avant la mise à jour du serveur."
+msgstr "No final confirmation is displayed before the server updates the status."
+
+#: shop/templates/shop/confirmation.html
+msgid "Données de commande protégées"
+msgstr "Protected order data"
+
+#: shop/templates/shop/confirmation.html
+msgid "Seul le propriétaire connecté peut consulter cette page."
+msgstr "Only the signed-in order owner can view this page."
+
+#: shop/templates/shop/confirmation.html
+msgid "Suivre la vérification du paiement"
+msgstr "Track payment verification"
+
+#: shop/templates/shop/confirmation.html
+msgid "Choisir un moyen de paiement"
+msgstr "Choose a payment method"
 msgid "Cette commande est déjà annulée."
 msgstr "This order has already been canceled."
 
