@@ -2,12 +2,65 @@ import warnings
 
 from django import forms
 from django.conf import settings
-from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 from django.core.exceptions import ValidationError
+from django.utils.functional import lazy
 from django.utils.translation import gettext_lazy as _, pgettext_lazy
 from PIL import Image
 
 from .models import CustomUser
+
+
+lazy_percent = lazy(lambda value, params: value % params, str)
+
+
+class AccessibleAccountFormMixin:
+    """Add presentational accessibility metadata without changing validation."""
+
+    autocomplete = {}
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._sync_accessibility_attrs()
+
+    def _sync_accessibility_attrs(self):
+        errors = self._errors or {}
+        for name, field in self.fields.items():
+            auto_id = self[name].auto_id
+            if name in self.autocomplete:
+                field.widget.attrs["autocomplete"] = self.autocomplete[name]
+            described_by = []
+            if field.help_text and auto_id:
+                described_by.append(f"{auto_id}_help")
+            if name in errors and auto_id:
+                field.widget.attrs["aria-invalid"] = "true"
+                described_by.append(f"{auto_id}_error")
+            else:
+                field.widget.attrs.pop("aria-invalid", None)
+            if described_by:
+                field.widget.attrs["aria-describedby"] = " ".join(described_by)
+            else:
+                field.widget.attrs.pop("aria-describedby", None)
+
+    def full_clean(self):
+        super().full_clean()
+        self._sync_accessibility_attrs()
+
+    def add_error(self, field, error):
+        super().add_error(field, error)
+        self._sync_accessibility_attrs()
+
+
+class AccountAuthenticationForm(AccessibleAccountFormMixin, AuthenticationForm):
+    autocomplete = {
+        "username": "email",
+        "password": "current-password",
+    }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["username"].label = _("Adresse e-mail")
+        self._bound_fields_cache.pop("username", None)
 
 
 class ProfilePhotoField(forms.ImageField):
@@ -35,11 +88,13 @@ class ProfilePhotoField(forms.ImageField):
         kwargs.setdefault("label", _("Photo de profil"))
         kwargs.setdefault(
             "help_text",
-            _(
-                "Formats acceptés : JPEG, PNG et WebP. "
-                "Taille maximale : %(max_size_mb)s Mo."
-            )
-            % {"max_size_mb": max_size_mb},
+            lazy_percent(
+                _(
+                    "Formats acceptés : JPEG, PNG et WebP. "
+                    "Taille maximale : %(max_size_mb)s Mo."
+                ),
+                {"max_size_mb": max_size_mb},
+            ),
         )
         super().__init__(*args, **kwargs)
         self.widget.attrs["accept"] = "image/jpeg,image/png,image/webp"
@@ -75,7 +130,15 @@ class ProfilePhotoField(forms.ImageField):
         return uploaded_file
 
 
-class CustomUserCreationForm(UserCreationForm):
+class CustomUserCreationForm(AccessibleAccountFormMixin, UserCreationForm):
+    autocomplete = {
+        "email": "email",
+        "password1": "new-password",
+        "password2": "new-password",
+        "first_name": "given-name",
+        "last_name": "family-name",
+        "telephone": "tel",
+    }
     first_name = forms.CharField(max_length=150, required=False, label=_("Prénom"))
     last_name = forms.CharField(max_length=150, required=False, label=_("Nom"))
     photo = ProfilePhotoField()
@@ -105,7 +168,12 @@ class CustomUserCreationForm(UserCreationForm):
         labels = {"email": _("Adresse e-mail")}
 
 
-class CustomUserUpdateForm(forms.ModelForm):
+class CustomUserUpdateForm(AccessibleAccountFormMixin, forms.ModelForm):
+    autocomplete = {
+        "first_name": "given-name",
+        "last_name": "family-name",
+        "telephone": "tel",
+    }
     photo = ProfilePhotoField()
 
     class Meta:

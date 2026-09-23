@@ -8,45 +8,60 @@
 {% endblock %}
 
 {% block contenu %}
-<section class="auth-page auth-page-register">
-  <div class="auth-panel auth-panel-intro">
+<section class="account-page account-page-register" aria-labelledby="account-title">
+  <header class="account-intro">
     <span class="eyebrow">{% translate "Créer un compte" %}</span>
-    <h1>{% translate "Rejoignez l’univers Teyilawson." %}</h1>
-    <p>{% translate "Créez votre espace personnel pour profiter d’une expérience plus fluide sur le site." %}</p>
-    <div class="auth-benefits">
-      <span><i class="fa-regular fa-circle-check" aria-hidden="true"></i> {% translate "Profil personnalisable" %}</span>
-      <span><i class="fa-regular fa-circle-check" aria-hidden="true"></i> {% translate "Commandes liées à votre compte" %}</span>
-      <span><i class="fa-regular fa-circle-check" aria-hidden="true"></i> {% translate "Accès sécurisé" %}</span>
-    </div>
-  </div>
+    <h1 id="account-title">{% translate "Rejoignez l’univers Teyilawson." %}</h1>
+    <p>{% translate "Créez votre espace personnel pour retrouver vos informations et vos commandes au même endroit." %}</p>
+    <p class="account-intro-note">{% translate "Vous pourrez modifier ces informations depuis votre profil." %}</p>
+  </header>
 
-  <div class="auth-card auth-card-wide">
-    <div class="auth-card-heading">
-      <span class="eyebrow">{% translate "Inscription" %}</span>
+  <div class="account-card account-card-wide">
+    <div class="account-card-heading">
+      <span class="account-step">{% translate "Inscription" %}</span>
       <h2>{% translate "Créer mon compte" %}</h2>
       <p>{% translate "Quelques informations suffisent pour commencer." %}</p>
     </div>
 
-    <form method="post" enctype="multipart/form-data" class="auth-form auth-form-grid">
+    <form method="post" enctype="multipart/form-data" class="account-form" data-account-form>
       {% csrf_token %}
-      {% if form.non_field_errors %}<div class="alert alert-danger auth-grid-full" role="alert">{{ form.non_field_errors }}</div>{% endif %}
-      {% for field in form %}
-      <div class="auth-field {% if field.name == 'email' or field.name == 'password1' or field.name == 'password2' or field.name == 'photo' or field.name == 'bio' %}auth-grid-full{% endif %}">
-        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-        {% if field.name == 'photo' %}<div class="profile-file-field">{{ field }}</div>{% else %}{{ field }}{% endif %}
-        {% if field.help_text %}<small>{{ field.help_text|safe }}</small>{% endif %}
-        {% if field.errors %}<div class="auth-field-error">{{ field.errors }}</div>{% endif %}
-      </div>
-      {% endfor %}
-      <div class="auth-grid-full">
-        <button type="submit" class="btn btn-brand btn-lg auth-submit">{% translate "Créer mon compte" %} <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></button>
-      </div>
+      {% include "accounts/_error_summary.html" with form=form %}
+      <p class="account-required-note"><span aria-hidden="true">*</span> {% translate "Champ obligatoire" %}</p>
+
+      <fieldset class="account-fieldset">
+        <legend>{% translate "Identifiants" %}</legend>
+        <div class="account-form-grid">
+          {% include "accounts/_form_field.html" with field=form.email wide=True %}
+          {% include "accounts/_form_field.html" with field=form.password1 wide=True %}
+          {% include "accounts/_form_field.html" with field=form.password2 wide=True %}
+        </div>
+      </fieldset>
+
+      <fieldset class="account-fieldset">
+        <legend>{% translate "Informations personnelles" %}</legend>
+        <div class="account-form-grid">
+          {% include "accounts/_form_field.html" with field=form.first_name %}
+          {% include "accounts/_form_field.html" with field=form.last_name %}
+          {% include "accounts/_form_field.html" with field=form.telephone wide=True %}
+          {% include "accounts/_form_field.html" with field=form.photo wide=True %}
+          {% include "accounts/_form_field.html" with field=form.bio wide=True %}
+        </div>
+      </fieldset>
+
+      <button type="submit" class="btn btn-brand btn-lg account-submit">
+        {% translate "Créer mon compte" %}
+        <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+      </button>
     </form>
 
-    <div class="auth-switch">
+    <div class="account-switch">
       <span>{% translate "Déjà inscrit ?" %}</span>
       <a href="{% url 'accounts:login' %}">{% translate "Se connecter" %}</a>
     </div>
   </div>
 </section>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/accounts.js' %}" defer></script>
 {% endblock %}
