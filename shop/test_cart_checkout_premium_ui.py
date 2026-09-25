@@ -9,6 +9,7 @@ from django.db import connection
 from django.test import Client, SimpleTestCase, TestCase
 from django.test.utils import CaptureQueriesContext
 from django.urls import reverse
+from django.utils import translation
 
 from .models import Cart, CartItem, Produit
 
@@ -51,6 +52,8 @@ class CartCheckoutPremiumUITests(TestCase):
         )
 
     def setUp(self):
+        translation.activate("fr")
+        self.addCleanup(translation.deactivate)
         self.client.force_login(self.user)
         self.cart = Cart.objects.create(user=self.user)
         self.item = CartItem.objects.create(

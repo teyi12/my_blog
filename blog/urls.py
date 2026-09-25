@@ -12,6 +12,7 @@ from .sitemaps import sitemaps
 
 urlpatterns = [
     # Infrastructure et intégrations externes : ne jamais préfixer ces URLs.
+    path("health/", views.health_check, name="health"),
     path("admin/", admin.site.urls),
     path("i18n/setlang/", i18n_views.set_language, name="set_language"),
     path("sitemap.xml", sitemap, {"sitemaps": sitemaps}, name="sitemap"),
