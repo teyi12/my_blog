@@ -7,6 +7,8 @@ from django.core.mail import EmailMessage
 from django.db.models import F
 from django.http import HttpResponse
 from django.shortcuts import redirect, render
+from django.views.decorators.cache import never_cache
+from django.views.decorators.http import require_safe
 from django.utils.translation import gettext as _
 
 from articles.models import Article
@@ -19,6 +21,12 @@ from .home_media import home_hero_image_url
 
 
 logger = logging.getLogger(__name__)
+
+
+@never_cache
+@require_safe
+def health_check(request):
+    return HttpResponse("ok", content_type="text/plain; charset=utf-8")
 
 
 def home_view(request):

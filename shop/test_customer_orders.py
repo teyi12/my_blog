@@ -15,6 +15,8 @@ from shop.models import Commande, LigneCommande, Produit
 
 class CustomerOrderHistoryTests(TestCase):
     def setUp(self):
+        translation.activate("fr")
+        self.addCleanup(translation.deactivate)
         user_model = get_user_model()
         self.customer = user_model.objects.create_user(
             email="customer-orders@example.com",

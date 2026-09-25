@@ -31,6 +31,19 @@ def env_positive_int(name, default):
     return value
 
 
+def env_nonnegative_int(name, default):
+    raw_value = os.getenv(name, str(default)).strip()
+    try:
+        value = int(raw_value)
+    except ValueError as exc:
+        raise ImproperlyConfigured(
+            f"{name} doit être un entier positif ou nul."
+        ) from exc
+    if value < 0:
+        raise ImproperlyConfigured(f"{name} doit être un entier positif ou nul.")
+    return value
+
+
 def validate_email_transport_security(use_tls, use_ssl):
     if use_tls and use_ssl:
         raise ImproperlyConfigured(
@@ -38,9 +51,62 @@ def validate_email_transport_security(use_tls, use_ssl):
         )
 
 
+def validate_allowed_hosts(hosts):
+    if not hosts:
+        raise ImproperlyConfigured("ALLOWED_HOSTS doit être défini en production.")
+    if "*" in hosts:
+        raise ImproperlyConfigured(
+            "ALLOWED_HOSTS ne peut pas contenir le joker global en production."
+        )
+    for host in hosts:
+        if "://" in host or "/" in host or any(
+            character.isspace() for character in host
+        ):
+            raise ImproperlyConfigured(
+                "ALLOWED_HOSTS doit contenir uniquement des noms d’hôte."
+            )
+
+
+def validate_csrf_trusted_origins(origins):
+    for origin in origins:
+        parsed = urlparse(origin)
+        if (
+            parsed.scheme != "https"
+            or not parsed.netloc
+            or parsed.username
+            or parsed.password
+            or parsed.path not in {"", "/"}
+            or parsed.params
+            or parsed.query
+            or parsed.fragment
+        ):
+            raise ImproperlyConfigured(
+                "CSRF_TRUSTED_ORIGINS doit contenir uniquement des origines HTTPS."
+            )
+
+
+def validate_site_base_url(value):
+    parsed = urlparse(value)
+    if (
+        parsed.scheme != "https"
+        or not parsed.netloc
+        or parsed.username
+        or parsed.password
+        or parsed.path not in {"", "/"}
+        or parsed.params
+        or parsed.query
+        or parsed.fragment
+    ):
+        raise ImproperlyConfigured(
+            "SITE_BASE_URL doit être une URL HTTPS publique en production."
+        )
+
+
 ENVIRONMENT = os.getenv("ENVIRONMENT", "development").strip().lower()
-IS_PRODUCTION = ENVIRONMENT == "production" or bool(os.getenv("RENDER"))
+IS_PRODUCTION = ENVIRONMENT == "production" or env_bool("RENDER", False)
 DEBUG = env_bool("DEBUG", default=not IS_PRODUCTION)
+if IS_PRODUCTION and DEBUG:
+    raise ImproperlyConfigured("DEBUG doit être désactivé en production.")
 
 SECRET_KEY = os.getenv("SECRET_KEY", "").strip()
 if not SECRET_KEY:
@@ -48,8 +114,19 @@ if not SECRET_KEY:
         raise ImproperlyConfigured("SECRET_KEY doit être définie en production.")
     SECRET_KEY = "unsafe-dev-key"
 
-ALLOWED_HOSTS = env_list("ALLOWED_HOSTS", "127.0.0.1,localhost")
+ALLOWED_HOSTS = env_list(
+    "ALLOWED_HOSTS",
+    "" if IS_PRODUCTION else "127.0.0.1,localhost",
+)
+render_hostname = os.getenv("RENDER_EXTERNAL_HOSTNAME", "").strip()
+if render_hostname and render_hostname not in ALLOWED_HOSTS:
+    ALLOWED_HOSTS.append(render_hostname)
+if IS_PRODUCTION:
+    validate_allowed_hosts(ALLOWED_HOSTS)
+
 CSRF_TRUSTED_ORIGINS = env_list("CSRF_TRUSTED_ORIGINS")
+if IS_PRODUCTION:
+    validate_csrf_trusted_origins(CSRF_TRUSTED_ORIGINS)
 
 # -----------------------------------------------------------------------------
 # Base de données
@@ -58,10 +135,25 @@ CSRF_TRUSTED_ORIGINS = env_list("CSRF_TRUSTED_ORIGINS")
 # -----------------------------------------------------------------------------
 DATABASE_URL = os.getenv("DATABASE_URL", "").strip()
 
+if IS_PRODUCTION and not DATABASE_URL:
+    raise ImproperlyConfigured("DATABASE_URL doit être définie en production.")
+
 if DATABASE_URL:
     parsed_db = urlparse(DATABASE_URL)
     if parsed_db.scheme not in {"postgres", "postgresql"}:
         raise ImproperlyConfigured("DATABASE_URL doit utiliser PostgreSQL.")
+    database_sslmode = os.getenv(
+        "DATABASE_SSLMODE",
+        "require" if IS_PRODUCTION else "prefer",
+    ).strip().lower()
+    if IS_PRODUCTION and database_sslmode not in {
+        "require",
+        "verify-ca",
+        "verify-full",
+    }:
+        raise ImproperlyConfigured(
+            "DATABASE_SSLMODE doit imposer TLS en production."
+        )
 
     DATABASES = {
         "default": {
@@ -72,11 +164,9 @@ if DATABASE_URL:
             "HOST": parsed_db.hostname or "",
             "PORT": str(parsed_db.port or 5432),
             "CONN_MAX_AGE": 60,
+            "CONN_HEALTH_CHECKS": IS_PRODUCTION,
             "OPTIONS": {
-                "sslmode": os.getenv(
-                    "DATABASE_SSLMODE",
-                    "require" if IS_PRODUCTION else "prefer",
-                ),
+                "sslmode": database_sslmode,
             },
         }
     }
@@ -93,7 +183,7 @@ else:
 # -----------------------------------------------------------------------------
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 EMAIL_HOST = os.getenv("EMAIL_HOST", "smtp.gmail.com")
-EMAIL_PORT = int(os.getenv("EMAIL_PORT", "587"))
+EMAIL_PORT = env_positive_int("EMAIL_PORT", 587)
 EMAIL_USE_TLS = env_bool("EMAIL_USE_TLS", True)
 EMAIL_USE_SSL = env_bool("EMAIL_USE_SSL", False)
 validate_email_transport_security(EMAIL_USE_TLS, EMAIL_USE_SSL)
@@ -102,7 +192,13 @@ EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD", "")
 EMAIL_TIMEOUT = env_positive_int("EMAIL_TIMEOUT", 10)
 DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL", EMAIL_HOST_USER).strip()
 CONTACT_EMAIL = os.getenv("CONTACT_EMAIL", "").strip()
-SITE_BASE_URL = os.getenv("SITE_BASE_URL", "http://127.0.0.1:8800").rstrip("/")
+SITE_BASE_URL = (
+    os.getenv("SITE_BASE_URL", "").strip()
+    or os.getenv("RENDER_EXTERNAL_URL", "").strip()
+    or ("" if IS_PRODUCTION else "http://127.0.0.1:8800")
+).rstrip("/")
+if IS_PRODUCTION:
+    validate_site_base_url(SITE_BASE_URL)
 ORDER_RECEIPT_ISSUER_NAME = os.getenv(
     "ORDER_RECEIPT_ISSUER_NAME",
     "Teyilawson",
@@ -153,6 +249,7 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 # -----------------------------------------------------------------------------
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "blog.security_middleware.PermissionsPolicyMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.locale.LocaleMiddleware",
@@ -295,14 +392,23 @@ STORAGES = {
 # développement local sur http://127.0.0.1:8800.
 # -----------------------------------------------------------------------------
 if IS_PRODUCTION:
-    SECURE_SSL_REDIRECT = env_bool("SECURE_SSL_REDIRECT", True)
+    SECURE_SSL_REDIRECT = True
     SESSION_COOKIE_SECURE = True
+    SESSION_COOKIE_HTTPONLY = True
+    SESSION_COOKIE_SAMESITE = "Lax"
     CSRF_COOKIE_SECURE = True
+    CSRF_COOKIE_SAMESITE = "Lax"
     SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
-    SECURE_HSTS_SECONDS = int(os.getenv("SECURE_HSTS_SECONDS", "3600"))
-    SECURE_HSTS_INCLUDE_SUBDOMAINS = env_bool("SECURE_HSTS_INCLUDE_SUBDOMAINS", True)
+    SECURE_HSTS_SECONDS = env_nonnegative_int("SECURE_HSTS_SECONDS", 3600)
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = env_bool(
+        "SECURE_HSTS_INCLUDE_SUBDOMAINS",
+        False,
+    )
     SECURE_HSTS_PRELOAD = env_bool("SECURE_HSTS_PRELOAD", False)
     SECURE_CONTENT_TYPE_NOSNIFF = True
+    SECURE_REFERRER_POLICY = "same-origin"
+    SECURE_CROSS_ORIGIN_OPENER_POLICY = "same-origin"
+    X_FRAME_OPTIONS = "DENY"
 else:
     SECURE_SSL_REDIRECT = False
     SESSION_COOKIE_SECURE = False
