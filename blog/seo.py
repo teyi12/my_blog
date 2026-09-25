@@ -1,3 +1,4 @@
+import json
 from html import unescape
 from urllib.parse import urlsplit, urlunsplit
 
@@ -6,6 +7,7 @@ from django.templatetags.static import static
 from django.urls import reverse
 from django.utils import translation
 from django.utils.html import strip_tags
+from django.utils.safestring import mark_safe
 from django.utils.text import Truncator
 from django.utils.translation import gettext_lazy as _
 
@@ -197,7 +199,86 @@ def _metadata(
         "og_locale_alternates": alternate_locales,
         "site_name": "Teyilawson",
         "twitter_card": "summary_large_image",
+        "language": effective_language,
     }
+
+
+def serialize_json_ld(payload):
+    """Serialize trusted schema fields without allowing a script end-tag injection."""
+    serialized = json.dumps(
+        payload,
+        ensure_ascii=False,
+        separators=(",", ":"),
+        sort_keys=True,
+    )
+    serialized = (
+        serialized.replace("&", "\\u0026")
+        .replace("<", "\\u003c")
+        .replace(">", "\\u003e")
+    )
+    return mark_safe(serialized)
+
+
+def _attach_json_ld(metadata, payload):
+    metadata["json_ld"] = serialize_json_ld(payload)
+    return metadata
+
+
+def _real_image(image):
+    return bool(
+        image
+        and getattr(image, "name", "")
+        and getattr(image, "name", "") != "default.jpg"
+    )
+
+
+def add_article_json_ld(metadata, article):
+    payload = {
+        "@context": "https://schema.org",
+        "@type": "Article",
+        "headline": str(article.titre),
+        "description": metadata["description"],
+        "url": metadata["canonical"],
+        "mainEntityOfPage": metadata["canonical"],
+        "inLanguage": metadata["language"],
+        "datePublished": article.date_publication.isoformat(),
+    }
+    if _real_image(article.image):
+        payload["image"] = metadata["og_image"]
+    return _attach_json_ld(metadata, payload)
+
+
+def add_video_json_ld(metadata, video):
+    if not _real_image(video.miniature):
+        return metadata
+    return _attach_json_ld(
+        metadata,
+        {
+            "@context": "https://schema.org",
+            "@type": "VideoObject",
+            "name": str(video.titre),
+            "description": metadata["description"],
+            "thumbnailUrl": metadata["og_image"],
+            "uploadDate": video.date_publication.isoformat(),
+            "embedUrl": video.embed_url,
+            "url": metadata["canonical"],
+            "inLanguage": metadata["language"],
+        },
+    )
+
+
+def add_product_json_ld(metadata, product):
+    payload = {
+        "@context": "https://schema.org",
+        "@type": "Product",
+        "name": str(product.localized_name),
+        "description": metadata["description"],
+        "url": metadata["canonical"],
+        "inLanguage": metadata["language"],
+    }
+    if _real_image(product.image):
+        payload["image"] = metadata["og_image"]
+    return _attach_json_ld(metadata, payload)
 
 
 def build_default_seo(request):
@@ -217,7 +298,7 @@ def build_static_seo(request, view_name):
         request,
         localized_path(view_name, active_language),
     )
-    return _metadata(
+    metadata = _metadata(
         request,
         title=title,
         description=description,
@@ -227,6 +308,18 @@ def build_static_seo(request, view_name):
         view_name=view_name,
         effective_language=active_language,
     )
+    if view_name == "home":
+        return _attach_json_ld(
+            metadata,
+            {
+                "@context": "https://schema.org",
+                "@type": "WebSite",
+                "name": metadata["site_name"],
+                "url": metadata["canonical"],
+                "inLanguage": metadata["language"],
+            },
+        )
+    return metadata
 
 
 def build_dynamic_seo(

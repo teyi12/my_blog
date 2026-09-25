@@ -34,7 +34,7 @@
   {% endif %}
 
   <div class="shop-toolbar" data-shop-section="toolbar">
-    <div><span class="shop-toolbar-label">{% translate "Sélection" %}</span><strong>{% blocktranslate count counter=produits|length %}{{ counter }} produit{% plural %}{{ counter }} produits{% endblocktranslate %}</strong></div>
+    <div><span class="shop-toolbar-label">{% translate "Sélection" %}</span><strong>{% blocktranslate count counter=page_obj.paginator.count %}{{ counter }} produit{% plural %}{{ counter }} produits{% endblocktranslate %}</strong></div>
     <span class="shop-toolbar-note"><i class="fa-solid fa-lock" aria-hidden="true"></i> {% translate "Paiement sécurisé" %}</span>
   </div>
 
@@ -49,6 +49,26 @@
     <p>{% translate "Explorez le reste de la boutique pour découvrir les produits actuellement disponibles." %}</p>
     <a href="{% url 'shop:liste' %}" class="btn btn-brand empty-state-action">{% translate "Voir toute la boutique" %}</a>
   </div>
+  {% endif %}
+
+  {% if is_paginated %}
+  <nav class="shop-pagination" aria-label="{% translate 'Pagination de la boutique' %}">
+    {% if page_obj.has_previous %}
+      <a class="shop-page-nav" href="?page={{ page_obj.previous_page_number }}"><i class="fa-solid fa-arrow-left" aria-hidden="true"></i> {% translate "Précédent" %}</a>
+    {% else %}
+      <span class="shop-page-nav is-disabled" aria-disabled="true"><i class="fa-solid fa-arrow-left" aria-hidden="true"></i> {% translate "Précédent" %}</span>
+    {% endif %}
+    <div class="shop-page-numbers" aria-label="{% translate 'Pages' %}">
+      {% for num in page_obj.paginator.page_range %}
+        {% if num == page_obj.number %}<span class="shop-page-number is-current" aria-current="page">{{ num }}</span>{% else %}<a class="shop-page-number" href="?page={{ num }}" aria-label="{% blocktranslate %}Page {{ num }}{% endblocktranslate %}">{{ num }}</a>{% endif %}
+      {% endfor %}
+    </div>
+    {% if page_obj.has_next %}
+      <a class="shop-page-nav" href="?page={{ page_obj.next_page_number }}">{% translate "Suivant" %} <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a>
+    {% else %}
+      <span class="shop-page-nav is-disabled" aria-disabled="true">{% translate "Suivant" %} <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></span>
+    {% endif %}
+  </nav>
   {% endif %}
 </div>
 {% endblock %}

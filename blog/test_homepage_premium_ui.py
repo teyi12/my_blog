@@ -274,7 +274,7 @@ class HomepagePremiumUITests(TestCase):
                 self.assertTrue(image.get("width"))
                 self.assertTrue(image.get("height"))
 
-        self.assertContains(response, "Open notebook beside a window")
+        self.assertNotContains(response, "Open notebook beside a window")
         self.assertContains(response, "Selected English guide")
         self.assertContains(response, "home-media-placeholder")
 
