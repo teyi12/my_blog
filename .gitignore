@@ -75,3 +75,4 @@ setup_env_auto.sh
 
 # Local HTTPS development certificates and private keys
 certs/*.pem
+media_backup.zip
