@@ -7,7 +7,7 @@ from django.urls import reverse
 from django.utils.translation import gettext as _
 
 from monetization.services import utilisateur_a_acces_premium
-from blog.seo import build_dynamic_seo
+from blog.seo import add_video_json_ld, build_dynamic_seo
 
 from .models import Video
 
@@ -62,6 +62,7 @@ def video_detail(request, slug):
         image_field="miniature",
         og_type="video.other",
     )
+    add_video_json_ld(seo, video)
     return render(request, "videos/detail.html", {"video": video, "seo": seo})
 
 # Create your views here.

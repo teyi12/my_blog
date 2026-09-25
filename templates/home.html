@@ -175,7 +175,9 @@
         {% for article in articles_recents %}
           <article class="surface-card home-editorial-card{% if forloop.first %} home-editorial-card-featured{% endif %}">
             <a class="home-card-media" href="{% url 'articles:article_detail' slug=article.slug %}" aria-label="{% blocktranslate with article_title=article.titre %}Lire {{ article_title }}{% endblocktranslate %}">
-              {% if article.image %}
+              {% if article.is_premium and not premium_access %}
+                <span class="home-media-placeholder" aria-hidden="true"><i class="fa-solid fa-lock"></i></span>
+              {% elif article.image %}
                 <img src="{{ article.image.url }}" alt="{{ article.resolved_image_alt }}" width="800" height="500" loading="lazy">
               {% else %}
                 <span class="home-media-placeholder" aria-hidden="true"><i class="fa-regular fa-newspaper"></i></span>
@@ -188,9 +190,13 @@
                 <time datetime="{{ article.date_publication|date:'Y-m-d' }}">{{ article.date_publication|date:"d F Y" }}</time>
               </div>
               <h3><a href="{% url 'articles:article_detail' slug=article.slug %}">{{ article.titre }}</a></h3>
+              {% if article.is_premium and not premium_access %}
+              <p>{% translate "Cet article est réservé aux abonnés." %}</p>
+              {% else %}
               <p>{{ article.contenu|striptags|truncatewords:24 }}</p>
+              {% endif %}
               <a class="home-card-link" href="{% url 'articles:article_detail' slug=article.slug %}">
-                {% translate "Lire l’article" %}<i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+                {% if article.is_premium and not premium_access %}{% translate "Accès Premium" %}{% else %}{% translate "Lire l’article" %}{% endif %}<i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
               </a>
             </div>
           </article>
@@ -224,7 +230,9 @@
         {% for video in videos_recentes %}
           <article class="surface-card home-video-card">
             <a class="home-card-media home-video-media" href="{% url 'videos:detail' slug=video.slug %}" aria-label="{% blocktranslate with video_title=video.titre %}Regarder {{ video_title }}{% endblocktranslate %}">
-              {% if video.miniature %}
+              {% if video.is_premium and not premium_access %}
+                <span class="home-media-placeholder" aria-hidden="true"><i class="fa-solid fa-lock"></i></span>
+              {% elif video.miniature %}
                 <img src="{{ video.miniature.url }}" alt="{{ video.resolved_miniature_alt }}" width="1280" height="720" loading="lazy">
               {% else %}
                 <img src="{% static 'images/video-placeholder.svg' %}" alt="{{ video.resolved_miniature_alt }}" width="1280" height="720" loading="lazy">
@@ -238,9 +246,13 @@
                 <time datetime="{{ video.date_publication|date:'Y-m-d' }}">{{ video.date_publication|date:"d F Y" }}</time>
               </div>
               <h3><a href="{% url 'videos:detail' slug=video.slug %}">{{ video.titre }}</a></h3>
+              {% if video.is_premium and not premium_access %}
+              <p>{% translate "Cette vidéo est réservée aux abonnés." %}</p>
+              {% else %}
               <p>{{ video.description|striptags|truncatewords:22 }}</p>
+              {% endif %}
               <a class="home-card-link" href="{% url 'videos:detail' slug=video.slug %}">
-                {% translate "Regarder la vidéo" %}<i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+                {% if video.is_premium and not premium_access %}{% translate "Accès Premium" %}{% else %}{% translate "Regarder la vidéo" %}{% endif %}<i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
               </a>
             </div>
           </article>

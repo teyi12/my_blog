@@ -30,7 +30,11 @@ from .models import (
 )
 from payments.models import Adresse, StripeOrderRefund
 from payments.cancellations import order_can_be_canceled
-from blog.seo import PRODUCT_CATEGORY_DESCRIPTION, build_dynamic_seo
+from blog.seo import (
+    PRODUCT_CATEGORY_DESCRIPTION,
+    add_product_json_ld,
+    build_dynamic_seo,
+)
 from .forms import (
     AdresseForm,
     CategorieForm,
@@ -258,6 +262,7 @@ class ProduitDetailView(DetailView):
             required_fields=("nom", "description"),
             image_field="image",
         )
+        add_product_json_ld(context["seo"], self.object)
         return context
 
 
@@ -268,6 +273,8 @@ def produits_par_categorie(request, slug):
         .select_related("categorie")
         .order_by("pk")
     )
+    paginator = Paginator(produits, 12)
+    page_obj = paginator.get_page(request.GET.get("page"))
     catalogue_categories = (
         Categorie.objects.annotate(product_count=Count("produit"))
         .filter(product_count__gt=0)
@@ -286,7 +293,10 @@ def produits_par_categorie(request, slug):
         request,
         "shop/produits_par_categorie.html",
         {
-            "produits": produits,
+            "produits": page_obj.object_list,
+            "page_obj": page_obj,
+            "paginator": paginator,
+            "is_paginated": page_obj.has_other_pages(),
             "categorie": categorie,
             "catalogue_categories": catalogue_categories,
             "seo": seo,

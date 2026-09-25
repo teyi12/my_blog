@@ -11,6 +11,7 @@ from django.utils.translation import gettext as _
 
 from articles.models import Article
 from monetization.models import Publicite
+from monetization.services import utilisateur_a_acces_premium
 from shop.models import Produit
 from videos.models import Video
 from .forms import ContactForm
@@ -56,6 +57,7 @@ def home_view(request):
             "produits_vedettes": produits_vedettes,
             "publicites": publicites,
             "hero_image_url": home_hero_image_url(),
+            "premium_access": utilisateur_a_acces_premium(request.user),
         },
     )
 

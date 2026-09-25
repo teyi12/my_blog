@@ -9,7 +9,7 @@ from django.urls import reverse
 from django.utils.translation import gettext as _
 
 from monetization.services import utilisateur_a_acces_premium
-from blog.seo import build_dynamic_seo
+from blog.seo import add_article_json_ld, build_dynamic_seo
 
 from .forms import ArticleForm
 from .models import Article
@@ -66,6 +66,7 @@ def article_view(request, slug):
         image_field="image",
         og_type="article",
     )
+    add_article_json_ld(seo, article)
     return render(request, "articles/detail.html", {"article": article, "seo": seo})
 
 
@@ -116,6 +117,11 @@ def supprimer_view(request, slug):
 
 def article_media_json(request, slug):
     article = get_object_or_404(Article, slug=slug)
+    if article.is_premium and not utilisateur_a_acces_premium(request.user):
+        return JsonResponse(
+            {"detail": _("Cet article est réservé aux abonnés.")},
+            status=403,
+        )
     media_type = request.GET.get("type", None)  # "image" ou "video"
     page = request.GET.get("page", 1)
 
