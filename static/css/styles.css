@@ -140,7 +140,7 @@ p { color: var(--ink-700); } .text-muted { color: var(--ink-500) !important; }
 .site-navigation-panel { display: grid; min-width: 0; grid-template-columns: minmax(0,1fr) auto; align-items: center; gap: clamp(.75rem,1.5vw,1.25rem); }
 .site-navigation-panel-header, .mobile-header-actions { display: none; }
 .main-nav { flex-direction: row; gap: .15rem; }
-.main-nav .nav-link { min-height: 2.75rem; padding: .6rem .7rem; border-radius: var(--radius-sm); color: var(--ink-700); font-size: .9rem; font-weight: 600; }
+.main-nav .nav-link { min-height: 2.75rem; padding: .6rem .7rem; border-radius: var(--radius-sm); color: var(--ink-700); font-size: 1rem; font-weight: 600; }
 .main-nav .nav-link:hover, .main-nav .nav-link:focus-visible, .main-nav .nav-link.show { color: var(--brand-800); background: var(--brand-50); }
 .main-nav .nav-link.is-current { color: var(--brand-900); background: var(--brand-50); box-shadow: inset 0 -3px 0 var(--gold-700); font-weight: 700; }
 .dropdown-menu { padding: .55rem; border: 1px solid var(--line); border-radius: var(--radius-md); box-shadow: var(--shadow-md); }
